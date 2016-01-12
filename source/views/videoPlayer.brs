@@ -600,7 +600,8 @@ sub ConfigureRaf(raf as Object, adUrl as String, videoPlayer as Object, bUseNiel
     raf.setContentGenre("General Variety")
     raf.setContentLength(AsInteger(episode.length)) ' seconds
     raf.setTrackingCallback(RafCallback, videoPlayer)
-    
+    raf.setAdPrefs(false)
+
     if bUseNielsen
         ConfigureEpisodeForNielsen(episode)
         raf.enableNielsenDAR(true)

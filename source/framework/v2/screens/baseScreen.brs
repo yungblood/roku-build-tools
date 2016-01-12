@@ -70,6 +70,13 @@ Function BaseScreen_Dispose() As Boolean
                 m.Screen.Close()
             End If
             m.Screen = invalid
+
+            if m.fakeFacade <> invalid then
+                sleep(100)
+                m.fakeFacade.Close()
+                m.fakeFacade = invalid
+            end if
+
             For Each eventName In m.Events
                 EventListener().UnregisterObserver(m, eventName)
             Next
@@ -101,6 +108,10 @@ Sub BaseScreen_Show()
         m.Initialize()
     End If
     If m.Screen <> invalid Then
+        m.fakeFacade = CreateObject("roPosterScreen")
+        m.fakeFacade.Show()
+        m.fakeFacade.ClearMessage()
+        
         m.Screen.Show()
     End If
 End Sub
