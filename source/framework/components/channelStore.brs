@@ -38,6 +38,8 @@ Function NewChannelStore() As Object
         SetOrder:           ChannelStore_SetOrder
         ClearOrder:         ChannelStore_ClearOrder
         DoOrder:            ChannelStore_DoOrder
+        
+        PurchaseProduct:    ChannelStore_PurchaseProduct
     }
     this.Init()
     Return this
@@ -53,6 +55,9 @@ Function ChannelStore_GetPartialUserData(properties As String) As Object
 End Function
 
 Function ChannelStore_GetChannelCred() As Object
+    If IsRokuOne() Then
+        Return invalid
+    End If
     Return m.Store.GetChannelCred()
 End Function
 
@@ -173,4 +178,18 @@ End Sub
 
 Function ChannelStore_DoOrder() As Dynamic
     Return m.GetData("doOrder")
+End Function
+
+Function ChannelStore_PurchaseProduct(product As Object) As String
+    If product <> invalid Then
+        ' Do the channel store purchase
+        m.ClearOrder()
+        m.AddToOrder(product)
+        result = m.DoOrder()
+        If IsArray(result) And result.Count() > 0 Then
+            transaction = result[0]
+            Return AsString(transaction.PurchaseId)
+        End If
+    End If
+    Return ""
 End Function

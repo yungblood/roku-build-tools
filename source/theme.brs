@@ -32,9 +32,9 @@ Sub InitTheme()
     'theme.BreadcrumbAdjustHD_X                      = "32"
     'theme.BreadcrumbAdjustSD_X                      = "18"
     theme.BreadcrumbAdjustSD_Y                      = "-5"
-    theme.DefaultBreadcrumbDelimiter                = "#B2B2B2"
-    theme.DefaultBreadcrumbTextLeft                 = "#B2B2B2"
-    theme.DefaultBreadcrumbTextRight                = "#B2B2B2"
+    theme.DefaultBreadcrumbDelimiter                = "#FFFFFF" '"#B2B2B2"
+    theme.DefaultBreadcrumbTextLeft                 = "#FFFFFF" '"#B2B2B2"
+    theme.DefaultBreadcrumbTextRight                = "#FFFFFF" '"#B2B2B2"
     
     theme.BreadcrumbDelimiter                       = theme.DefaultBreadcrumbDelimiter
     theme.BreadcrumbTextLeft                        = theme.DefaultBreadcrumbTextLeft

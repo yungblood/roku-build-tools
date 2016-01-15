@@ -78,3 +78,9 @@ End Sub
 Sub DeleteRegistryValue(key As String, section As String)
     RegDelete(key, section)
 End Sub
+
+Sub DeleteRegistrySection(section As String)
+    registry = CreateObject("roRegistry")
+    registry.Delete(section)
+    registry.Flush()
+End Sub

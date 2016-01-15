@@ -15,6 +15,8 @@ Function NewGridScreen() As Object
     this.RowIndex               = 0
     this.ItemIndex              = 0
     this.RowItems               = []
+    this.PopulatedRows          = [] ' Track rows that have been populated with SetContentList
+    this.LoadingItemID          = "grid_loading"
     
     this.InitializeScreen       = GridScreen_InitializeScreen
 
@@ -33,6 +35,7 @@ Function NewGridScreen() As Object
     this.SetRowItems            = GridScreen_SetRowItems
     this.SetContentList         = GridScreen_SetContentList
     this.SetListVisible         = GridScreen_SetListVisible
+    this.GetListVisible         = GridScreen_GetListVisible
     this.SetListOffset          = GridScreen_SetListOffset
     this.SetFocusedListItem     = GridScreen_SetFocusedListItem
     this.GetFocusedListItem     = GridScreen_GetFocusedListItem
@@ -159,9 +162,14 @@ Sub GridScreen_SetRowItems(rowItems As Object)
         For i = 0 To m.RowItems.Count() - 1
             row = m.RowItems[i]
             If row.IsLoaded <> False And row.ContentList <> invalid Then
+                m.PopulatedRows[i] = True
                 m.Screen.SetContentList(i, row.ContentList)
                 If row.SelectedIndex <> invalid Then
                     m.Screen.SetListOffset(i, row.SelectedIndex)
+                End If
+            Else
+                If Not IsNullOrEmpty(m.LoadingPosterHD) Then
+                    m.Screen.SetContentList(i, [{ Title: "Loading...", ID: m.LoadingItemID, HDPosterUrl: m.LoadingPosterHD, SDPosterUrl: m.LoadingPosterSD }])
                 End If
             End If
             If row.IsVisible = False Then
@@ -180,6 +188,7 @@ Sub GridScreen_SetContentList(rowIndex As Integer, contentList As Object)
         row.IsLoaded = True
         row.IsLoading = False
         If m.Screen <> invalid Then
+            m.PopulatedRows[rowIndex] = True
             m.Screen.SetContentList(rowIndex, contentList)
         End If
     End If
@@ -201,6 +210,14 @@ Sub GridScreen_SetListVisible(rowIndex As Integer, visible = True As Boolean)
         End If
     End If
 End Sub
+
+Function GridScreen_GetListVisible(rowIndex As Integer) As Boolean
+    row = m.RowItems[rowIndex]
+    If row <> invalid Then
+        Return AsBoolean(row.IsVisible, True)
+    End If
+    Return False
+End Function
 
 Sub GridScreen_SetListOffset(rowIndex As Integer, itemIndex As Integer)
     row = m.RowItems[rowIndex]
@@ -328,6 +345,14 @@ Function GridScreen_OnEvent(eventData As Object, callbackData = invalid As Objec
             If row <> invalid Then
                 row.SelectedIndex = m.ItemIndex
             End If
+            ' Make sure the surrounding rows have been populated, if they're already marked as loaded
+            For i = -1 To 1
+                rowIndex = m.RowIndex + i
+                row = m.RowItems[rowIndex]
+                If row <> invalid And row.IsLoaded = True And row.ContentList <> invalid And m.PopulatedRows[rowIndex] <> True Then
+                    m.SetContentList(rowIndex, row.ContentList)
+                End If
+            Next
             ' Raise the list item focused event
             m.RaiseEvent("ListItemFocused", m.GetBaseEventData())
             ' Load the current and surrounding rows
@@ -340,7 +365,10 @@ Function GridScreen_OnEvent(eventData As Object, callbackData = invalid As Objec
             m.RowIndex = msg.GetIndex()
             m.ItemIndex = msg.GetData()
             ' Raise the list item selected event
-            m.RaiseEvent("ListItemSelected", m.GetBaseEventData())
+            data = m.GetBaseEventData()
+            If data.Item <> invalid And data.Item.ID <> m.LoadingItemID Then
+                m.RaiseEvent("ListItemSelected", data)
+            End If
         Else If msg.IsRemoteKeyPressed() Then
             data = m.GetBaseEventData()
             data.RemoteKey = msg.GetIndex()
@@ -356,7 +384,7 @@ Function GridScreen_OnEvent(eventData As Object, callbackData = invalid As Objec
         End If
         If Not m.InitialLoad And eventData.IdleTime > 250 And m.RowItems <> invalid Then
             If m.LoadAsync Then
-            ' Load the current and surrounding rows
+                ' Load the current and surrounding rows
                 m.LoadRows(m.RowIndex, m.RowLoadThreshold, True)
             Else If Not m.AllLoaded Then
                 found = False

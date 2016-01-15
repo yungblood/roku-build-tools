@@ -17,14 +17,16 @@ Function NewCbs(useStaging = False As Boolean) As Object
     this.ResumeOffset               = 3
     
     this.UseStaging                 = False
-    this.isSearchScreenOpened       = false
-    this.isSettingsScreenOpened     = false
+    this.IsSearchScreenOpened       = false
+    this.IsSettingsScreenOpened     = false
     
     this.RokuProductCode            = "com.cbsallaccess.subscription.trial" ' "PROD1"
     this.ProductCode                = "CBS_ALL_ACCESS_PACKAGE" '
     this.SignUpUrl                  = "cbs.com/all-access"
     this.TosUrl                     = "http://www.cbs.com/sites/roku/cbs_roku.cfg"
     this.LegalUrl                   = "http://www.cbs.com/sites/roku/cbs_roku_legal_notices.cfg"
+    
+    this.CSNumber                   = "(888) 274-5354"
     
     this.StagingApiKey              = "c3d24e796cbc78c7"
     this.StagingEndpoint            = "https://test-www.cbs.com/apps-api/"
@@ -50,7 +52,7 @@ Function NewCbs(useStaging = False As Boolean) As Object
     this.ProductionComScoreSecret   = "2cb08ca4d095dd734a374dff8422c2e5"
     this.ProductionAkamaiUrl        = "http://ma61-r.analytics.edgesuite.net/config/beacon-5508.xml"
     
-    this.nielsenAppID               = "PEEF1AF93-F59E-414A-96BE-DCE421E5C92D"
+    this.NielsenAppID               = "PEEF1AF93-F59E-414A-96BE-DCE421E5C92D"
     
     this.AkamaiDims                 = {
         device:     "Roku"
@@ -75,6 +77,7 @@ Function NewCbs(useStaging = False As Boolean) As Object
     this.Verify                     = Cbs_Verify
     
     this.IsAuthenticated            = Cbs_IsAuthenticated
+    this.IsSubscribed               = Cbs_IsSubscribed
     this.GetLinkCode                = Cbs_GetLinkCode
     this.CheckLinkCode              = Cbs_CheckLinkCode
     this.Logout                     = Cbs_Logout
@@ -194,6 +197,10 @@ Function Cbs_IsAuthenticated(refresh = False As Boolean) As Boolean
         Return True
     End If
     Return False
+End Function
+
+Function Cbs_IsSubscribed() As Boolean
+    Return m.GetCurrentUser().IsSubscriber()
 End Function
 
 Function Cbs_GetLinkCode() As Object
@@ -615,11 +622,18 @@ Function Cbs_IsShowCached(showID As String) As Boolean
 End Function
 
 Function Cbs_GetShow(showID As String) As Object
-    If m.ShowCache[showID] = invalid Then
+    If IsNullOrEmpty(showID) Then
+        Return invalid
+    End If
+    show = m.ShowCache[showID]
+    If show = invalid Or (show.ClipCount = 0 And show.EpisodeCount = 0) Then
         url = m.Endpoint + "v2.0/roku/shows/" + showID + ".json"
         response = m.Request(url, "GET")
         If response <> invalid And response.show <> invalid Then
-            m.ShowCache[showID] = NewShow(response)
+            show = NewShow(response)
+            If Not IsNullOrEmpty(show.ID) Then
+                m.ShowCache[showID] = show
+            End If
         End If
     End If
     Return m.ShowCache[showID]
@@ -694,30 +708,32 @@ Function Cbs_GetShowEpisodes(showID As String, season As Integer, startIndex = 0
     pageInfo.Count = 0
     pageInfo.TotalCount = 0
 
-    url = m.Endpoint + "v2.0/roku/shows/" + showID + "/videos/config/DEFAULT_ROKU_SVOD.json"
-    url = AddQueryString(url, "platformType", "roku")
-    url = AddQueryString(url, "begin", startIndex)
-    url = AddQueryString(url, "rows", count)
-    If season > 0 Then
-        url = AddQueryString(url, "params", "seasonNum=" + season.ToStr())
-        url = AddQueryString(url, "seasonNum", season)
-    End If
-    response = m.Request(url, "GET")
-    If IsAssociativeArray(response) And response.success = True And response.results <> invalid Then
-        For Each result In AsArray(response.results)
-            If IsAssociativeArray(result) And result.section_type = "Full Episodes" And IsAssociativeArray(result.sectionItems) Then
-                pageInfo.StartIndex = startIndex
-                pageInfo.Count = AsArray(result.sectionItems.itemList).Count()
-                pageInfo.TotalCount = AsInteger(result.sectionItems.itemCount)
-                For Each episodeItem In AsArray(result.sectionItems.itemList)
-                    episode = NewEpisode(episodeItem)
-                    If episode.IsAvailable() Then
-                        episodes.Push(episode)
-                    End If
-                Next
-                Exit For
-            End If
-        Next
+    If Not IsNullOrEmpty(showID) Then
+        url = m.Endpoint + "v2.0/roku/shows/" + showID + "/videos/config/DEFAULT_ROKU_SVOD.json"
+        url = AddQueryString(url, "platformType", "roku")
+        url = AddQueryString(url, "begin", startIndex)
+        url = AddQueryString(url, "rows", count)
+        If season > 0 Then
+            url = AddQueryString(url, "params", "seasonNum=" + season.ToStr())
+            url = AddQueryString(url, "seasonNum", season)
+        End If
+        response = m.Request(url, "GET")
+        If IsAssociativeArray(response) And response.success = True And response.results <> invalid Then
+            For Each result In AsArray(response.results)
+                If IsAssociativeArray(result) And result.section_type = "Full Episodes" And IsAssociativeArray(result.sectionItems) Then
+                    pageInfo.StartIndex = startIndex
+                    pageInfo.Count = AsArray(result.sectionItems.itemList).Count()
+                    pageInfo.TotalCount = AsInteger(result.sectionItems.itemCount)
+                    For Each episodeItem In AsArray(result.sectionItems.itemList)
+                        episode = NewEpisode(episodeItem)
+                        If episode.IsAvailable() Then
+                            episodes.Push(episode)
+                        End If
+                    Next
+                    Exit For
+                End If
+            Next
+        End If
     End If
     Return episodes
 End Function
@@ -728,26 +744,28 @@ Function Cbs_GetShowClips(showID As String, startIndex = 0 As Integer, count = 1
     pageInfo.Count = 0
     pageInfo.TotalCount = 0
 
-    url = m.Endpoint + "v2.0/roku/shows/" + showID + "/videos/config/DEFAULT_ROKU_SVOD.json"
-    url = AddQueryString(url, "platformType", "roku")
-    url = AddQueryString(url, "begin", startIndex)
-    url = AddQueryString(url, "rows", count)
-    response = m.Request(url, "GET")
-    If IsAssociativeArray(response) And response.success = True And response.results <> invalid Then
-        For Each result In AsArray(response.results)
-            If IsAssociativeArray(result) And result.section_type = "Clips" And IsAssociativeArray(result.sectionItems) Then
-                pageInfo.StartIndex = startIndex
-                pageInfo.Count = AsArray(result.sectionItems.itemList).Count()
-                pageInfo.TotalCount = AsInteger(result.sectionItems.itemCount)
-                For Each clipItem In AsArray(result.sectionItems.itemList)
-                    clip = NewEpisode(clipItem)
-                    If clip.IsAvailable() Then
-                        clips.Push(clip)
-                    End If
-                Next
-                Exit For
-            End If
-        Next
+    If Not IsNullOrEmpty(showID) Then
+        url = m.Endpoint + "v2.0/roku/shows/" + showID + "/videos/config/DEFAULT_ROKU_SVOD.json"
+        url = AddQueryString(url, "platformType", "roku")
+        url = AddQueryString(url, "begin", startIndex)
+        url = AddQueryString(url, "rows", count)
+        response = m.Request(url, "GET")
+        If IsAssociativeArray(response) And response.success = True And response.results <> invalid Then
+            For Each result In AsArray(response.results)
+                If IsAssociativeArray(result) And result.section_type = "Clips" And IsAssociativeArray(result.sectionItems) Then
+                    pageInfo.StartIndex = startIndex
+                    pageInfo.Count = AsArray(result.sectionItems.itemList).Count()
+                    pageInfo.TotalCount = AsInteger(result.sectionItems.itemCount)
+                    For Each clipItem In AsArray(result.sectionItems.itemList)
+                        clip = NewEpisode(clipItem)
+                        If clip.IsAvailable() Then
+                            clips.Push(clip)
+                        End If
+                    Next
+                    Exit For
+                End If
+            Next
+        End If
     End If
     Return clips
 End Function

@@ -3,10 +3,15 @@
 ' Copyright Steven Kean 2010-2015
 ' All Rights Reserved.
 ' ******************************************************
-Function GetFont(fontFamily As String, fontSize As Integer, bold = False As Boolean, italic = False As Boolean, fontPath = "" As String) As Object
+Function GetFontRegistry() As Object
     If m.FontRegistry = invalid Then
         m.FontRegistry = CreateObject("roFontRegistry")
     End If
+    Return m.FontRegistry
+End Function
+
+Function GetFont(fontFamily As String, fontSize As Integer, bold = False As Boolean, italic = False As Boolean, fontPath = "" As String) As Object
+    GetFontRegistry()
     If m.FontCache = invalid Then
         m.FontCache = {}
     End If
@@ -33,9 +38,7 @@ Function GetFont(fontFamily As String, fontSize As Integer, bold = False As Bool
 End Function
 
 Function GetCanvasFont(fontFamily As String, fontSize As Integer, weight = 0 As Integer, italic = False As Boolean, fontPath = "" As String) As Object
-    If m.FontRegistry = invalid Then
-        m.FontRegistry = CreateObject("roFontRegistry")
-    End If
+    GetFontRegistry()
     font = invalid
     If Not IsNullOrEmpty(fontPath) And Not ArrayContains(m.FontRegistry.GetFamilies(), fontFamily) Then
         RegisterFont(fontPath)

@@ -16,6 +16,8 @@ Function NewBaseScreen(screenType As String, events = [] As Object) As Object
     this.Screen                 = invalid
     this.Events                 = AsArray(events)
     
+    this.ShowFacade             = True
+    
     this.Initialized            = False
     this.Disposed               = False
 
@@ -71,15 +73,13 @@ Function BaseScreen_Dispose() As Boolean
             End If
             m.Screen = invalid
 
-            if m.fakeFacade <> invalid then
-                sleep(100)
-                m.fakeFacade.Close()
-                m.fakeFacade = invalid
-            end if
+            If m.Facade <> invalid Then
+                Sleep(100)
+                m.Facade.Close()
+                m.Facade = invalid
+            End If
 
-            For Each eventName In m.Events
-                EventListener().UnregisterObserver(m, eventName)
-            Next
+            EventListener().UnregisterObserverForAllEvents(m)
             EventListener().UnregisterPort(m.EventPort)
             m.EventPort = invalid
         End If
@@ -103,16 +103,21 @@ Function BaseScreen_GetEventPort() As Object
     Return m.EventPort
 End Function
 
-Sub BaseScreen_Show()
+Sub BaseScreen_Show(raiseShownEvent = False As Boolean)
     If Not m.Initialized Then
         m.Initialize()
     End If
     If m.Screen <> invalid Then
-        m.fakeFacade = CreateObject("roPosterScreen")
-        m.fakeFacade.Show()
-        m.fakeFacade.ClearMessage()
+    	If m.ShowFacade Then
+            m.Facade = CreateObject("roPosterScreen")
+            m.Facade.Show()
+            m.Facade.ClearMessage()
+        End If
         
         m.Screen.Show()
+        If raiseShownEvent Then
+            m.RaiseEvent("Shown")
+        End If
     End If
 End Sub
 

@@ -63,7 +63,7 @@ Sub Observable_UnregisterObserverForAllEvents(observer As Object)
     Next
 End Sub
 
-Function Observable_RaiseEvent(event As String, eventData = {} As Object) As Dynamic
+Function Observable_RaiseEvent(event As String, eventData = {} As Object, eventMessage = invalid As Object) As Dynamic
     If event <> "Idle" And event <> "ScreenRefresh" And event <> "GetMessage" Then
         DebugPrint(event, "Observable.RaiseEvent", 3)
     End If
@@ -75,6 +75,9 @@ Function Observable_RaiseEvent(event As String, eventData = {} As Object) As Dyn
     End If
     If eventData.EventType = invalid Then
         eventData.EventType = event
+    End If
+    If eventMessage <> invalid Then
+        eventData.EventMessage = eventMessage
     End If
     
     result = invalid

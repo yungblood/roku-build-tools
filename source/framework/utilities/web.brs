@@ -618,6 +618,23 @@ Function GetUrlToJson(url As String, timeout = 30 As Integer, headers = invalid 
     Return GetUrlToJsonEx(url, timeout, headers, certificates, certificatesDepth, method).Json
 End Function
 
+Function PostUrlToJsonEx(url As String, postData = "" As String, timeout = 30 As Integer, headers = invalid As Object, certificates = "common:/certs/ca-bundle.crt" As String, certificatesDepth = -1 As Integer, method = "POST" As String, requireCertVerification = True As Boolean) As Dynamic
+    xml = CreateObject("roXmlElement")
+    response = PostUrlToStringEx(url, postData, timeout, headers, certificates, certificatesDepth, method, requireCertVerification)
+    If response <> invalid Then
+        If Not IsNullOrEmpty(response.Response) Then
+            response.Json = ParseJson(response.Response)
+        Else
+            response.Json = invalid
+        End If
+    End If
+    Return response
+End Function
+
+Function PostUrlToJson(url As String, postData = "" As String, timeout = 30 As Integer, headers = invalid As Object, certificates = "common:/certs/ca-bundle.crt" As String, certificatesDepth = -1 As Integer, method = "POST" As String, requireCertVerification = True As Boolean) As Dynamic
+    Return PostUrlToJsonEx(url, postData, timeout, headers, certificates, certificatesDepth, method, requireCertVerification).Json
+End Function
+
 Function UrlExists(url As String, timeout = 30 As Integer) As Boolean
     headers = GetUrlHeadersEx(url, timeout)
     Return (Int(headers.ResponseCode / 100) = 2)

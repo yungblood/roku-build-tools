@@ -47,7 +47,7 @@ Function LiveTVScreen_Show(channel = invalid As Object, autoPlay = False As Bool
     End If
     m.ResetContent()
     m.Screen.Show()
-    If autoPlay And Cbs().IsAuthenticated() Then
+    If autoPlay And Cbs().IsSubscribed() Then
         m.StartPlayback()
     End If
     Return True

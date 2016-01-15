@@ -58,7 +58,7 @@ End Function
 
 Sub ShowOptionsDialog(showSearch = True As Boolean, showSettings = True As Boolean)
     options = []
-    If not Cbs().isSearchScreenOpened Then
+    If not Cbs().IsSearchScreenOpened Then
         options.Push({
             Text: "Search"
             ID: "search"
@@ -75,7 +75,7 @@ Sub ShowOptionsDialog(showSearch = True As Boolean, showSettings = True As Boole
         ID: "legal"
         Events: ["event19"]
     })
-    If not Cbs().isSettingsScreenOpened Then
+    If not Cbs().IsSettingsScreenOpened Then
         options.Push({
             Text: "Settings"
             ID: "settings"

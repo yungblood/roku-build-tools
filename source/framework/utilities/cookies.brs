@@ -78,6 +78,42 @@ Function GetCookie(cookieName As String, url = "" As String) As String
     Return ""
 End Function
 
+Sub SetCookie(cookieName As String, cookieValue As String, url = "" As String)
+    domain = ""
+    path = ""
+    container = GetCookieContainer()
+    If Not IsNullOrEmpty(url) Then
+        domain = GetCookieDomain(url)
+        path = GetCookiePath(url)
+    End If
+    cookies = []
+    For Each cookieDomain In container
+        If IsNullOrEmpty(domain) Or EndsWith(domain, cookieDomain) Then
+            cookies.Append(container[cookieDomain])
+        End If
+    Next
+    For Each cookie In cookies
+        If cookie.Name = cookieName Then
+            cookie.Value = cookieValue
+            Return
+        End If
+    Next
+    ' If we get this far, the cookie doesn't exist, so add it
+    cookie = {
+        Name:       cookieName
+        Value:      cookieValue
+        Domain:     domain
+        Path:       path
+        Expires:    0
+    }
+    cookies = container[cookie.Domain]
+    If cookies = invalid Then
+        cookies = []
+        container[cookie.Domain] = cookies
+    End If
+    cookies.Push(cookie)
+End Sub
+
 Function GetCookieDomain(url As String) As String
     domain = url
     If domain.InStr("://") > -1 Then

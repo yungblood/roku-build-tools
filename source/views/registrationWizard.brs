@@ -666,10 +666,10 @@ Function RegistrationWizard_AuthenticateWithCode(email = "" As String) As Boolea
             If msg = invalid Then
                 ' Check the code for success
                 If Cbs().CheckLinkCode(linkCodeInfo.regCode) Then
-                    If m.WelcomeScreenCanvas<>invalid Then 
-						m.WelcomeScreenCanvas.close()
-					End If
-					m.WelcomeScreenCanvas = invalid
+                    If m.WelcomeScreenCanvas <> invalid Then 
+                        m.WelcomeScreenCanvas.Close()
+                    End If
+                    m.WelcomeScreenCanvas = invalid
                     Return True
                 End If
             Else If Type(msg) = "roCodeRegistrationScreenEvent" Then

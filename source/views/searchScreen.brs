@@ -38,7 +38,7 @@ End Sub
 
 Sub CbsSearchScreen_OnShown(eventData As Object, callbackData = invalid As Object)
     Omniture().TrackPage("app:roku:search")
-    Cbs().isSearchScreenOpened = true
+    Cbs().IsSearchScreenOpened = True
 End Sub
 
 Sub CbsSearchScreen_OnHidden(eventData As Object, callbackData = invalid As Object)
@@ -85,7 +85,7 @@ End Sub
 Sub CbsSearchScreen_OnDisposed(eventData As Object, callbackData = invalid As Object)
     m.Screen.UnregisterObserverForAllEvents(m)
     m.Screen = invalid
-    Cbs().isSearchScreenOpened = false
+    Cbs().IsSearchScreenOpened = False
     
     ' Reset the overhangs
     SetThemeAttribute("OverhangPrimaryLogoHD", AsString(m.PreviousOverhangHD))

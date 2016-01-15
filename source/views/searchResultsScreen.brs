@@ -49,7 +49,7 @@ Sub SearchResultsScreen_OnRemoteKeyPressed(eventData As Object, callbackData = i
         ShowOptionsDialog()
         
         ' workaround phantom event issue occuring for some firmware versions
-        m.screen.messagePort.WaitMessage(500)
+        m.Screen.MessagePort.WaitMessage(500)
     End If
 End Sub
 

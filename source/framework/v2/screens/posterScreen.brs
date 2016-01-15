@@ -73,7 +73,7 @@ Sub PosterScreen_SetLoadingPoster(sdPoster As Dynamic, hdPoster = sdPoster As Dy
     End If
 End Sub
 
-Sub PosterScreen_SetListItems(listItems As Object)
+Sub PosterScreen_SetListItems(listItems As Object, raiseEvent = False As Boolean)
     m.ListItems = []
     If IsArray(listItems) Then
         m.ListItems.Append(listItems)
@@ -88,6 +88,9 @@ Sub PosterScreen_SetListItems(listItems As Object)
             End If
         Next
         m.Screen.SetListNames(listNames)
+        If raiseEvent Then
+            m.RaiseEvent("ListFocused", m.GetBaseEventData())
+        End If
     End If
 End Sub
 

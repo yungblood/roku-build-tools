@@ -44,7 +44,7 @@ Function LiveFeedScreen_Show(row As Object, index = 0 As Integer, autoPlay = Fal
     m.ResetContent()
     m.Screen.Show()
 
-    If autoPlay And Cbs().IsAuthenticated() Then
+    If autoPlay And Cbs().IsSubscribed() Then
         m.StartPlayback()
     End If
 

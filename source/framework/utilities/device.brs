@@ -43,6 +43,30 @@ Function GetHashedDeviceID() As String
     Return m.HashedDeviceID
 End Function
 
+Function GetPublisherID() As String
+    If m.PublisherID = invalid Then
+        If IsRokuOne() Then
+            Return GetHashedDeviceID()
+        Else
+            deviceInfo = CreateObject("roDeviceInfo")
+            m.PublisherID = deviceInfo.GetPublisherID()
+        End If
+    End If
+    Return m.PublisherID
+End Function
+
+Function GetAdvertisingID() As String
+    If m.AdvertisingID = invalid Then
+        If IsRokuOne() Then
+            Return GetHashedDeviceID()
+        Else
+            deviceInfo = CreateObject("roDeviceInfo")
+            m.AdvertisingID = deviceInfo.GetAdvertisingID()
+        End If
+    End If
+    Return m.AdvertisingID
+End Function
+
 Function GetIPAddress() As String
     If m.IPAddress = invalid Then
         deviceInfo = CreateObject("roDeviceInfo")

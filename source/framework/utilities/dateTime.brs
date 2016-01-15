@@ -143,6 +143,10 @@ Function DateFromISO8601String(iso8601String As Object) As Object
     If IsNullOrEmpty(iso8601String) Or Not IsString(iso8601String) Then
         iso8601String = "0"
     End If
+'    If iso8601String.InStr(".") > 0 Then
+'        regex = CreateObject("roRegex", "(\.\d{3})", "i")
+'        iso8601String = regex.ReplaceAll(iso8601String, "")
+'    End If
     date = CreateObject("roDateTime")
     date.FromISO8601String(iso8601String)
     Return date

@@ -85,9 +85,9 @@ Function ConvertToTypeByValue(input As Dynamic, referenceValue As Dynamic) As Dy
     End If
 End Function
 
-Function AsString(input As Dynamic) As String
+Function AsString(input As Dynamic, defaultValue = "" As String) As String
     If input = invalid Then
-        Return ""
+        Return defaultValue
     Else If IsString(input) Then
         Return input
     Else If IsInteger(input) Then
@@ -113,7 +113,7 @@ Function AsString(input As Dynamic) As String
     End If
 End Function
 
-Function AsInteger(input As Dynamic) As Integer
+Function AsInteger(input As Dynamic, defaultValue = 0 As Integer) As Integer
     If input = invalid Then
         Return 0
     Else If IsString(input) Then
@@ -128,11 +128,11 @@ Function AsInteger(input As Dynamic) As Integer
     Else If IsDateTime(input) Then
         Return input.AsSeconds()
     Else
-        Return 0
+        Return defaultValue
     End If
 End Function
 
-Function AsFloat(input As Dynamic) As Float
+Function AsFloat(input As Dynamic, defaultValue = 0.0 As Float) As Float
     If input = invalid Then
         Return 0.0
     Else If IsString(input) Then
@@ -148,12 +148,12 @@ Function AsFloat(input As Dynamic) As Float
         output! = input.AsSeconds()
         Return output!
     Else
-        Return 0.0
+        Return defaultValue
     End If
 End Function
 
-Function AsDouble(input As Dynamic) As Double
-    output# = 0
+Function AsDouble(input As Dynamic, defaultValue = 0 As Double) As Double
+    output# = defaultValue
     If IsString(input) Then
         If input.Len() <= 9 Then
             output# = input.ToInt()

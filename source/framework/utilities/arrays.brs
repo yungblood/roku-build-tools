@@ -6,14 +6,16 @@
 '=====================
 ' Arrays
 '=====================
-Sub SortArray(array As Object, sortFunction = invalid As Dynamic)
+Sub SortArray(array As Object, sortMethod = invalid As Dynamic)
     For i = array.Count() - 2 To 0 Step -1
         for j = 0 to i
             swap = False
-            If sortFunction = invalid Then
+            If sortMethod = invalid Then
                 swap = array[j] > array[j + 1]
-            Else
-                swap = sortFunction(array[j], array[j + 1])
+            Else If IsFunction(sortMethod) Then
+                swap = sortMethod(array[j], array[j + 1])
+            Else If IsString(sortMethod) Then
+                swap = AsAssociativeArray(array[j])[sortMethod] > AsAssociativeArray(array[j + 1])[sortMethod]
             End If
             If swap Then
                 temp = array[j + 1]

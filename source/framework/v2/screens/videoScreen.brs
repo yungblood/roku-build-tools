@@ -23,7 +23,9 @@ Function NewVideoScreen() As Object
 
     this.SetContent                     = VideoScreen_SetContent
     this.GetContent                     = VideoScreen_GetContent
+    this.GetContentIndex                = VideoScreen_GetContentIndex
     this.SetContentList                 = VideoScreen_SetContentList
+    this.UpdateContent                  = VideoScreen_UpdateContent
     
     this.SetPositionNotificationPeriod  = VideoScreen_SetPositionNotificationPeriod
     this.EnableTrickPlay                = VideoScreen_EnableTrickPlay
@@ -96,6 +98,10 @@ Function VideoScreen_GetContent() As Object
     Return invalid
 End Function
 
+Function VideoScreen_GetContentIndex() As Integer
+    Return m.ItemIndex
+End Function
+
 Sub VideoScreen_SetContentList(contentList As Object, index = 0 As Integer)
     m.Set("ContentList", AsArray(contentList))
     m.Set("ItemIndex", index)
@@ -103,6 +109,10 @@ Sub VideoScreen_SetContentList(contentList As Object, index = 0 As Integer)
     If content <> invalid And m.Screen <> invalid Then
         m.Screen.SetContent(content)
     End If
+End Sub
+
+Sub VideoScreen_UpdateContent(content As Object)
+    m.ContentList[m.ItemIndex] = content
 End Sub
 
 Sub VideoScreen_SetPositionNotificationPeriod(period As Integer)
@@ -161,16 +171,16 @@ Function VideoScreen_OnEvent(eventData As Object, callbackData = invalid As Obje
             If message = "startup progress" Then
                 callbackData = m.GetBaseEventData()
                 callbackData.Percentage = Int(msg.GetIndex() / 10)
-                m.RaiseEvent("Buffer", callbackData)
+                m.RaiseEvent("Buffer", callbackData, msg)
             Else
             End If
         Else If msg.IsStreamStarted() Then
             info = msg.GetInfo()
             If info.IsUnderrun Then
-                m.RaiseEvent("Rebuffer", m.GetBaseEventData())
+                m.RaiseEvent("Rebuffer", m.GetBaseEventData(), msg)
             Else
                 If Not m.IsPaused Then
-                    m.RaiseEvent("Start", m.GetBaseEventData())
+                    m.RaiseEvent("Start", m.GetBaseEventData(), msg)
                 End If
             End If
         Else If msg.IsPlaybackPosition() Then
@@ -180,22 +190,22 @@ Function VideoScreen_OnEvent(eventData As Object, callbackData = invalid As Obje
             If m.IsPaused Then
                 m.IsPaused = False
                 callbackData.OldPosition = oldPosition
-                m.RaiseEvent("Skip", callbackData)
+                m.RaiseEvent("Skip", callbackData, msg)
             Else
                 content = m.GetContent()
                 If AsInteger(content.Length) > 0 Then
                     quarts = AsInteger(content.Length) / 4
                     If m.Position = Int(quarts) Then
-                        m.RaiseEvent("FirstQuartile", callbackData)
+                        m.RaiseEvent("FirstQuartile", callbackData, msg)
                     Else If m.Position = Int(quarts * 2) Then
-                        m.RaiseEvent("Midpoint", callbackData)
+                        m.RaiseEvent("Midpoint", callbackData, msg)
                     Else If m.Position = Int(quarts * 3) Then
-                        m.RaiseEvent("ThirdQuartile", callbackData)
+                        m.RaiseEvent("ThirdQuartile", callbackData, msg)
                     End If
                 End If
                 If m.PositionNotificationPeriod > 0 And m.Position Mod m.PositionNotificationPeriod = 0 Then
                     ' We have a position notification, so raise the OnPlaybackPosition event
-                    m.RaiseEvent("PositionNotification", callbackData)
+                    m.RaiseEvent("PositionNotification", callbackData, msg)
                 End If
             End If
         Else If msg.IsRequestFailed() Then
@@ -203,18 +213,18 @@ Function VideoScreen_OnEvent(eventData As Object, callbackData = invalid As Obje
             callbackData.Code = msg.GetIndex()
             callbackData.Message = msg.GetMessage()
             callbackData.Info = msg.GetInfo()
-            m.RaiseEvent("Error", callbackData)
+            m.RaiseEvent("Error", callbackData, msg)
         Else If msg.IsFullResult() Then
-            m.RaiseEvent("Complete", m.GetBaseEventData())
+            m.RaiseEvent("Complete", m.GetBaseEventData(), msg)
             m.IgnoreClose = m.SetNext(m.ItemIndex + 1)
         Else If msg.IsPartialResult() Then
-            m.RaiseEvent("Close", m.GetBaseEventData())
+            m.RaiseEvent("Close", m.GetBaseEventData(), msg)
         Else If msg.IsPaused() Then
             m.IsPaused = True
-            m.RaiseEvent("Pause", m.GetBaseEventData())
+            m.RaiseEvent("Pause", m.GetBaseEventData(), msg)
         Else If msg.IsResumed() Then
             m.IsPaused = False
-            m.RaiseEvent("Resume", m.GetBaseEventData())
+            m.RaiseEvent("Resume", m.GetBaseEventData(), msg)
         'Else If msg.IsStreamSegmentInfo() Then
         'Else If msg.IsTimedMetaData() Then
         End If
@@ -222,7 +232,7 @@ Function VideoScreen_OnEvent(eventData As Object, callbackData = invalid As Obje
     Return True
 End Function
 
-Function VideoScreen_GetBaseEventData(itemIndex = m.ItemIndex As Integer) As Object
+Function VideoScreen_GetBaseEventData(itemIndex = m.ItemIndex As Integer, msg = invalid As Object) As Object
     eventData = {
         ContentList:    m.ContentList
         ItemIndex:      itemIndex

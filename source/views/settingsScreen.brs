@@ -80,7 +80,7 @@ Sub SettingsScreen_OnShown(eventData As Object, callbackData = invalid As Object
     SetThemeAttribute("GridScreenLogoHD", "")
     SetThemeAttribute("GridScreenLogoSD", "")
     Omniture().TrackPage("app:roku:settings")
-    Cbs().isSettingsScreenOpened = true
+    Cbs().IsSettingsScreenOpened = True
 End Sub
 
 Sub SettingsScreen_OnHidden(eventData As Object, callbackData = invalid As Object)
@@ -111,7 +111,7 @@ End Sub
 Function SettingsScreen_OnDisposed(eventData As Object, callbackData = invalid As Object)
     m.Screen.UnregisterObserverForAllEvents(m)
     m.Screen = invalid
-    Cbs().isSettingsScreenOpened = false
+    Cbs().IsSettingsScreenOpened = False
 
     ' Reset the overhangs
     SetThemeAttribute("GridScreenLogoHD", AsString(m.PreviousOverhangHD))

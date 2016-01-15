@@ -17,10 +17,10 @@ Function NewVideoPlayer() As Object
     this.Akamai                     = AkaMA_plugin()
     this.StreamSense                = CSStreamingTag()
     this.StreamSenseParams          = {}
-    this.bShowAds                   = false
+    this.ShowAds                    = False
     this.Raf                        = Roku_Ads()
     
-    this.playedAdDuration           = 0
+    this.PlayedAdDuration           = 0
 
     ' Seconds to add to ad break positions
     this.AdPositionOffset           = 1
@@ -109,7 +109,10 @@ Function VideoPlayer_Play(episodeOrChannel As Object, resume = False As Boolean)
     m.InitAkamai()
     
     ' Get the stream
-    stream = m.Content.GetStream(resume)
+    stream = invalid
+    If Cbs().IsSubscribed() Or (m.Content.IsClip() And m.Content.IsAvailable()) Then
+        stream = m.Content.GetStream(resume)
+    End If
     If stream <> invalid Then
         m.PlayerID = MD5Hash(GetDeviceID() + AsString(NowDate().AsSeconds()))
         DW().PlayerInit(m.PlayerID)
@@ -126,7 +129,7 @@ Function VideoPlayer_Play(episodeOrChannel As Object, resume = False As Boolean)
         Return True
     Else
         If Cbs().GetCurrentUser().Status = "SUSPENDED" Then
-            ShowMessageBox("Error", "An error occurred when attempting to play this video. Please contact customer support for assistance at (877) 749-9863.", ["OK"], True)
+            ShowMessageBox("Error", "An error occurred when attempting to play this video. Please contact customer support for assistance at " + Cbs().CSNumber + ".", ["OK"], True)
         Else
             ShowMessageBox("Content Unavailable", "The content you are trying to play is currently unavailable. Please try again later.", ["OK"], True)
         End If
@@ -162,8 +165,8 @@ End Function
 
 Function VideoPlayer_GetPlayerPosition(includeAds = False As Boolean) As Integer
     position = m.Position
-    If includeAds
-        position = position + m.playedAdDuration
+    If includeAds Then
+        position = position + m.PlayedAdDuration
     End If
     Return position
 End Function
@@ -186,8 +189,8 @@ Function VideoPlayer_OnGetMessage(eventData As Object, callbackData As Object) A
         msg = Wait(eventData.Timeout, eventData.Port)
     End If
     
-    If type(msg) = "roVideoScreenEvent"
-        m.lastVideoScreenEvent = msg ' used by Raf
+    If Type(msg) = "roVideoScreenEvent" Then
+        m.LastVideoScreenEvent = msg ' used by Raf
     End If
     m.Akamai.pluginEventHandler(msg)
     m.StreamSense.Tick()
@@ -222,17 +225,17 @@ Function VideoPlayer_OnBeforeNewContent(eventData As Object, callbackData As Obj
         customParams = customParams + "&ppid=" + AsString(Cbs().GetCurrentUser().Ppid)
         vmapUrl = AddQueryString(vmapUrl, "cust_params", customParams)
         
-        m.bShowAds = true
+        m.ShowAds = True
         ConfigureRaf(m.Raf, vmapUrl, m)
         secondsSinceLastPlay = NowDate().AsSeconds() - PlayTimes().GetPlayTime(m.Content.ID)
         If secondsSinceLastPlay > 3600 Then
             ' It's been more than an hour, so play the preroll
-            adPods = m.Raf.getAds()
-            If adPods <> invalid and adPods.Count() > 0
+            adPods = m.Raf.GetAds()
+            If adPods <> invalid And adPods.Count() > 0 Then
                 ' Let comScore know we're playing an ad
                 m.StreamSense.PlayAdvertisement()
                 
-                If Not m.Raf.showAds(adPods)
+                If Not m.Raf.ShowAds(adPods) Then
                     ' The user exited the ad, so call the close event, and return false
                     m.OnClose(invalid, invalid)
                     Return False
@@ -309,13 +312,13 @@ Sub VideoPlayer_OnComplete(eventData As Object, callbackData As Object)
     Else If m.Content.ClassName = "Channel" Or m.Content.ClassName = "LiveFeed" Then
         DW().PlayerLiveEnd(m.Content, m.GetPlayerPosition(True), m.GetPlayerPosition(False))
     End If
-    If m.bShowAds
-        adPods = m.Raf.getAds(m.lastVideoScreenEvent)
-        If adPods <> invalid and adPods.Count() > 0
+    If m.ShowAds
+        adPods = m.Raf.GetAds(m.LastVideoScreenEvent)
+        If adPods <> invalid And adPods.Count() > 0 Then
             ' Let comScore know we're playing an ad
             m.StreamSense.PlayAdvertisement()
     
-            m.Raf.showAds(adPods)
+            m.Raf.ShowAds(adPods)
         End If
     End If
 End Sub
@@ -356,11 +359,11 @@ Sub VideoPlayer_OnPositionNotification(eventData As Object, callbackData As Obje
             DW().PlayerLivePlayPosition(m.Content, m.GetPlayerPosition(False))
         End If
     End If
-    If m.bShowAds
+    If m.ShowAds
         ' Check for an ad
         adPosition = eventData.Position + m.AdPositionOffset
-        adPods = m.Raf.getAds(m.lastVideoScreenEvent)
-        If adPods <> invalid and adPods.Count() > 0
+        adPods = m.Raf.GetAds(m.LastVideoScreenEvent)
+        If adPods <> invalid And adPods.Count() > 0 Then
             If m.Content.ClassName = "Episode" Then
                 ' Track the resume point
                 m.Content.SetResumePoint(m.GetPlayerPosition(False))
@@ -406,9 +409,9 @@ Sub VideoPlayer_OnSkip(eventData As Object, callbackData As Object)
     Else If eventData.OldPosition > eventData.Position Then
         DW().PlayerRewind(eventData.OldPosition - eventData.Position, m.Content, m.GetPlayerPosition(True), m.GetPlayerPosition(False)) 
     End If
-    If m.bShowAds
-        adPods = m.Raf.getAds(m.lastVideoScreenEvent)
-        If adPods <> invalid and adPods.Count() > 0
+    If m.ShowAds Then
+        adPods = m.Raf.GetAds(m.LastVideoScreenEvent)
+        If adPods <> invalid And adPods.Count() > 0 Then
             m.PlayAd(adPods, m.Position, eventData.Item)
         End If
     End If
@@ -542,39 +545,38 @@ End Sub
 
 
 Sub RafCallback(videoPlayer = invalid As Dynamic, eventType = invalid As Dynamic, ctx = invalid As Dynamic)
-    If not IsAssociativeArray(videoPlayer) then return
+    If Not IsAssociativeArray(videoPlayer) Then Return
     
     eventData = RafGetEventData(ctx)
-    If not IsAssociativeArray(eventData) then return
+    If Not IsAssociativeArray(eventData) Then Return
     
     eventType = LCase(AsString(eventType))
     
-    If eventType = "start"
+    If eventType = "start" Then
         videoPlayer.OnAdStart(eventData)
-    Else If eventType = "firstquartile"
+    Else If eventType = "firstquartile" Then
         videoPlayer.OnAdFirstQuartile(eventData)
-    Else If eventType = "midpoint"
+    Else If eventType = "midpoint" Then
         videoPlayer.OnAdMidpoint(eventData)
-    Else If eventType = "thirdquartile"
+    Else If eventType = "thirdquartile" Then
         videoPlayer.OnAdThirdQuartile(eventData)
-    Else If eventType.Len() = 0 and IsAssociativeArray(ctx) and ctx.time <> invalid ' position notification
+    Else If eventType.Len() = 0 and IsAssociativeArray(ctx) and ctx.time <> invalid Then ' position notification
         videoPlayer.OnAdPositionNotification(eventData)
-    Else If eventType = "complete"
-        If IsInteger(videoPlayer.playedAdDuration) and IsInteger(eventData.ad.duration)
-            videoPlayer.playedAdDuration = videoPlayer.playedAdDuration + eventData.ad.Duration
+    Else If eventType = "complete" Then
+        If IsInteger(videoPlayer.PlayedAdDuration) And IsInteger(eventData.ad.duration) Then
+            videoPlayer.PlayedAdDuration = videoPlayer.PlayedAdDuration + eventData.ad.Duration
         End If
         videoPlayer.OnAdComplete(eventData)
-    Else If eventType = "close"
+    Else If eventType = "close" Then
         videoPlayer.OnAdClose(eventData)
     End If
 End Sub
 
-
 Function RafGetEventData(ctx As Object) as Object
-    If not IsAssociativeArray(ctx) or not IsAssociativeArray(ctx.ad) then return invalid
+    If Not IsAssociativeArray(ctx) Or Not IsAssociativeArray(ctx.ad) Then Return invalid
     
     eventData = {
-        PodIndex    : AsInteger(0) 'TODO replace once podIndex is available
+        PodIndex    : AsInteger(0) 'TODO: replace once podIndex is available
         AdIndex     : AsInteger(ctx.adIndex)
         Position    : AsInteger(ctx.time)
     }
@@ -587,12 +589,11 @@ Function RafGetEventData(ctx As Object) as Object
     
     eventData.ad = ad
     
-    return eventData
+    Return eventData
 End Function
 
-
-sub ConfigureRaf(raf as Object, adUrl as String, videoPlayer as Object, bUseNielsen = true as Boolean)
-    if not IsAssociativeArray(raf) then return
+Sub ConfigureRaf(raf As Object, adUrl As String, videoPlayer As Object, useNielsen = True As Boolean)
+    If Not IsAssociativeArray(raf) Then Return
     
     episode = videoPlayer.content
     raf.setAdUrl(adUrl)
@@ -602,29 +603,28 @@ sub ConfigureRaf(raf as Object, adUrl as String, videoPlayer as Object, bUseNiel
     raf.setTrackingCallback(RafCallback, videoPlayer)
     raf.setAdPrefs(false)
 
-    if bUseNielsen
+    If useNielsen Then
         ConfigureEpisodeForNielsen(episode)
         raf.enableNielsenDAR(true)
         raf.setNielsenProgramId(AsString(episode.nielsenID)) ' a human readable designation of the show or category this content belongs to
         raf.setNielsenGenre(episode.genreNielsen) ' in most cases this will be the same for all content in a channel
-        if IsString(Cbs().nielsenAppID)
-            raf.setNielsenAppId(Cbs().nielsenAppID) ' assigned by Nielsen
-        end if
-    end if
-end sub
+        If IsString(Cbs().NielsenAppID) Then
+            raf.setNielsenAppId(Cbs().NielsenAppID) ' assigned by Nielsen
+        End If
+    End If
+End Sub
 
-
-sub ConfigureEpisodeForNielsen(episode as Object)
-    if not IsAssociativeArray(episode) then return
+Sub ConfigureEpisodeForNielsen(episode as Object)
+    If Not IsAssociativeArray(episode) Then Return
     
     episode.genreNielsen = "GV"
-    if IsString(episode.showName)
+    If IsString(episode.showName) Then
         episode.nielsenID = episode.showName
-    else
+    Else
         episode.nielsenID = "CBAA"
-    end if
+    End If
     
-    if not IsValid(episode.length)
+    If Not IsValid(episode.length) Then
         episode.length = 1
-    end if
-end sub
+    End If
+End Sub

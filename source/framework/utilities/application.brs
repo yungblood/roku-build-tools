@@ -30,3 +30,7 @@ End Function
 Function GetAppVersion() As String
     Return GetAppVersionEx().FullVersion
 End Function
+
+Function GetAppTitle() As String
+    Return GetManifest().title
+End Function
