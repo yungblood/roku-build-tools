@@ -39,7 +39,7 @@ Sub App_Run(ecp = invalid As Object)
     Omniture().Initialize(Cbs().OmnitureSuiteID, user.ID, user.GetStatusForTracking(), Cbs().OmnitureEvar5)
     
     ' Initialize comScore
-    CSComScore().log_debug = True
+    CSComScore().log_debug = (GetLogLevel() > 1)
     CSComScore().SetCustomerC2(Cbs().ComScoreC2)
     CSComScore().SetPublisherSecret(Cbs().ComScoreSecret)
 

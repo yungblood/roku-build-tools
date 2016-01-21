@@ -39,9 +39,10 @@ Function NewHomeScreen() As Object
     Return this
 End Function
 
-Function HomeScreen_Show(ecpItem As Dynamic) As Boolean
+Function HomeScreen_Show(ecpItem = invalid As Dynamic, rows = [] As Object) As Boolean
     m.Screen.Show()
 
+    m.Rows = rows
     ' Process any passed in ECP parameters
     If ecpItem = invalid Or Not OpenItem(ecpItem) Then
         m.SetupRows()
@@ -50,58 +51,60 @@ Function HomeScreen_Show(ecpItem As Dynamic) As Boolean
     Return True
 End Function
 
-Sub HomeScreen_SetupRows()
-    m.Rows = []
-    m.Rows.Push({
-        ID:             "menu"
-        Name:           ""
-        ContentList:    [
-            {
-                Title:          "All Shows"
-                ID:             "allShows"
-                ClassName:      "menuItem"
-                HDPosterUrl:    "pkg:/images/icon_shows_hd.png"
-                SDPosterUrl:    "pkg:/images/icon_shows_sd.png"
-            }
-            {
-                Title:          "Live TV"
-                ID:             "liveTV"
-                ClassName:      "menuItem"
-                HDPosterUrl:    "pkg:/images/icon_livetv_hd.png"
-                SDPosterUrl:    "pkg:/images/icon_livetv_sd.png"
-            }
-            {
-                Title:          "Search"
-                ID:             "search"
-                ClassName:      "menuItem"
-                HDPosterUrl:    "pkg:/images/icon_search_hd.png"
-                SDPosterUrl:    "pkg:/images/icon_search_sd.png"
-            }
-            {
-                Text:           ""
-                ID:             "settings"
-                ClassName:      "menuItem"
-                HDPosterUrl:    "pkg:/images/icon_settings_hd.png"
-                SDPosterUrl:    "pkg:/images/icon_settings_sd.png"
-            }
-        ]
-    })
-    m.Rows.Push({
-        ID:     "featured"
-        Name:   "Featured Shows"
-    })
-    m.Rows.Push({
-        ID:         "myCBS"
-        Name:       "My CBS"
-        IsVisible:  Cbs().IsAuthenticated()
-    })
-    m.Rows.Push({
-        ID:         "recentlyWatched"
-        Name:       "Recently Watched"
-        IsVisible:  Cbs().IsAuthenticated()
-    })
-    
-    m.Rows.Append(Cbs().GetHomeRows(10, 100))
+Sub HomeScreen_SetupRows(refresh = False As Boolean)
+    If refresh Or m.Rows = invalid Or m.Rows.IsEmpty() Then
+        m.Rows = []
+        m.Rows.Push({
+            ID:             "menu"
+            Name:           ""
+            ContentList:    [
+                {
+                    Title:          "All Shows"
+                    ID:             "allShows"
+                    ClassName:      "menuItem"
+                    HDPosterUrl:    "pkg:/images/icon_shows_hd.png"
+                    SDPosterUrl:    "pkg:/images/icon_shows_sd.png"
+                }
+                {
+                    Title:          "Live TV"
+                    ID:             "liveTV"
+                    ClassName:      "menuItem"
+                    HDPosterUrl:    "pkg:/images/icon_livetv_hd.png"
+                    SDPosterUrl:    "pkg:/images/icon_livetv_sd.png"
+                }
+                {
+                    Title:          "Search"
+                    ID:             "search"
+                    ClassName:      "menuItem"
+                    HDPosterUrl:    "pkg:/images/icon_search_hd.png"
+                    SDPosterUrl:    "pkg:/images/icon_search_sd.png"
+                }
+                {
+                    Text:           ""
+                    ID:             "settings"
+                    ClassName:      "menuItem"
+                    HDPosterUrl:    "pkg:/images/icon_settings_hd.png"
+                    SDPosterUrl:    "pkg:/images/icon_settings_sd.png"
+                }
+            ]
+        })
+        m.Rows.Push({
+            ID:     "featured"
+            Name:   "Featured Shows"
+        })
+        m.Rows.Push({
+            ID:         "myCBS"
+            Name:       "My CBS"
+            IsVisible:  Cbs().IsAuthenticated()
+        })
+        m.Rows.Push({
+            ID:         "recentlyWatched"
+            Name:       "Recently Watched"
+            IsVisible:  Cbs().IsAuthenticated()
+        })
+        
+        m.Rows.Append(Cbs().GetHomeRows(10, 100))
+    End If
     
     m.Screen.SetRowItems(m.Rows)
     m.Screen.SetDescriptionVisible(False)
@@ -207,14 +210,21 @@ Sub HomeScreen_OnListItemSelected(eventData As Object, callbackData = invalid As
     End If
 End Sub
 
-Function HomeScreen_OnDisposed(eventData As Object, callbackData = invalid As Object)
+Function HomeScreen_OnDisposed(eventData As Object, callbackData = invalid As Object) As Boolean
     m.Screen.UnregisterObserverForAllEvents(m)
     m.Screen = invalid
     
     GlobalEventRegistry().UnregisterObserverForAllEvents(m)
     
-    ' Exit the event loop if this is the last screen
-    Return ScreenManager().Screens.Count() > 0
+    ' Prompt the user to exit if this is the last screen
+    If ScreenManager().Screens.Count() = 0 Then
+        If ShowExitScreen() Then
+            Return False
+        Else
+            NewHomeScreen().Show(invalid, m.Rows)
+        End If
+    End If
+    Return True
 End Function
 
 Sub HomeScreen_OnFavoritesChanged(eventData As Object, callbackData = invalid As Object)

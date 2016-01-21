@@ -17,8 +17,9 @@ Function NewCbs(useStaging = False As Boolean) As Object
     this.ResumeOffset               = 3
     
     this.UseStaging                 = False
-    this.IsSearchScreenOpened       = false
-    this.IsSettingsScreenOpened     = false
+    this.IsSearchScreenOpened       = False
+    this.IsSettingsScreenOpened     = False
+    this.AutoPlayEnabled            = True
     
     this.RokuProductCode            = "com.cbsallaccess.subscription.trial" ' "PROD1"
     this.ProductCode                = "CBS_ALL_ACCESS_PACKAGE" '
@@ -121,6 +122,7 @@ Function NewCbs(useStaging = False As Boolean) As Object
     this.GetShowEpisodes            = Cbs_GetShowEpisodes
     this.GetShowClips               = Cbs_GetShowClips
     this.GetEpisode                 = Cbs_GetEpisode
+    this.GetNextEpisode             = Cbs_GetNextEpisode
     
     this.GetCurrentUser             = Cbs_GetCurrentUser
     
@@ -782,6 +784,22 @@ Function Cbs_GetEpisode(contentID As String) As Object
     End If
     Return invalid
 End Function
+
+Function Cbs_GetNextEpisode(showID As String, contentID As String) As Object
+    If Not IsNullOrEmpty(showID) And Not IsNullOrEmpty(contentID) Then
+        url = m.Endpoint + "v3.0/roku/shows/" + showID + "/video/autoplay/nextEpisode.json"
+        url = AddQueryString(url, "contentId", contentID)
+        response = m.Request(url, "GET")
+        If IsAssociativeArray(response) And response.success = True Then
+            item = response.nextVideo
+            If item <> invalid Then
+                Return NewEpisode(item)
+            End If
+        End If
+    End If
+    Return invalid
+End Function
+
 
 ' **********************
 ' User

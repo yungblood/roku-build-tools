@@ -226,19 +226,21 @@ Function VideoPlayer_OnBeforeNewContent(eventData As Object, callbackData As Obj
         vmapUrl = AddQueryString(vmapUrl, "cust_params", customParams)
         
         m.ShowAds = True
-        ConfigureRaf(m.Raf, vmapUrl, m)
-        secondsSinceLastPlay = NowDate().AsSeconds() - PlayTimes().GetPlayTime(m.Content.ID)
-        If secondsSinceLastPlay > 3600 Then
-            ' It's been more than an hour, so play the preroll
-            adPods = m.Raf.GetAds()
-            If adPods <> invalid And adPods.Count() > 0 Then
-                ' Let comScore know we're playing an ad
-                m.StreamSense.PlayAdvertisement()
-                
-                If Not m.Raf.ShowAds(adPods) Then
-                    ' The user exited the ad, so call the close event, and return false
-                    m.OnClose(invalid, invalid)
-                    Return False
+        If m.ShowAds Then
+            ConfigureRaf(m.Raf, vmapUrl, m)
+            secondsSinceLastPlay = NowDate().AsSeconds() - PlayTimes().GetPlayTime(m.Content.ID)
+            If secondsSinceLastPlay > 3600 Then
+                ' It's been more than an hour, so play the preroll
+                adPods = m.Raf.GetAds()
+                If adPods <> invalid And adPods.Count() > 0 Then
+                    ' Let comScore know we're playing an ad
+                    m.StreamSense.PlayAdvertisement()
+                    
+                    If Not m.Raf.ShowAds(adPods) Then
+                        ' The user exited the ad, so call the close event, and return false
+                        m.OnClose(invalid, invalid)
+                        Return False
+                    End If
                 End If
             End If
         End If
@@ -312,13 +314,23 @@ Sub VideoPlayer_OnComplete(eventData As Object, callbackData As Object)
     Else If m.Content.ClassName = "Channel" Or m.Content.ClassName = "LiveFeed" Then
         DW().PlayerLiveEnd(m.Content, m.GetPlayerPosition(True), m.GetPlayerPosition(False))
     End If
-    If m.ShowAds
+    
+    autoPlay = Cbs().AutoPlayEnabled
+    If m.ShowAds Then
         adPods = m.Raf.GetAds(m.LastVideoScreenEvent)
         If adPods <> invalid And adPods.Count() > 0 Then
             ' Let comScore know we're playing an ad
             m.StreamSense.PlayAdvertisement()
     
-            m.Raf.ShowAds(adPods)
+            ' We don't want to autoplay if the user exits the post-roll
+            autoPlay = m.Raf.ShowAds(adPods) And autoPlay
+        End If
+    End If
+    
+    If autoPlay And m.Content.ClassName = "Episode" And Not IsNullOrEmpty(m.Content.ShowID) And Not IsNullOrEmpty(m.Content.ContentID) Then
+        nextEpisode = Cbs().GetNextEpisode(m.Content.ShowID, m.Content.ContentID)
+        If nextEpisode <> invalid Then
+            NewVideoPlayer().Play(nextEpisode)
         End If
     End If
 End Sub
@@ -359,7 +371,7 @@ Sub VideoPlayer_OnPositionNotification(eventData As Object, callbackData As Obje
             DW().PlayerLivePlayPosition(m.Content, m.GetPlayerPosition(False))
         End If
     End If
-    If m.ShowAds
+    If m.ShowAds Then
         ' Check for an ad
         adPosition = eventData.Position + m.AdPositionOffset
         adPods = m.Raf.GetAds(m.LastVideoScreenEvent)
@@ -543,7 +555,6 @@ Sub VideoPlayer_OnAdClose(eventData As Object)
     End If
 End Sub
 
-
 Sub RafCallback(videoPlayer = invalid As Dynamic, eventType = invalid As Dynamic, ctx = invalid As Dynamic)
     If Not IsAssociativeArray(videoPlayer) Then Return
     
@@ -560,7 +571,7 @@ Sub RafCallback(videoPlayer = invalid As Dynamic, eventType = invalid As Dynamic
         videoPlayer.OnAdMidpoint(eventData)
     Else If eventType = "thirdquartile" Then
         videoPlayer.OnAdThirdQuartile(eventData)
-    Else If eventType.Len() = 0 and IsAssociativeArray(ctx) and ctx.time <> invalid Then ' position notification
+    Else If eventType.Len() = 0 And IsAssociativeArray(ctx) And ctx.time <> invalid Then ' position notification
         videoPlayer.OnAdPositionNotification(eventData)
     Else If eventType = "complete" Then
         If IsInteger(videoPlayer.PlayedAdDuration) And IsInteger(eventData.ad.duration) Then
@@ -601,7 +612,7 @@ Sub ConfigureRaf(raf As Object, adUrl As String, videoPlayer As Object, useNiels
     raf.setContentGenre("General Variety")
     raf.setContentLength(AsInteger(episode.length)) ' seconds
     raf.setTrackingCallback(RafCallback, videoPlayer)
-    raf.setAdPrefs(false)
+    raf.setAdPrefs(False)
 
     If useNielsen Then
         ConfigureEpisodeForNielsen(episode)
@@ -614,7 +625,7 @@ Sub ConfigureRaf(raf As Object, adUrl As String, videoPlayer As Object, useNiels
     End If
 End Sub
 
-Sub ConfigureEpisodeForNielsen(episode as Object)
+Sub ConfigureEpisodeForNielsen(episode As Object)
     If Not IsAssociativeArray(episode) Then Return
     
     episode.genreNielsen = "GV"

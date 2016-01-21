@@ -16,7 +16,7 @@ Function NewBaseScreen(screenType As String, events = [] As Object) As Object
     this.Screen                 = invalid
     this.Events                 = AsArray(events)
     
-    this.ShowFacade             = True
+    this.ShowFacade             = False 'True
     
     this.Initialized            = False
     this.Disposed               = False

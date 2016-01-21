@@ -15,6 +15,10 @@ Sub SetLogLevel(logLevel = 0 As Integer, remoteLoggingUrl = "" As String)
     m.LogRequests   = []
 End Sub
 
+Function GetLogLevel() As Integer
+    Return m.DebugLogLevel
+End Function
+
 Sub DebugPrint(data As Object, prefix = "" As String, logLevel = 0 As Integer, remoteLoggingUrl = "" As String)
     If IsNullOrEmpty(remoteLoggingUrl) And Not IsNullOrEmpty(m.RemoteLogUrl) Then
         remoteLoggingUrl = m.RemoteLogUrl
