@@ -58,7 +58,18 @@ End Function
 
 Sub ShowOptionsDialog(showSearch = True As Boolean, showSettings = True As Boolean)
     options = []
-    If not Cbs().IsSearchScreenOpened Then
+    
+    'TODO: For testing purposes, should not display when published to production
+'    If Cbs().UseStaging = True Then
+        options.Push({
+            Text:   "DEBUG: Display IP Address"
+            ID:     "ip"
+        })
+        options.Push("separator")
+'    End If
+    
+    
+    If Not Cbs().IsSearchScreenOpened Then
         options.Push({
             Text: "Search"
             ID: "search"
@@ -129,8 +140,10 @@ Sub ProcessGlobalOption(option As Object, linkName = "" As String, events = [] A
     Else If option.ID = "legal" Then
         ShowMessageBox("Legal Notices", Cbs().GetLegalText(), ["Close"], True)
     Else If option.ID = "network" Then
-        ShowMessageBox("Network Info", "IP Address: " + GetExternalIPAddress(), ["Close"], True)
+        ShowMessageBox("Network Info", "IP Address: " + Cbs().GetIPAddress(), ["Close"], True)
     Else If option.ID = "settings" Then
         NewSettingsScreen().Show()
+    Else If option.ID = "ip" Then
+        ShowMessageBox("IP Address", "Roku API: " + Cbs().GetIPAddress(False) + Chr(10) + "CBS API: " + Cbs().GetIPAddress(), ["Close"], True)
     End If
 End Sub

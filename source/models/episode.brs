@@ -12,6 +12,8 @@ Function NewEpisode(json = invalid As Object) As Object
     this.IsClip                 = Episode_IsClip
     this.IsAvailable            = Episode_IsAvailable
     
+    this.GetNextEpisode         = Episode_GetNextEpisode
+    
     this.GetShow                = Episode_GetShow
     this.IsShowLoaded           = Episode_IsShowLoaded
     
@@ -128,6 +130,17 @@ End Function
 
 Function Episode_IsAvailable() As Boolean
     Return (m.Status = "AVAILABLE" Or m.Status = "DELAYED" Or m.Status = "PREMIUM")
+End Function
+
+Function Episode_GetNextEpisode() As Object
+    If m.IsClip() Then
+        Return m.NextClip
+    Else
+        If Not IsNullOrEmpty(m.ShowID) And Not IsNullOrEmpty(m.ContentID) Then
+            Return Cbs().GetNextEpisode(m.ShowID, m.ContentID)
+        End If
+    End If
+    Return invalid
 End Function
 
 Function Episode_GetShow() As Object

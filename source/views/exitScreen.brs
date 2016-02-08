@@ -5,10 +5,10 @@ Function ShowExitScreen() As Boolean
     
     layers = [
         {
-            Color: "#000e1b"
+            Color: "#000000"
         }
         {
-            Text: "Are you sure you want to exit CBS All Access?"
+            Text: "Are you sure you would like to exit CBS All Access?"
             TargetRect: {
                 x: 0
                 y: 240
@@ -25,7 +25,7 @@ Function ShowExitScreen() As Boolean
     ]
     
     exitText = "Exit"
-    cancelText = "Cancel"
+    cancelText = "Back"
     buttonFont = GetCanvasFont("Default", IIf(IsHD(), 22, 16))
     buttons = [
         {
@@ -143,7 +143,7 @@ Function ShowExitScreen() As Boolean
     
     screen.SetLayer(1, layers)
     
-    buttonIndex = 0
+    buttonIndex = 1
     buttonLayer = 2
     For i = 0 To buttons.Count() - 1
         If i = buttonIndex Then
@@ -161,7 +161,7 @@ Function ShowExitScreen() As Boolean
             If msg.IsRemoteKeyPressed() Then
                 key = msg.GetIndex()
                 If key = 0 Then         ' Back
-                    screen.Close()
+                    'screen.Close()
                 Else If key = 6 Then    ' Select
                     button = buttons[buttonIndex]
                     If button <> invalid Then

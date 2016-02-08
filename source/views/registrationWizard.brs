@@ -535,7 +535,7 @@ Function RegistrationWizard_ShowWelcomeScreen() As Integer
                             facade = CreateObject("roPosterScreen")
                             facade.Show()
                             dialog = ShowWaitDialog("Please wait...")
-                            product = ChannelStore().GetProduct(Cbs().RokuProductCode)
+                            product = ChannelStore().GetProduct(AsString(upsellInfo.ProductCode))
                             If product <> invalid And ChannelStore().GetPurchases().Count() = 0 Then
                                 dialog.Close()
                                 dialog = invalid

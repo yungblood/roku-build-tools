@@ -10,6 +10,8 @@ Function NewVideoPlayer() As Object
     this.ResumingAfterAd            = False
     this.IsResume                   = False
     
+    this.History                    = []
+    
     this.LiveTimedOut               = False
     this.LiveTimeout                = 2 * 60 * 60 * 1000 ' 2 hours
     this.LiveCTATimeout             = 5 * 60 * 1000      ' 5 minutes
@@ -25,6 +27,7 @@ Function NewVideoPlayer() As Object
     ' Seconds to add to ad break positions
     this.AdPositionOffset           = 1
     
+    this.Initialize                 = VideoPlayer_Initialize
     this.Play                       = VideoPlayer_Play
     this.PlayAd                     = VideoPlayer_PlayAd
     this.GetPlayerPosition          = VideoPlayer_GetPlayerPosition
@@ -56,39 +59,54 @@ Function NewVideoPlayer() As Object
     this.OnAdPositionNotification   = VideoPlayer_OnAdPositionNotification
     this.OnAdComplete               = VideoPlayer_OnAdComplete
     this.OnAdClose                  = VideoPlayer_OnAdClose
-            
-    this.Screen                     = NewVideoScreen()
-    this.Screen.SetPositionNotificationPeriod(1)
-
-    this.Screen.GetEventPort().RegisterObserver(this, "GetMessage", "OnGetMessage")
-    
-    this.Screen.RegisterObserver(this, "BeforeNewContent", "OnBeforeNewContent")
-    this.Screen.RegisterObserver(this, "Start", "OnStart")
-    this.Screen.RegisterObserver(this, "FirstQuartile", "OnFirstQuartile")
-    this.Screen.RegisterObserver(this, "Midpoint", "OnMidpoint")
-    this.Screen.RegisterObserver(this, "ThirdQuartile", "OnThirdQuartile")
-    this.Screen.RegisterObserver(this, "Complete", "OnComplete")
-    this.Screen.RegisterObserver(this, "Close", "OnClose")
-    this.Screen.RegisterObserver(this, "PositionNotification", "OnPositionNotification")
-    this.Screen.RegisterObserver(this, "Pause", "OnPause")
-    this.Screen.RegisterObserver(this, "Resume", "OnResume")
-    this.Screen.RegisterObserver(this, "Skip", "OnSkip")
-    this.Screen.RegisterObserver(this, "Error", "OnError")
-    this.Screen.RegisterObserver(this, "Disposed", "OnDisposed")
-    
-    EventListener().RegisterObserver(this, "Idle", "OnIdle")
     
     Return this
 End Function
 
+Sub VideoPlayer_Initialize()
+    m.Screen                     = NewVideoScreen()
+    m.Screen.SetPositionNotificationPeriod(1)
+
+    m.Screen.GetEventPort().RegisterObserver(m, "GetMessage", "OnGetMessage")
+    
+    m.Screen.RegisterObserver(m, "BeforeNewContent", "OnBeforeNewContent")
+    m.Screen.RegisterObserver(m, "Start", "OnStart")
+    m.Screen.RegisterObserver(m, "FirstQuartile", "OnFirstQuartile")
+    m.Screen.RegisterObserver(m, "Midpoint", "OnMidpoint")
+    m.Screen.RegisterObserver(m, "ThirdQuartile", "OnThirdQuartile")
+    m.Screen.RegisterObserver(m, "Complete", "OnComplete")
+    m.Screen.RegisterObserver(m, "Close", "OnClose")
+    m.Screen.RegisterObserver(m, "PositionNotification", "OnPositionNotification")
+    m.Screen.RegisterObserver(m, "Pause", "OnPause")
+    m.Screen.RegisterObserver(m, "Resume", "OnResume")
+    m.Screen.RegisterObserver(m, "Skip", "OnSkip")
+    m.Screen.RegisterObserver(m, "Error", "OnError")
+    m.Screen.RegisterObserver(m, "Disposed", "OnDisposed")
+
+    EventListener().RegisterObserver(m, "Idle", "OnIdle")
+End Sub
+
 Function VideoPlayer_Play(episodeOrChannel As Object, resume = False As Boolean) As Boolean
+    If m.Screen = invalid Then
+        m.Initialize()
+    End If
+    
     m.Canvas.SetLayer(0, { Color: "#000000" })
     m.Canvas.Show()
+    
+    ' Clear the next episode data
+    m.NextEpisode = invalid
     
     m.IsResume = resume
     m.Content = episodeOrChannel
     m.Position = 0
     m.AdCount = 0
+    
+    ' Add the current content to the play history
+    m.History.Push(m.Content)
+    
+    ' Refresh the current user state, in case it changed between videos
+    Cbs().GetCurrentUser(True)
     
     If m.Content.ClassName = "Episode" Then
         ' Refresh the content to ensure the user still has permission to view it
@@ -198,55 +216,57 @@ Function VideoPlayer_OnGetMessage(eventData As Object, callbackData As Object) A
 End Function
 
 Function VideoPlayer_OnBeforeNewContent(eventData As Object, callbackData As Object) As Boolean
-    stream = eventData.Item
-    response = GetUrlToStringEx(stream.Stream.Url)
-    If response <> invalid Then
-        cookies = ""
-        For Each header In response.ResponseHeadersArray
-            If header["Set-Cookie"] <> invalid Then
-                cookies = cookies + header["Set-Cookie"] + ", "
-            End If
-        Next
-        m.Screen.SetCookies(cookies)
-    End If
-    If AsInteger(stream.PlayStart) > 0 And stream.Live <> True Then
-        m.Position = stream.PlayStart
-    End If
-    If m.Vmap = invalid And Not IsNullOrEmpty(stream.VmapUrl) Then
-        vmapUrl = Replace(stream.VmapUrl, "[timestamp]", NowDate().AsSeconds().ToStr())
-        vmapUrl = AddQueryString(vmapUrl, "ppid", AsString(Cbs().GetCurrentUser().Ppid))
-        
-        customParams = "sb=" + AsString(Cbs().GetCurrentUser().GetStatusForAds())
-        cbsU = GetCookie("CBS_U")
-        If Not IsNullOrEmpty(cbsU) Then
-            ' Convert "ge:1|gr:2" to ge=1&gr=2
-            customParams = customParams + "&" + cbsU.Replace(":", "=").Replace("|", "&").Replace(Chr(34), "")
+    If Not m.ResumingAfterAd Then
+        stream = eventData.Item
+        response = GetUrlToStringEx(stream.Stream.Url)
+        If response <> invalid Then
+            cookies = ""
+            For Each header In response.ResponseHeadersArray
+                If header["Set-Cookie"] <> invalid Then
+                    cookies = cookies + header["Set-Cookie"] + ", "
+                End If
+            Next
+            m.Screen.SetCookies(cookies)
         End If
-        customParams = customParams + "&ppid=" + AsString(Cbs().GetCurrentUser().Ppid)
-        vmapUrl = AddQueryString(vmapUrl, "cust_params", customParams)
-        
-        m.ShowAds = True
-        If m.ShowAds Then
-            ConfigureRaf(m.Raf, vmapUrl, m)
-            secondsSinceLastPlay = NowDate().AsSeconds() - PlayTimes().GetPlayTime(m.Content.ID)
-            If secondsSinceLastPlay > 3600 Then
-                ' It's been more than an hour, so play the preroll
-                adPods = m.Raf.GetAds()
-                If adPods <> invalid And adPods.Count() > 0 Then
-                    ' Let comScore know we're playing an ad
-                    m.StreamSense.PlayAdvertisement()
-                    
-                    If Not m.Raf.ShowAds(adPods) Then
-                        ' The user exited the ad, so call the close event, and return false
-                        m.OnClose(invalid, invalid)
-                        Return False
+        If AsInteger(stream.PlayStart) > 0 And stream.Live <> True Then
+            m.Position = stream.PlayStart
+        End If
+        If Not IsNullOrEmpty(stream.VmapUrl) Then
+            vmapUrl = Replace(stream.VmapUrl, "[timestamp]", NowDate().AsSeconds().ToStr())
+            vmapUrl = AddQueryString(vmapUrl, "ppid", AsString(Cbs().GetCurrentUser().Ppid))
+            
+            customParams = "sb=" + AsString(Cbs().GetCurrentUser().GetStatusForAds())
+            cbsU = GetCookie("CBS_U")
+            If Not IsNullOrEmpty(cbsU) Then
+                ' Convert "ge:1|gr:2" to ge=1&gr=2
+                customParams = customParams + "&" + cbsU.Replace(":", "=").Replace("|", "&").Replace(Chr(34), "")
+            End If
+            customParams = customParams + "&ppid=" + AsString(Cbs().GetCurrentUser().Ppid)
+            vmapUrl = AddQueryString(vmapUrl, "cust_params", customParams)
+            
+            m.ShowAds = True
+            If m.ShowAds Then
+                ConfigureRaf(m.Raf, vmapUrl, m)
+                secondsSinceLastPlay = NowDate().AsSeconds() - PlayTimes().GetPlayTime(m.Content.ID)
+                If secondsSinceLastPlay > 3600 Then
+                    ' It's been more than an hour, so play the preroll
+                    adPods = m.Raf.GetAds()
+                    If adPods <> invalid And adPods.Count() > 0 Then
+                        ' Let comScore know we're playing an ad
+                        m.StreamSense.PlayAdvertisement()
+                        
+                        If Not m.Raf.ShowAds(adPods) Then
+                            ' The user exited the ad, so call the close event, and return false
+                            m.OnClose(invalid, invalid)
+                            Return False
+                        End If
                     End If
                 End If
             End If
         End If
+        ' Record the play time
+        PlayTimes().SetPlayTime(m.Content.ID)
     End If
-    ' Record the play time
-    PlayTimes().SetPlayTime(m.Content.ID)
     Return True
 End Function
 
@@ -265,6 +285,13 @@ Sub VideoPlayer_OnStart(eventData As Object, callbackData As Object)
             params.v38 = "video"
             params.v59 = IIf(m.Content.SubscriptionLevel = "FREE", "non-svod", "svod")
             Omniture().TrackEvent("app:roku:video playback:episode " + IIf(m.IsResume, "resume", "start"), [IIf(m.IsResume, "event19", "event52")], params)
+            
+            If Cbs().AutoplayEnabled And m.NextEpisode = invalid Then
+                If m.Content.ClassName = "Episode" Then
+                    m.NextEpisode = m.Content.GetNextEpisode()
+                End If
+            End If
+            
         Else If m.Content.ClassName = "Channel" Or m.Content.ClassName = "LiveFeed" Then
             DW().PlayerLiveStart(m.Content, m.GetPlayerPosition(True))
             
@@ -315,23 +342,31 @@ Sub VideoPlayer_OnComplete(eventData As Object, callbackData As Object)
         DW().PlayerLiveEnd(m.Content, m.GetPlayerPosition(True), m.GetPlayerPosition(False))
     End If
     
-    autoPlay = Cbs().AutoPlayEnabled
+    autoPlay = Cbs().AutoPlayEnabled And m.NextEpisode <> invalid
     If m.ShowAds Then
         adPods = m.Raf.GetAds(m.LastVideoScreenEvent)
-        If adPods <> invalid And adPods.Count() > 0 Then
+        If adPods <> invalid Then
             ' Let comScore know we're playing an ad
             m.StreamSense.PlayAdvertisement()
     
+            If autoPlay Then
+                ' Retrieve the postroll ad(s) and update the render sequence so the correct messaging is displayed
+                For Each adPod in AsArray(adPods)
+                    If adPod.renderSequence = "postroll" Then
+                        adPod.renderSequence = "preroll"
+                    End If
+                Next
+            End If
+
             ' We don't want to autoplay if the user exits the post-roll
             autoPlay = m.Raf.ShowAds(adPods) And autoPlay
         End If
     End If
     
-    If autoPlay And m.Content.ClassName = "Episode" And Not IsNullOrEmpty(m.Content.ShowID) And Not IsNullOrEmpty(m.Content.ContentID) Then
-        nextEpisode = Cbs().GetNextEpisode(m.Content.ShowID, m.Content.ContentID)
-        If nextEpisode <> invalid Then
-            NewVideoPlayer().Play(nextEpisode)
-        End If
+    If m.NextEpisode <> invalid Then
+        ' Dispose the video screen
+        m.OnDisposed(invalid, invalid)
+        m.Play(m.NextEpisode)
     End If
 End Sub
 
@@ -397,7 +432,7 @@ Sub VideoPlayer_OnPause(eventData As Object, callbackData As Object)
         m.Content.SetResumePoint(m.GetPlayerPosition(False))
         DW().PlayerPlayPosition(m.Content, m.GetPlayerPosition(False))
     End If
-    ' Let comScore know we've stopping playback
+    ' Let comScore know we've stopped playback
     m.StreamSense.Stop()
 End Sub
 
@@ -411,7 +446,7 @@ Sub VideoPlayer_OnResume(eventData As Object, callbackData As Object)
 End Sub
 
 Sub VideoPlayer_OnSkip(eventData As Object, callbackData As Object)
-    ' Let comScore know we're resumed playback
+    ' Let comScore know we've resumed playback
     m.StreamSense.PlayContentPart(m.StreamSenseParams)
 
     ' Update the stored position to the new position
@@ -456,7 +491,7 @@ Sub VideoPlayer_OnError(eventData As Object, callbackData As Object)
 End Sub
 
 Function VideoPlayer_OnDisposed(eventData As Object, callbackData As Object) As Boolean
-    ' Let comScore know we've stopping playback
+    ' Let comScore know we've stopped playback
     m.StreamSense.Stop()
 
     EventListener().UnregisterObserver(m, "Idle")

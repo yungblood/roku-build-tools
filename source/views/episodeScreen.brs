@@ -51,6 +51,8 @@ Sub EpisodeScreen_SetContentList(contentList As Object, index = 0 As Integer)
     ' Make a copy of the content, so it's not updated out from under us
     m.ContentList = ShallowCopy(AsArray(contentList))
     m.ItemIndex = index
+    ' Clear the section, since we're setting the content list explicitly
+    m.Section = invalid
 End Sub
 
 Sub EpisodeScreen_SetSection(section As Object, index = 0 As Integer)
@@ -162,9 +164,16 @@ Function EpisodeScreen_PrepareContent(content As Object) As Object
 End Function
 
 Sub EpisodeScreen_OnShown(eventData As Object, callbackData = invalid As Object)
+    If m.VideoPlayer <> invalid Then
+        ' We're returning from the video, so we need to update to the last autoplayed content
+        m.SetContentList(m.VideoPlayer.History, m.VideoPlayer.History.Count() - 1)
+    End If
+    
     content = m.GetContent(False)
     Omniture().TrackPage("app:roku:" + IIf(content.IsFullEpisode(), "episode", "clip") + ":" + LCase(AsString(content.Title)))
     m.ResetContent()
+    
+    m.VideoPlayer = invalid
 End Sub
 
 Sub EpisodeScreen_OnHidden(eventData As Object, callbackData = invalid As Object)
@@ -186,7 +195,8 @@ Sub EpisodeScreen_OnButtonPressed(eventData As Object, callbackData = invalid As
                     Omniture().TrackPage("app:roku:settings:concurrent stream limit")
                     ShowMessageBox("Concurrent Streams Limit", "You've reached the maximum number of simultaneous video streams for your account. To view this video, close the other videos you're watching and try again.", ["OK"], True)
                 Else
-                    NewVideoPlayer().Play(content, (eventData.Button.ID = "resume"))
+                    m.VideoPlayer = NewVideoPlayer()
+                    m.VideoPlayer.Play(content, (eventData.Button.ID = "resume"))
                 End If
             End If
         Else If eventData.Button.ID = "addFavorite" Then

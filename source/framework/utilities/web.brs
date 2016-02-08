@@ -180,7 +180,7 @@ Function GetUrlHeaders(url As String, timeout = 30 As Integer, headers = invalid
 End Function
 
 Function GetUrlToStringEx(url As String, timeout = 30 As Integer, headers = invalid As Object, certificates = "common:/certs/ca-bundle.crt" As String, certificatesDepth = -1 As Integer, method = "GET" As String, requireCertVerification = True As Boolean) As Object
-    DebugPrint(url, "GetUrlToStringEx", 2)
+    DebugPrint({ Url: url, Headers: headers }, "GetUrlToStringEx", 2)
     timeout = timeout * 1000
     
     response = {
@@ -252,7 +252,7 @@ Function GetUrlToString(url As String, timeout = 30 As Integer, headers = invali
 End Function
 
 Function GetUrlToStringAsync(url As String, headers = invalid As Object, certificates = "common:/certs/ca-bundle.crt" As String, certificatesDepth = -1 As Integer, method = "GET" As String, requireCertVerification = True As Boolean) As Dynamic
-    DebugPrint(url, "GetUrlToStringAsync", 2)
+    DebugPrint({ Url: url, Headers: headers }, "GetUrlToStringAsync", 2)
 
     http = CreateObject("roUrlTransfer")
     http.SetPort(CreateObject("roMessagePort"))
@@ -403,7 +403,7 @@ Function GetUrlToFileAsync(url As String, path As String, headers = invalid As O
 End Function
 
 Function PostUrlToStringEx(url As String, postData = "" As String, timeout = 30 As Integer, headers = invalid As Object, certificates = "common:/certs/ca-bundle.crt" As String, certificatesDepth = -1 As Integer, method = "POST" As String, requireCertVerification = True As Boolean) As Object
-    DebugPrint({ Url: url, PostData: postData }, "PostUrlToStringEx", 2)
+    DebugPrint({ Url: url, PostData: postData, Headers: headers }, "PostUrlToStringEx", 2)
     timeout = timeout * 1000
     
     response = {
@@ -470,7 +470,7 @@ Function PostUrlToString(url As String, postData = "" As String, timeout = 30 As
 End Function
 
 Function PostUrlToStringAsync(url As String, postData = "" As String, headers = invalid As Object, certificates = "common:/certs/ca-bundle.crt" As String, certificatesDepth = -1 As Integer, method = "POST" As String, requireCertVerification = True As Boolean) As Dynamic
-    DebugPrint({ Url: url, PostData: postData }, "PostUrlToStringAsync", 2)
+    DebugPrint({ Url: url, PostData: postData, Headers: headers}, "PostUrlToStringAsync", 2)
 
     http = CreateObject("roUrlTransfer")
     http.SetPort(CreateObject("roMessagePort"))

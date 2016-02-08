@@ -39,6 +39,7 @@ Sub Section_Initialize(json As Object)
                 m.Videos.Push(episode)
             End If
         Next
+        m.LoadVideos()
         itemCount = AsInteger(json.sectionItems.itemCount)
         If itemCount > 0 Then
             m.SetTotalCount(itemCount)
@@ -93,7 +94,7 @@ End Function
 
 Sub Section_LoadVideos(startIndex = 0 As Integer, count = 10 As Integer)
     loadNewPage = False
-    For i = startIndex To startIndex + count
+    For i = startIndex To startIndex + count - 1
         If m.Videos[i] = invalid Then
             loadNewPage = True
             Exit For
@@ -116,4 +117,15 @@ Sub Section_LoadVideos(startIndex = 0 As Integer, count = 10 As Integer)
             m.Videos[startIndex + i] = items[i]
         Next
     End If
+    
+    ' HACK: Capture the next clips for autoplay functionality
+    lastClip = invalid
+    For Each video In m.Videos
+        If video <> invalid And video.IsClip() Then
+            If lastClip <> invalid Then
+                lastClip.NextClip = video
+            End If
+            lastClip = video
+        End If
+    Next
 End Sub

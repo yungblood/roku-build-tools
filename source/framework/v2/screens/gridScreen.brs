@@ -148,7 +148,11 @@ Sub GridScreen_SetRowItems(rowItems As Object)
         rowStyles = []
         For Each row in m.RowItems
             If row <> invalid Then
-                rowNames.Push(row.Name)
+                If Not IsNullOrEmpty(row.Name) Then
+                    rowNames.Push(row.Name)
+                Else
+                    rowNames.Push(row.Title)
+                End If
                 If Not IsNullOrEmpty(row.PosterStyle) Then
                     rowStyles.Push(row.PosterStyle)
                 Else

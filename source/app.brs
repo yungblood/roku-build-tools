@@ -74,6 +74,10 @@ Sub App_Run(ecp = invalid As Object)
             ' The user didn't authenticate, so load the default content now
             Cbs().LoadDefaultContent()
         End If
+        
+        facade = CreateObject("roPosterScreen")
+        facade.ShowMessage("")
+        facade.Show()
 
         ' Show the home screen
         listen = NewHomeScreen().Show(ecpItem)

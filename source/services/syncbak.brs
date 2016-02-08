@@ -75,7 +75,7 @@ Function Syncbak_GetDeviceData() As Object
     If m.DeviceData = invalid Then
         deviceData = {}
         deviceData["deviceId"] = GetDeviceID()
-        deviceData["ip"] = GetExternalIPAddress() '"67.221.255.55" ' 
+        'deviceData["ip"] = Cbs().GetIPAddress() '"67.221.255.55" ' 
         deviceData["locationAccuracy"] = 5
         deviceData["locationAge"] = 0
 

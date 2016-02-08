@@ -5,7 +5,7 @@ Function Cbs() As Object
     Return m.Cbs
 End Function
 
-Function NewCbs(useStaging = False As Boolean) As Object
+Function NewCbs() As Object
     this                            = {}
     this.ClassName                  = "Cbs"
     
@@ -27,7 +27,7 @@ Function NewCbs(useStaging = False As Boolean) As Object
     this.TosUrl                     = "http://www.cbs.com/sites/roku/cbs_roku.cfg"
     this.LegalUrl                   = "http://www.cbs.com/sites/roku/cbs_roku_legal_notices.cfg"
     
-    this.CSNumber                   = "(888) 274-5354"
+    this.CSNumber                   = "(888) 274-5343"
     
     this.StagingApiKey              = "c3d24e796cbc78c7"
     this.StagingEndpoint            = "https://test-www.cbs.com/apps-api/"
@@ -76,6 +76,8 @@ Function NewCbs(useStaging = False As Boolean) As Object
     this.LoadDefaultContent         = Cbs_LoadDefaultContent
     
     this.Verify                     = Cbs_Verify
+    
+    this.GetIPAddress               = Cbs_GetIPAddress
     
     this.IsAuthenticated            = Cbs_IsAuthenticated
     this.IsSubscribed               = Cbs_IsSubscribed
@@ -145,6 +147,7 @@ Function NewCbs(useStaging = False As Boolean) As Object
 End Function
 
 Function Cbs_Initialize(useStaging = False As Boolean) As Boolean
+    m.UseStaging = useStaging
     If useStaging Then
         m.ApiKey            = m.StagingApiKey
         m.Endpoint          = m.StagingEndpoint
@@ -188,6 +191,19 @@ Function Cbs_Verify() As Boolean
     Return (result <> invalid And Not IsNullOrEmpty(result.version))
 End Function
 
+Function Cbs_GetIPAddress(useCbsApi = True As Boolean) As String
+    If useCbsApi Then
+        url = "https://www.cbs.com/apps/user/ip.json"
+        result = GetUrlToJson(url)
+        If result <> invalid And result.success = True Then
+            Return result.ip
+        End If
+    Else
+        Return GetExternalIPAddress()
+    End If
+    Return "Unknown"
+End Function
+
 Function Cbs_IsAuthenticated(refresh = False As Boolean) As Boolean
     ' We want to refresh if forced, or we have no cookies
     refresh = refresh Or IsNullOrEmpty(GetCookiesForUrl(m.Endpoint))
@@ -208,7 +224,7 @@ End Function
 Function Cbs_GetLinkCode() As Object
     url = m.Endpoint + "v2.0/ott/devices/roku/auth/code.xml"
     url = AddQueryString(url, "deviceId", GetDeviceID())
-    url = AddQueryString(url, "ipAddress", GetExternalIPAddress())
+    url = AddQueryString(url, "ipAddress", m.GetIPAddress())
     url = AddQueryString(url, "newCode", "true")
     
     result = m.Request(url, "GET", invalid, "xml")
@@ -273,18 +289,33 @@ Function Cbs_GetUpsellInfo() As Object
     url = m.Endpoint + "roku/upsell.json?pageURL=ROKU_SIGN_UP_SCREEN"
     result = m.Request(url, "GET")
     If IsAssociativeArray(result) And result.upsellInfo <> invalid Then
-        upsellInfo = AsArray(result.upsellInfo)[0]
-        If upsellInfo <> invalid Then
-            info = {
-                Headline:   AsString(upsellInfo.upsellMessage)
-                Message:    AsString(upsellInfo.upsellMessage2)
-                Background: m.GetImageUrl(upsellInfo.upsellHDImagePath, 1280)
-            }
-            If Not IsHD() Or IsNullOrEmpty(info.Background) Then
-                info.Background = m.GetImageUrl(upsellInfo.upsellImagePath, 720)
-            End If
-            Return info
+        state = m.GetCurrentUser().State
+        If IsNullOrEmpty(state) Then
+            state = "ANONYMOUS"
         End If
+        upsellInfos = AsArray(result.upsellInfo)
+        For Each upsellInfo In upsellInfos
+            If ArrayContains(upsellInfo.userStateList, state) Then
+                ' TODO: We're using _liveDate and _expireDate instead of liveDate and expireDate, 
+                '       because Roku's json parser mangles 64-bit integers.  We should revisit
+                '       after all devices have updated to firmware 7.x+
+                liveDate = DateFromISO8601String(upsellInfo["_liveDate"]).AsSeconds()
+                expireDate = DateFromISO8601String(upsellInfo["_expireDate"]).AsSeconds()
+                current = NowDate().AsSeconds()
+                If current >= liveDate And current <= expireDate Then
+                    info = {
+                        Headline:       AsString(upsellInfo.upsellMessage)
+                        Message:        AsString(upsellInfo.upsellMessage2)
+                        Background:     m.GetImageUrl(upsellInfo.upsellHDImagePath, 1280)
+                        ProductCode:    AsString(upsellInfo.aaProductID)
+                    }
+                    If Not IsHD() Or IsNullOrEmpty(info.Background) Then
+                        info.Background = m.GetImageUrl(upsellInfo.upsellImagePath, 720)
+                    End If
+                    Return info
+                End If
+            End If
+        Next
     End If
     Return {}
 End Function
@@ -535,7 +566,7 @@ End Function
 Function Cbs_GetBigBrotherStreamToken(id As String, debug = False As Boolean) As String
     url = m.Endpoint + "v3.0/roku/video/bbl/token.json"
     url = AddQueryString(url, "stream", id)
-    url = AddQueryString(url, "ip", GetExternalIPAddress())
+    url = AddQueryString(url, "ip", m.GetIPAddress())
     If debug Then
         url = AddQueryString(url, "tokenGeneration", "true")
     End If

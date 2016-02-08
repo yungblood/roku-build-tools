@@ -84,7 +84,11 @@ Sub PosterScreen_SetListItems(listItems As Object, raiseEvent = False As Boolean
         listStyles = []
         For Each list in m.ListItems
             If list <> invalid Then
-                listNames.Push(list.Name)
+                If Not IsNullOrEmpty(list.Name) Then
+                    listNames.Push(list.Name)
+                Else
+                    listNames.Push(list.Title)
+                End If
             End If
         Next
         m.Screen.SetListNames(listNames)
