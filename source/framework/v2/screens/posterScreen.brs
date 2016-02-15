@@ -92,6 +92,7 @@ Sub PosterScreen_SetListItems(listItems As Object, raiseEvent = False As Boolean
             End If
         Next
         m.Screen.SetListNames(listNames)
+        m.Screen.SetFocusedList(m.ListIndex)
         If raiseEvent Then
             m.RaiseEvent("ListFocused", m.GetBaseEventData())
         End If

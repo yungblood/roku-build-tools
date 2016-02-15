@@ -4,51 +4,59 @@
 ' All Rights Reserved.
 ' ******************************************************
 Function NewGridScreen() As Object
-    this                        = NewBaseScreen("roGridScreen", ["Idle", "roGridScreenEvent"])
-    this.ClassName              = "GridScreen"
+    this                            = NewBaseScreen("roGridScreen", ["Idle", "roGridScreenEvent"])
+    this.ClassName                  = "GridScreen"
     
-    this.InitialLoad            = True
-    this.AllLoaded              = False
-    this.LoadAsync              = True
-    this.LoadIndex              = 0
-    this.RowLoadThreshold       = 5 ' Either side of the current row
-    this.RowIndex               = 0
-    this.ItemIndex              = 0
-    this.RowItems               = []
-    this.PopulatedRows          = [] ' Track rows that have been populated with SetContentList
-    this.LoadingItemID          = "grid_loading"
+    this.InitialLoad                = True
+    this.AllLoaded                  = False
+    this.LoadAsync                  = True
+    this.LoadIndex                  = 0
+    this.RowLoadThreshold           = 5 ' Either side of the current row
+    this.RowIndex                   = 0
+    this.ItemIndex                  = 0
+    this.RowItems                   = []
+    this.PopulatedRows              = [] ' Track rows that have been populated with SetContentList
+    this.LoadingItemID              = "grid_loading"
     
-    this.InitializeScreen       = GridScreen_InitializeScreen
+    
+    ' HACK: Workaround for a bizarre firmware bug that can cause a dialog to flash on screen
+    '       when exiting a grid screen
+    this.ShowFacade                 = True
+    
+    this.InitializeScreen           = GridScreen_InitializeScreen
 
-    this.SetLoadAsync           = GridScreen_SetLoadAsync
+    this.SetLoadAsync               = GridScreen_SetLoadAsync
     
-    this.ShowMessage            = GridScreen_ShowMessage
+    this.ShowMessage                = GridScreen_ShowMessage
     
-    this.SetGridStyle           = GridScreen_SetGridStyle
-    this.SetDisplayMode         = GridScreen_SetDisplayMode
-    this.SetUpBehaviorAtTopRow  = GridScreen_SetUpBehaviorAtTopRow
-    this.SetDescriptionVisible  = GridScreen_SetDescriptionVisible
-    this.SetCounterVisible      = GridScreen_SetCounterVisible
-    this.SetLoadingPoster       = GridScreen_SetLoadingPoster
-    this.SetErrorPoster         = GridScreen_SetErrorPoster
+    this.SetGridStyle               = GridScreen_SetGridStyle
+    this.SetDisplayMode             = GridScreen_SetDisplayMode
+    this.SetUpBehaviorAtTopRow      = GridScreen_SetUpBehaviorAtTopRow
+    this.SetDescriptionVisible      = GridScreen_SetDescriptionVisible
+    this.SetCounterVisible          = GridScreen_SetCounterVisible
+    this.SetLoadingPoster           = GridScreen_SetLoadingPoster
+    this.SetErrorPoster             = GridScreen_SetErrorPoster
     
-    this.SetRowItems            = GridScreen_SetRowItems
-    this.SetContentList         = GridScreen_SetContentList
-    this.SetListVisible         = GridScreen_SetListVisible
-    this.GetListVisible         = GridScreen_GetListVisible
-    this.SetListOffset          = GridScreen_SetListOffset
-    this.SetFocusedListItem     = GridScreen_SetFocusedListItem
-    this.GetFocusedListItem     = GridScreen_GetFocusedListItem
-    this.GetRowIndex            = GridScreen_GetRowIndex
-    this.GetFocusedRowIndex     = GridScreen_GetFocusedRowIndex
-    this.GetFocusedRow          = GridScreen_GetFocusedRow
+    this.SetRowItems                = GridScreen_SetRowItems
+    this.SetContentList             = GridScreen_SetContentList
+    this.SetListVisible             = GridScreen_SetListVisible
+    this.GetListVisible             = GridScreen_GetListVisible
+    this.SetListOffset              = GridScreen_SetListOffset
+    this.SetFocusedListItem         = GridScreen_SetFocusedListItem
+    this.GetFocusedListItem         = GridScreen_GetFocusedListItem
+    this.GetFocusedListItemIndex    = GridScreen_GetFocusedListItemIndex
+    this.GetRow                     = GridScreen_GetRow
+    this.GetRowByID                 = GridScreen_GetRowByID
+    this.GetRowIndex                = GridScreen_GetRowIndex
+    this.GetFocusedRowIndex         = GridScreen_GetFocusedRowIndex
+    this.GetFocusedRow              = GridScreen_GetFocusedRow
     
-    this.ReloadRow              = GridScreen_ReloadRow
-    this.LoadRows               = GridScreen_LoadRows
+    this.ReloadRow                  = GridScreen_ReloadRow
+    this.LoadRows                   = GridScreen_LoadRows
     
-    this.OnEvent                = GridScreen_OnEvent
+    this.OnEvent                    = GridScreen_OnEvent
     
-    this.GetBaseEventData       = GridScreen_GetBaseEventData
+    this.GetBaseEventData           = GridScreen_GetBaseEventData
     
     Return this
 End Function
@@ -75,6 +83,7 @@ Sub GridScreen_SetLoadAsync(async = True As Boolean)
 End Sub
 
 Sub GridScreen_ShowMessage(message As String)
+    m.Message = message
     If m.Screen <> invalid Then
         m.Screen.ShowMessage(message)
     End If
@@ -261,6 +270,18 @@ Function GridScreen_GetFocusedListItem() As Object
         End If
     End If
     Return invalid
+End Function
+
+Function GridScreen_GetFocusedListItemIndex() As Integer
+    Return m.ItemIndex
+End Function
+
+Function GridScreen_GetRow(index As Integer) As Object
+    Return m.RowItems[index]
+End Function
+
+Function GridScreen_GetRowByID(id As String) As Object
+    Return m.GetRow(m.GetRowIndex(id))
 End Function
 
 Function GridScreen_GetRowIndex(id As String) As Integer

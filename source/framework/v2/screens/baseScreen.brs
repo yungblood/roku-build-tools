@@ -74,7 +74,7 @@ Function BaseScreen_Dispose() As Boolean
             m.Screen = invalid
 
             If m.Facade <> invalid Then
-                Sleep(100)
+                Sleep(10)
                 m.Facade.Close()
                 m.Facade = invalid
             End If

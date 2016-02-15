@@ -286,7 +286,7 @@ Function Cbs_GetLegalText() As String
 End Function
 
 Function Cbs_GetUpsellInfo() As Object
-    url = m.Endpoint + "roku/upsell.json?pageURL=ROKU_SIGN_UP_SCREEN"
+    url = m.Endpoint + "roku/upsell.json?pageURL=ROKU_ALL_ACCESS_TRIAL" 'ROKU_SIGN_UP_SCREEN"
     result = m.Request(url, "GET")
     If IsAssociativeArray(result) And result.upsellInfo <> invalid Then
         state = m.GetCurrentUser().State

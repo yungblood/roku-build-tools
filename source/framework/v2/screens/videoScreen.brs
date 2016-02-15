@@ -12,6 +12,7 @@ Function NewVideoScreen() As Object
     this.PositionNotificationPeriod     = 0
     this.Cookies                        = ""
     this.Position                       = 0
+    this.Wrap                           = False
     
     this.IgnoreClose                    = False
     this.IsPaused                       = False
@@ -32,6 +33,7 @@ Function NewVideoScreen() As Object
     
     this.SetCookies                     = VideoScreen_SetCookies
     
+    this.SetWrap                        = VideoScreen_SetWrap
     this.SetNext                        = VideoScreen_SetNext
     
     this.Pause                          = VideoScreen_Pause
@@ -130,7 +132,14 @@ Sub VideoScreen_SetCookies(cookies As String)
     m.Cookies = cookies
 End Sub
 
+Sub VideoScreen_SetWrap(wrap = True As Boolean)
+    m.Wrap = wrap
+End Sub
+
 Function VideoScreen_SetNext(index As Integer) As Boolean
+    If m.Wrap Then
+        index = index Mod m.ContentList.Count()
+    End If
     If index < m.ContentList.Count() Then
         m.ItemIndex = index
         If m.RaiseEvent("BeforeNewContent", m.GetBaseEventData()) <> False Then

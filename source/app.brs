@@ -58,6 +58,11 @@ Sub App_Run(ecp = invalid As Object)
                     End If
                 Else If ecp.mediaType = "show" Or ecp.mediaType = "series" Then
                     ecpItem = Cbs().GetShow(contentID)
+                    
+                    'HACK: Workaround for Roku "My Feed" bug that specifies series for some episodes
+                    If ecpItem = invalid Then
+                        ecpItem = Cbs().GetEpisode(contentID)
+                    End If
                 Else If ecp.contentID = "live" Then
                     ecpItem = { ClassName: "menuItem", ID: "liveTV" }
                 End If
