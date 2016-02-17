@@ -161,7 +161,7 @@ Function ShowExitScreen() As Boolean
             If msg.IsRemoteKeyPressed() Then
                 key = msg.GetIndex()
                 If key = 0 Then         ' Back
-                    'screen.Close()
+                    screen.Close()
                 Else If key = 6 Then    ' Select
                     button = buttons[buttonIndex]
                     If button <> invalid Then

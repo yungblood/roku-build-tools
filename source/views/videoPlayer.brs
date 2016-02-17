@@ -195,6 +195,7 @@ Sub VideoPlayer_InitAkamai()
         configXML:          Cbs().AkamaiUrl
         customDimensions:   m.Content.GetAkamaiDims(Cbs().AkamaiDims)
     }
+    m.Akamai = AkaMA_plugin()
     m.Akamai.pluginMain(config)
     m.Akamai.setViewerDiagnosticId(Cbs().GetCurrentUser().ID)
 End Sub

@@ -218,10 +218,14 @@ Function HomeScreen_OnDisposed(eventData As Object, callbackData = invalid As Ob
     
     ' Prompt the user to exit if this is the last screen
     If ScreenManager().Screens.Count() = 0 Then
-        If ShowExitScreen() Then
-            Return False
+        If Not App().Restart Then
+            If ShowExitScreen() Then
+                Return False
+            Else
+                NewHomeScreen().Show(invalid, m.Rows)
+            End If
         Else
-            NewHomeScreen().Show(invalid, m.Rows)
+            Return False
         End If
     End If
     Return True
