@@ -4,6 +4,10 @@ Function NewChannel(json = invalid As Object) As Object
     
     this.Initialize     = Channel_Initialize
     
+    ' Implemented strictly to simplify video player content checking
+    this.IsAvailable    = Channel_IsAvailable
+    this.IsClip         = Channel_IsClip
+    
     this.GetAkamaiDims  = Channel_GetAkamaiDims
     
     this.GetNowPlaying  = Channel_GetNowPlaying
@@ -67,6 +71,14 @@ Sub Channel_Initialize(json As Object)
         End If
     End If
 End Sub
+
+Function Channel_IsAvailable() As Boolean
+    Return True
+End Function
+
+Function Channel_IsClip() As Boolean
+    Return False
+End Function
 
 Function Channel_GetAkamaiDims(additionalDims = {} As Object) As Object
     dims = {

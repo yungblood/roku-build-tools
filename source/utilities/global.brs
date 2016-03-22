@@ -60,13 +60,13 @@ Sub ShowOptionsDialog(showSearch = True As Boolean, showSettings = True As Boole
     options = []
     
     'TODO: For testing purposes, should not display when published to production
-'    If Cbs().UseStaging = True Then
+    If Cbs().UseStaging = True Then
         options.Push({
             Text:   "DEBUG: Display IP Address"
             ID:     "ip"
         })
         options.Push("separator")
-'    End If
+    End If
     
     
     If Not Cbs().IsSearchScreenOpened Then

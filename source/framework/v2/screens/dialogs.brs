@@ -107,6 +107,7 @@ Function ShowMessageBox(title As String, message As String, buttons = ["OK"], en
     
     messageBox.Show()
 
+    timer = CreateObject("roTimespan")
     While EventListener().ListenForOne()
         ' Wait for user interaction or timeout
         If timeout > 0 And timeout <= timer.TotalMilliseconds() Then

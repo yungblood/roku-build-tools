@@ -7,6 +7,10 @@ Function NewLiveFeed(json = invalid As Object) As Object
     
     this.Initialize     = LiveFeed_Initialize
     
+    ' Implemented strictly to simplify video player content checking
+    this.IsAvailable    = LiveFeed_IsAvailable
+    this.IsClip         = LiveFeed_IsClip
+    
     this.GetAkamaiDims  = LiveFeed_GetAkamaiDims
     
     this.SetShowID      = LiveFeed_SetShowID
@@ -40,6 +44,14 @@ Sub LiveFeed_Initialize(json As Object)
 
     m.StreamUrl = AsString(json.hls)
 End Sub
+
+Function LiveFeed_IsAvailable() As Boolean
+    Return True
+End Function
+
+Function LiveFeed_IsClip() As Boolean
+    Return False
+End Function
 
 Function LiveFeed_GetAkamaiDims(additionalDims = {} As Object) As Object
     dims = {
