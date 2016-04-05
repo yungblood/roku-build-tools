@@ -120,11 +120,16 @@ Function EventListener_Listen() As Boolean
     End If
 End Function
 
-Function EventListener_ListenForOne() As Boolean
+Function EventListener_ListenForOne(port = invalid As Object) As Boolean
     result = True
-    For i = 0 To m.Ports.Count() - 1
-        m.CurrentPort = (m.CurrentPort + 1) Mod m.Ports.Count()
-        eventPort = m.Ports[m.CurrentPort]
+    i = 0
+    While True
+        eventPort = port
+        If eventPort = invalid Then
+            ' A port wasn't passed in, so get the next port in the sequence
+            m.CurrentPort = (m.CurrentPort + 1) Mod m.Ports.Count()
+            eventPort = m.Ports[m.CurrentPort]
+        End If
         If eventPort <> invalid Then
             ' If we don't require precision, let the system breathe for a millisecond
             msg = eventPort.GetMessage(IIf(m.RequirePrecision, -1, 1))
@@ -178,8 +183,16 @@ Function EventListener_ListenForOne() As Boolean
                     End If
                 End If
                 '?m.LastEventType
+                
+                ' We processed an event, so bail out of the loop
+                Exit While
             End If
         End If
-    Next
+
+        i = i + 1
+        If i >= m.Ports.Count() Or port <> invalid Then
+            Exit While
+        End If
+    End While
     Return (result <> False)
 End Function

@@ -21,7 +21,9 @@ Function NewPosterScreen() As Object
     this.SetListItems           = PosterScreen_SetListItems
     this.SetContentList         = PosterScreen_SetContentList
     this.SetFocusedList         = PosterScreen_SetFocusedList
+    this.GetFocusedList         = PosterScreen_GetFocusedList
     this.SetFocusedListItem     = PosterScreen_SetFocusedListItem
+    this.GetFocusedListItem     = PosterScreen_GetFocusedListItem
 
     this.OnEvent                = PosterScreen_OnEvent
     
@@ -104,7 +106,7 @@ Sub PosterScreen_SetContentList(contentList As Object)
         ' No filter items were set, so create a placeholder
         m.ListItems = [{}]
     End If
-    list = m.ListItems[m.ListIndex]
+    list = m.GetFocusedList()
     If list <> invalid Then
         list.ContentList = contentList
         list.IsLoaded = True
@@ -121,8 +123,15 @@ Sub PosterScreen_SetFocusedList(listIndex As Integer)
     End If
 End Sub
 
+Function PosterScreen_GetFocusedList() As Object
+    If m.ListItems <> invalid Then
+        Return m.ListItems[m.ListIndex]
+    End If
+    Return invalid
+End Function
+
 Sub PosterScreen_SetFocusedListItem(itemIndex As Integer)
-    list = m.ListItems[m.ListIndex]
+    list = m.GetFocusedList()
     If list <> invalid And list.IsLoaded = True And list.ContentList <> invalid Then
         If itemIndex >= list.ContentList.Count() Then
             itemIndex = 0
@@ -134,6 +143,14 @@ Sub PosterScreen_SetFocusedListItem(itemIndex As Integer)
     End If
 End Sub
 
+Function PosterScreen_GetFocusedListItem() As Object
+    list = m.GetFocusedList()
+    If list <> invalid And list.ContentList <> invalid Then
+        Return list.ContentList[m.ItemIndex]
+    End If
+    Return invalid
+End Function
+
 Function PosterScreen_OnEvent(eventData As Object, callbackData = invalid As Object) As Boolean
     ' Retrieve the message via the key, to avoid Eclipse parser errors
     msg = eventData["Event"]
@@ -144,7 +161,7 @@ Function PosterScreen_OnEvent(eventData As Object, callbackData = invalid As Obj
             m.ItemIndex = 0
             m.ListIndex = msg.GetIndex()
             ' Store the list's current selected index
-            list = m.ListItems[m.ListIndex]
+            list = m.GetFocusedList()
             If list <> invalid Then
                 If list.SelectedIndex <> invalid Then
                     m.ItemIndex = list.SelectedIndex
@@ -161,7 +178,7 @@ Function PosterScreen_OnEvent(eventData As Object, callbackData = invalid As Obj
         Else If msg.IsListItemFocused() Then
             m.ItemIndex = msg.GetIndex()
             ' Store the list's current selected index
-            list = m.ListItems[m.ListIndex]
+            list = m.GetFocusedList()
             If list <> invalid Then
                 list.SelectedIndex = m.ItemIndex
             End If

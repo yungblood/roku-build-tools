@@ -64,7 +64,7 @@ Function NewVideoPlayer() As Object
 End Function
 
 Sub VideoPlayer_Initialize()
-    m.Screen                     = NewVideoScreen()
+    m.Screen = NewVideoScreen()
     m.Screen.SetPositionNotificationPeriod(1)
 
     m.Screen.GetEventPort().RegisterObserver(m, "GetMessage", "OnGetMessage")
@@ -86,7 +86,7 @@ Sub VideoPlayer_Initialize()
     EventListener().RegisterObserver(m, "Idle", "OnIdle")
 End Sub
 
-Function VideoPlayer_Play(episodeOrChannel As Object, resume = False As Boolean) As Boolean
+Function VideoPlayer_Play(episodeOrChannel As Object, resume = False As Boolean, isAutoPlay = False As Boolean) As Boolean
     If m.Screen = invalid Then
         m.Initialize()
     End If
@@ -99,6 +99,7 @@ Function VideoPlayer_Play(episodeOrChannel As Object, resume = False As Boolean)
     
     m.IsResume = resume
     m.Content = episodeOrChannel
+    m.InitialPosition = 0
     m.Position = 0
     m.AdCount = 0
     
@@ -128,10 +129,36 @@ Function VideoPlayer_Play(episodeOrChannel As Object, resume = False As Boolean)
     
     ' Get the stream
     stream = invalid
-    If Cbs().IsSubscribed() Or (m.Content.IsClip() And m.Content.IsAvailable()) Then
+    If m.Content.CanWatch() Then
         stream = m.Content.GetStream(resume)
     End If
     If stream <> invalid Then
+        ' Create the Conviva session
+        If m.ConvivaSession <> invalid Then
+            ConvivaLivePassInstance().CleanupSession(m.ConvivaSession)
+            m.ConvivaSession = invalid
+        End If
+        
+        convivaTags = {}
+        convivaTags["category"]             = AsString(m.Content.TopLevelCategory)
+        convivaTags["contentId"]            = AsString(m.Content.ContentID)
+        convivaTags["contentType"]          = IIf(stream.Live = True, "Live", "VOD")
+        convivaTags["show"]                 = AsString(m.Content.ShowName)
+        convivaTags["site"]                 = AsString(isAutoPlay)
+        convivaTags["connectionType"]       = IIf(GetEthernetInterface() = "eth0", "Ethernet", "WiFi")
+        convivaTags["playerVersion"]        = GetAppVersion()
+        convivaTags["accessType"]           = IIf(Cbs().IsAuthenticated(), IIf(Cbs().IsSubscribed(), "Premium", "Authenticated"), "Free")
+    
+        convivaMetadata = ConvivaContentInfo(m.Content.GetConvivaName(), convivaTags)
+        convivaMetadata["streamUrl"]        = stream.Stream.Url
+        convivaMetadata["streamFormat"]     = "hls"
+        convivaMetadata["contentLength"]    = AsString(m.Content.Length)
+        convivaMetadata["isLive"]           = AsString(stream.Live = True)
+        convivaMetadata["playerName"]       = "CBSAllAccess Roku"
+        convivaMetadata["viewerId"]         = Cbs().GetCurrentUser().ID
+    
+        m.ConvivaSession = ConvivaLivePassInstance().createSession(invalid, convivaMetadata, 1)
+
         m.PlayerID = MD5Hash(GetDeviceID() + AsString(NowDate().AsSeconds()))
         DW().PlayerInit(m.PlayerID)
         
@@ -205,13 +232,13 @@ Function VideoPlayer_OnGetMessage(eventData As Object, callbackData As Object) A
     If eventData.Timeout = -1 Then
         msg = eventData.Port.GetMessage()
     Else
-        msg = Wait(eventData.Timeout, eventData.Port)
+        msg = ConvivaWait(eventData.Timeout, eventData.Port, invalid)
     End If
     
     If Type(msg) = "roVideoScreenEvent" Then
         m.LastVideoScreenEvent = msg ' used by Raf
+        m.Akamai.pluginEventHandler(msg)
     End If
-    m.Akamai.pluginEventHandler(msg)
     m.StreamSense.Tick()
     Return msg
 End Function
@@ -367,7 +394,7 @@ Sub VideoPlayer_OnComplete(eventData As Object, callbackData As Object)
     If m.NextEpisode <> invalid Then
         ' Dispose the video screen
         m.OnDisposed(invalid, invalid)
-        m.Play(m.NextEpisode)
+        m.Play(m.NextEpisode, False, True)
     End If
 End Sub
 
@@ -390,7 +417,13 @@ Sub VideoPlayer_OnClose(eventData As Object, callbackData As Object)
 End Sub
 
 Sub VideoPlayer_OnPositionNotification(eventData As Object, callbackData As Object)
-    m.Position = eventData.Position
+    ' Capture the initial position notification for live streams to adjust for 
+    ' timestamp-based positions
+    If eventData.Item.Live = True And m.InitialPosition = 0 Then
+        m.InitialPosition = eventData.Position
+    End If
+    m.Position = eventData.Position - m.InitialPosition
+
     ' The logic for sending play events is built into the DW class
     If m.Content.ClassName = "Episode" Then
         DW().PlayerPlay(m.Content, m.GetPlayerPosition(True), m.GetPlayerPosition(False))
@@ -494,6 +527,12 @@ End Sub
 Function VideoPlayer_OnDisposed(eventData As Object, callbackData As Object) As Boolean
     ' Let comScore know we've stopped playback
     m.StreamSense.Stop()
+    
+    ' Clean up the conviva session
+    If m.ConvivaSession <> invalid Then
+        ConvivaLivePassInstance().CleanupSession(m.ConvivaSession)
+        m.ConvivaSession = invalid
+    End If
 
     EventListener().UnregisterObserver(m, "Idle")
     If m.Screen <> invalid Then

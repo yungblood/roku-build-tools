@@ -17,6 +17,7 @@ Function NewUser(json = invalid As Object) As Object
     this.GetMyCbsShows              = User_GetMyCbsShows
     this.GetMyCbsEpisodes           = User_GetMyCbsEpisodes
     this.GetRecentlyWatched         = User_GetRecentlyWatched
+    this.GetRecentlyWatchedForShow  = User_GetRecentlyWatchedForShow
     this.AddToRecentlyWatched       = User_AddToRecentlyWatched
     
     this.GetFavorites               = User_GetFavorites
@@ -122,9 +123,19 @@ End Function
 
 Function User_GetRecentlyWatched(refresh = False As Boolean) As Object
     If m.RecentlyWatched = invalid Or refresh Then
-        m.RecentlyWatched = Cbs().GetRecentlyWatched(1, 25)
+        m.RecentlyWatched = Cbs().GetRecentlyWatched(1, 50)
     End If
     Return m.RecentlyWatched
+End Function
+
+Function User_GetRecentlyWatchedForShow(showID As String, refresh = False As Boolean) As Object
+    recentlyWatched = m.GetRecentlyWatched(refresh)
+    For Each episode In recentlyWatched
+        If episode.ShowID = showID Then
+            Return episode
+        End If
+    Next
+    Return invalid
 End Function
 
 Sub User_AddToRecentlyWatched(episode As Object)
@@ -139,7 +150,7 @@ Sub User_AddToRecentlyWatched(episode As Object)
 End Sub
 
 Function User_GetFavorites(refresh = False As Boolean) As Object
-    If m.Favorites = invalid Or refresh Then
+    If refresh Or m.Favorites = invalid Then
         m.Favorites = Cbs().GetFavoriteShowIDs()
     End If
     Return m.Favorites
@@ -156,8 +167,7 @@ End Function
 
 Function User_AddShowToFavorites(showID As String) As Boolean
     If Cbs().AddShowToFavorites(showID) Then
-        m.GetFavorites()
-        m.Favorites.Push(showID)
+        m.GetFavorites(True)
         GlobalEventRegistry().RaiseEvent("FavoritesChanged", { ShowID: showID, Added: True })
         Return True
     End If
@@ -166,12 +176,7 @@ End Function
 
 Function User_RemoveShowFromFavorites(showID As String) As Boolean
     If Cbs().RemoveShowFromFavorites(showID) Then
-        m.GetFavorites()
-        For i = m.Favorites.Count() - 1 To 0 Step -1
-            If m.Favorites[i] = showID Then
-                m.Favorites.Delete(i)
-            End If
-        Next
+        m.GetFavorites(True)
         GlobalEventRegistry().RaiseEvent("FavoritesChanged", { ShowID: showID, Added: False })
         Return True
     End If

@@ -12,6 +12,12 @@ Function OpenItem(item As Object, eventData = invalid As Object) As Boolean
     Else If item.ClassName = "Show" Then
         NewShowScreen().Show(item.ID)
     Else If item.ClassName = "LiveFeed" Then
+        If eventData = invalid Then
+            eventData = {
+                Row: { ContentList: [item] }
+                ItemIndex: 0
+            }
+        End If
         NewLiveFeedScreen().Show(eventData.Row, eventData.ItemIndex, Cbs().GetCurrentUser().IsSubscriber())
     Else If item.ClassName = "SearchResult" Then
         If item.ResultType = "Show" Then

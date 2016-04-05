@@ -44,7 +44,10 @@ End Function
 Sub Vast3_Init(urlOrData As Object)
     vastData = urlOrData
     If IsString(vastData) Then
-        xmlString = GetUrlToString(vastData)
+        ' Replace any macros/tokens in the URL
+        url = Replace(vastData, "[timestamp]", NowDate().AsSeconds().ToStr())
+        
+        xmlString = GetUrlToString(url)
         vastData = ParseXmlAsJson(xmlString, True, "")
     End If
     If IsAssociativeArray(vastData) And IsAssociativeArray(vastData.VAST) Then

@@ -3,8 +3,8 @@ subtitle=Watch Full Seasons of Your Shows. Anytime, Anywhere.
 dial_title=CBS All Access
 
 major_version=1
-minor_version=3
-build_version=20160322
+minor_version=4
+build_version=20160404
 
 mm_icon_focus_hd=pkg:/images/channelstore_hd.jpg
 mm_icon_side_hd=pkg:/images/channelstore_hd.jpg

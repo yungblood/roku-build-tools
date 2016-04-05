@@ -108,7 +108,8 @@ Function ShowMessageBox(title As String, message As String, buttons = ["OK"], en
     messageBox.Show()
 
     timer = CreateObject("roTimespan")
-    While EventListener().ListenForOne()
+    ' Block on this dialog's event port
+    While EventListener().ListenForOne(messageBox.GetEventPort())
         ' Wait for user interaction or timeout
         If timeout > 0 And timeout <= timer.TotalMilliseconds() Then
             messageBox.Close()
@@ -153,7 +154,8 @@ Function ShowModalKeyboardScreen(title As String, displayText As String, text = 
     
     keyboardScreen.Show()
 
-    While EventListener().ListenForOne()
+    ' Block on this screen's event port
+    While EventListener().ListenForOne(keyboardScreen.GetEventPort())
     End While
     
     Return callback.Result

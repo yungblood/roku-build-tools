@@ -39,9 +39,6 @@ End Function
 Function ShowScreen_Show(showID As String) As Boolean
     ' Get the show
     m.ShowItem = Cbs().GetShow(showID)
-
-    ' Show the screen while we load the content
-    m.Screen.Show()
     
     If m.ShowItem <> invalid And (m.ShowItem.EpisodeCount > 0 Or m.ShowItem.ClipCount > 0) Then
         m.PreviousOverhangHD = GetThemeAttribute("GridScreenLogoHD")
@@ -52,6 +49,9 @@ Function ShowScreen_Show(showID As String) As Boolean
         If AsInteger(m.ShowItem.EpisodeCount) > 0 Then
             m.Screen.SetBreadcrumbText(AsString(m.ShowItem.EpisodeCount) + " Episode" + IIf(m.ShowItem.EpisodeCount > 1, "s", ""))
         End If
+
+        ' Show the screen while we load the content
+        m.Screen.Show()
         
         m.SetupRows()
         m.Screen.Show()
@@ -59,6 +59,7 @@ Function ShowScreen_Show(showID As String) As Boolean
         
         Return True
     Else
+        m.Screen.Show()
         m.Screen.ShowMessage("No content is currently available. Please try again later.")
     End If
     Return False
@@ -77,7 +78,7 @@ Sub ShowScreen_SetupRows()
             ID:     "bigBrotherLive"
         })
     End If
-    
+
     m.Rows.Append(m.ShowItem.GetRows())
     m.Screen.SetRowItems(m.Rows)
 End Sub
@@ -97,6 +98,9 @@ Sub ShowScreen_OnShown(eventData As Object, callbackData = invalid As Object)
         End If
     End If
     
+    ' Reload the menu row, to update the dynamic play button
+    m.Screen.ReloadRow("menu")
+    
     ' Reload the big brother live row, if present
     m.Screen.ReloadRow("bigBrotherLive")
 End Sub
@@ -110,18 +114,9 @@ Sub ShowScreen_OnRowLoading(eventData As Object, callbackData = invalid As Objec
             content = invalid
             If eventData.Row.ID = "menu" Then
                 content = []
-                If m.ShowItem.Category <> "Classics" Then
-                    episode = m.ShowItem.GetMostRecentEpisode()
-                    If episode <> invalid Then
-                        watchLatest = {}
-                        watchLatest.Append(episode)
-                        watchLatest.ID = "watchLatest"
-                        watchLatest.HDPosterUrl = "pkg:/images/icon_watchlatest_hd.png"
-                        watchLatest.SDPosterUrl = "pkg:/images/icon_watchlatest_sd.png"
-                        watchLatest.Episode = episode
-                        watchLatest.ShowDescription = True
-                        content.Push(watchLatest)
-                    End If
+                episode = m.ShowItem.GetDynamicPlayEpisode()
+                If episode <> invalid Then
+                    content.Push(episode)
                 End If
                 If m.ShowItem.ClipCount > 0 Then
                     content.Push({
@@ -210,7 +205,7 @@ Sub ShowScreen_OnListItemSelected(eventData As Object, callbackData = invalid As
     End If
     If eventData.Item <> invalid Then
         If eventData.Row <> invalid And eventData.Row.ID = "menu" Then
-            If eventData.Item.ID = "watchLatest" Then
+            If eventData.Item.ID = "dynamicPlay" Then
                 OpenItem(eventData.Item.Episode)
             Else If eventData.Item.ID = "clips" Then
                 index = m.Screen.GetRowIndex("clips")

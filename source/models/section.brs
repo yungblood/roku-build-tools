@@ -31,7 +31,16 @@ End Function
 
 Sub Section_Initialize(json As Object)
     m.SectionID = AsString(json.id)
-    m.Name      = AsString(json.sectionTitle)
+    If IsNullOrEmpty(m.SectionID) Then
+        m.SectionID = AsString(json.sectionId)
+    End If
+    m.Name = AsString(json.sectionTitle)
+    If IsNullOrEmpty(m.Name) Then
+        m.Name = AsString(json.title)
+    End If
+    
+    m.SeasonsSortOrder = LCase(AsString(json.seasons_sort_order))
+
     If IsAssociativeArray(json.sectionItems) Then
         For Each item In AsArray(json.sectionItems.itemList)
             episode = NewEpisode(item)
@@ -39,7 +48,7 @@ Sub Section_Initialize(json As Object)
                 m.Videos.Push(episode)
             End If
         Next
-        m.LoadVideos()
+        m.LoadVideos(0, 1)
         itemCount = AsInteger(json.sectionItems.itemCount)
         If itemCount > 0 Then
             m.SetTotalCount(itemCount)

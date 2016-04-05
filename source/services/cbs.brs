@@ -40,6 +40,8 @@ Function NewCbs() As Object
     this.StagingComScoreC2          = "3002231"
     this.StagingComScoreSecret      = "2cb08ca4d095dd734a374dff8422c2e5"
     this.StagingAkamaiUrl           = "http://ma61-r.analytics.edgesuite.net/config/beacon-5508.xml"
+    this.StagingConvivaID           = "c3.CBSCom-Test"
+    this.StagingConvivaKey          = "ce4836fb66f6e081bcf6fea7df4531f22ac7ffbb"
     
     this.ProductionApiKey           = "c3d24e796cbc78c7"
     this.ProductionEndpoint         = "https://www.cbs.com/apps-api/"
@@ -52,6 +54,8 @@ Function NewCbs() As Object
     this.ProductionComScoreC2       = "3002231"
     this.ProductionComScoreSecret   = "2cb08ca4d095dd734a374dff8422c2e5"
     this.ProductionAkamaiUrl        = "http://ma61-r.analytics.edgesuite.net/config/beacon-5508.xml"
+    this.ProductionConvivaID        = "c3.CBSCom"
+    this.ProductionConvivaKey       = "87a6b28bc7823e67a5bb2a0a6728c702afcae78d"
     
     this.NielsenAppID               = "PEEF1AF93-F59E-414A-96BE-DCE421E5C92D"
     
@@ -120,6 +124,7 @@ Function NewCbs() As Object
     this.IsShowCached               = Cbs_IsShowCached
     this.GetShowAvailableSeasons    = Cbs_GetShowAvailableSeasons
     this.GetShowSeasons             = Cbs_GetShowSeasons
+    this.GetShowSections            = Cbs_GetShowSections
     this.GetShowSectionIDs          = Cbs_GetShowSectionIDs
     this.GetShowEpisodes            = Cbs_GetShowEpisodes
     this.GetShowClips               = Cbs_GetShowClips
@@ -158,6 +163,11 @@ Function Cbs_Initialize(useStaging = False As Boolean) As Boolean
         m.ComScoreSecret    = m.StagingComScoreSecret
         m.AkamaiUrl         = m.StagingAkamaiUrl
         Syncbak().Initialize(m.StagingSyncbakKey, m.StagingSyncbakSecret, m.StagingSyncbakEndpoint)
+
+        ConvivaLivePassInit(m.StagingConvivaKey)
+        ConvivaLivePassInstance().ToggleTraces(True)
+        
+        Roku_Ads().SetDebugOutput(True)
     Else
         m.ApiKey            = m.ProductionApiKey
         m.Endpoint          = m.ProductionEndpoint
@@ -168,6 +178,11 @@ Function Cbs_Initialize(useStaging = False As Boolean) As Boolean
         m.ComScoreSecret    = m.ProductionComScoreSecret
         m.AkamaiUrl         = m.ProductionAkamaiUrl
         Syncbak().Initialize(m.ProductionSyncbakKey, m.ProductionSyncbakSecret, m.ProductionSyncbakEndpoint)
+
+        'ConvivaLivePassInit(m.ProductionConvivaKey)
+
+        ConvivaLivePassInit(m.StagingConvivaKey)
+        ConvivaLivePassInstance().ToggleTraces(True)
     End If
     Return m.Verify()
 End Function
@@ -286,7 +301,7 @@ Function Cbs_GetLegalText() As String
 End Function
 
 Function Cbs_GetUpsellInfo() As Object
-    url = m.Endpoint + "roku/upsell.json?pageURL=ROKU_ALL_ACCESS_TRIAL" 'ROKU_SIGN_UP_SCREEN"
+    url = m.Endpoint + "roku/upsell.json?pageURL=ROKU_ALL_ACCESS_TRIAL" 'ROKU_SIGN_UP_SCREEN" '
     result = m.Request(url, "GET")
     If IsAssociativeArray(result) And result.upsellInfo <> invalid Then
         state = m.GetCurrentUser().State
@@ -489,7 +504,7 @@ Sub Cbs_SetResumePoint(contentID As String, position As Integer)
 End Sub
 
 Function Cbs_GetResumePoint(contentID As String) As Integer
-    If m.ResumePoints[contentID] = invalid Then
+    If m.ResumePoints[contentID] = invalid And m.IsAuthenticated() Then
         url = m.Endpoint + "v3.0/roku/video/streams.json"
         url = AddQueryString(url, "contentId", contentID)
         
@@ -655,7 +670,7 @@ Function Cbs_IsShowCached(showID As String) As Boolean
 End Function
 
 Function Cbs_GetShow(showID As String) As Object
-    If IsNullOrEmpty(showID) Then
+    If IsNullOrEmpty(showID) Or showID = "-1" Then
         Return invalid
     End If
     show = m.ShowCache[showID]
@@ -689,7 +704,10 @@ Function Cbs_GetShowAvailableSeasons(showID As String) As Object
     response = m.Request(url, "GET")
     If IsAssociativeArray(response) And response.success = True And IsAssociativeArray(response.video_available_season) Then
         For Each item In AsArray(response.video_available_season.itemList)
-            seasons.Push(AsInteger(item.seasonNum))
+            seasons.Push({
+                Number: AsInteger(item.seasonNum)
+                TotalCount: AsInteger(item.totalCount)
+            })
         Next
     End If
     Return seasons
@@ -705,15 +723,35 @@ Function Cbs_GetShowSeasons(showID As String, sectionID As String) As Object
             response = m.Request(url, "GET")
             If IsAssociativeArray(response) And IsAssociativeArray(response.season) Then
                 seasonDetails = AsArray(response.season.results)
-                For Each seasonNumber In availableSeasons
+                For Each availableSeason In availableSeasons
                     season = NewSeason()
-                    season.Initialize(show, seasonNumber, sectionID)
+                    season.Initialize(show, availableSeason.Number, sectionID)
+                    season.SetTotalCount(availableSeason.TotalCount)
                     seasons.Push(season)
                 Next
             End If
         End If
     End If
     Return seasons
+End Function
+
+Function Cbs_GetShowSections(showID As String) As Object
+    sections = []
+    If Not IsNullOrEmpty(showID) Then
+        url = m.Endpoint + "v2.0/roku/shows/" + showID + "/videos/config/DEFAULT_ROKU_SVOD.json"
+        url = AddQueryString(url, "platformType", "roku")
+        url = AddQueryString(url, "begin", 0)
+        url = AddQueryString(url, "rows", 0)
+        response = m.Request(url, "GET")
+        If IsAssociativeArray(response) And response.success = True And response.videoSectionMetadata <> invalid Then
+            For Each result In AsArray(response.videoSectionMetadata)
+                If IsAssociativeArray(result) Then
+                    sections.Push(NewSection(result))
+                End If
+            Next
+        End If
+    End If
+    Return sections
 End Function
 
 Function Cbs_GetShowSectionIDs(showID As String) As Object
@@ -937,20 +975,22 @@ End Function
 
 Function Cbs_GetRecentlyWatched(page = 1, count = 10 As Integer) As Object
     episodes = []
-    url = m.Endpoint + "v3.0/roku/video/streams/history.json"
-    url = AddQueryString(url, "page", page)
-    url = AddQueryString(url, "rows", count)
-    
-    response = m.Request(url, "GET")
-    If IsAssociativeArray(response) And response.success = True Then
-        For Each historyItem In AsArray(response.history)
-            If historyItem.canModel <> invalid Then
-                episode = NewEpisode(historyItem.canModel)
-                If episode.IsAvailable() Then
-                    episodes.Push(episode)
+    If m.IsAuthenticated() Then
+        url = m.Endpoint + "v3.0/roku/video/streams/history.json"
+        url = AddQueryString(url, "page", page)
+        url = AddQueryString(url, "rows", count)
+        
+        response = m.Request(url, "GET")
+        If IsAssociativeArray(response) And response.success = True Then
+            For Each historyItem In AsArray(response.history)
+                If historyItem.canModel <> invalid Then
+                    episode = NewEpisode(historyItem.canModel)
+                    If episode.IsAvailable() Then
+                        episodes.Push(episode)
+                    End If
                 End If
-            End If
-        Next
+            Next
+        End If
     End If
     Return episodes
 End Function

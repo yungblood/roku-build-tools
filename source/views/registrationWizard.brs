@@ -335,7 +335,7 @@ Function RegistrationWizard_ShowWelcomeScreen() As Integer
     ]
     
     signUpText = "Sign Up for CBS All Access"
-    signInText = "Sign In"
+    signInText = "Already a Subscriber? Sign In"
     browseText = "Browse and Watch Clips"
     buttonFont = GetCanvasFont("Default", IIf(IsHD(), 22, 16))
     buttons = [

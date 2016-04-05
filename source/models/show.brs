@@ -10,12 +10,16 @@ Function NewShow(json = invalid As Object) As Object
     this.OverhangHD             = ""
     this.OverhangSD             = ""
     
+    this.Seasons                = invalid
+    
+    this.GetSeasons             = Show_GetSeasons
+    this.GetSections            = Show_GetSections
     this.GetSectionIDs          = Show_GetSectionIDs
     this.GetSectionID           = Show_GetSectionID
     
     this.GetRows                = Show_GetRows
 
-    this.GetMostRecentEpisode   = Show_GetMostRecentEpisode
+    this.GetDynamicPlayEpisode  = Show_GetDynamicPlayEpisode
     
     If json <> invalid Then
         this.Initialize(json)
@@ -94,6 +98,21 @@ Sub Show_Initialize(json As Object)
     End If
 End Sub
 
+Function Show_GetSeasons(refresh = False As Boolean) As Object
+    If refresh Or m.Seasons = invalid Then
+        sectionID = AsString(m.GetSectionID("Full Episodes"))
+        m.Seasons = Cbs().GetShowSeasons(m.ID, sectionID)
+    End If
+    Return m.Seasons
+End Function
+
+Function Show_GetSections() As Object
+    If m.Sections = invalid Then
+        m.Sections = Cbs().GetShowSections(m.ID)
+    End If
+    Return m.Sections
+End Function
+
 Function Show_GetSectionIDs() As Object
     If m.SectionIDs = invalid Then
         m.SectionIDs = Cbs().GetShowSectionIDs(m.ID)
@@ -101,43 +120,97 @@ Function Show_GetSectionIDs() As Object
     Return m.SectionIDs
 End Function
 
-Function Show_GetSectionID(section As String) As String
-    Return AsString(m.GetSectionIDs()[section])
+Function Show_GetSectionID(sectionName As String) As String
+    sections = m.GetSections()
+    section = FindElementInArray(sections, sectionName, "Name")
+    If section <> invalid Then
+        Return AsString(section.SectionID)
+    End If
+    Return ""
 End Function
 
 Function Show_GetRows() As Object
     rows = []
-    sectionID = m.GetSectionID("Full Episodes")
-    If Not IsNullOrEmpty(sectionID) Then
-        seasons = Cbs().GetShowSeasons(m.ID, sectionID)
-        For Each season In seasons
+    For Each section In m.GetSections()
+        ' This is necessary to restrict the section to the current show
+        section.ExcludeShow = False
+        If section.Name = "Full Episodes" Then
+            seasons = Cbs().GetShowSeasons(m.ID, section.SectionID)
+
+            If section.SeasonsSortOrder = "asc" Then
+                SortArray(seasons, Function(item1 As Object, item2 As Object) As Boolean : Return item1.SeasonNumber > item2.SeasonNumber : End Function)
+            Else If section.SeasonsSortOrder = "desc" Then
+                SortArray(seasons, Function(item1 As Object, item2 As Object) As Boolean : Return item1.SeasonNumber < item2.SeasonNumber : End Function)
+            End If
+
+            For Each season In seasons
+                row = {
+                    Name:       season.Title
+                    Section:    season
+                }
+                rows.Push(row)
+            Next
+        Else
             row = {
-                Name:       season.Title
-                Section:    season
+                ID:         LCase(AsString(section.Name))
+                Name:       section.Name
+                Section:    section
             }
             rows.Push(row)
-        Next
-    End If
-    sectionID = m.GetSectionID("Clips")
-    If Not IsNullOrEmpty(sectionID) Then
-        row = {
-            ID:         "clips"
-            Name:       "Clips"
-            Section:    NewSection()
-        }
-        row.Section.SetSectionID(sectionID, False)
-        rows.Push(row)
-    End If
+        End If
+    Next
     Return rows
 End Function
 
-Function Show_GetMostRecentEpisode() As Object
-    sectionID = m.GetSectionID("Full Episodes")
-    If Not IsNullOrEmpty(sectionID) Then
-        episodes = Cbs().GetSectionVideos(sectionID, False, {}, 0, 1)
-        If episodes.Count() > 0 Then
-            Return episodes[0]
+Function Show_GetDynamicPlayEpisode() As Object
+    hdPoster = invalid
+    sdPoster = invalid
+    episode = Cbs().GetCurrentUser().GetRecentlyWatchedForShow(m.ID)
+    If episode <> invalid Then
+        If episode.IsFullyWatched() Then
+            episode = episode.GetNextEpisode()
+            If episode <> invalid Then
+                If episode.ShowID = m.ID Then
+                    ' Ensure the "next episode" is from the same show
+                    hdPoster = "pkg:/images/icon_watchnext_hd.png"
+                    sdPoster = "pkg:/images/icon_watchnext_sd.png"
+                Else
+                    episode = invalid
+                End If
+            End If
+        Else
+            hdPoster = "pkg:/images/icon_continuewatching_hd.jpg"
+            sdPoster = "pkg:/images/icon_continuewatching_sd.jpg"
         End If
+    End If
+    If episode = invalid Then
+        ' TODO: The API _should_ return the episodes in the display order, so
+        '       grabbing the first episode in the list _should_ be accurate
+        sectionID = m.GetSectionID("Full Episodes")
+        If Not IsNullOrEmpty(sectionID) Then
+            episodes = Cbs().GetSectionVideos(sectionID, False, {}, 0, 1)
+            If episodes.Count() > 0 Then
+                episode = episodes[0]
+            End If
+        End If
+        If m.Category = "Classics" Then
+            hdPoster = "pkg:/images/icon_watchfirst_hd.png"
+            sdPoster = "pkg:/images/icon_watchfirst_sd.png"
+        Else
+            hdPoster = "pkg:/images/icon_watchlatest_hd.png"
+            sdPoster = "pkg:/images/icon_watchlatest_sd.png"
+        End If
+    End If
+    
+    If episode <> invalid Then
+        dynamicPlay = {}
+        dynamicPlay.Append(episode)
+        dynamicPlay.ID = "dynamicPlay"
+        dynamicPlay.HDPosterUrl = hdPoster
+        dynamicPlay.SDPosterUrl = sdPoster
+        dynamicPlay.Episode = episode
+        dynamicPlay.ShowDescription = True
+        Return dynamicPlay
     End If
     Return invalid
 End Function

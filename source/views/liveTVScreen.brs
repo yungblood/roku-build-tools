@@ -82,7 +82,7 @@ Function LiveTVScreen_GetContent(showLoading = True As Boolean) As Object
             })
         Else
             buttons.Push({
-                Text: "Watch (Subscription Required)"
+                Text: "Subscribe to watch"
                 ID: "subscribe"
             })
         End If

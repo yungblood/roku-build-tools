@@ -117,8 +117,8 @@ Function EpisodeScreen_PrepareContent(content As Object) As Object
         prepared.Delete("TitleSeason")
         
         buttons = []
-        If Cbs().IsAuthenticated() Or (content.IsClip() And content.IsAvailable()) Then
-            If content.GetResumePoint() > 0 And content.GetResumePoint() < content.Length - 10 Then
+        If content.CanWatch() Then
+            If content.IsFullEpisode() And content.GetResumePoint() > 0 And Not content.IsFullyWatched() Then
                 buttons.Push({
                     Text: "Resume"
                     ID: "resume"
@@ -135,7 +135,7 @@ Function EpisodeScreen_PrepareContent(content As Object) As Object
             End If
         Else
             buttons.Push({
-                Text: "Watch (Subscription Required)"
+                Text: "Subscribe to watch"
                 ID: "subscribe"
             })
         End If

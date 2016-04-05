@@ -1,5 +1,5 @@
 Function NewEpisode(json = invalid As Object) As Object
-    this                        = {}
+    this                        = NewStreamBase()
     this.ClassName              = "Episode"
     
     this.Initialize             = Episode_Initialize
@@ -11,6 +11,7 @@ Function NewEpisode(json = invalid As Object) As Object
     this.IsFullEpisode          = Episode_IsFullEpisode
     this.IsClip                 = Episode_IsClip
     this.IsAvailable            = Episode_IsAvailable
+    this.CanWatch               = Episode_CanWatch
     
     this.GetNextEpisode         = Episode_GetNextEpisode
     
@@ -18,9 +19,12 @@ Function NewEpisode(json = invalid As Object) As Object
     this.IsShowLoaded           = Episode_IsShowLoaded
     
     this.GetAkamaiDims          = Episode_GetAkamaiDims
+    this.GetConvivaName         = Episode_GetConvivaName
     
     this.SetResumePoint         = Episode_SetResumePoint
     this.GetResumePoint         = Episode_GetResumePoint
+    this.IsFullyWatched         = Episode_IsFullyWatched
+
     this.GetVmapUrl             = Episode_GetVmapUrl
     this.GetStreamUrl           = Episode_GetStreamUrl
     this.GetStream              = Episode_GetStream
@@ -33,6 +37,8 @@ Function NewEpisode(json = invalid As Object) As Object
 End Function
 
 Sub Episode_Initialize(json As Object)
+    m.Json = json
+
     m.ID                    = AsString(json.pid)
     m.ContentID             = AsString(json.contentId)
     m.MediaID               = AsString(json["__FOR_TRACKING_ONLY_MEDIA_ID"])
@@ -132,6 +138,12 @@ Function Episode_IsAvailable() As Boolean
     Return (m.Status = "AVAILABLE" Or m.Status = "DELAYED" Or m.Status = "PREMIUM")
 End Function
 
+Function Episode_CanWatch() As Boolean
+    ' TODO: We're ensuring anonymous users aren't able to watch episodes.  This should
+    '       be handled by the API "status" eventually.
+    Return (Cbs().IsAuthenticated() And m.Status = "AVAILABLE") Or (Not Cbs().IsAuthenticated() And m.IsClip())
+End Function
+
 Function Episode_GetNextEpisode() As Object
     If m.IsClip() Then
         Return m.NextClip
@@ -167,12 +179,25 @@ Function Episode_GetAkamaiDims(additionalDims = {} As Object) As Object
     Return dims
 End Function
 
+Function Episode_GetConvivaName() As String
+    Return "[" + m.ContentID + "] " + m.ShowName + " - " + m.Title
+End Function
+
 Sub Episode_SetResumePoint(position As Integer)
     Cbs().SetResumePoint(m.ContentID, position)
 End Sub
 
 Function Episode_GetResumePoint() As Integer
     Return Cbs().GetResumePoint(m.ContentID)
+End Function
+
+Function Episode_IsFullyWatched() As Boolean
+    If m.Length > 0 Then
+        resumePoint = m.GetResumePoint()
+        percentage = resumePoint / m.Length
+        Return percentage >= .97
+    End If
+    Return False
 End Function
 
 Function Episode_GetVmapUrl() As String

@@ -1,14 +1,11 @@
 Function NewChannel(json = invalid As Object) As Object
-    this                = {}
+    this                = NewStreamBase()
     this.ClassName      = "Channel"
     
     this.Initialize     = Channel_Initialize
     
-    ' Implemented strictly to simplify video player content checking
-    this.IsAvailable    = Channel_IsAvailable
-    this.IsClip         = Channel_IsClip
-    
     this.GetAkamaiDims  = Channel_GetAkamaiDims
+    this.GetConvivaName = Channel_GetConvivaName
     
     this.GetNowPlaying  = Channel_GetNowPlaying
     this.GetSchedule    = Channel_GetSchedule
@@ -72,14 +69,6 @@ Sub Channel_Initialize(json As Object)
     End If
 End Sub
 
-Function Channel_IsAvailable() As Boolean
-    Return True
-End Function
-
-Function Channel_IsClip() As Boolean
-    Return False
-End Function
-
 Function Channel_GetAkamaiDims(additionalDims = {} As Object) As Object
     dims = {
         category:   "Live"
@@ -87,6 +76,10 @@ Function Channel_GetAkamaiDims(additionalDims = {} As Object) As Object
     }
     dims.Append(additionalDims)
     Return dims
+End Function
+
+Function Channel_GetConvivaName() As Object
+    Return m.TrackingTitle
 End Function
 
 Function Channel_GetNowPlaying() As Object

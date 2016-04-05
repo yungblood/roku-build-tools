@@ -108,10 +108,10 @@ Sub BaseScreen_Show(raiseShownEvent = False As Boolean)
         m.Initialize()
     End If
     If m.Screen <> invalid Then
-    	If m.ShowFacade Then
+    	If m.ShowFacade And m.Facade = invalid Then
             m.Facade = CreateObject("roPosterScreen")
+            m.Facade.SetBreadcrumbText(m.Get("BreadcrumbA", ""), m.Get("BreadcrumbB", ""))
             m.Facade.Show()
-            m.Facade.ClearMessage()
         End If
         
         m.Screen.Show()

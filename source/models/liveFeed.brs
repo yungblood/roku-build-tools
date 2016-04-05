@@ -1,5 +1,5 @@
 Function NewLiveFeed(json = invalid As Object) As Object
-    this                = {}
+    this                = NewStreamBase()
     this.ClassName      = "LiveFeed"
     
     this.ShowID         = ""
@@ -7,14 +7,13 @@ Function NewLiveFeed(json = invalid As Object) As Object
     
     this.Initialize     = LiveFeed_Initialize
     
-    ' Implemented strictly to simplify video player content checking
-    this.IsAvailable    = LiveFeed_IsAvailable
-    this.IsClip         = LiveFeed_IsClip
-    
     this.GetAkamaiDims  = LiveFeed_GetAkamaiDims
+    this.GetConvivaName = LiveFeed_GetConvivaName
     
     this.SetShowID      = LiveFeed_SetShowID
     this.GetShow        = LiveFeed_GetShow
+    
+    this.GetVmapUrl     = LiveFeed_GetVmapUrl
     this.GetStream      = LiveFeed_GetStream
 
     If json <> invalid Then
@@ -43,28 +42,28 @@ Sub LiveFeed_Initialize(json As Object)
     m.SDPosterUrl = AsString(json.carousel_sd)
 
     m.StreamUrl = AsString(json.hls)
+
+    show = m.GetShow()
+    If show <> invalid Then
+        m.ShowName = show.Title
+    End If
 End Sub
-
-Function LiveFeed_IsAvailable() As Boolean
-    Return True
-End Function
-
-Function LiveFeed_IsClip() As Boolean
-    Return False
-End Function
 
 Function LiveFeed_GetAkamaiDims(additionalDims = {} As Object) As Object
     dims = {
         category:   "Live"
         title:      m.TrackingTitle
     }
-    show = m.GetShow()
-    If show <> invalid Then
-        dims.show = show.Title
+    If Not IsNullOrEmpty(m.ShowName) Then
+        dims.show = m.ShowName
     End If
     
     dims.Append(additionalDims)
     Return dims
+End Function
+
+Function LiveFeed_GetConvivaName() As String
+    Return "[" + m.ContentId + "] " + IIf(IsNullOrEmpty(m.ShowName), "", m.ShowName + " - ") + m.TrackingTitle
 End Function
 
 Sub LiveFeed_SetShowID(id As String)
@@ -78,6 +77,10 @@ Function LiveFeed_GetShow() As Object
     Return m.Show
 End Function
 
+Function LiveFeed_GetVmapUrl() As String
+    Return "" 'Replace(Cbs().VmapUrl, "[CONTENTID]", "px0OafYrFi0JafVspX1dO4FHeC_H9Aaw")
+End Function
+
 ' Resume param is ignored for live streams, but is necessary to prevent
 ' extra logic in the video player
 Function LiveFeed_GetStream(resume = False As Boolean) As Object
@@ -89,6 +92,7 @@ Function LiveFeed_GetStream(resume = False As Boolean) As Object
             SwitchingStrategy: "full-adaptation"
             Live: True
             PlayStart: NowDate().AsSeconds() + 999999
+            VmapUrl: m.GetVmapUrl()
             TrackIDSubtitle: "eia608/1"
             'MinBandwidth: 800
             Stream: {
