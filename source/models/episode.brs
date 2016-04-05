@@ -141,7 +141,7 @@ End Function
 Function Episode_CanWatch() As Boolean
     ' TODO: We're ensuring anonymous users aren't able to watch episodes.  This should
     '       be handled by the API "status" eventually.
-    Return (Cbs().IsAuthenticated() And m.Status = "AVAILABLE") Or (Not Cbs().IsAuthenticated() And m.IsClip())
+    Return m.Status = "AVAILABLE" And (Cbs().IsAuthenticated() Or m.IsClip())
 End Function
 
 Function Episode_GetNextEpisode() As Object
