@@ -3,7 +3,7 @@ Function NewUser(json = invalid As Object) As Object
     this.ClassName                  = "User"
     
     this.Packages                   = []
-    this.Favorites                  = []
+    this.Favorites                  = invalid
     this.ID                         = ""
     
     this.Initialize                 = User_Initialize

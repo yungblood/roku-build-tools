@@ -182,7 +182,7 @@ Function Cbs_Initialize(useStaging = False As Boolean) As Boolean
         'ConvivaLivePassInit(m.ProductionConvivaKey)
 
         ConvivaLivePassInit(m.StagingConvivaKey)
-        ConvivaLivePassInstance().ToggleTraces(True)
+        'ConvivaLivePassInstance().ToggleTraces(True)
     End If
     Return m.Verify()
 End Function
