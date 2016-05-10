@@ -1,6 +1,6 @@
 'IMPORTS=utilities/conversion
 ' ******************************************************
-' Copyright Steven Kean 2010-2015
+' Copyright Steven Kean 2010-2016
 ' All Rights Reserved.
 ' ******************************************************
 Function IntToBase64(int As Integer, pad = True As Boolean) As String

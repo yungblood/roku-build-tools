@@ -1,6 +1,6 @@
 'IMPORTS=v2/base/object v2/base/observable v2/events/eventListener v2/screens/screenManager v2/base/inheritance
 ' ******************************************************
-' Copyright Steven Kean 2010-2015
+' Copyright Steven Kean 2010-2016
 ' All Rights Reserved.
 ' ******************************************************
 Function NewBaseScreen(screenType As String, events = [] As Object) As Object

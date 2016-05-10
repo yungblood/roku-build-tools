@@ -1,6 +1,6 @@
 'IMPORTS=v2/base/callbackInfo v2/base/globalObjectRegistry utilities/arrays
 ' ******************************************************
-' Copyright Steven Kean 2010-2015
+' Copyright Steven Kean 2010-2016
 ' All Rights Reserved.
 ' ******************************************************
 Function NewObservable() As Object

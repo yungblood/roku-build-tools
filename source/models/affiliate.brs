@@ -12,6 +12,8 @@ Function NewAffiliate(json = invalid As Object) As Object
 End Function
 
 Sub Affiliate_Initialize(json As Object)
+    m.Json = json
+    
     m.ID = AsString(json.id)
     m.Name = AsString(json.affiliateName)
     m.Url = AsString(json.affiliateUrl)

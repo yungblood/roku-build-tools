@@ -133,12 +133,9 @@ Function VideoPlayer_Play(episodeOrChannel As Object, resume = False As Boolean,
         stream = m.Content.GetStream(resume)
     End If
     If stream <> invalid Then
-        ' Create the Conviva session
-        If m.ConvivaSession <> invalid Then
-            ConvivaLivePassInstance().CleanupSession(m.ConvivaSession)
-            m.ConvivaSession = invalid
-        End If
         
+        ' Create the Conviva metadata
+        ' This will be used in OnBeforeNewContent to initialize the Conviva session
         convivaTags = {}
         convivaTags["category"]             = AsString(m.Content.TopLevelCategory)
         convivaTags["contentId"]            = AsString(m.Content.ContentID)
@@ -149,16 +146,15 @@ Function VideoPlayer_Play(episodeOrChannel As Object, resume = False As Boolean,
         convivaTags["playerVersion"]        = GetAppVersion()
         convivaTags["accessType"]           = IIf(Cbs().IsAuthenticated(), IIf(Cbs().IsSubscribed(), "Premium", "Authenticated"), "Free")
     
-        convivaMetadata = ConvivaContentInfo(m.Content.GetConvivaName(), convivaTags)
-        convivaMetadata["streamUrl"]        = stream.Stream.Url
-        convivaMetadata["streamFormat"]     = "hls"
-        convivaMetadata["contentLength"]    = AsString(m.Content.Length)
-        convivaMetadata["isLive"]           = AsString(stream.Live = True)
-        convivaMetadata["playerName"]       = "CBSAllAccess Roku"
-        convivaMetadata["viewerId"]         = Cbs().GetCurrentUser().ID
-    
-        m.ConvivaSession = ConvivaLivePassInstance().createSession(invalid, convivaMetadata, 1)
-
+        m.ConvivaMetadata = ConvivaContentInfo(m.Content.GetConvivaName(), m.ConvivaTags)
+        m.ConvivaMetadata["streamUrl"]        = stream.Stream.Url
+        m.ConvivaMetadata["streamFormat"]     = "hls"
+        m.ConvivaMetadata["contentLength"]    = m.Content.Length
+        m.ConvivaMetadata["isLive"]           = stream.Live = True
+        m.ConvivaMetadata["playerName"]       = "CBSAllAccess Roku"
+        m.ConvivaMetadata["viewerId"]         = Cbs().GetCurrentUser().ID
+        
+        
         m.PlayerID = MD5Hash(GetDeviceID() + AsString(NowDate().AsSeconds()))
         DW().PlayerInit(m.PlayerID)
         
@@ -232,7 +228,8 @@ Function VideoPlayer_OnGetMessage(eventData As Object, callbackData As Object) A
     If eventData.Timeout = -1 Then
         msg = eventData.Port.GetMessage()
     Else
-        msg = ConvivaWait(eventData.Timeout, eventData.Port, invalid)
+        ' Conviva needs enough time to process events, so override the default timeout
+        msg = ConvivaWait(250, eventData.Port, invalid)
     End If
     
     If Type(msg) = "roVideoScreenEvent" Then
@@ -276,7 +273,7 @@ Function VideoPlayer_OnBeforeNewContent(eventData As Object, callbackData As Obj
             If m.ShowAds Then
                 ConfigureRaf(m.Raf, vmapUrl, m)
                 secondsSinceLastPlay = NowDate().AsSeconds() - PlayTimes().GetPlayTime(m.Content.ID)
-                If secondsSinceLastPlay > 3600 Then
+                If secondsSinceLastPlay > 3600 Or stream.Live = True Then
                     ' It's been more than an hour, so play the preroll
                     adPods = m.Raf.GetAds()
                     If adPods <> invalid And adPods.Count() > 0 Then
@@ -292,6 +289,14 @@ Function VideoPlayer_OnBeforeNewContent(eventData As Object, callbackData As Obj
                 End If
             End If
         End If
+
+        ' Create the Conviva session
+        If m.ConvivaSession <> invalid Then
+            ConvivaLivePassInstance().CleanupSession(m.ConvivaSession)
+            m.ConvivaSession = invalid
+        End If    
+        m.ConvivaSession = ConvivaLivePassInstance().createSession(invalid, m.ConvivaMetadata, 1)
+
         ' Record the play time
         PlayTimes().SetPlayTime(m.Content.ID)
     End If
@@ -521,6 +526,9 @@ Sub VideoPlayer_OnError(eventData As Object, callbackData As Object)
         params.v70 = AsString(eventData.Code)
         Omniture().TrackEvent("app:roku:live:feed:" + AsString(eventData.Code) + ":" + LCase(AsString(eventData.Message)), ["event85"], params)
     End If
+    ' Report the error to Conviva
+    ConvivaLivePassInstance().ReportError(m.ConvivaSession, eventData.Message)
+    
     ShowMessageBox("Error", "Unfortunately, an error occurred during playback. Please try again.", ["OK"], True)
 End Sub
 

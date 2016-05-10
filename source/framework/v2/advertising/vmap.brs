@@ -1,6 +1,6 @@
 'IMPORTS=v2/advertising/vmapAdBreak utilities/web utilities/xml utilities/strings utilities/types utilities/dateTime
 ' ******************************************************
-' Copyright Steven Kean 2010-2015
+' Copyright Steven Kean 2010-2016
 ' All Rights Reserved.
 ' ******************************************************
 Function NewVmap(url As String) As Object

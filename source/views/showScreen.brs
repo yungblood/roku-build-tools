@@ -71,13 +71,13 @@ Sub ShowScreen_SetupRows()
         Name:   ""
         ID:     "menu"
     })
-    ' Check for Big Brother streams
-    If m.ShowItem <> invalid And m.ShowItem.ID = "5692" Then
-        m.rows.Push({
-            Name:   "Live Feeds"
-            ID:     "bigBrotherLive"
-        })
-    End If
+'    ' Check for Big Brother streams
+'    If m.ShowItem <> invalid And m.ShowItem.ID = "5692" Then
+'        m.rows.Push({
+'            Name:   "Live Feeds"
+'            ID:     "bigBrotherLive"
+'        })
+'    End If
 
     m.Rows.Append(m.ShowItem.GetRows())
     m.Screen.SetRowItems(m.Rows)
@@ -101,8 +101,12 @@ Sub ShowScreen_OnShown(eventData As Object, callbackData = invalid As Object)
     ' Reload the menu row, to update the dynamic play button
     m.Screen.ReloadRow("menu")
     
-    ' Reload the big brother live row, if present
-    m.Screen.ReloadRow("bigBrotherLive")
+    ' Reload all live rows to refresh thumbnails
+    For i = 0 To m.Rows.Count() - 1
+        If m.Rows[i].IsLive = True Then
+            m.Screen.ReloadRow(i)
+        End If
+    Next
 End Sub
 
 Sub ShowScreen_OnHidden(eventData As Object, callbackData = invalid As Object)
@@ -142,16 +146,23 @@ Sub ShowScreen_OnRowLoading(eventData As Object, callbackData = invalid As Objec
                         })
                     End If
                 End If
-            Else If eventData.Row.ID = "bigBrotherLive" Then
-                content = Cbs().GetBigBrotherStreams()
+'            Else If eventData.Row.ID = "bigBrotherLive" Then
+'                content = Cbs().GetBigBrotherStreams()
             Else If eventData.Row.Section <> invalid Then
+                ' Reset the videos, to force reloading
+                eventData.Row.Section.Videos = []
                 eventData.Row.Section.GetVideo(0)
                 content = eventData.Row.Section.GetVideos()
             End If
             If content <> invalid And content.Count() > 0 Then
                 For Each item In content
-                    If item <> invalid And item.ClassName = "Episode" Then
-                        item.UpdateDescription("Show")
+                    If item <> invalid Then
+                        If item.ClassName = "Episode" Then
+                            item.UpdateDescription("Show")
+                        End If
+                        If item.IsLive = True Then
+                            eventData.Row.IsLive = True
+                        End If
                     End If
                 Next
                 m.Screen.SetContentList(eventData.RowIndex, content)

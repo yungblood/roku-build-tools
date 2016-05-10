@@ -12,6 +12,8 @@ Function NewScheduleItem(json = invalid As Object) As Object
 End Function
 
 Sub ScheduleItem_Initialize(json As Object)
+    m.Json = json
+    
     m.ID = AsString(json.programId)
     m.EpisodeTitle = AsString(json.episodeTitle)
     m.ShowName = AsString(json.name)

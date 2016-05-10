@@ -1,6 +1,6 @@
 'IMPORTS=v2/base/globalObjectRegistry utilities/general utilities/strings
 ' ******************************************************
-' Copyright Steven Kean 2010-2015
+' Copyright Steven Kean 2010-2016
 ' All Rights Reserved.
 ' ******************************************************
 Function NewCallbackInfo(receiver As Object, callback As String, failureCallback = callback As String, callbackData = invalid As Object) As Object

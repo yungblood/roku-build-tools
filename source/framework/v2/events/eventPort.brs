@@ -1,6 +1,6 @@
 'IMPORTS=v2/base/observable v2/base/globalObjectRegistry utilities/general
 ' ******************************************************
-' Copyright Steven Kean 2010-2015
+' Copyright Steven Kean 2010-2016
 ' All Rights Reserved.
 ' ******************************************************
 Function NewEventPort(port = invalid As Object, timeout = -1 As Integer) As Object

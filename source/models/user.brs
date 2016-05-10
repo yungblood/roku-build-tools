@@ -33,6 +33,8 @@ Function NewUser(json = invalid As Object) As Object
 End Function
 
 Sub User_Initialize(json As Object)
+    m.Json = json
+    
     m.ID = AsString(json.userId)
     m.FirstName = AsString(json.firstName)
     m.LastName = AsString(json.lastName)

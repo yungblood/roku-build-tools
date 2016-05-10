@@ -1,6 +1,6 @@
 'IMPORTS=utilities/types utilities/device
 ' ******************************************************
-' Copyright Steven Kean 2010-2015
+' Copyright Steven Kean 2010-2016
 ' All Rights Reserved.
 ' ******************************************************
 '=====================

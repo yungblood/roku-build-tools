@@ -15,6 +15,8 @@ Function NewSearchResult(json = invalid As Object) As Object
 End Function
 
 Sub SearchResult_Initialize(json As Object)
+    m.Json = json
+    
     m.Title = AsString(json.show_title)
     m.ID = AsString(json.cbs_show_id)
     m.ResultType = "Show"

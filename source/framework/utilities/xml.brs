@@ -1,6 +1,6 @@
 'IMPORTS=utilities/strings utilities/types
 ' ******************************************************
-' Copyright Steven Kean 2010-2015
+' Copyright Steven Kean 2010-2016
 ' All Rights Reserved.
 ' ******************************************************
 '=====================

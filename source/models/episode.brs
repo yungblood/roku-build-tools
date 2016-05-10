@@ -64,6 +64,7 @@ Sub Episode_Initialize(json As Object)
     m.TitleSeason           = AsString(json.seriesTitle)
     
     m.FullEpisode           = AsBoolean(json.fullEpisode, True)
+    m.IsLive                = AsBoolean(json.isLive, False)
     m.TopLevelCategory      = AsString(json.topLevelCategory)
     
     m.AirDate               = DateFromISO8601String(AsString(json["_airDateISO"]))
@@ -229,6 +230,7 @@ Function Episode_GetStream(resume = False As Boolean) As Object
             SubtitleUrl: m.SubtitleUrl
             SDBifUrl: m.SDBifUrl
             HDBifUrl: m.HDBifUrl
+            Live: m.IsLive
         }
         If m.SeasonNumber > 0 And m.EpisodeNumber > 0 Then
             stream.Title = Substitute("S{0} Ep{1}", AsString(m.SeasonNumber), AsString(m.EpisodeNumber)) + " | " + stream.Title

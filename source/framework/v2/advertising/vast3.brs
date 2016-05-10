@@ -1,6 +1,6 @@
 'IMPORTS=v2/advertising/vast3Ad utilities/arrays utilities/web utilities/xml utilities/strings utilities/types utilities/dateTime
 ' ******************************************************
-' Copyright Steven Kean 2010-2015
+' Copyright Steven Kean 2010-2016
 ' All Rights Reserved.
 ' ******************************************************
 Function NewVast3(urlOrData As Object, allowMultipleAds = True As Boolean) As Object

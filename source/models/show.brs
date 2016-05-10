@@ -29,6 +29,8 @@ Function NewShow(json = invalid As Object) As Object
 End Function
 
 Sub Show_Initialize(json As Object)
+    m.Json = json
+    
     If IsAssociativeArray(json.show) Then
         If AsArray(json.show.results).Count() > 0 Then
             ' This is a show response

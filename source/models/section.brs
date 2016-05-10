@@ -30,6 +30,8 @@ Function NewSection(json = invalid As Object) As Object
 End Function
 
 Sub Section_Initialize(json As Object)
+    m.Json = json
+    
     m.SectionID = AsString(json.id)
     If IsNullOrEmpty(m.SectionID) Then
         m.SectionID = AsString(json.sectionId)

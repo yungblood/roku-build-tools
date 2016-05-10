@@ -1,6 +1,6 @@
 'IMPORTS=utilities/device utilities/strings utilities/arrays utilities/debug utilities/cookies utilities/types
 ' ******************************************************
-' Copyright Steven Kean 2010-2015
+' Copyright Steven Kean 2010-2016
 ' All Rights Reserved.
 ' ******************************************************
 Function AddQueryString(url As String, parameter As String, value = "" As Dynamic, addIfExists = True As Boolean, encode = True As Boolean) As String

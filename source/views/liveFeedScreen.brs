@@ -39,6 +39,7 @@ Function LiveFeedScreen_Show(row As Object, index = 0 As Integer, autoPlay = Fal
     m.PreviousOverhangSD = GetThemeAttribute("OverhangPrimaryLogoSD")
     
     m.Row = row
+    m.Section = row.Section
     m.ItemIndex = index
     
     m.ResetContent()
@@ -52,13 +53,23 @@ Function LiveFeedScreen_Show(row As Object, index = 0 As Integer, autoPlay = Fal
 End Function
 
 Function LiveFeedScreen_GetContent(showLoading = True As Boolean) As Object
-    content = m.Row.ContentList[m.ItemIndex]
+    content = invalid
+    If m.Section <> invalid Then
+        content = m.Section.GetVideo(m.ItemIndex)
+    Else
+        content = m.Row.ContentList[m.ItemIndex]
+    End If
     If content <> invalid Then
         If showLoading Then
             m.Screen.SetButtons(["Loading..."])
         End If
         content = ShallowCopy(content)
-        content.Actors = ["Big Brother Live Feeds"]
+        ' Re-initialize the data, so the thumbnails update
+        content.Initialize(content.Json)
+        If m.Row <> invalid Then
+            content.Actors = [m.Row.Name]
+        End If
+        
         buttons = []
         If Cbs().IsAuthenticated() Then
             buttons.Push({
@@ -71,6 +82,19 @@ Function LiveFeedScreen_GetContent(showLoading = True As Boolean) As Object
                 ID: "subscribe"
             })
         End If
+'        If Cbs().IsAuthenticated() And Not IsNullOrEmpty(content.ShowID) And content.ShowID <> "-1" Then
+'            If Cbs().GetCurrentUser().ShowIsInFavorites(content.ShowID) Then
+'                buttons.Push({
+'                    Text: "Remove show from My CBS"
+'                    ID: "removeFavorite"
+'                })
+'            Else
+'                buttons.Push({
+'                    Text: "Add show to My CBS"
+'                    ID: "addFavorite"
+'                })
+'            End If
+'        End If
         content.Buttons = buttons
     End If
     Return content
@@ -109,7 +133,8 @@ Sub LiveFeedScreen_StartPlayback()
 End Sub
 
 Sub LiveFeedScreen_OnShown(eventData As Object, callbackData = invalid As Object)
-    Omniture().TrackPage("app:roku:live:bblf:" + LCase(AsString(m.GetContent(False).Title)))
+    content = m.GetContent(False)
+    Omniture().TrackPage("app:roku:live:" + LCase(AsString(content.SectionName)) + ":" + LCase(AsString(content.Title)))
     m.ResetContent()
 End Sub
 
@@ -118,7 +143,8 @@ End Sub
 
 Sub LiveFeedScreen_OnButtonPressed(eventData As Object, callbackData = invalid As Object)
     If eventData.Button <> invalid And Not IsString(eventData.Button) Then
-        linkName = "app:roku:live:bblf:" + LCase(AsString(m.GetContent(False).Title)) + ":" + LCase(AsString(eventData.Button.Text))
+        content = m.GetContent(False)
+        linkName = "app:roku:live:" + LCase(AsString(content.SectionName)) + ":" + LCase(AsString(content.Title)) + ":" + LCase(AsString(eventData.Button.Text))
         Omniture().TrackEvent(linkName, ["event19"], { v46: linkName })
 
         If eventData.Button.ID = "watch" Or eventData.Button.ID = "subscribe" Then
@@ -129,6 +155,16 @@ Sub LiveFeedScreen_OnButtonPressed(eventData As Object, callbackData = invalid A
             If playContent Then
                 m.StartPlayback()
             End If
+        Else If eventData.Button.ID = "addFavorite" Then
+            dialog = ShowWaitDialog("Adding show to My CBS...")
+            Cbs().GetCurrentUser().AddShowToFavorites(content.ShowID)
+            dialog.Close()
+            m.ResetContent(False)
+        Else If eventData.Button.ID = "removeFavorite" Then
+            dialog = ShowWaitDialog("Removing show from My CBS...")
+            Cbs().GetCurrentUser().RemoveShowFromFavorites(content.ShowID)
+            dialog.Close()
+            m.ResetContent(False)
         End If
     End If
 End Sub

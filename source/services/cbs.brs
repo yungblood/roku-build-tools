@@ -31,7 +31,9 @@ Function NewCbs() As Object
     
     this.StagingApiKey              = "c3d24e796cbc78c7"
     this.StagingEndpoint            = "https://test-www.cbs.com/apps-api/"
+    'this.StagingEndpoint            = "https://stage-apps.cbs.com/apps-api/"
     this.StagingCodeAuthUrl         = "test-www.cbs.com/roku"
+    'this.StagingCodeAuthUrl         = "stage-apps.cbs.com/roku"
     this.StagingSyncbakKey          = "db166d252cf24aa982a220a4b8475e25"
     this.StagingSyncbakSecret       = "40c9f215dafb43149924e75baf05b5dc"
     this.StagingSyncbakEndpoint     = "https://stage-cbsservice.aws.syncbak.com"
@@ -486,7 +488,11 @@ Function Cbs_GetSectionVideos(sectionID As String, excludeShow = True As Boolean
             pageInfo.Count = AsArray(response.sectionItems.itemList).Count()
             pageInfo.TotalCount = AsInteger(response.sectionItems.itemCount)
             For Each item In AsArray(response.sectionItems.itemList)
-                episode = NewEpisode(item)
+                If item.isLive = True Then
+                    episode = NewLiveFeed(item, AsString(response.sectionTitle))
+                Else
+                    episode = NewEpisode(item)
+                End If
                 If episode.IsAvailable() Then
                     videos.Push(episode)
                 End If
@@ -1011,9 +1017,11 @@ Function Cbs_Search(term As String, expandDetails = False As Boolean, startIndex
             searchResult = NewSearchResult(item)
             If expandDetails Then
                 result = searchResult.GetShow()
-                result.ShortDescriptionLine2 = result.ShortDescriptionLine1
-                result.ShortDescriptionLine1 = searchResult.Title
-                results.Push(result)
+                If result <> invalid Then
+                    result.ShortDescriptionLine2 = result.ShortDescriptionLine1
+                    result.ShortDescriptionLine1 = searchResult.Title
+                    results.Push(result)
+                End If
             Else
                 results.Push(searchResult)
             End If

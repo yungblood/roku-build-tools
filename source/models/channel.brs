@@ -19,6 +19,8 @@ Function NewChannel(json = invalid As Object) As Object
 End Function
 
 Sub Channel_Initialize(json As Object)
+    m.Json = json
+    
     m.ID = AsString(json.stationId)
     m.ParentID = AsString(json.parentStationId)
     m.MediaID = AsString(json.mediaId)

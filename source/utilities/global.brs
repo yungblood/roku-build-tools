@@ -142,7 +142,7 @@ Sub ProcessGlobalOption(option As Object, linkName = "" As String, events = [] A
     Else If option.ID = "signUp" Then
         NewRegistrationWizard().Show()
     Else If option.ID = "help" Then
-        ShowMessageBox("Help", "For help or to submit feedback, please visit cbs.com/roku/help.", ["Close"], True)
+        ShowMessageBox("Help", "For help or to submit feedback, please visit cbs.com/roku/help or submit feedback at" + Chr(10) + "cbs-roku-feedback@cbsinteractive.com", ["Close"], True)
     Else If option.ID = "legal" Then
         ShowMessageBox("Legal Notices", Cbs().GetLegalText(), ["Close"], True)
     Else If option.ID = "network" Then

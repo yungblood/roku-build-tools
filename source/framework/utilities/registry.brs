@@ -1,11 +1,17 @@
 'IMPORTS=utilities/strings
 ' ******************************************************
-' Copyright Steven Kean 2010-2015
+' Copyright Steven Kean 2010-2016
 ' All Rights Reserved.
 ' ******************************************************
 '=====================
 ' Registry
 '=====================
+Function IsRegistryAvailable() As Boolean
+    ' Used for testing availability in the current thread
+    reg = CreateObject("roRegistry")
+    Return reg <> invalid
+End Function
+
 Function RegRead(key as String, section = invalid As Dynamic) As Dynamic
     If section = invalid Then section = "Default"
     reg = CreateObject("roRegistrySection", section)
@@ -26,6 +32,25 @@ Sub RegDelete(key as String, section = invalid As Dynamic)
     reg.Delete(key)
     reg.Flush()
 End Sub
+
+Function GetRegistryValues(section As String) As Object
+    values = {}
+    reg = CreateObject("roRegistrySection", section)
+    For Each key In reg.GetKeyList()
+        values[key] = reg.Read(key)
+    Next
+    Return values
+End Function
+
+Function SetRegistryValues(section As String, values As Object) As Boolean
+    result = True
+    reg = CreateObject("roRegistrySection", section)
+    For Each key In AsAssociativeArray(values)
+        result = reg.Write(key, AsString(values[key])) And result
+    Next
+    result = reg.Flush() And result
+    Return result
+End Function
 
 Function GetRegistryValue(key As String, default As Dynamic, section As string) As Dynamic
     value = RegRead(key, section)

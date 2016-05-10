@@ -1,6 +1,6 @@
 'IMPORTS=utilities/web utilities/xml utilities/strings utilities/types utilities/dateTime v2/base/observable
 ' ******************************************************
-' Copyright Steven Kean 2010-2015
+' Copyright Steven Kean 2010-2016
 ' All Rights Reserved.
 ' ******************************************************
 Function NewVast3Ad(adData As Object) As Object

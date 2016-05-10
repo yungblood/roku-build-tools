@@ -14,6 +14,8 @@ Function NewShowGroup(json = invalid As Object) As Object
 End Function
 
 Sub ShowGroup_Initialize(json As Object)
+    m.Json = json
+    
     m.ID = AsString(json.id)
     m.Name = AsString(json.title)
 End Sub

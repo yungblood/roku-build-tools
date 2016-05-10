@@ -327,7 +327,7 @@ End Sub
 Sub DW_PlayerLivePlayPosition(channel As Object, position As Integer)
     data = {}
     data["userid"] = Cbs().GetCurrentUser().ID
-    'data["v22"] = episode.ContentID
+    data["v22"] = AsString(channel.ContentID)
     data["affiliate"] = (channel.ClassName = "Channel")
     data["premium"] = False
     data["platform"] = "roku"
