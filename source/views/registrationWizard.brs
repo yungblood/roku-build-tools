@@ -35,6 +35,12 @@ Function RegistrationWizard_Show() As Integer
 
     SetThemeAttribute("OverhangSliceSD", "pkg:/images/overhang_options_sd.jpg")
     SetThemeAttribute("OverhangSliceHD", "pkg:/images/overhang_options_hd.jpg")
+    
+    If result = 1 Then
+        ' Force a reload of favorites and recently watched
+        GlobalEventRegistry().RaiseEvent("FavoritesChanged", {})
+        GlobalEventRegistry().RaiseEvent("RecentlyWatchedChanged")
+    End If
     Return result
 End Function
 
