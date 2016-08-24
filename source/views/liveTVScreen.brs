@@ -84,6 +84,14 @@ Function LiveTVScreen_GetContent(showLoading = True As Boolean) As Object
             buttons.Push({
                 Text: "Subscribe to watch"
                 ID: "subscribe"
+                OmnitureData:   {
+                    LinkName: "app:roku:all access:upsell:Limited Commercial:live-tv:click"
+                    Params: {  
+                        v10: "livetv_upsell"
+                        v4: "CIA-00-10abc6f"
+                    }
+                    Events: ["event19"]
+                }
             })
         End If
         content.Buttons = buttons
@@ -122,9 +130,20 @@ Sub LiveTVScreen_OnButtonPressed(eventData As Object, callbackData = invalid As 
         Omniture().TrackEvent(linkName, ["event19"], { v46: linkName })
 
         If eventData.Button.ID = "watch" Or eventData.Button.ID = "subscribe" Then
+            If eventData.Button.OmnitureData <> invalid Then
+                linkName = eventData.Button.OmnitureData.LinkName
+                events = eventData.Button.OmnitureData.Events
+                params = eventData.Button.OmnitureData.Params
+                Omniture().TrackEvent(linkName, events, params)
+            End If
+
             playContent = True
             If eventData.Button.ID = "subscribe" Then
-                playContent = (NewRegistrationWizard().Show() = 1)
+                If Cbs().IsCFFlowEnabled Then
+                    playContent = NewRegistrationWizard().ShowLiveTVUpsellScreen()
+                Else
+                    playContent = (NewRegistrationWizard().Show() = 1)
+                End If
             End If
             If playContent Then
                 m.StartPlayback()

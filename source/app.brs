@@ -36,12 +36,13 @@ Sub App_Run(ecp = invalid As Object)
     End If
     ' Initialize Omniture
     user = Cbs().GetCurrentUser()
-    Omniture().Initialize(Cbs().OmnitureSuiteID, user.ID, user.GetStatusForTracking(), Cbs().OmnitureEvar5)
+    Omniture().Initialize(Cbs().OmnitureSuiteID, user.ID, user.GetStatusForTracking(), user.GetProductForTracking(), Cbs().OmnitureEvar5)
     
     ' Initialize comScore
     CSComScore().log_debug = (GetLogLevel() > 1)
     CSComScore().SetCustomerC2(Cbs().ComScoreC2)
     CSComScore().SetPublisherSecret(Cbs().ComScoreSecret)
+    CSComScore().Start()
 
     While True
         m.Restart = False
@@ -119,7 +120,7 @@ End Sub
 
 Sub App_OnAuthenticationChanged(eventData As Object, callbackData = invalid As Object)
     user = Cbs().GetCurrentUser()
-    Omniture().Initialize(Cbs().OmnitureSuiteID, user.ID, user.GetStatusForTracking(), Cbs().OmnitureEvar5)    
+    Omniture().Initialize(Cbs().OmnitureSuiteID, user.ID, user.GetStatusForTracking(), user.GetProductForTracking(), Cbs().OmnitureEvar5)    
     Cbs().LoadDefaultContent()
 End Sub
 

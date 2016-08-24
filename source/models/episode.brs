@@ -120,12 +120,14 @@ Sub Episode_UpdateDescription(screen As String)
     m.ShortDescriptionLine2 = m[screen + "DescriptionLine2"]
 End Sub
 
-Sub Episode_Refresh()
+Function Episode_Refresh() As Boolean
     episode = Cbs().GetEpisode(m.ContentID)
     If episode <> invalid Then
         m.Append(episode)
+        Return True
     End If
-End Sub
+    Return False
+End Function
 
 Function Episode_IsFullEpisode() As Boolean
     Return m.FullEpisode
@@ -181,7 +183,7 @@ Function Episode_GetAkamaiDims(additionalDims = {} As Object) As Object
 End Function
 
 Function Episode_GetConvivaName() As String
-    Return "[" + m.ContentID + "] " + m.ShowName + " - " + m.Title
+    Return m.ShowName + " - " + m.Title
 End Function
 
 Sub Episode_SetResumePoint(position As Integer)

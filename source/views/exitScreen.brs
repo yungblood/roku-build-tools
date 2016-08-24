@@ -32,7 +32,7 @@ Function ShowExitScreen() As Boolean
             ID: "exit"
             Layers:  [
                 {
-                    Url: "pkg:/images/button_upsell_off.png"
+                    Url: "pkg:/images/upsell/button_upsell_off.png"
                     TargetRect: {
                         x: 402
                         y: 372
@@ -57,7 +57,7 @@ Function ShowExitScreen() As Boolean
             ]
             FocusedLayers:  [
                 {
-                    Url: "pkg:/images/button_upsell_on.png"
+                    Url: "pkg:/images/upsell/button_upsell_on.png"
                     TargetRect: {
                         x: 402
                         y: 372
@@ -85,7 +85,7 @@ Function ShowExitScreen() As Boolean
             ID: "cancel"
             Layers: [
                 {
-                    Url: "pkg:/images/button_upsell_off.png"
+                    Url: "pkg:/images/upsell/button_upsell_off.png"
                     TargetRect: {
                         x: 402
                         y: 434
@@ -110,7 +110,7 @@ Function ShowExitScreen() As Boolean
             ]
             FocusedLayers:  [
                 {
-                    Url: "pkg:/images/button_upsell_on.png"
+                    Url: "pkg:/images/upsell/button_upsell_on.png"
                     TargetRect: {
                         x: 402
                         y: 434

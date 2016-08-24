@@ -37,12 +37,28 @@ Function ReverseArray(array As Object) As Object
     Return reversed
 End Function
 
+Sub InsertElementIntoArray(array As Object, element As Object, index As Integer)
+    newArray = []
+    If index >= array.Count() Then
+        array[index] = element
+        Return
+    End If
+    For curIndex = 0 To array.Count() - 1
+        If curIndex = index Then
+            newArray.Push(element)
+        End If
+        newArray.Push(array[curIndex])
+    Next
+    array.Clear()
+    array.Append(newArray)
+End Sub
+
 Sub MoveElementInArray(array As Object, curIndex As Integer, newIndex As Integer)
     If curIndex <> newIndex And curIndex >= 0 And curIndex < array.Count() And newIndex >= 0 Or newIndex < array.Count() Then
         item = array[curIndex]
         array.Delete(curIndex)
         newArray = []
-        For index = 0 To array.Count()
+        For index = 0 To array.Count() - 1
             If index = newIndex Then
                 newArray.Push(item)
             Else

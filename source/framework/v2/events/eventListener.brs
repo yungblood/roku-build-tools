@@ -5,52 +5,66 @@
 ' ******************************************************
 Function EventListener() As Object
     If m.EventListener = invalid Then
-        this                                = {}
-        
-        this.IsListening                    = False
-        this.RequirePrecision               = True
-        
-        this.RegisteredEvents               = {}
-        this.Observers                      = []
-        this.Ports                          = []
-        this.CurrentPort                    = 0
-        this.LastEventType                  = invalid
-        this.UserIdleTimer                  = CreateObject("roTimespan")
-        
-        this.UserEvents                     = [0, 1, 2, 3, 4, 5, 7, 12, 13, 14, 17, 22, 23]
-        this.NonStandardEvents              = ["Idle", "roUniversalControlEvent", "roUrlEvent", "roTextureRequestEvent"]
-        
-        this.SetRequirePrecision            = EventListener_SetRequirePrecision
-
-        this.GetUserIdleTime                = EventListener_GetUserIdleTime
-
-        this.RegisterPort                   = EventListener_RegisterPort
-        this.UnregisterPort                 = EventListener_UnregisterPort
-        this.GetDefaultPort                 = EventListener_GetDefaultPort
-
-        this.RegisterObserver               = EventListener_RegisterObserver
-        this.UnregisterObserver             = EventListener_UnregisterObserver
-        this.UnregisterObserverForAllEvents = EventListener_UnregisterObserverForAllEvents
-        
-        this.Listen                         = EventListener_Listen
-        this.ListenForOne                   = EventListener_ListenForOne
-        
-
-        ' Register the default port
-        this.EventPort                      = NewEventPort()
-        this.RegisterPort(this.EventPort)
-        
-        ' Create a system log
-        this.SystemLog              = CreateObject("roSystemLog")
-        this.SystemLog.SetMessagePort(this.GetDefaultPort())
-        this.SystemLog.EnableType("http.error")
-        this.SystemLog.EnableType("http.connect")
-        this.SystemLog.EnableType("bandwidth.minute")
-
-        m.EventListener = this
+        m.EventListener = NewEventListener()
     End If
     Return m.EventListener
 End Function
+
+Function NewEventListener() As Object
+    this                                = {}
+    this.ClassName                      = "EventListener"
+    
+    this.Initialized                    = False
+    this.IsListening                    = False
+    this.RequirePrecision               = True
+    
+    this.RegisteredEvents               = {}
+    this.Observers                      = []
+    this.Ports                          = []
+    this.CurrentPort                    = 0
+    this.LastEventType                  = invalid
+    this.UserIdleTimer                  = CreateObject("roTimespan")
+    
+    this.UserEvents                     = [0, 1, 2, 3, 4, 5, 7, 12, 13, 14, 17, 22, 23]
+    this.NonStandardEvents              = ["Idle", "roUniversalControlEvent", "roUrlEvent", "roTextureRequestEvent"]
+    
+    this.Initialize                     = EventListener_Initialize
+    this.SetRequirePrecision            = EventListener_SetRequirePrecision
+
+    this.GetUserIdleTime                = EventListener_GetUserIdleTime
+
+    this.RegisterPort                   = EventListener_RegisterPort
+    this.UnregisterPort                 = EventListener_UnregisterPort
+    this.GetDefaultPort                 = EventListener_GetDefaultPort
+
+    this.RegisterObserver               = EventListener_RegisterObserver
+    this.UnregisterObserver             = EventListener_UnregisterObserver
+    this.UnregisterObserverForAllEvents = EventListener_UnregisterObserverForAllEvents
+    
+    this.Listen                         = EventListener_Listen
+    this.ListenForOne                   = EventListener_ListenForOne
+
+    ' Register the default port
+    this.EventPort                      = NewEventPort()
+    this.RegisterPort(this.EventPort)
+
+    Return this
+ End Function
+
+Sub EventListener_Initialize(requirePrecision = m.RequirePrecision As Boolean, enableSystemLog = True As Boolean)
+    m.Initialized = True
+    m.SetRequirePrecision(requirePrecision)
+    If enableSystemLog Then
+        ' Create a system log
+        m.SystemLog = CreateObject("roSystemLog")
+        If m.SystemLog <> invalid Then
+            m.SystemLog.SetMessagePort(m.GetDefaultPort())
+            m.SystemLog.EnableType("http.error")
+            m.SystemLog.EnableType("http.connect")
+            m.SystemLog.EnableType("bandwidth.minute")
+        End If
+    End If
+End Sub
 
 Sub EventListener_SetRequirePrecision(requirePrecision As Boolean)
     m.RequirePrecision = requirePrecision
@@ -121,6 +135,7 @@ Function EventListener_Listen() As Boolean
 End Function
 
 Function EventListener_ListenForOne(port = invalid As Object) As Boolean
+    If Not m.Initialized Then m.Initialize()
     result = True
     i = 0
     While True

@@ -28,6 +28,7 @@ Sub Channel_Initialize(json As Object)
     m.Description = AsString(json.description)
     m.Token = AsString(json.token)
     
+    m.ConvivaTrackingTitle = m.Name + "-LiveTV"
     m.TrackingTitle = m.Name + "-liveTV"
     m.TrackingID = 2344
     m.TrackingAstID = 600
@@ -81,7 +82,7 @@ Function Channel_GetAkamaiDims(additionalDims = {} As Object) As Object
 End Function
 
 Function Channel_GetConvivaName() As Object
-    Return m.TrackingTitle
+    Return m.ConvivaTrackingTitle
 End Function
 
 Function Channel_GetNowPlaying() As Object

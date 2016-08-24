@@ -3,16 +3,23 @@ Function NewUser(json = invalid As Object) As Object
     this.ClassName                  = "User"
     
     this.Packages                   = []
+    this.PackageStatus              = {}
     this.Favorites                  = invalid
     this.ID                         = ""
     
     this.Initialize                 = User_Initialize
     
     this.HasPackage                 = User_HasPackage
+    this.GetProductForTracking      = User_GetProductForTracking
     this.GetStatusForTracking       = User_GetStatusForTracking
     this.GetStatusForAds            = User_GetStatusForAds
     
     this.IsSubscriber               = User_IsSubscriber
+    this.IsRokuSubscriber           = User_IsRokuSubscriber
+    
+    this.CanUpgrade                 = User_CanUpgrade
+    this.CanDowngrade               = User_CanDowngrade
+    this.GetEligibleProducts        = User_GetEligibleProducts       
     
     this.GetMyCbsShows              = User_GetMyCbsShows
     this.GetMyCbsEpisodes           = User_GetMyCbsEpisodes
@@ -51,6 +58,8 @@ Sub User_Initialize(json As Object)
     For Each package In AsArray(json.cbsPackageInfo)
         m.Packages.Push(package)
     Next
+    
+    m.PackageStatus = m.json.packageStatus
 End Sub
 
 Function User_HasPackage(packageName As String) As Boolean
@@ -62,57 +71,126 @@ Function User_HasPackage(packageName As String) As Boolean
     Return False
 End Function
 
+Function User_GetProductForTracking() As String
+    If m.Packages.Count() > 0 Then
+        Return m.Packages[0].productCode
+    End If
+    Return ""
+End Function
+
 Function User_GetStatusForTracking() As String
-    status = "anon"
-    If m.Status = "REGISTERED" Then
-        status = "reg"
-    Else If m.Status = "SUBSCRIBER" Then
-        status = "reg;sub"
-        foundTrial = False
-        For Each package In m.Packages
-            If package.packageStatus = "TRIAL" Then
-                status = status + ";trial"
-                foundTrial = True
-                Exit For
-            End If
-        Next
-        If Not foundTrial Then
-            status = status + ";pay"
+    status = ""
+    For Each value In AsArray(m.PackageStatus.subscriberPackage)
+        If status.Len() > 0 Then
+            status = status + ","
         End If
-    Else If m.Status = "EX_SUBSCRIBER" Then
-        status = "reg;sub;exsub"
-    Else If m.Status = "SUSPENDED" Then
-        status = "reg;sub;susp"
+        status = status + "sb|" + AsString(value)
+    Next
+    For Each value In AsArray(m.PackageStatus.subscriberTrialPackage)
+        If status.Len() > 0 Then
+            status = status + ","
+        End If
+        status = status + "tsb|" + AsString(value)
+    Next
+    For Each value In AsArray(m.PackageStatus.exsubscriberPackage)
+        If status.Len() > 0 Then
+            status = status + ","
+        End If
+        status = status + "esb|" + AsString(value)
+    Next
+    For Each value In AsArray(m.PackageStatus.suspendedPackage)
+        If status.Len() > 0 Then
+            status = status + ","
+        End If
+        status = status + "ssb|" + AsString(value)
+    Next
+    If IsNullOrEmpty(status) Then
+        ' Anonymous user
+        status = "sb|0"
     End If
     Return status
 End Function
 
-Function User_GetStatusForAds() As Integer
-    status = 0
-    If m.Status = "REGISTERED" Then
-        status = 2
-    Else If m.Status = "SUBSCRIBER" Then
-        status = 1
-        foundTrial = False
-        For Each package In m.Packages
-            If package.packageStatus = "TRIAL" Then
-                foundTrial = True
-                Exit For
-            End If
-        Next
-        If Not foundTrial Then
-            status = 5
+Function User_GetStatusForAds() As String
+    sb = ""
+    For Each value In AsArray(m.PackageStatus.subscriberPackage)
+        If sb.Len() > 0 Then
+            sb = sb + ","
         End If
-    Else If m.Status = "EX_SUBSCRIBER" Then
-        status = 4
-    Else If m.Status = "SUSPENDED" Then
-        status = 3
+        sb = sb + AsString(value)
+    Next
+    tsb = ""
+    For Each value In AsArray(m.PackageStatus.subscriberTrialPackage)
+        If tsb.Len() > 0 Then
+            tsb = tsb + ","
+        End If
+        tsb = tsb + AsString(value)
+    Next
+    esb = ""
+    For Each value In AsArray(m.PackageStatus.exsubscriberPackage)
+        If esb.Len() > 0 Then
+            esb = esb + ","
+        End If
+        esb = esb + AsString(value)
+    Next
+    ssb = ""
+    For Each value In AsArray(m.PackageStatus.suspendedPackage)
+        If ssb.Len() > 0 Then
+            ssb = ssb + ","
+        End If
+        ssb = ssb + AsString(value)
+    Next
+    status = ""
+    If sb.Len() > 0 Then
+        status = "sb=" + sb
+    End If
+    If tsb.Len() > 0 Then
+        If status.Len() > 0 Then
+            status = status + "&"
+        End If
+        status = status + "tsb=" + tsb
+    End If
+    If esb.Len() > 0 Then
+        If status.Len() > 0 Then
+            status = status + "&"
+        End If
+        status = status + "esb=" + esb
+    End If
+    If ssb.Len() > 0 Then
+        If status.Len() > 0 Then
+            status = status + "&"
+        End If
+        status = status + "ssb=" + ssb
     End If
     Return status
 End Function
 
 Function User_IsSubscriber() As Boolean
     Return (m.Status = "SUBSCRIBER")
+End Function
+
+Function User_IsRokuSubscriber() As Boolean
+    For Each package In m.Packages
+        If package.packageSource = "roku" Then
+            Return True
+        End If
+    Next
+    Return False
+End Function
+
+Function User_CanUpgrade() As Boolean
+    Return m.GetEligibleProducts().Upgrades.Count() > 0
+End Function
+
+Function User_CanDowngrade() As Boolean
+    Return m.GetEligibleProducts().Downgrades.Count() > 0
+End Function
+
+Function User_GetEligibleProducts(refresh = False As Boolean) As Object
+    If refresh Or m.EligibleProducts = invalid Then
+        m.EligibleProducts = Cbs().GetEligibility()
+    End If
+    Return m.EligibleProducts
 End Function
 
 Function User_GetMyCbsShows(refresh = False As Boolean) As Object

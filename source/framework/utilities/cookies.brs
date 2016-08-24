@@ -48,6 +48,10 @@ Sub DeleteCookiesForUrl(url As String)
     container.Delete(domain)
 End Sub
 
+Sub DeleteAllCookies()
+    GetCookieContainer().Clear()
+End Sub
+
 Function GetCookie(cookieName As String, url = "" As String) As String
     domain = ""
     path = ""

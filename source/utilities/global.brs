@@ -8,6 +8,16 @@ Function OpenItem(item As Object, eventData = invalid As Object) As Boolean
             NewCbsSearchScreen().Show()
         Else If item.ID = "settings" Then
             NewSettingsScreen().Show()
+        Else If item.ID = "signUp" Or item.ID = "freeTrial" Then
+            If Cbs().IsCFFlowEnabled Then
+                NewRegistrationWizard().ShowSubscriptionSelectionScreen()
+            Else
+                NewRegistrationWizard().Show()
+            End If
+        Else If item.ID = "upgrade" Then
+            NewRegistrationWizard().ShowUpgradeScreen(Cbs().GetCurrentUser().IsRokuSubscriber())
+        Else If item.ID = "downgrade" Then
+            NewRegistrationWizard().ShowDowngradeScreen(Cbs().GetCurrentUser().IsRokuSubscriber())
         End If
     Else If item.ClassName = "Show" Then
         NewShowScreen().Show(item.ID)
@@ -71,6 +81,10 @@ Sub ShowOptionsDialog(showSearch = True As Boolean, showSettings = True As Boole
             Text:   "DEBUG: Display IP Address"
             ID:     "ip"
         })
+        options.Push({
+            Text:   "DEBUG: Re-authenticate"
+            ID:     "reauth"
+        })
         options.Push("separator")
     End If
     
@@ -92,7 +106,7 @@ Sub ShowOptionsDialog(showSearch = True As Boolean, showSettings = True As Boole
         ID: "legal"
         Events: ["event19"]
     })
-    If not Cbs().IsSettingsScreenOpened Then
+    If Not Cbs().IsSettingsScreenOpened Then
         options.Push({
             Text: "Settings"
             ID: "settings"
@@ -119,9 +133,9 @@ Sub ShowOptionsDialog(showSearch = True As Boolean, showSettings = True As Boole
     End If
 End Sub
 
-Sub ProcessGlobalOption(option As Object, linkName = "" As String, events = [] As Object)
+Sub ProcessGlobalOption(option As Object, linkName = "" As String, events = [] As Object, omnitureParams = {} As Object)
     If Not IsNullOrEmpty(linkName) Then
-        Omniture().TrackEvent(linkName, events, { v46: linkName })
+        Omniture().TrackEvent(linkName, events, omnitureParams)
     End If
     
     If option.ID = "search" Then
@@ -139,8 +153,18 @@ Sub ProcessGlobalOption(option As Object, linkName = "" As String, events = [] A
             dialog.Close()
             facade.Close()
         End If
-    Else If option.ID = "signUp" Then
-        NewRegistrationWizard().Show()
+    Else If option.ID = "signIn" Then
+        NewRegistrationWizard().AuthenticateWithCode()
+    Else If option.ID = "signUp" Or option.ID = "freeTrial" Then
+        If Cbs().IsCFFlowEnabled Then
+            NewRegistrationWizard().ShowSubscriptionSelectionScreen()
+        Else
+            NewRegistrationWizard().Show()
+        End If
+    Else If option.ID = "upgrade" Then
+        NewRegistrationWizard().ShowUpgradeScreen(Cbs().GetCurrentUser().IsRokuSubscriber())
+    Else If option.ID = "downgrade" Then
+        NewRegistrationWizard().ShowDowngradeScreen(Cbs().GetCurrentUser().IsRokuSubscriber())
     Else If option.ID = "help" Then
         ShowMessageBox("Help", "For help or to submit feedback, please visit cbs.com/roku/help or submit feedback at" + Chr(10) + "cbs-roku-feedback@cbsinteractive.com", ["Close"], True)
     Else If option.ID = "legal" Then
@@ -151,5 +175,7 @@ Sub ProcessGlobalOption(option As Object, linkName = "" As String, events = [] A
         NewSettingsScreen().Show()
     Else If option.ID = "ip" Then
         ShowMessageBox("IP Address", "Roku API: " + Cbs().GetIPAddress(False) + Chr(10) + "CBS API: " + Cbs().GetIPAddress(), ["Close"], True)
+    Else If option.ID = "reauth" Then
+        Cbs().IsAuthenticated(True)
     End If
 End Sub

@@ -8,6 +8,8 @@ Function NewStreamBase(json = invalid As Object) As Object
     this.CanWatch               = Function() As Boolean : Return True  : End Function
 
     this.IsFullyWatched         = Function() As Boolean : Return False : End Function
+    
+    this.Refresh                = Function() As Boolean : Return True  : End Function
 
     this.GetVmapUrl             = Function() As String  : Return ""    : End Function
     

@@ -17,6 +17,7 @@ Function NewHomeScreen() As Object
     this.OnDisposed                 = HomeScreen_OnDisposed
     this.OnFavoritesChanged         = HomeScreen_OnFavoritesChanged
     this.OnRecentlyWatchedChanged   = HomeScreen_OnRecentlyWatchedChanged
+    this.OnAuthenticationChanged    = HomeScreen_OnAuthenticationChanged
 
     this.Screen                     = NewGridScreen()
     this.Screen.SetGridStyle("two-row-flat-landscape-custom")
@@ -35,6 +36,7 @@ Function NewHomeScreen() As Object
     
     GlobalEventRegistry().RegisterObserver(this, "FavoritesChanged", "OnFavoritesChanged")
     GlobalEventRegistry().RegisterObserver(this, "RecentlyWatchedChanged", "OnRecentlyWatchedChanged")
+    GlobalEventRegistry().RegisterObserver(this, "AuthenticationChanged", "OnAuthenticationChanged")
 
     Return this
 End Function
@@ -54,7 +56,8 @@ End Function
 Sub HomeScreen_SetupRows(refresh = False As Boolean)
     If refresh Or m.Rows = invalid Or m.Rows.IsEmpty() Then
         m.Rows = []
-        m.Rows.Push({
+        
+        menu = {
             ID:             "menu"
             Name:           ""
             ContentList:    [
@@ -79,15 +82,53 @@ Sub HomeScreen_SetupRows(refresh = False As Boolean)
                     HDPosterUrl:    "pkg:/images/icon_search_hd.png"
                     SDPosterUrl:    "pkg:/images/icon_search_sd.png"
                 }
-                {
-                    Text:           ""
-                    ID:             "settings"
-                    ClassName:      "menuItem"
-                    HDPosterUrl:    "pkg:/images/icon_settings_hd.png"
-                    SDPosterUrl:    "pkg:/images/icon_settings_sd.png"
-                }
             ]
+        }
+        If Cbs().IsCFFlowEnabled Then
+            If Not Cbs().IsAuthenticated() Then
+                menu.ContentList.Unshift({
+                    Text:           ""
+                    ID:             "freeTrial"
+                    ClassName:      "menuItem"
+                    HDPosterUrl:    "pkg:/images/icon_freetrial_hd.jpg"
+                    SDPosterUrl:    "pkg:/images/icon_freetrial_sd.jpg"
+                    OmnitureData:   {
+                        LinkName: "app:roku:all access:upsell:Limited Commercial:click"
+                        Params: {  
+                            v10: "home"
+                            v4: "CIA-00-10abc6e"
+                        }
+                        Events: ["event19"]
+                    }
+                })
+            Else If Cbs().GetCurrentUser().CanUpgrade() Then
+                menu.ContentList.Push({
+                    Title:          "Upgrade"
+                    ID:             "upgrade"
+                    ClassName:      "menuItem"
+                    HDPosterUrl:    "pkg:/images/icon_upgrade_hd.jpg"
+                    SDPosterUrl:    "pkg:/images/icon_upgrade_sd.jpg"
+                    OmnitureData:   {
+                        LinkName: "app:roku:CF:upgrade:marquee:click"
+                        Params: {  
+                            v10: "home"
+                            v4: "CIA-00-10abc6j"
+                        }
+                        Events: ["event19"]
+                    }
+                })
+            End If            
+        End If
+        menu.ContentList.Push({
+            Text:           ""
+            ID:             "settings"
+            ClassName:      "menuItem"
+            HDPosterUrl:    "pkg:/images/icon_settings_hd.png"
+            SDPosterUrl:    "pkg:/images/icon_settings_sd.png"
         })
+
+        m.Rows.Push(menu)
+        
         m.Rows.Push({
             ID:     "featured"
             Name:   "Featured Shows"
@@ -204,7 +245,14 @@ Sub HomeScreen_OnListItemSelected(eventData As Object, callbackData = invalid As
         If eventData.Row.ID = "menu" Then
             linkName = "app:roku:home:" + LCase(AsString(eventData.Item.Title))
         End If
-        Omniture().TrackEvent(linkName, ["event19"], { v46: linkName })
+        events = ["event19"]
+        params = {}
+        If eventData.Item.OmnitureData <> invalid Then
+            linkName = eventData.Item.OmnitureData.LinkName
+            events = eventData.Item.OmnitureData.Events
+            params = eventData.Item.OmnitureData.Params
+        End If
+        Omniture().TrackEvent(linkName, events, params)
 
         OpenItem(eventData.Item, eventData)
     End If
@@ -237,4 +285,18 @@ End Sub
 
 Sub HomeScreen_OnRecentlyWatchedChanged(eventData As Object, callbackData = invalid As Object)
     m.Screen.ReloadRow("recentlyWatched", False, True, True)
+End Sub
+
+Sub HomeScreen_OnAuthenticationChanged(eventData As Object, callbackData = invalid As Object)
+    ' Refresh the current user state
+    Cbs().GetCurrentUser(True)
+    If m.Screen.IsTopMost() Then
+        m.SetupRows(True)
+    Else
+        ' There's a bizarre grid screen/video screen interaction issue when
+        ' a grid screen is updated while video is playing, so we only want to
+        ' update if we're the top most screen.  Clearing the rows should force
+        ' an update the next time this screen is shown.
+        m.Rows.Clear()
+    End If
 End Sub

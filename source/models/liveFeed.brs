@@ -7,6 +7,8 @@ Function NewLiveFeed(json = invalid As Object, sectionName = "" As String) As Ob
     
     this.Initialize     = LiveFeed_Initialize
     
+    this.Refresh        = LiveFeed_Refresh
+    
     this.GetAkamaiDims  = LiveFeed_GetAkamaiDims
     this.GetConvivaName = LiveFeed_GetConvivaName
     
@@ -68,6 +70,16 @@ Sub LiveFeed_Initialize(json As Object, sectionName = "" As String)
 
 End Sub
 
+Function LiveFeed_Refresh() As Boolean
+    ' For live feeds, we're only interested in updating the pid
+    episode = Cbs().GetEpisode(m.ContentID)
+    If episode <> invalid Then
+        m.ID = episode.ID
+        Return True
+    End If
+    Return False
+End Function
+
 Function LiveFeed_GetAkamaiDims(additionalDims = {} As Object) As Object
     dims = {
         category:   "Live"
@@ -82,7 +94,7 @@ Function LiveFeed_GetAkamaiDims(additionalDims = {} As Object) As Object
 End Function
 
 Function LiveFeed_GetConvivaName() As String
-    Return "[" + m.ContentID + "] " + IIf(IsNullOrEmpty(m.ShowName), "", m.ShowName + " - ") + m.TrackingTitle
+    Return IIf(IsNullOrEmpty(m.ShowName), "", m.ShowName + " - ") + m.Name
 End Function
 
 Sub LiveFeed_SetShowID(id As String)

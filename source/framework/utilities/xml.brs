@@ -145,7 +145,7 @@ Function ParseXmlAsJson(xml As Object, stripNamespaces = False As Boolean, attri
 
         body = node.GetBody()
         If IsString(body) Then
-             If current.IsEmpty() Then
+            If current.IsEmpty() Then
                 current = body
             Else
                 current["#text"] = body
@@ -165,6 +165,8 @@ Function ParseXmlAsJson(xml As Object, stripNamespaces = False As Boolean, attri
                     current[name].Push(parsedChild)
                 End If
             Next
+        Else If body = invalid And current.IsEmpty() Then
+            current = invalid
         End If
         nodeName = node.GetName()
         If stripNamespaces And nodeName.InStr(":") > -1 Then

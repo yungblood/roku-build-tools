@@ -13,6 +13,7 @@ Function NewSettingsScreen() As Object
     this.OnListItemFocused          = SettingsScreen_OnListItemFocused
     this.OnListItemSelected         = SettingsScreen_OnListItemSelected
     this.OnDisposed                 = SettingsScreen_OnDisposed
+    this.OnAuthenticationChanged    = SettingsScreen_OnAuthenticationChanged
 
     this.Screen                     = NewGridScreen()
     this.Screen.SetGridStyle("two-row-flat-landscape-custom")
@@ -27,6 +28,8 @@ Function NewSettingsScreen() As Object
     this.Screen.RegisterObserver(this, "ListItemFocused", "OnListItemFocused")
     this.Screen.RegisterObserver(this, "ListItemSelected", "OnListItemSelected")
     this.Screen.RegisterObserver(this, "Disposed", "OnDisposed")
+
+    GlobalEventRegistry().RegisterObserver(this, "AuthenticationChanged", "OnAuthenticationChanged")
 
     Return this
 End Function
@@ -57,6 +60,37 @@ Sub SettingsScreen_SetupRows()
         Events: ["event19"]        
     })
     If Cbs().IsAuthenticated() Then
+        If Cbs().GetCurrentUser().CanUpgrade() Then
+            row.ContentList.Push({
+                Title: "Upgrade"
+                ID: "upgrade"
+                HDPosterUrl: "pkg:/images/icon_upgrade_hd.jpg"
+                SDPosterUrl: "pkg:/images/icon_upgrade_sd.jpg"
+                OmnitureData:   {
+                    LinkName: "app:roku:CF:upgrade:settings:click"
+                    Params: {  
+                        v10: "settings"
+                        v4: "CIA-00-10abc7a"
+                    }
+                    Events: ["event19"]
+                }
+            })
+        Else If Cbs().GetCurrentUser().CanDowngrade() Then
+            row.ContentList.Push({
+                Title: "Manage Account"
+                ID: "downgrade"
+                HDPosterUrl: "pkg:/images/icon_manageaccount_hd.jpg"
+                SDPosterUrl: "pkg:/images/icon_manageaccount_sd.jpg"
+                OmnitureData:   {
+                    LinkName: "app:roku:CF:downgrade:settings:click"
+                    Params: {  
+                        v10: "settings"
+                        v4: "CIA-00-10abc7b"
+                    }
+                    Events: ["event19"]
+                }
+            })
+        End If
         row.ContentList.Push({
             Title: "Sign out"
             ID: "signOut"
@@ -65,13 +99,37 @@ Sub SettingsScreen_SetupRows()
             Events: ["event22"]
         })
     Else
-        row.ContentList.Push({
-            Title: "Sign up or Sign in"
-            ID: "signUp"
-            HDPosterUrl: "pkg:/images/icon_signup_hd.png"
-            SDPosterUrl: "pkg:/images/icon_signup_sd.png"
-            Events: ["event22"]
-        })
+        If Cbs().IsCFFlowEnabled Then
+            row.ContentList.Push({
+                Title: "Start your free trial"
+                ID: "signUp"
+                HDPosterUrl: "pkg:/images/icon_freetrial_hd.jpg"
+                SDPosterUrl: "pkg:/images/icon_freetrial_sd.jpg"
+                OmnitureData:   {
+                    LinkName: "app:roku:all access:upsell:settings:subscribe:click"
+                    Params: {  
+                        v10: "settings"
+                        v4: "CIA-00-10abc6g"
+                    }
+                    Events: ["event19"]
+                }
+            })
+            row.ContentList.Push({
+                Title: "Sign in"
+                ID: "signIn"
+                HDPosterUrl: "pkg:/images/icon_signin_hd.jpg"
+                SDPosterUrl: "pkg:/images/icon_signin_sd.jpg"
+                Events: ["event22"]
+            })
+        Else
+            row.ContentList.Push({
+                Title: "Sign up or Sign in"
+                ID: "signUp"
+                HDPosterUrl: "pkg:/images/icon_signup_hd.png"
+                SDPosterUrl: "pkg:/images/icon_signup_sd.png"
+                Events: ["event22"]
+            })
+        End If
     End If
     m.Screen.SetRowItems([row])
 End Sub
@@ -101,14 +159,22 @@ End Sub
 Sub SettingsScreen_OnListItemSelected(eventData As Object, callbackData = invalid As Object)
     If eventData.Item <> invalid Then
         linkName = "app:roku:settings:" + LCase(AsString(eventData.Item.Title))
-        ProcessGlobalOption(eventData.Item, linkName, eventData.Item.Events)
-        If eventData.Item.ID = "signUp" Or eventData.Item.ID = "signOut" Then
+        events = eventData.Item.Events
+        params = {}
+        If eventData.Item.OmnitureData <> invalid Then
+            linkName = eventData.Item.OmnitureData.LinkName
+            events = eventData.Item.OmnitureData.Events
+            params = eventData.Item.OmnitureData.Params
+        End If
+        ProcessGlobalOption(eventData.Item, linkName, events, params)
+        If eventData.Item.ID <> "network" Then
             m.SetupRows()
         End If
     End If
 End Sub
 
 Function SettingsScreen_OnDisposed(eventData As Object, callbackData = invalid As Object)
+    GlobalEventRegistry().UnregisterObserverForAllEvents(m)
     m.Screen.UnregisterObserverForAllEvents(m)
     m.Screen = invalid
     Cbs().IsSettingsScreenOpened = False
@@ -119,3 +185,11 @@ Function SettingsScreen_OnDisposed(eventData As Object, callbackData = invalid A
     
     Return True
 End Function
+
+Sub SettingsScreen_OnAuthenticationChanged(eventData As Object, callbackData = invalid As Object)
+    ' Refresh the current user state
+    Cbs().GetCurrentUser(True)
+    If m.Screen <> invalid Then
+        m.SetupRows()
+    End If
+End Sub

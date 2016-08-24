@@ -109,9 +109,9 @@ Function VideoPlayer_Play(episodeOrChannel As Object, resume = False As Boolean,
     ' Refresh the current user state, in case it changed between videos
     Cbs().GetCurrentUser(True)
     
+    ' Refresh the content to ensure the user still has permission to view it
+    m.Content.Refresh()
     If m.Content.ClassName = "Episode" Then
-        ' Refresh the content to ensure the user still has permission to view it
-        m.Content.Refresh()
         Cbs().GetCurrentUser().AddToRecentlyWatched(m.Content)
     End If
     
@@ -146,7 +146,7 @@ Function VideoPlayer_Play(episodeOrChannel As Object, resume = False As Boolean,
         convivaTags["playerVersion"]        = GetAppVersion()
         convivaTags["accessType"]           = IIf(Cbs().IsAuthenticated(), IIf(Cbs().IsSubscribed(), "Premium", "Authenticated"), "Free")
     
-        m.ConvivaMetadata = ConvivaContentInfo(m.Content.GetConvivaName(), m.ConvivaTags)
+        m.ConvivaMetadata = ConvivaContentInfo(m.Content.GetConvivaName(), convivaTags)
         m.ConvivaMetadata["streamUrl"]        = stream.Stream.Url
         m.ConvivaMetadata["streamFormat"]     = "hls"
         m.ConvivaMetadata["contentLength"]    = m.Content.Length
@@ -260,7 +260,7 @@ Function VideoPlayer_OnBeforeNewContent(eventData As Object, callbackData As Obj
             vmapUrl = Replace(stream.VmapUrl, "[timestamp]", NowDate().AsSeconds().ToStr())
             vmapUrl = AddQueryString(vmapUrl, "ppid", AsString(Cbs().GetCurrentUser().Ppid))
             
-            customParams = "sb=" + AsString(Cbs().GetCurrentUser().GetStatusForAds())
+            customParams = AsString(Cbs().GetCurrentUser().GetStatusForAds())
             cbsU = GetCookie("CBS_U")
             If Not IsNullOrEmpty(cbsU) Then
                 ' Convert "ge:1|gr:2" to ge=1&gr=2
@@ -268,6 +268,8 @@ Function VideoPlayer_OnBeforeNewContent(eventData As Object, callbackData As Obj
             End If
             customParams = customParams + "&ppid=" + AsString(Cbs().GetCurrentUser().Ppid)
             vmapUrl = AddQueryString(vmapUrl, "cust_params", customParams)
+            
+            ?"VAST URL: ";vmapUrl
             
             m.ShowAds = True
             If m.ShowAds Then
@@ -436,13 +438,24 @@ Sub VideoPlayer_OnPositionNotification(eventData As Object, callbackData As Obje
         DW().PlayerLivePlay(m.Content, m.GetPlayerPosition(True), m.GetPlayerPosition(False))
     End If
     ' Track the playhead position for resumes
-    If eventData.Position > 0 And eventData.Position Mod 10 = 0 Then
-        DebugPrint(eventData.Position, "Track playhead", 2)
-        If m.Content.ClassName = "Episode" Then
-            m.Content.SetResumePoint(m.GetPlayerPosition(False))
-            DW().PlayerPlayPosition(m.Content, m.GetPlayerPosition(False))
-        Else If m.Content.ClassName = "Channel" Or m.Content.ClassName = "LiveFeed" Then
-            DW().PlayerLivePlayPosition(m.Content, m.GetPlayerPosition(False))
+    If eventData.Position > 0 Then
+        If eventData.Position Mod 10 = 0 Then
+            DebugPrint(eventData.Position, "Track playhead", 2)
+            If m.Content.ClassName = "Episode" Then
+                m.Content.SetResumePoint(m.GetPlayerPosition(False))
+                DW().PlayerPlayPosition(m.Content, m.GetPlayerPosition(False))
+            Else If m.Content.ClassName = "Channel" Or m.Content.ClassName = "LiveFeed" Then
+                DW().PlayerLivePlayPosition(m.Content, m.GetPlayerPosition(False))
+            End If
+        End If
+        If eventData.Position Mod 60 = 0 Then
+            params = {}
+            params.v25 = m.Content.Title
+            params.v31 = m.Content.MediaID
+            params.v32 = "cbs_roku_app|can"
+            params.v38 = "video"
+            params.v59 = IIf(m.Content.SubscriptionLevel = "FREE", "non-svod", "svod")
+            Omniture().TrackEvent("app:roku:video playback:beacon", ["event57"], params)
         End If
     End If
     If m.ShowAds Then

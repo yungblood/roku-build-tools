@@ -21,6 +21,11 @@ Function NewCbs() As Object
     this.IsSettingsScreenOpened     = False
     this.AutoPlayEnabled            = True
     
+    this.IsCFFlowEnabled            = True
+    
+    this.UpgradeTime                = 0
+    this.UpgradeCoolDown            = 150   ' 2.5 minutes
+    
     this.RokuProductCode            = "com.cbsallaccess.subscription.trial" ' "PROD1"
     this.ProductCode                = "CBS_ALL_ACCESS_PACKAGE" '
     this.SignUpUrl                  = "cbs.com/all-access"
@@ -103,6 +108,9 @@ Function NewCbs() As Object
     this.Subscribe                  = Cbs_Subscribe
     this.CreateAccount              = Cbs_CreateAccount
     this.GetEntitlement             = Cbs_GetEntitlement
+    this.Upgrade                    = Cbs_Upgrade
+    this.Downgrade                  = Cbs_Downgrade
+    this.GetEligibility             = Cbs_GetEligibility
     
     this.GetHomeRows                = Cbs_GetHomeRows
     this.GetSectionVideos           = Cbs_GetSectionVideos
@@ -181,9 +189,9 @@ Function Cbs_Initialize(useStaging = False As Boolean) As Boolean
         m.AkamaiUrl         = m.ProductionAkamaiUrl
         Syncbak().Initialize(m.ProductionSyncbakKey, m.ProductionSyncbakSecret, m.ProductionSyncbakEndpoint)
 
-        'ConvivaLivePassInit(m.ProductionConvivaKey)
+        ConvivaLivePassInit(m.ProductionConvivaKey)
 
-        ConvivaLivePassInit(m.StagingConvivaKey)
+        'ConvivaLivePassInit(m.StagingConvivaKey)
         'ConvivaLivePassInstance().ToggleTraces(True)
     End If
     Return m.Verify()
@@ -227,7 +235,10 @@ Function Cbs_IsAuthenticated(refresh = False As Boolean) As Boolean
     token = Configuration().Get(m.AuthTokenKey, "")
     If Not IsNullOrEmpty(token) Then
         If refresh Then
-            Return m.CheckLinkCode(token)
+            If m.CheckLinkCode(token) Then
+                cookie = GetCookie("CBS_COM", m.Endpoint)
+                Return Not IsNullOrEmpty(cookie)
+            End If
         End If
         Return True
     End If
@@ -281,7 +292,7 @@ Function Cbs_Logout() As Boolean
         m.ResumePoints.Clear()
         m.CurrentUser = invalid
         Configuration().Remove(m.AuthTokenKey)
-        DeleteCookiesForUrl(m.Endpoint)
+        DeleteAllCookies()
         GlobalEventRegistry().RaiseEvent("AuthenticationChanged", { Authenticated: False })
         Return True
     'End If
@@ -302,8 +313,8 @@ Function Cbs_GetLegalText() As String
     Return m.LegalText
 End Function
 
-Function Cbs_GetUpsellInfo() As Object
-    url = m.Endpoint + "roku/upsell.json?pageURL=ROKU_ALL_ACCESS_TRIAL" 'ROKU_SIGN_UP_SCREEN" '
+Function Cbs_GetUpsellInfo(pageUrl = "ROKU_ALL_ACCESS_TRIAL" As String) As Object
+    url = m.Endpoint + "roku/upsell.json?pageURL=" + UrlEncode(pageUrl) 'ROKU_SIGN_UP_SCREEN" '
     result = m.Request(url, "GET")
     If IsAssociativeArray(result) And result.upsellInfo <> invalid Then
         state = m.GetCurrentUser().State
@@ -325,10 +336,12 @@ Function Cbs_GetUpsellInfo() As Object
                         Message:        AsString(upsellInfo.upsellMessage2)
                         Background:     m.GetImageUrl(upsellInfo.upsellHDImagePath, 1280)
                         ProductCode:    AsString(upsellInfo.aaProductID)
+                        Response:       upsellInfo
                     }
                     If Not IsHD() Or IsNullOrEmpty(info.Background) Then
                         info.Background = m.GetImageUrl(upsellInfo.upsellImagePath, 720)
                     End If
+                    ?info
                     Return info
                 End If
             End If
@@ -376,6 +389,7 @@ Function Cbs_Subscribe(product As Object) As String
         ChannelStore().AddToOrder(product)
         result = ChannelStore().DoOrder()
         If IsArray(result) And result.Count() > 0 Then
+            m.UpgradeTime = NowDate().AsSeconds()
             transaction = result[0]
             Return AsString(transaction.PurchaseId)
         End If
@@ -437,6 +451,55 @@ Function Cbs_GetEntitlement(transactionID As String) As Boolean
         Sleep(1000)
     Next
     Return False
+End Function
+
+Function Cbs_Upgrade(transactionID As String) As Boolean
+    url = m.Endpoint + "v2.0/roku/subscription/product/upgrade.json"
+    url = AddQueryString(url, "newTransactionId", transactionID)
+
+    ' Attempt to complete the upgrade up to three times
+    For i = 1 To 3
+        response = m.Request(url)
+        If IsAssociativeArray(response) And response.success = True Then
+            If response.isRefundSuccess = False Then
+                ShowMessageBox("Error", "An error occurred when switching your CBS All Access plan. Please contact customer support for assistance at " + m.CSNumber + ".", ["OK"], True)
+            End If
+            Return m.IsAuthenticated(True)
+        End If
+        Sleep(1000)
+    Next
+    Return False
+End Function
+
+Function Cbs_Downgrade(transactionID As String) As Boolean
+    Return m.Upgrade(transactionID)
+End Function
+
+Function Cbs_GetEligibility() As Object
+    url = m.Endpoint + "v2.0/roku/subscription/upgrade/eligibility.json"
+
+    products = {
+        Upgrades: []
+        Downgrades: []
+    }
+    If m.IsCFFlowEnabled Then
+        response = m.Request(url, "GET")
+        If IsAssociativeArray(response) And response.success = True Then
+            For Each item In AsArray(response["productUpgradeList: "])
+                products.Upgrades.Push(NewProduct(item))
+            Next
+            For Each item In AsArray(response["productDowngradeList: "])
+                products.Downgrades.Push(NewProduct(item))
+            Next
+            For Each item In AsArray(response.productUpgradeList)
+                products.Upgrades.Push(NewProduct(item))
+            Next
+            For Each item In AsArray(response.productDowngradeList)
+                products.Downgrades.Push(NewProduct(item))
+            Next
+        End If
+    End If
+    Return products
 End Function
 
 Function Cbs_GetHomeRows(itemsPerRow = 10 As Integer, maxCount = -1 As Integer) As Object
@@ -1083,8 +1146,8 @@ Function Cbs_Request(url As String, method = "POST" As String, postData = invali
             If format = "xml" Then
                 json = ParseXmlAsJson(response.Response)
             Else
-                ' Convert the tracking IDs from longs to strings to avoid json parsing errors
-                response.Response = RegexReplace(response.Response, "(" + Chr(34) + "__FOR_TRACKING_ONLY_MEDIA_ID" + Chr(34) + ":)\s?(\d*)(\W)", "\1" + Chr(34) + "\2" + Chr(34) + "\3")
+                ' Convert the tracking IDs and dates from longs to strings to avoid json parsing errors
+                response.Response = RegexReplace(response.Response, "(" + Chr(34) + "__FOR_TRACKING_ONLY_MEDIA_ID" + Chr(34) + ":|" + Chr(34) + "live_date" + Chr(34) + ":|" + Chr(34) + "expires_on" + Chr(34) + ":|" + Chr(34) + "created_date" + Chr(34) + ":)\s?(\d*)(\W)", "\1" + Chr(34) + "\2" + Chr(34) + "\3")
                 json = ParseJson(response.Response)
             End If
             Return m.ProcessResponse(json)
@@ -1103,8 +1166,8 @@ Sub Cbs_OnResponse(eventData As Object, callbackData As Object)
         If format = "xml" Then
             json = ParseXmlAsJson(response.Response)
         Else
-            ' Convert the tracking IDs from longs to strings to avoid json parsing errors
-            response.Response = RegexReplace(response.Response, "(" + Chr(34) + "__FOR_TRACKING_ONLY_MEDIA_ID" + Chr(34) + ":)\s?(\d*)(\W)", "\1" + Chr(34) + "\2" + Chr(34) + "\3")
+            ' Convert the tracking IDs and dates from longs to strings to avoid json parsing errors
+            response.Response = RegexReplace(response.Response, "(" + Chr(34) + "__FOR_TRACKING_ONLY_MEDIA_ID" + Chr(34) + ":|" + Chr(34) + "live_date" + Chr(34) + ":|" + Chr(34) + "expires_on" + Chr(34) + ":|" + Chr(34) + "created_date" + Chr(34) + ":)\s?(\d*)(\W)", "\1" + Chr(34) + "\2" + Chr(34) + "\3")
             json = ParseJson(response.Response)
         End If
         response = m.ProcessResponse(json)

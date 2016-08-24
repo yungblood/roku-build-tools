@@ -106,6 +106,8 @@ Function EpisodeScreen_PrepareContent(content As Object) As Object
     If content <> invalid Then
         If Not content.IsShowLoaded() Or Cbs().IsAuthenticated() Then
             m.Screen.SetButtons(["Loading..."])
+            ' Refresh the content
+            content.Refresh()
             ' Populate the show
             content.GetShow()
         End If
@@ -137,6 +139,13 @@ Function EpisodeScreen_PrepareContent(content As Object) As Object
             buttons.Push({
                 Text: "Subscribe to watch"
                 ID: "subscribe"
+                OmnitureData:   {
+                    LinkName: "app:roku:all access:upsell:show page:click"
+                    Params: {  
+                        v10: "show"
+                    }
+                    Events: ["event19"]
+                }
             })
         End If
         If Cbs().IsAuthenticated() And prepared.ShowID <> "-1" Then
@@ -183,12 +192,24 @@ Sub EpisodeScreen_OnButtonPressed(eventData As Object, callbackData = invalid As
     If eventData.Button <> invalid And Not IsString(eventData.Button) Then
         content = m.GetContent(False)
         linkName = "app:roku:" + IIf(content.IsFullEpisode(), "episode", "clip") + ":" + LCase(AsString(content.Title)) + ":" + LCase(AsString(eventData.Button.Text))
-        Omniture().TrackEvent(linkName, ["event19"], { v46: linkName })
+        events = ["event19"]
+        params = {}
+        If eventData.Button.OmnitureData <> invalid Then
+            linkName = eventData.Button.OmnitureData.LinkName
+            events = eventData.Button.OmnitureData.Events
+            params = eventData.Button.OmnitureData.Params
+            Omniture().TrackEvent(linkName, events, params)
+        End If
+        Omniture().TrackEvent(linkName, events, params)
         
         If eventData.Button.ID = "watch" Or eventData.Button.ID = "resume" Or eventData.Button.ID = "subscribe" Then
             playContent = True
             If eventData.Button.ID = "subscribe" Then
-                playContent = (NewRegistrationWizard().Show() = 1)
+                If Cbs().IsCFFlowEnabled Then
+                    playContent = NewRegistrationWizard().ShowSubscriptionSelectionScreen()
+                Else
+                    playContent = (NewRegistrationWizard().Show() = 1)
+                End If
             End If
             If playContent Then
                 If Cbs().IsOverStreamLimit() Then
