@@ -1,6 +1,6 @@
 ' Copyright: Conviva Inc. 2011-2012
 ' Conviva LivePass Brightscript Client library for Roku devices
-' LivePass Version: 2.103.0.28531
+' LivePass Version: 2.115.0.31160
 ' authors: Alex Roitman <shura@conviva.com>
 '          George Necula <necula@conviva.com>
 ' 
@@ -166,6 +166,12 @@ function ConvivaLivePassInitWithSettings (apiKey as string, settings as object)
     self.CDN_NAME_MIRRORIMAGE = "MIRRORIMAGE"
     self.CDN_NAME_SONIC= "SONIC"
     self.CDN_NAME_ATLAS= "ATLAS"
+    self.CDN_NAME_OOYALA = "OOYALA"
+    self.CDN_NAME_TATA = "TATA"
+    self.CDN_NAME_GOOGLE = "GOOGLE"
+    self.CDN_NAME_INSTARTLOGIC = "INSTARTLOGIC"
+    self.CDN_NAME_TELSTRA="TELSTRA"
+    self.CDN_NAME_OPTUS="OPTUS"
     self.CDN_NAME_OTHER = "OTHER"
     
     
@@ -252,8 +258,35 @@ function ConvivaLivePassInitWithSettings (apiKey as string, settings as object)
     ''' sessionCallback - callback function which will be registered by the app to to get notified about the session status
     ''' callbackObj - an object whcih will be passed back as an argument to the callback.      
     self.createSession = function (screen as object , contentInfo as object, positionNotificationPeriod as integer, clipInfo = invalid  as Dynamic, sessionCallback = invalid as Dynamic, callbackObj = invalid as Dynamic) as object
-        self = m        
-        if clipInfo = invalid then
+        self = m
+        video = invalid
+        if clipInfo <> invalid and sessionCallback <> invalid and callbackObj = invalid then
+            self.utils.log("createSession with  Roku Scene Graph Integration API")
+            video = clipInfo
+            port = sessionCallback
+            video.unobserveField("streamInfo")
+            video.unobserveField("position")
+            video.unobserveField("state")
+            video.unobserveField("bufferingStatus")
+            video.unobserveField("duration")
+            video.unobserveField("streamingSegment")
+            video.unobserveField("errorCode")
+            video.unobserveField("errorMsg")
+
+            video.observeField("streamInfo", port)
+            video.observeField("position", port)
+            video.observeField("state", port)
+            video.observeField("bufferingStatus", port)
+            video.observeField("duration", port)
+            video.observeField("streamingSegment", port)
+            video.observeField("errorCode", port)
+            video.observeField("errorMsg", port)
+
+            self.streamFormat = video.content.streamformat
+            clipInfo = invalid
+            sessionCallback = invalid
+
+        else if clipInfo = invalid then
             self.utils.log("createSession with  Old Integration API")
         else 
             self.utils.log("createSession with  New Integration API")
@@ -268,8 +301,9 @@ function ConvivaLivePassInitWithSettings (apiKey as string, settings as object)
             self.utils.log("Automatically closing previous session with id "+stri(self.session.sessionId))
             self.cleanupSession(self.session)
         end if
-        sess = cwsConvivaSession(self, screen, contentInfo, positionNotificationPeriod, clipInfo, sessionCallback, callbackObj)
+        sess = cwsConvivaSession(self, screen, contentInfo, positionNotificationPeriod, clipInfo, sessionCallback, callbackObj, video)
         self.session = sess
+        self.attachStreamer(screen)
         return sess
     end function
 
@@ -374,9 +408,11 @@ function ConvivaLivePassInitWithSettings (apiKey as string, settings as object)
             return
         end if 
         self.utils.log("Cleaning session")
-        self.checkCurrentSession(session)
-        session.cleanup ()
-        self.session = invalid
+        if session <> invalid
+            self.checkCurrentSession(session)
+            session.cleanup ()
+            self.session = invalid
+        end if
     end function
 
 
@@ -401,6 +437,133 @@ function ConvivaLivePassInitWithSettings (apiKey as string, settings as object)
         end if
     end function
 
+    '''
+    ''' attachStreamer : Attach a streamer to the monitor and resume monitoring if suspended
+    '''
+    self.attachStreamer = function (screen as Object) as void
+        self = m
+        if self.session = invalid then
+            print "ERROR: called attachStreamer on uninitialized LivePass"
+            return
+        end if
+        self.utils.log("attachStreamer")
+        self.session.screen = screen
+        if screen = invalid ' attach with null streamer
+            self.session.cwsSessOnStateChange(self.session.ps.notmonitored, invalid)
+        else                ' attach with proper streamer
+            ' Not guaranteed to work, see CSR-103. Extra integration step needed.
+            if screen <> invalid
+                if Type(screen) = "roVideoScreen" then
+                    screen.SetPositionNotificationPeriod(self.session.notificationPeriod)
+                else if Type(screen) = "roSGScreen" then
+                    self.session.video.notificationinterval = self.session.notificationPeriod
+                end if
+            end if
+
+            ' We need to remember last PHT occurence to detect buffering with hls
+            if self.session.lastPhtTimer = invalid then
+                self.session.lastPhtTimer = CreateObject("roTimespan")
+                callback = function(sess as dynamic)
+                    sess.cwsPhtCheck()
+                end function
+                self.session.phtCheckTimer = self.session.utils.createTimer(callback, self.session, 400, "phtCheck")
+            end if
+
+            if Type(screen) = "roSGScreen"
+                if self.session.video.GetField("state") = "playing"
+                    self.session.lastPhtTimer.mark()
+                    self.session.cwsSessOnStateChange(self.session.ps.playing, invalid)
+                else if self.session.video.GetField("state") = "paused"
+                    self.session.cwsSessOnStateChange(self.session.ps.paused, invalid)
+                else if self.session.video.GetField("state") = "buffering"
+                    self.session.cwsSessOnStateChange(self.session.ps.buffering, invalid)
+                end if
+            end if
+
+            ' Restoring the prevBitrate reported during detach streamer as a fallback
+            ' even during ad playback, Roku doesn't report bitrate
+            if self.session.prevBitrateKbps <> invalid
+                self.session.cwsSessOnBitrateChange(self.session.prevBitrateKbps)
+                self.session.prevBitrateKbps = invalid
+            end if
+        end if
+    end function
+
+    '''
+    ''' detachStreamer : Pause monitoring such that it can be restarted later and detach from current streamer
+    '''
+    self.detachStreamer = function () as void
+        self = m
+        if self.session = invalid then
+            print "ERROR: called detachStreamer on uninitialized LivePass"
+            return
+        end if
+        self.utils.log("detachStreamer")
+        self.session.cwsSessOnStateChange(self.session.ps.notmonitored, invalid)
+        self.session.screen = invalid
+    end function
+
+    '''
+    ''' adStart : Notifies our library that an ad is about to be played.
+    '''           Suspend the accumulation of join time.
+    '''           Use, e.g., when an ad is starting and the time should not be counted as part of the join time.
+    '''
+    self.adStart = function () as void
+        self = m
+        if self.session = invalid then
+            print "ERROR: called adStart on uninitialized LivePass"
+            return
+        end if
+        if self.session.screen <> invalid then
+            print "ERROR: called adStart after joining"
+            return
+        end if
+        self.utils.log("adStart")
+        pjt = {
+            t: "CwsStateChangeEvent",
+                new: {
+                    pj: true
+            }
+        }
+        pjt.old = {
+                pj: false
+        }
+        if pjt <> invalid then
+            self.session.pj = true
+            self.session.cwsSessSendEvent(pjt.t, pjt)
+        end if
+    end function
+
+    '''
+    ''' adEnd : Notifies our library that an ad is over.
+    '''         Resume the accumulation of join time.
+    '''
+    self.adEnd = function () as void
+        self = m
+        if self.session = invalid then
+            print "ERROR: called adEnd on uninitialized LivePass"
+            return
+        end if
+        if self.session.screen <> invalid then
+            print "ERROR: called adEnd after joining"
+            return
+        end if
+        self.utils.log("adEnd")
+        pjt = {
+            t: "CwsStateChangeEvent",
+                new: {
+                    pj: false
+            }
+        }
+        pjt.old = {
+                pj: true
+        }
+        if pjt <> invalid then
+            self.session.pj = false
+            self.session.cwsSessSendEvent(pjt.t, pjt)
+        end if
+    end function
+
     ' Store ourselves in the globalAA for future use
     globalAA = getGLobalAA()
     globalAA.ConvivaLivePass = self
@@ -413,12 +576,14 @@ end function
 '--------------
 ' Session class
 '--------------
-function cwsConvivaSession(cws as object, screen as object, contentInfo as object, notificationPeriod as integer, clipInfo as Dynamic, notifyReadyCb as Dynamic, callbackObj as Dynamic) as object
+function cwsConvivaSession(cws as object, screen as object, contentInfo as object, notificationPeriod as integer, clipInfo as Dynamic, notifyReadyCb as Dynamic, callbackObj as Dynamic, video as object) as object
     self = {}
+    self.video = video
     self.screen = screen
     self.contentInfo = contentInfo
     self.notificationPeriod = notificationPeriod
-    self.notificationTimer = invalid ' will be created lazily
+    ' TODO: Need to revisit this logic of notificationTimer, as it is unused right now
+    'self.notificationTimer = invalid ' will be created lazily
     self.notifyReady = notifyReadyCb
     self.notifyCbObj = callbackObj
     self.clipinfo = clipInfo
@@ -428,7 +593,8 @@ function cwsConvivaSession(cws as object, screen as object, contentInfo as objec
     self.fbseq = -1 ' sequence number of the last heartbeat message when fallback occured 
     self.bl = -1
     self.pht = -1
-
+    self.fw = invalid
+    self.fwv = invalid
     self.cws = cws
     
     self.utils = cws.utils
@@ -486,29 +652,17 @@ function cwsConvivaSession(cws as object, screen as object, contentInfo as objec
 
 
     self.sessionId = int(2147483647*rnd(0))
-    
+    self.pj = false
     if self.cfg.usesel = false then 
         self.sessionFlags = 7  ' SFLAG_VIDEO | SFLAG_QUALITY_METRICS | SFLAG_BITRATE_METRICS 
     else 
         self.sessionFlags = 39  ' SFLAG_VIDEO | SFLAG_QUALITY_METRICS | SFLAG_BITRATE_METRICS | SFLAG_PRECISION_VIDEO
     end if
 
-    ' Not guaranteed to work, see CSR-103. Extra integration step needed.
-    if screen <> invalid then
-        screen.SetPositionNotificationPeriod(1)
-    end if
-
     callback = function (sess as dynamic) 
          sess.cwsSessSendHb()
     end function
     self.hbTimer = self.utils.createTimer(callback, self, self.utils.settings.heartbeatIntervalMs, "heartbeat")
-
-    ' We need to remember last PHT occurence to detect buffering with hls
-    self.lastPhtTimer = CreateObject("roTimespan")
-    callback = function(sess as dynamic)
-        sess.cwsPhtCheck()
-    end function
-    self.phtCheckTimer = self.utils.createTimer(callback, self, 400, "phtCheck")
 
     self.utils.log("Created new session with id "+stri(self.sessionId)+" for asset "+contentInfo.assetName)
 
@@ -545,7 +699,15 @@ function cwsConvivaSession(cws as object, screen as object, contentInfo as objec
     end if
 
     ' PD-8962: Smooth Streaming support
-    self.streamFormat = contentInfo.streamFormat
+    ' StreamFormat is not fetched from contentInfo for Roku SG
+    if video <> invalid then
+        self.streamFormat = self.cws.streamFormat
+        self.fw = "Roku Scene Graph"
+        self.fwv = "version " + cws.platformMeta["v"].Mid(2,3) + " . build " + cws.platformMeta["v"].Mid(8,4)
+    else
+        self.streamFormat = contentInfo.streamFormat
+    end if
+
     if self.streamFormat <> invalid and self.streamFormat <> "mp4" and self.streamFormat <> "ism" and self.streamFormat <> "hls" then
         self.utils.log("Received invalid streamFormat from player: " + self.streamFormat)
         self.utils.log("Valid streamFormats : mp4, ism, hls")
@@ -583,6 +745,8 @@ function cwsConvivaSession(cws as object, screen as object, contentInfo as objec
         pj: false,
         caps: cws.cfg.caps,
         sst: self.sessionStartTimeMs ' PD-15624: add "sst" field
+        fw: self.fw
+        fwv: self.fwv
     }
         
     
@@ -609,6 +773,10 @@ function cwsConvivaSession(cws as object, screen as object, contentInfo as objec
         self.hb.cl = cl
     end if
 
+    if contentInfo.streamUrls <> invalid and contentInfo.streamUrls.count() > 0
+        self.psm.streamUrl = contentInfo.streamUrls[0]
+    end if
+
     self.cleanup  = function () as void
         self = m
         if self.utils = invalid then 
@@ -626,7 +794,9 @@ function cwsConvivaSession(cws as object, screen as object, contentInfo as objec
 
         self.utils.cleanupTimer(self.hbTimer)
         self.hbTimer = invalid
-        self.utils.cleanupTimer(self.phtCheckTimer)
+        if self.phtCheckTimer <> invalid
+            self.utils.cleanupTimer(self.phtCheckTimer)
+        end if
         self.phtCheckTimer = invalid
         self.lastPhtTimer = invalid
         self.initialTimer = invalid
@@ -634,11 +804,13 @@ function cwsConvivaSession(cws as object, screen as object, contentInfo as objec
         self.cws = invalid
         self.sessionId = invalid
         self.sessionTimer = invalid
-        self.notificationTimer = invalid
+        ' TODO: Need to revisit this logic of notificationTimer, as it is unused right now
+        'self.notificationTimer = invalid
         self.psm = invalid
         self.hb = invalid
         self.utils = invalid
         self.screen = invalid
+        self.video = invalid
     end function
 
     ' We use a per-session logger, as per the CWS logging spec
@@ -668,6 +840,7 @@ function cwsConvivaSession(cws as object, screen as object, contentInfo as objec
         self.hb.st = sessionTimeMs
         self.hb.pht = self.pht
         self.hb.bl = -1
+        self.hb.pj = self.pj
         if self.cws.sendLogs then 
             self.hb.lg = self.utils.getLogs ()
         else
@@ -715,7 +888,7 @@ function cwsConvivaSession(cws as object, screen as object, contentInfo as objec
         ' We allow a second, since we only have integer precision.
         ' If this is not the case, we must be buffering.
         if msSinceLastPhtOccurence > 1500 then
-            if self.psm.curState = self.ps.playing then
+            if self.psm.curState = self.ps.playing and self.screen <> invalid then
                 self.log("phtCheck: last PHT was seen "+stri(msSinceLastPhtOccurence)+" ms ago. Changing player state to buffering")
                 self.cwsSessOnStateChange(self.ps.buffering, invalid)
             end if
@@ -1264,6 +1437,91 @@ function cwsConvivaSession(cws as object, screen as object, contentInfo as objec
     end function
 
     '
+    ' Process a screen and node events of Roku Scene Graph
+    '
+    self.cwsProcessSceneVideoEvent = function (event)
+        'TODO: check that this event is for the screen we are monitoring
+        self = m
+        if type(event) = "roSGScreenEvent"
+            if event.isScreenClosed() then               'real end of session
+                self.cwsSessOnStateChange(self.ps.stopped, invalid)
+            end if
+        else if type(event) = "roSGNodeEvent"
+            if event.getField() = "streamInfo"
+                if self.screen <> invalid
+                    if event.getData()["isUnderrun"]
+                        self.utils.log("isUnderRun flag is true in streamInfo event")
+                    else
+                        self.utils.log("isUnderRun flag is false in streamInfo event")
+                        evt = { t: "CwsSeekEvent",
+                                "act": "pse", }
+                        self.cwsSessSendEvent(evt.t, evt)
+                    end if
+                end if
+            else if event.getField() = "position" Then
+                ' To ignore the unwanted pht timer marking after end of midroll, added check for playing
+                if self.video.GetField("state") = "playing"
+                    if self.screen <> invalid
+                        self.lastPhtTimer.mark()
+                        self.cwsSessOnStateChange(self.ps.playing, invalid)
+                        self.pht = event.getData()
+                    end if
+                end if
+            else if event.getField() = "errorCode" Then
+                ' No need to handle right now
+            else if event.getField() = "errorMsg" Then
+                if self.screen <> invalid
+                    if event.getData() <> invalid and event.getData() <> "" then
+                        errData = { ft: true,
+                                    err: event.getData() }
+                        self.cwsSessionOnError(errData)
+                    end if
+                else
+                    ' dont need to do anything right now
+                end if
+            else if event.getField() = "state" Then
+                state = self.video.GetField("state")
+                if self.screen <> invalid
+                    if state = "playing" Then
+                        self.lastPhtTimer.mark()
+                        self.cwsSessOnStateChange(self.ps.playing, invalid)
+                    else if state = "paused" Then
+                        self.cwsSessOnStateChange(self.ps.paused, invalid)
+                    else if state = "finished" Then ' No need to handle stopped state
+                        self.cwsSessOnStateChange(self.ps.stopped, invalid)
+                    else if state = "buffering" Then
+                        self.cwsSessOnStateChange(self.ps.buffering, invalid)
+                    else if state = "error" Then
+                        ' self.cwsSessOnStateChange(self.ps.stopped, invalid)
+                        ' No Need to handle right now
+                    end if
+                endif
+                return true
+            else if event.getField() = "duration" Then
+                ' To ignore the unwanted setting video duration after end of midroll, added check for playing
+                if self.video.GetField("state") = "playing"
+                    self.setCurrentStreamMetadata({ duration: str(event.getData()) })
+                    if self.sel.url <> invalid
+                        self.cwsSessOnResourceChange(self.sel.url)
+                    end if
+                end if
+            else if event.getField() = "streamingSegment" Then
+                if event.getData() <> invalid
+                    ' updateBitrateFromEventInfo API will set proper bitrate for SS by combining Audio and Video Bitrates
+                    self.updateBitrateFromEventInfo(event.getData()["segUrl"], int(event.getData()["segBitrateBps"]/1000))
+                    if self.screen <> invalid
+                        self.cwsSessOnBitrateChange(self.totalBitrate)
+                    else
+                        ' Restoring the prevBitrate reported during detach streamer as a fallback
+                        ' even during ad playback, Roku doesn't report bitrate
+                        self.prevBitrateKbps = self.totalBitrate
+                    end if
+                end if
+            end if
+        end if
+    end function
+
+    '
     ' Process a video event, return true if we processed it
     '
     self.cwsProcessVideoEvent = function (event) 
@@ -1279,15 +1537,29 @@ function cwsConvivaSession(cws as object, screen as object, contentInfo as objec
             
         else if event.isPaused() then           'user paused
             self.log("videoEvent: isPaused")
-            self.cwsSessOnStateChange(self.ps.paused, invalid)
+            if self.screen <> invalid
+                self.cwsSessOnStateChange(self.ps.paused, invalid)
+            end if
         else if event.isResumed() then          'user resumed
             self.log("videoEvent: isResumed")
-            self.cwsSessOnStateChange(self.ps.playing, invalid)
-            self.lastPhtTimer.mark()
+            if self.screen <> invalid
+                self.lastPhtTimer.mark()
+                self.cwsSessOnStateChange(self.ps.playing, invalid)
+            end if
         else if event.isStreamStarted() then    'bufferring started
             info = event.GetInfo()
             self.log("videoEvent: isStreamStarted MeasuredBitrate="+stri(info.MeasuredBitrate)+" StreamBitrate="+stri(info.StreamBitrate)+" url="+info.url)
-            self.cwsSessOnStateChange(self.ps.buffering, invalid)
+            if self.screen <> invalid
+                self.cwsSessOnStateChange(self.ps.buffering, invalid)
+                if info.isUnderrun
+                    self.utils.log("isUnderRun is true in isStreamStarted")
+                else
+                    self.utils.log("isUnderRun is false in isStreamStarted")
+                    evt = { t: "CwsSeekEvent",
+                            "act": "pse", }
+                    self.cwsSessSendEvent(evt.t, evt)
+                end if
+            end if
             if self.streamFormat = invalid then
                 self.streamFormat = self.utils.streamFormatFromUrl(info.url)
                 self.log("streamFormat (guessed): " + self.streamFormat)
@@ -1303,39 +1575,56 @@ function cwsConvivaSession(cws as object, screen as object, contentInfo as objec
                 end if
             end if
             self.log("videoEvent: isStreamStarted MeasuredBitrate="+stri(info.MeasuredBitrate)+" StreamBitrate="+stri(info.StreamBitrate)+" cwsSessOnBitrateChange "+stri(self.totalBitrate))
-            self.cwsSessOnBitrateChange(self.totalBitrate)
-            self.cwsSessOnResourceChange(info.url)
+            if self.screen <> invalid
+                self.cwsSessOnBitrateChange(self.totalBitrate)
+                self.cwsSessOnResourceChange(info.url)
+            else
+                ' Restoring the prevBitrate reported during detach streamer as a fallback
+                ' even during ad playback, Roku doesn't report bitrate
+                self.prevBitrateKbps = self.totalBitrate
+            end if
         else if event.isStreamSegmentInfo() then    'new ism/hls segment
             info = event.GetInfo()
             self.log("videoEvent: isStreamSegmentInfo StreamBandwidth="+stri(info.StreamBandwidth)+" Sequence="+stri(info.Sequence)+" SegUrl="+info.SegUrl)
-            self.cwsSessOnStateChange(self.ps.playing, invalid)
+            if self.screen <> invalid
+                self.lastPhtTimer.mark()
+                self.cwsSessOnStateChange(self.ps.playing, invalid)
+            end if
             ' PD-8962: this event should take care of ism/hls bitrate
             self.updateBitrateFromEventInfo(info.SegUrl, int(info.StreamBandwidth))
-            self.cwsSessOnBitrateChange(self.totalBitrate)
+            if self.screen <> invalid
+                self.cwsSessOnBitrateChange(self.totalBitrate)
+            else
+                ' Restoring the prevBitrate reported during detach streamer as a fallback
+                ' even during ad playback, Roku doesn't report bitrate
+                self.prevBitrateKbps = self.totalBitrate
+            end if
             ' PD-8962: don't change streamUrl to fragment urls for ism/hls
             ' self.cwsSessOnResourceChange(info.SegUrl)
         else if event.isPlaybackPosition() then 'playing
             self.log("videoEvent: isPlaybackPosition pht="+stri(event.GetIndex()))
-            self.cwsSessOnStateChange(self.ps.playing, invalid)
-
-            self.lastPhtTimer.mark()
-            self.pht = event.GetIndex()
-
-            if self.notificationPeriod = 1 then
-                'self.utils.log("RETURNING to caller, skip throttling")
-                return false  'no throttling at all
-            else if self.notificationTimer = invalid then
-                self.notificationTimer = CreateObject("roTimeSpan")
-                self.notificationTimer.mark()
-                'self.utils.log("RETURNING to caller, 1st notification")
-                return false
-            else if self.notificationTimer.TotalSeconds() > (self.notificationPeriod-1) then
-                'self.utils.log("RETURNING to caller, non-1st notification")
-                self.notificationTimer.mark()
-                return false
-            else 
-                return true
+            if self.screen <> invalid
+                self.lastPhtTimer.mark()
+                self.cwsSessOnStateChange(self.ps.playing, invalid)
+                self.pht = event.GetIndex()
             end if
+
+            ' TODO: Need to revisit this logic of notificationTimer, as it is unused right now
+'            if self.notificationPeriod = 1 then
+'                'self.utils.log("RETURNING to caller, skip throttling")
+'                return false  'no throttling at all
+'            else if self.notificationTimer = invalid then
+'                self.notificationTimer = CreateObject("roTimeSpan")
+'                self.notificationTimer.mark()
+'                'self.utils.log("RETURNING to caller, 1st notification")
+'                return false
+'            else if self.notificationTimer.TotalSeconds() > (self.notificationPeriod-1) then
+'                'self.utils.log("RETURNING to caller, non-1st notification")
+'                self.notificationTimer.mark()
+'                return false
+'            else
+'                return true
+'            end if
         else if event.isRequestFailed() then    'fatal error
             errorMsg = event.GetMessage()
             self.log("videoEvent: isRequestFailed err="+errorMsg)
@@ -1343,9 +1632,32 @@ function cwsConvivaSession(cws as object, screen as object, contentInfo as objec
                 errData = { ft: true,
                             err: event.GetMessage() }
                 self.cwsSessionOnError(errData)
+            else if event.getIndex() <= 0
+                if event.getIndex() = 0
+                    msg = "Network error : server down or unresponsive, server is unreachable, network setup problem on the client."
+                else if event.getIndex() = -1
+                    msg = "HTTP error: malformed headers or HTTP error result."
+                else if event.getIndex() = -2
+                    msg = "Connection timed out"
+                else if event.getIndex() = -3
+                    msg = "Unknown error"
+                else if event.getIndex() = -4
+                    msg = "Empty list; no streams were specified to play"
+                else if event.getIndex() = -5
+                    msg = "Media error; the media format is unknown or unsupported"
+                else
+                    msg = "UnIdentified Error"
+                end if
+                errData = { ft: true,
+                            err: msg }
+                self.cwsSessionOnError(errData)
+            else
+                errData = { ft: true,
+                            err: "Unknown Err" }
+                self.cwsSessionOnError(errData)
             end if
             return true
-        else if event.GetType() = 11 then    'EventStatusMessage
+        else if event.isStatusMessage() then    'EventStatusMessage
             msg = event.GetMessage()
             action = self.utils.getEventStatusMessageType(msg)
             self.log("videoEvent: EventStatusMessage (#11) message="+msg+" convivaAction="+action)
@@ -1355,11 +1667,16 @@ function cwsConvivaSession(cws as object, screen as object, contentInfo as objec
                 self.cwsSessionOnError(errData)
                 self.log("videoEvent: reported error and switched to error state.")
             else if action = "buffering" then
-                self.cwsSessOnStateChange(self.ps.buffering, invalid)
-                self.log("videoEvent: inferred buffering state.")
+                if self.screen <> invalid
+                    self.cwsSessOnStateChange(self.ps.buffering, invalid)
+                    self.log("videoEvent: inferred buffering state.")
+                end if
             else if action = "playing" then
-                self.cwsSessOnStateChange(self.ps.playing, invalid)
-                self.log("videoEvent: inferred playing state.")
+                if self.screen <> invalid
+                    self.lastPhtTimer.mark()
+                    self.cwsSessOnStateChange(self.ps.playing, invalid)
+                    self.log("videoEvent: inferred playing state.")
+                end if
             else if action = "stopped" then
                 self.cwsSessOnStateChange(self.ps.stopped, invalid)
                 self.log("videoEvent: inferred stopped state.")
@@ -1386,18 +1703,14 @@ function cwsConvivaPlayerState(sess as object) as object
     self.utils = sess.utils
 
     ps = sess.ps
+    self.ignoreBufferingStatus = false
     self.totalBufferingEvents = 0
     self.joinTimeMs = -1
     self.contentLength = -1
     self.encodedFramerate = -1
 
     self.totalPlayingKbits = 0
-    'todo check if this is correct
-    if sess.screen = invalid then
-        self.curState = self.session.ps.notmonitored
-    else 
-        self.curState = self.session.ps.stopped
-    endif
+    self.curState = self.session.ps.stopped
     
     self.bitrateKbps = sess.contentInfo.defaultReportingBitrateKbps
     self.cdnName = sess.contentInfo.defaultReportingCdnName
@@ -1490,7 +1803,7 @@ function cwsConvivaPlayerState(sess as object) as object
         if self.streamUrl <> invalid or self.streamUrl <> ""
             data.url =  self.streamUrl
         end if
-        if self.bitrateKbps <> -1 then
+        if self.bitrateKbps <> -1 and self.session.screen <> invalid then
             data.br =  self.bitrateKbps
         end if
         if self.encodedFramerate <> -1 then 
@@ -1499,10 +1812,15 @@ function cwsConvivaPlayerState(sess as object) as object
         if self.contentLength <> -1 then 
             data.cl = self.contentLength
         end if
-        if self.session.totalBitrate <> -1 then
+        if self.session.totalBitrate <> -1 and self.session.screen <> invalid then
             data.br = self.session.totalBitrate
         end if
         
+        if self.session.fw <> invalid
+            data.fw = self.session.fw
+            data.fwv = self.session.fwv
+        end if
+
         return data
     end function
     
@@ -1511,22 +1829,22 @@ end function
 
 ' Copyright: Conviva Inc. 2011-2012
 ' Conviva LivePass Brightscript Client library for Roku devices
-' LivePass Version: 2.103.0.28531
+' LivePass Version: 2.115.0.31160
 ' authors: Alex Roitman <shura@conviva.com>
 '          George Necula <necula@conviva.com>
-' 
+'
 
 ''''
 '''' Utilities
 ''''
 ' A series of methods used to access the platform services
-' This function will construct a singleton object with the platform utilities. 
+' This function will construct a singleton object with the platform utilities.
 ' For each call to ConvivaUtils() there should be a call to utils.cleanup ()
 function cwsConvivaUtils()  as object
     ' We only want a single Utils object around
     globalAA = GetGlobalAA()
     self = globalAA.cwsConvivaUtils
-    if self <> invalid then 
+    if self <> invalid then
         self.refcount = 1 + self.refcount
         return self
     end if
@@ -1534,7 +1852,7 @@ function cwsConvivaUtils()  as object
     self.refcount = 1     ' Since the utilities may be shared across modules, we keep a reference count
                           ' to know when we need to really clean up
     globalAA.cwsConvivaUtils = self
-    self.regexes = invalid 
+    self.regexes = invalid
     self.settings = cwsConvivaSettings ()
     self.httpPort = invalid ' the PORT on which we will be listening for the HTTP responses
     self.logBuffer = [ ]   ' We keep here a list of the last few log entries
@@ -1545,8 +1863,8 @@ function cwsConvivaUtils()  as object
 
     self.pendingTimers = { } ' A map of timers indexsed by their id : { timer (roTimespan), timerIntervalMs }
     self.nextTimerId   = 0
-    
-    self.start = function () 
+
+    self.start = function ()
         ' Start the
         self = m
         self.regexes = self.cwsRegexes ()
@@ -1557,7 +1875,7 @@ function cwsConvivaUtils()  as object
             uto.SetPort(self.httpPort)
             ' By default roku adds a Expect: 100-continue header. This does
             ' not work properly with the Touchstone HTTPS redirectors, and it
-            ' is only an optimization, so we turn it off here. 
+            ' is only an optimization, so we turn it off here.
             uto.AddHeader("Expect", "")
             self.availableUtos.push(uto)
         end for
@@ -1566,13 +1884,13 @@ function cwsConvivaUtils()  as object
     self.cleanup = function () as void
         self = m
         self.refcount = self.refcount - 1
-        if self.refcount > 0 then 
+        if self.refcount > 0 then
             self.log("ConvivaUtils not yet cleaning. Refcount now "+stri(self.refcount))
             return
         end if
-        if self.refcount < 0 then 
+        if self.refcount < 0 then
             print "ERROR: cleaning ConvivaUtils too many times"
-            return 
+            return
         end if
         self.log("Cleaning up the utilities")
         for each tid in self.pendingTimers
@@ -1590,8 +1908,8 @@ function cwsConvivaUtils()  as object
     ' Time since Epoch
     ' We do not get it in ms, because that would require a float and Roku seems
     ' to use single-precision for floats
-    ' We try to force it as a double 
-    self.epochTimeSec = function () 
+    ' We try to force it as a double
+    self.epochTimeSec = function ()
         dt = CreateObject("roDateTime")
         return 0# + dt.asSeconds() + (dt.getMilliseconds () / 1000.0#)
     end function
@@ -1603,7 +1921,7 @@ function cwsConvivaUtils()  as object
      ' Log a string message
      self.log = function (msg as string) as void
             self = m
-            if self.logBuffer <> invalid then 
+            if self.logBuffer <> invalid then
                 dt = CreateObject("roDateTime")
                 ' Poor's man printing of floating points
                 msec = dt.getMilliseconds ()
@@ -1615,25 +1933,25 @@ function cwsConvivaUtils()  as object
                 end if
                 msg = "[" + stri(dt.asSeconds()) + "." + msecStr + "] " + msg
                 self.logBuffer.push(msg)
-                if self.logBuffer.Count() > self.logBufferMaxSize then 
+                if self.logBuffer.Count() > self.logBufferMaxSize then
                     self.logBuffer.Shift()
                 end if
             else
                 print "WARNING: called log after utils was cleaned"
             end if
             ' The enableLogging flag controls ONLY the printing to the console
-            if self.settings.enableLogging then 
+            if self.settings.enableLogging then
                 print "CWS: "+msg
             end if
       end function
-         
+
       ' Log an error message
-      self.err = function (msg as string) as void 
+      self.err = function (msg as string) as void
             m.log("ERROR: "+msg)
       end function
 
       ' Get and consume the log buffer
-      self.getLogs = function () 
+      self.getLogs = function ()
         self = m
         res = self.logBuffer
         self.logBuffer = [ ]
@@ -1641,24 +1959,24 @@ function cwsConvivaUtils()  as object
       end function
 
       ' Read local data
-      self.readLocalData = function (key as string) as string 
+      self.readLocalData = function (key as string) as string
           sec = CreateObject("roRegistrySection", "Conviva")
-          if sec.exists(key) then 
+          if sec.exists(key) then
               return sec.read(key)
           else
               return ""
-          end If 
+          end If
        end function
 
        ' Write local data
-       self.writeLocalData = function (key as string, value as string)  
+       self.writeLocalData = function (key as string, value as string)
           sec = CreateObject("roRegistrySection", "Conviva")
           sec.write(key, value)
           sec.flush()
        end function
 
        ' Delete local data
-       self.deleteLocalData = function ( ) 
+       self.deleteLocalData = function ( )
            sec = CreateObject("roRegistrySection", "Conviva")
            keyList = sec.GetKeyList ()
            For Each key In keyList
@@ -1706,7 +2024,7 @@ function cwsConvivaUtils()  as object
                    l = l + 1
                end for
                self.log("Pending requests size is"+stri(l))
-           else    
+           else
                self.err("POST Request failed")
                self.availableUtos.push(uto)
                return invalid
@@ -1730,7 +2048,7 @@ function cwsConvivaUtils()  as object
            If respCode = 200 Then
                reqData.callback(reqData.callbackObj, True, event.GetString())
            Else
-               reqData.callback(reqData.callbackObj, False, event.GetFailureReason())     
+               reqData.callback(reqData.callbackObj, False, event.GetFailureReason())
            End If
       End Function
 
@@ -1742,10 +2060,10 @@ function cwsConvivaUtils()  as object
               timer : CreateObject("roTimespan"),  ' Will be marked when we fire
               intervalMs : intervalMs,
               callback : callback,
-              callbackObj : callbackObj, 
+              callbackObj : callbackObj,
               actionName : actionName,
               timerId : stri(self.nextTimerId),
-              fireOnce : False, 
+              fireOnce : False,
               }
            timerData.timer.Mark ()
            self.pendingTimers[timerData.timerId] = timerData
@@ -1762,7 +2080,7 @@ function cwsConvivaUtils()  as object
       End Function
 
       self.cleanupTimer = Function (timerData As dynamic)
-          m.pendingTimers.delete(timerData.timerId) 
+          m.pendingTimers.delete(timerData.timerId)
           timerData.clear ()
       End Function
 
@@ -1775,7 +2093,7 @@ function cwsConvivaUtils()  as object
       ' Return invalid if there is no timer
       self.timeUntilTimerEvent = Function ()
           self = m
-          res  = invalid 
+          res  = invalid
           For Each tid in self.pendingTimers
               timer = self.pendingTimers[tid]
               timeToNextFiring = timer.intervalMs - timer.timer.TotalMilliseconds ()
@@ -1791,18 +2109,18 @@ function cwsConvivaUtils()  as object
                       timeToNextFiring = timer.intervalMs
                   End If
               End If
-              if timeToNextFiring <> invalid then 
-                  If res = invalid then 
+              if timeToNextFiring <> invalid then
+                  If res = invalid then
                       res = timeToNextFiring
                   else if timeToNextFiring < res Then
                       res = timeToNextFiring
                   End If
               end if
           End For
-          Return res    
+          Return res
       End Function
 
-      self.set = function () 
+      self.set = function ()
       end function
 
     ' A wrapper around the system's wait that will process our timers, HTTP requests, and videoEvents
@@ -1810,33 +2128,33 @@ function cwsConvivaUtils()  as object
     ' ConvivaObject should be the reference to the object returned by ConvivaLivePassInit
     self.wait = function (timeout as integer, port as object, customWait as dynamic, ConvivaObject as object) as dynamic
         self = m
-        
+
         if timeout = 0 then
             timeoutTimer = invalid
         else
             timeoutTimer = CreateObject("roTimeSpan")
             timeoutTimer.mark()
         end if
-    
+
         ' Run the event loop, return from the loop with an event that we have not processed
         while True
             event = invalid
             ' Run the ready timers, and get the time to the next timer
             timeToNextTimer = self.timeUntilTimerEvent()
-            
+
             ' Perhaps we are done
             if timeout > 0 Then
                 timeToExternalTimeout = timeout - timeoutTimer.TotalMilliseconds()
                 If timeToExternalTimeout <= 0 Then
                     ' We reached the external timeout
                     Return invalid
-                    
+
                 Else If timeToNextTimer = invalid or timeToExternalTimeout < timeToNextTimer Then
                     realTimeout = timeToExternalTimeout
                 Else
                     realTimeout = timeToNextTimer
                 End If
-            Else if timeToNextTimer = invalid then 
+            Else if timeToNextTimer = invalid then
                 ' Even if we have no timers, or external constraints, do not block on wait for too long
                 ' We need this to ensure that we can periodically poll our private ports
                 realTimeout = 100
@@ -1848,14 +2166,14 @@ function cwsConvivaUtils()  as object
             ' We don't want to block for more than 100 ms
             if realTimeout > 100 then
                 realTimeout = 100
-            else if realTimeout <= 0 then 
+            else if realTimeout <= 0 then
                 ' This happened before because timeUntilTimerEvent returned negative value
                 realTimeout = 1
             end if
-    
+
             ' Wait briefly for messages on our httpPort
             httpEvent = wait(1, self.httpPort)
-            if httpEvent <> invalid then 
+            if httpEvent <> invalid then
                 if type(httpEvent) = "roUrlEvent" then            'Process network response
                     if not self.processUrlEvent(httpEvent) Then
                         ' This should never happen, because httpPort is private
@@ -1863,17 +2181,27 @@ function cwsConvivaUtils()  as object
                     End if
                 end if
             end if
-                
+
             'Call either real wait or custom wait function
             if customWait = invalid then
                 event = wait(realTimeout, port)
             else
                 event = customWait(realTimeout, port)
             end if
-    
+
             if event<>invalid then   'Process player events
-                if type(event) = "roVideoScreenEvent" or type(event) = "roVideoPlayerEvent" Then
-                    if ConvivaObject <> invalid and ConvivaObject.session <> invalid then 
+                if type(event) = "roSGNodeEvent" or type(event) = "roSGScreenEvent" Then
+                    if ConvivaObject <> invalid and ConvivaObject.session <> invalid then
+                        ConvivaObject.session.cwsProcessSceneVideoEvent (event)
+                    else if type(event) = "roSGNodeEvent"
+                        self.log("Got "+type(event)+" event type = "+event.getField())
+                    else if type(event) = "roSGScreenEvent"
+                        self.log("Got "+type(event)+" event type = "+str(event.GetType()))
+                    end if
+                    ' We need to return the event even if we processed it
+                    return event
+                else if type(event) = "roVideoScreenEvent" or type(event) = "roVideoPlayerEvent" Then
+                    if ConvivaObject <> invalid and ConvivaObject.session <> invalid then
                         ConvivaObject.session.cwsProcessVideoEvent (event)
                         ' We would like to use the code below instead,
                         ' but message ports can't be comared on Roku!
@@ -1882,12 +2210,12 @@ function cwsConvivaUtils()  as object
                         'else
                         '    self.log("Got video event for the un-monitored screen")
                         'end if
-                    else
-                        self.log("Got "+type(event)+" event type = "+str(event.GetType()))
+                    else if type(event) = "roVideoScreenEvent"
+                        self.log("Got "+type(event)+" event type = "+str(event.GetType()) + " message ="+event.GetMessage())
                     end if
                     ' We need to return the event even if we processed it
                     return event
-    
+
                 else if type(event) = "roUrlEvent" then
                     return event
 
@@ -1899,7 +2227,7 @@ function cwsConvivaUtils()  as object
                 end if
             end if
         end while
-    
+
         'Return the event to the caller of cwsWait
         return event
     end function
@@ -1911,7 +2239,7 @@ function cwsConvivaUtils()  as object
         ret = {}
         q = chr(34) 'quote
         b = chr(92) 'backslash
-    
+
         'Regular expression needed for json string encoding
         ret.quote = CreateObject("roRegex", q, "i")
         ret.bslash = CreateObject("roRegex", String(2,b), "i")
@@ -1921,20 +2249,20 @@ function cwsConvivaUtils()  as object
         ret.ffeed = CreateObject("roRegex", chr(12), "i")
         ret.cret = CreateObject("roRegex", chr(13), "i")
         ret.fslash = CreateObject("roRegex", chr(47), "i")
-    
+
         'Regular expression needed for parsing
         ret.cwsOpenBrace = CreateObject( "roRegex", "^\s*\{", "i" )
         ret.cwsOpenBracket = CreateObject( "roRegex", "^\s*\[", "i" )
         ret.cwsCloseBrace = CreateObject( "roRegex", "^\s*\},?", "i" )
         ret.cwsCloseBracket = CreateObject( "roRegex", "^\s*\],?", "i" )
-    
+
         ret.cwsKey = CreateObject( "roRegex", "^\s*" + q + "(\w+)" + q + "\s*\:", "i" )
         ret.cwsString = CreateObject( "roRegex", "^\s*" + q + "([^" + q + "]*)" + q + "\s*,?", "i" )
         ret.cwsNumber = CreateObject( "roRegex", "^\s*(\-?\d+(\.\d+)?)\s*,?", "i" )
         ret.cwsTrue = CreateObject( "roRegex", "^\s*true\s*,?", "i" )
         ret.cwsFalse = CreateObject( "roRegex", "^\s*false\s*,?", "i" )
         ret.cwsNull = CreateObject( "roRegex", "^\s*null\s*,?", "i" )
-    
+
         'This is needed to split the scheme://server part of the URL
         ret.resource = CreateObject("roRegex", "(\w+://[\w\d:#@%;$()~_\+\-=\.]+)/.*", "i")
 
@@ -1946,7 +2274,7 @@ function cwsConvivaUtils()  as object
 
         ' PD-10716: safer handling of roVideoEvent #11, "EventStatusMessage"
         ret.videoTrackUnplayable = CreateObject("roRegex", "^(?=.*\bvideo\b)(?=.*\btrack\b)(?=.*\bunplayable\b)", "i")
-    
+
         return ret
     end function
 
@@ -1991,7 +2319,7 @@ function cwsConvivaUtils()  as object
             return "unknown"
         end if
     end function
-    
+
     '================================================
     ' Utility functions for encoding and parsing JSON
     '================================================
@@ -2001,14 +2329,14 @@ function cwsConvivaUtils()  as object
         notfirst = false
         comma = ""
         q = chr(34)
-    
+
         for each key in dict
             val = dict[key]
             typestr = type(val)
             if typestr="roInvalid" then
                 valstr = "null"
             else if typestr="roBoolean" then
-                if val then 
+                if val then
                     valstr = "true"
                 else
                     valstr = "false"
@@ -2065,20 +2393,20 @@ function cwsConvivaUtils()  as object
         ' Now fval = factor * fvalHi + fvalLoInt + fvalLoFrac / 1000
         ' print "fvalHi=" + stri(fvalHi) + " fvalLo="+str(fvalLo)+" fvalLoInt="+stri(fvalLoInt)+" fvalLoFrac="+stri(fvalLoFrac)
         ' stri will add a blank prefix for the sign
-        if fvalHi > 0 then 
+        if fvalHi > 0 then
            fvalHiStr = self.cwsJsonEncodeInt(fvalHi)
         else
            fvalHiStr = ""
         end if
 	fvalLoIntStr = self.cwsJsonEncodeInt(fvalLoInt)
-	if fvalHi > 0 then 
+	if fvalHi > 0 then
            fvalLoIntStr = String(4 - Len(fvalLoIntStr), "0") + fvalLoIntStr
         end if
         ' print "fvalHiStr="+fvalHiStr+" fvalLoIntStr="+fvalLoIntStr
         fvalLoFracStr = self.cwsJsonEncodeInt(fvalLoFrac)
-        if fvalLoFrac > 0 then 
+        if fvalLoFrac > 0 then
            fvalLoFracStr = String(3 - Len(fvalLoFracStr), "0") + fvalLoFracStr
-        end if   
+        end if
         result = sign + fvalHiStr + fvalLoIntStr + "." + fvalLoFracStr
         ' print "Result="+result
         return result
@@ -2099,13 +2427,13 @@ function cwsConvivaUtils()  as object
         ret = box("[")
         notfirst = false
         comma = ""
-    
+
         for each val in array
             typestr = type(val)
             if typestr="roInvalid" then
                 valstr = "null"
             else if typestr="roBoolean" then
-                if val then 
+                if val then
                     valstr = "true"
                 else
                     valstr = "false"
@@ -2131,7 +2459,7 @@ function cwsConvivaUtils()  as object
         end for
         return ret + "]"
     end function
-    
+
     self.cwsJsonEncodeString = function (line) as string
         regexes = m.regexes
         q = chr(34) 'quote
@@ -2147,8 +2475,8 @@ function cwsConvivaUtils()  as object
         ret = regexes.fslash.ReplaceAll(ret, b2+"/")
         return q + ret + q
     end function
-    
-    
+
+
     '=================================================================
     ' Parse JSON string into a Brightscript object.
     '
@@ -2163,10 +2491,10 @@ function cwsConvivaUtils()  as object
     ' * The string values *do not contain* special JSON chars that
     '   need to be escaped (slashes, quotes, apostrophes, backspaces, etc).
     '   If they do, we will include them in the output, meaning the \n will
-    '   show as literal \n, and not the new line. 
+    '   show as literal \n, and not the new line.
     '   In particular, \" will be literal backslash followed by the quote,
     '   so the string will end there, and the rest will be invalid and we
-    '   return invalid.'   
+    '   return invalid.'
     '
     ' * The input *must* be valid JSON. Otherwise we will return invalid.
     '=================================================================
@@ -2178,7 +2506,7 @@ function cwsConvivaUtils()  as object
         end if
         return value_and_rest.value
     end function
-    
+
     '----------------------------------------------------------
     ' Return key, value and rest of string packed into the dict.
     ' If matlching the key or the value did not work, return invalid.
@@ -2187,24 +2515,24 @@ function cwsConvivaUtils()  as object
         self = m
         regexes = self.regexes
         result = {}
-    
+
         if not regexes.cwsKey.IsMatch(rest) then
             return invalid
         end if
-    
+
         result.key = regexes.cwsKey.Match(rest)[1]
         rest = regexes.cwsKey.Replace(rest, "")
-    
+
         value_and_rest = self.cwsGetValue(rest)
         if value_and_rest = invalid then
             return invalid
         end if
         result.value = value_and_rest.value
         result.rest = value_and_rest.rest
-    
+
         return result
     end function
-    
+
     '----------------------------------------------------------
     ' Return the value and rest of string packed into the dict.
     ' If we could not match the value, return invalid.
@@ -2213,7 +2541,7 @@ function cwsConvivaUtils()  as object
         self = m
         regexes = self.regexes
         result = {}
-    
+
         'The next token determines the value type
         if regexes.cwsString.IsMatch(rest) then            'string
             result.value = regexes.cwsString.Match(rest)[1]
@@ -2267,10 +2595,10 @@ function cwsConvivaUtils()  as object
         else
             return invalid
         end if
-    
+
         return result
     end function
-    
+
     self.start ()
     return self
 End Function
@@ -2281,26 +2609,22 @@ End Function
 function cwsConvivaSettings() as object
     cfg = {}
     ' The next line is changed by set_versions
-    cfg.version = "2.103.0.28531"
-    
-    cfg.enableLogging = true                       'change to false to disable debugging output
+    cfg.version = "2.115.0.31160"
+
+    cfg.enableLogging = false                      ' change to false to disable debugging output
     cfg.defaultHeartbeatInvervalMs = 20000         ' 20 sec HB interval
     cfg.heartbeatIntervalMs = cfg.defaultHeartbeatInvervalMs
     cfg.maxUtos = 5  ' How large is the pool of UTO objects we re-use for POSTs
-    
-    cfg.maxEventsPerHeartbeat = 10                 
+
+    cfg.maxEventsPerHeartbeat = 10
     cfg.apiKey = ""
 
     cfg.defaultGatewayUrl = "https://cws.conviva.com"
-    'cfg.defaultGatewayUrl = "http://172.16.3.167:8999"
-    
-    'cfg.defaultGatewayUrl = "https://cws.qe1.conviva.com"    
-    'cfg.defaultGatewayUrl = "http://172.20.10.115" 'cws.qe1.conviva.com
-    'cfg.defaultGatewayUrl = "http://touchstone.conviva.com"
-    
-    cfg.gatewayUrl        = cfg.defaultGatewayUrl 
+    'cfg.defaultGatewayUrl = "https://cbscom.testonly.conviva.com"
+
+    cfg.gatewayUrl        = cfg.defaultGatewayUrl
     cfg.gatewayPath     = "/0/wsg" 'Gateway URL
-    cfg.protocolVersion = "2.1"
+    cfg.protocolVersion = "2.2"
 
     cfg.printHb = true
 
@@ -2308,7 +2632,7 @@ function cwsConvivaSettings() as object
     cfg.CAP_INI_RESOURCE = 2
     cfg.CAP_BITRATE_RANGE = 4
     cfg.CAP_MULTI_BITRATE_RANGE = 8
- 
+
 '    cfg.device = "roku"
 '    cfg.deviceType = "Settop"
 '    cfg.os = "ROKU"
@@ -2322,6 +2646,6 @@ function cwsConvivaSettings() as object
 '    cfg.deviceVersion = d.GetModel()
 '    cfg.osVersion = d.GetVersion()
 '    cfg.platformVersion = d.GetVersion()
-     
+
     return cfg
 end function

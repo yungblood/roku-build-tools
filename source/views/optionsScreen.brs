@@ -2,6 +2,8 @@ Function NewOptionsScreen() As Object
     this                        = {}
     this.ClassName              = "OptionsScreen"
     
+    this.AudioGuide             = CreateObject("roAudioGuide")
+    
     this.OptionIndex            = 0
     this.ButtonIndex            = -1
         
@@ -128,6 +130,21 @@ Function OptionsScreen_Show(options = m.Options As Object, buttons = m.Buttons A
     Next
 
     m.Screen.Show()
+    Sleep(100)
+    
+    If m.AudioGuide <> invalid Then
+        m.AudioGuide.Flush()
+        buttonText = ""
+        If m.OptionIndex > -1 Then
+            buttonText = optionLayers[m.OptionIndex].Text + ",button," + (m.OptionIndex + 1).ToStr() + " of " + (optionLayers.Count() + buttonLayers.Count()).ToStr()
+        Else If m.ButtonIndex > -1 Then
+            buttonText = buttonLayers[m.ButtonIndex].Text + ",button," + (optionLayers.Count() + m.ButtonIndex + 1).ToStr() + " of " + (optionLayers.Count() + buttonLayers.Count()).ToStr()
+        End If
+        If Not IsNullOrEmpty(buttonText) Then
+            m.AudioGuide.Say(buttonText, True, True)
+        End If
+    End If
+    
     'Omniture().TrackPage("app:roku:launch:splash page")
     While True
         msg = Wait(0, m.Screen.GetMessagePort())
@@ -184,6 +201,15 @@ Function OptionsScreen_Show(options = m.Options As Object, buttons = m.Buttons A
                             m.Screen.SetLayer(buttonLayer + i, buttonLayers[i].Layers)
                         End If
                     Next
+                    buttonText = ""
+                    If m.OptionIndex > -1 Then
+                        buttonText = optionLayers[m.OptionIndex].Text + ",button," + (m.OptionIndex + 1).ToStr() + " of " + (optionLayers.Count() + buttonLayers.Count()).ToStr()
+                    Else If m.ButtonIndex > -1 Then
+                        buttonText = buttonLayers[m.ButtonIndex].Text + ",button," + (optionLayers.Count() + m.ButtonIndex + 1).ToStr() + " of " + (optionLayers.Count() + buttonLayers.Count()).ToStr()
+                    End If
+                    If m.AudioGuide <> invalid And Not IsNullOrEmpty(buttonText) Then
+                        m.AudioGuide.Say(buttonText, True, True)
+                    End If
                 End If
             Else If msg.IsScreenClosed() Then
                 m.Screen = invalid
@@ -219,7 +245,7 @@ Function OptionsScreen_CreateOptionButton(optionInfo As Object, x = 0 As Integer
     }
     
     titleLayer = {
-        Text: IIf(IsNullOrEmpty(optionInfo.TitleText), invalid, optionInfo.TitleText)
+        Text: IIf(IsNullOrEmpty(optionInfo.TitleText), invalid, UCase(optionInfo.TitleText))
         TextAttrs: {
             Font:   titleFont
             Color:  "#CCCCCC"
@@ -319,6 +345,7 @@ Function OptionsScreen_CreateOptionButton(optionInfo As Object, x = 0 As Integer
     
     button = {
         ID: optionInfo.ID
+        Text: AsString(titleLayer.Text) + "," + AsString(subtitleLayer.Text) + "," + AsString(priceLayer.Text) + "," + AsString(trialLayer.Text)
         Layers: layers
         FocusedLayers: focusedLayers
     }
@@ -367,6 +394,7 @@ Function OptionsScreen_CreateButton(buttonInfo As Object, y = 0 As Integer) As O
     
     button = {
         ID: buttonInfo.ID
+        Text: textLayer.Text
         Layers: layers
         FocusedLayers: focusedLayers
     }

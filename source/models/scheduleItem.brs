@@ -19,6 +19,7 @@ Sub ScheduleItem_Initialize(json As Object)
     m.ShowName = AsString(json.name)
     m.Description = AsString(json.description)
     m.Length = AsInteger(json.duration)
+    
     m.StartTime = DateFromSeconds(AsInteger(json.startTime))
     m.StartTime.ToLocalTime()
     m.EndTime = DateFromSeconds(AsInteger(json.startTime) + m.Length)

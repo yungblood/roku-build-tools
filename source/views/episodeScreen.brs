@@ -34,12 +34,18 @@ Function NewEpisodeScreen() As Object
     Return this
 End Function
 
-Function EpisodeScreen_Show() As Boolean
+Function EpisodeScreen_Show(autoplay = False As Boolean) As Boolean
     m.PreviousOverhangHD = GetThemeAttribute("OverhangPrimaryLogoHD")
     m.PreviousOverhangSD = GetThemeAttribute("OverhangPrimaryLogoSD")
 
     m.Screen.Show()
     m.ResetContent(False)
+    If autoplay Then
+        content = m.GetContent(True)
+        If content <> invalid Then
+            m.OnButtonPressed({ Button: content.Buttons[0] }, invalid)
+        End If
+    End If
     Return True
 End Function
 
@@ -140,8 +146,9 @@ Function EpisodeScreen_PrepareContent(content As Object) As Object
                 Text: "Subscribe to watch"
                 ID: "subscribe"
                 OmnitureData:   {
-                    LinkName: "app:roku:all access:upsell:show page:click"
-                    Params: {  
+                    LinkName: "app:roku:all access:upsell:video entry:click"
+                    Params: {
+                        v4: "CIA-00-10abc6d"  
                         v10: "show"
                     }
                     Events: ["event19"]
@@ -209,6 +216,9 @@ Sub EpisodeScreen_OnButtonPressed(eventData As Object, callbackData = invalid As
                     playContent = NewRegistrationWizard().ShowSubscriptionSelectionScreen()
                 Else
                     playContent = (NewRegistrationWizard().Show() = 1)
+                End If
+                If playContent Then
+                    playContent = Cbs().GetCurrentUser().IsSubscriber()
                 End If
             End If
             If playContent Then

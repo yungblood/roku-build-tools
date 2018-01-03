@@ -34,3 +34,7 @@ End Function
 Function GetAppTitle() As String
     Return GetManifest().title
 End Function
+
+Function GetManifestValue(key As String) As String
+    Return GetManifest()[key]
+End Function

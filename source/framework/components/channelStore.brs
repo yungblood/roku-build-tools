@@ -24,6 +24,7 @@ Function NewChannelStore() As Object
         
         GetPartialUserData: ChannelStore_GetPartialUserData
         GetChannelCred:     ChannelStore_GetChannelCred
+        GetRokuUserID:      ChannelStore_GetRokuUserID
         
         GetData:            ChannelStore_GetData
         
@@ -59,6 +60,20 @@ Function ChannelStore_GetChannelCred() As Object
         Return invalid
     End If
     Return m.Store.GetChannelCred()
+End Function
+
+Function ChannelStore_GetRokuUserID() As String
+    If IsNullOrEmpty(m.UserID) Then
+        m.UserID = ""
+        channelCred = m.GetChannelCred()
+        If channelCred <> invalid And Not IsNullOrEmpty(channelCred.json) Then
+            json = ParseJson(channelCred.json)
+            If json <> invalid And Not IsNullOrEmpty(json.roku_pucid) Then
+                m.UserID = json.roku_pucid
+            End If
+        End If
+    End If
+    Return m.UserID
 End Function
 
 Function ChannelStore_GetData(method As String, timeout = 0 As Integer) As Dynamic

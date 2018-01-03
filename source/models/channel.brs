@@ -70,6 +70,8 @@ Sub Channel_Initialize(json As Object)
             m.ShortDescriptionLine1 = m.ShortDescriptionLine1 + affiliate.Name
         End If
     End If
+    
+    m.ScheduleUrl = AsString(json.scheduleUrl)
 End Sub
 
 Function Channel_GetAkamaiDims(additionalDims = {} As Object) As Object
@@ -92,8 +94,40 @@ Function Channel_GetNowPlaying() As Object
     Return m.NowPlaying
 End Function
 
-Function Channel_GetSchedule(startTime = NowDate() As Object, count = 10 As Integer) As Object
-    Return Syncbak().GetSchedule(m.ID, startTime, count)
+Function Channel_GetSchedule(startTimeUtc = NowDate() As Object, count = 10 As Integer) As Object
+    scheduleItems = []
+    
+    startTime = CreateObject("roDateTime")
+    startTime.fromSeconds(startTimeUtc.AsSeconds())
+    startTime.ToLocalTime()
+    startTimeSeconds = startTime.asSeconds()
+    
+    refreshed = False
+    If Not IsNullOrEmpty(m.ScheduleUrl) And (m.Schedule = invalid Or m.Schedule.Count() = 0 Or m.Schedule.Peek().EndTime.AsSeconds() < startTimeSeconds) Then
+        m.Schedule = Syncbak().GetSchedule(m.ScheduleUrl)
+    End If
+    
+    startIndex = -1
+    schedule = AsArray(m.Schedule)
+    For i = 0 To schedule.Count() - 1
+        scheduleItem = schedule[i]
+        If scheduleItem <> invalid And scheduleItem.StartTime.AsSeconds() <= startTimeSeconds And scheduleItem.EndTime.AsSeconds() > startTimeSeconds Then
+            startIndex = i
+            Exit For
+        End If
+    Next
+    If startIndex > -1 Then
+        For i = 0 To count - 1
+            scheduleItem = schedule[startIndex + i]
+            If scheduleItem <> invalid Then
+                scheduleItems.Push(scheduleItem)
+            End If
+        Next
+    End If
+    If scheduleItems.Count() = 0 Then
+        scheduleItems = Syncbak().GetScheduleLegacy(m.ID, startTime, count)
+    End If
+    Return scheduleItems
 End Function
 
 ' Resume param is ignored for live streams, but is necessary to prevent

@@ -1,4 +1,4 @@
-Function OpenItem(item As Object, eventData = invalid As Object) As Boolean
+Function OpenItem(item As Object, eventData = invalid As Object, isECP = False As Boolean) As Boolean
     If item.ClassName = "menuItem" Then
         If item.ID = "allShows" Then
             NewAllShowsScreen().Show()
@@ -44,7 +44,7 @@ Function OpenItem(item As Object, eventData = invalid As Object) As Boolean
         Else
             screen.SetContentList(item)
         End If
-        screen.Show()
+        screen.Show(isECP)
     End If
     Return True
 End Function
@@ -179,3 +179,28 @@ Sub ProcessGlobalOption(option As Object, linkName = "" As String, events = [] A
         Cbs().IsAuthenticated(True)
     End If
 End Sub
+
+Function GetEcpItem(ecp As Object) As Object
+    ecpItem = invalid
+    If ecp <> invalid Then
+        contentID = ecp.contentID
+        If Not IsNullOrEmpty(contentID) Then
+            If ecp.mediaType = "episode" Or ecp.mediaType = "clip" Or ecp.mediaType = "season" Then
+                ecpItem = Cbs().GetEpisode(contentID)
+                If ecp.mediaType = "season" And ecpItem <> invalid And ecpItem.ClassName = "Episode" Then
+                    ecpItem = ecpItem.GetShow()
+                End If
+            Else If ecp.mediaType = "show" Or ecp.mediaType = "series" Then
+                ecpItem = Cbs().GetShow(contentID)
+                
+                'HACK: Workaround for Roku "My Feed" bug that specifies series for some episodes
+                If ecpItem = invalid Then
+                    ecpItem = Cbs().GetEpisode(contentID)
+                End If
+            Else If ecp.contentID = "live" Then
+                ecpItem = { ClassName: "menuItem", ID: "liveTV" }
+            End If
+        End If
+    End If
+    Return ecpItem
+End Function

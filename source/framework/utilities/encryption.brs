@@ -34,11 +34,11 @@ Function Decrypt(method As String, key As String, iv As String, text As String) 
     Return HexDecrypt(method, Base64ToHex(key), Base64ToHex(iv), Base64ToHex(text))
 End Function
 
-Function Encrypt(method As String, key As String, IV As String, text As String) As String
+Function Encrypt(method As String, key As String, iv As String, text As String) As String
     Return HexToBase64(HexEncrypt(method, Base64ToHex(key), Base64ToHex(iv), text))
 End Function
 
-Function HexDecrypt(method As String, key As String, IV As String, text As String) As String
+Function HexDecrypt(method As String, key As String, iv As String, text As String) As String
     crypto = CreateObject("roEVPCipher")
     crypto.Setup(False, method, key, iv, 1)
     ba = CreateObject("roByteArray")
@@ -65,10 +65,13 @@ Function HexEncrypt(method As String, key As String, iv As String, text As Strin
 End Function
 
 Function MD5Hash(text As String) As String
+    Return EVPDigest(text, "md5")
+End Function
+
+Function EVPDigest(text As String, digestType As String) As String
     digest = CreateObject("roEVPDigest")
-    digest.Setup("md5")
+    digest.Setup(digestType)
     ba = CreateObject("roByteArray")
     ba.FromAsciiString(text)
-    digest.Update(ba)
-    Return LCase(digest.Final())
+    Return digest.Process(ba)
 End Function

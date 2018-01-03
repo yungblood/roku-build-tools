@@ -94,7 +94,7 @@ Function LiveFeed_GetAkamaiDims(additionalDims = {} As Object) As Object
 End Function
 
 Function LiveFeed_GetConvivaName() As String
-    Return IIf(IsNullOrEmpty(m.ShowName), "", m.ShowName + " - ") + m.Name
+    Return m.Name
 End Function
 
 Sub LiveFeed_SetShowID(id As String)
@@ -113,10 +113,12 @@ Function LiveFeed_GetVmapUrl() As String
 End Function
 
 Function LiveFeed_GetStreamUrl() As String
+    url = ""
     If Not IsNullOrEmpty(m.ID) Then
-        Return Replace(Cbs().StreamUrl, "[PID]", m.ID)
+        url = Replace(Cbs().StreamUrl, "[PID]", m.ID)
+        url = Replace(url, "[SIGNATURE]", Cbs().GetVideoStreamToken(m.ID))
     End If
-    Return ""
+    Return url
 End Function
 
 ' Resume param is ignored for live streams, but is necessary to prevent

@@ -46,7 +46,7 @@ Function HomeScreen_Show(ecpItem = invalid As Dynamic, rows = [] As Object) As B
 
     m.Rows = rows
     ' Process any passed in ECP parameters
-    If ecpItem = invalid Or Not OpenItem(ecpItem) Then
+    If ecpItem = invalid Or Not OpenItem(ecpItem, invalid, True) Then
         m.SetupRows()
     End If
     
@@ -87,7 +87,7 @@ Sub HomeScreen_SetupRows(refresh = False As Boolean)
         If Cbs().IsCFFlowEnabled Then
             If Not Cbs().IsAuthenticated() Then
                 menu.ContentList.Unshift({
-                    Text:           ""
+                    Title:          "Start your free trial"
                     ID:             "freeTrial"
                     ClassName:      "menuItem"
                     HDPosterUrl:    "pkg:/images/icon_freetrial_hd.jpg"
@@ -97,6 +97,7 @@ Sub HomeScreen_SetupRows(refresh = False As Boolean)
                         Params: {  
                             v10: "home"
                             v4: "CIA-00-10abc6e"
+                            v6: "cbs svod|upsell"
                         }
                         Events: ["event19"]
                     }
@@ -120,7 +121,7 @@ Sub HomeScreen_SetupRows(refresh = False As Boolean)
             End If            
         End If
         menu.ContentList.Push({
-            Text:           ""
+            Text:           "Settings"
             ID:             "settings"
             ClassName:      "menuItem"
             HDPosterUrl:    "pkg:/images/icon_settings_hd.png"

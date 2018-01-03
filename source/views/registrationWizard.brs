@@ -1,6 +1,8 @@
 Function NewRegistrationWizard() As Object
     this                                    = {}
     this.ClassName                          = "RegistrationWizard"
+    
+    this.AudioGuide                         = CreateObject("roAudioGuide")
 
     this.Show                               = RegistrationWizard_Show
     this.CreateAccount                      = RegistrationWizard_CreateAccount
@@ -351,6 +353,7 @@ Function RegistrationWizard_ShowWelcomeScreen() As Integer
     buttons = [
         {
             ID: "signUp"
+            Text: signUpText
             Layers:  [
                 {
                     Url: "pkg:/images/upsell/button_upsell_off.png"
@@ -404,6 +407,7 @@ Function RegistrationWizard_ShowWelcomeScreen() As Integer
         }
         {
             ID: "signIn"
+            Text: signInText
             Layers: [
                 {
                     Url: "pkg:/images/upsell/button_upsell_off.png"
@@ -457,6 +461,7 @@ Function RegistrationWizard_ShowWelcomeScreen() As Integer
         }
         {
             ID: "browse"
+            Text: browseText
             Layers: [
                 {
                     Url: "pkg:/images/upsell/button_upsell_off.png"
@@ -528,6 +533,15 @@ Function RegistrationWizard_ShowWelcomeScreen() As Integer
     Next
     
     screen.Show()
+    Sleep(1000)
+    
+    If m.AudioGuide <> invalid Then
+        m.AudioGuide.Flush()
+        m.AudioGuide.Say("CBS All Access", True, True)
+        button = buttons[buttonIndex]
+        m.AudioGuide.Say(button.Text + ", button, " + (buttonIndex + 1).ToStr() + " of " + buttons.Count().ToStr(), False, True)
+    End If
+
     Omniture().TrackPage("app:roku:launch:splash page")
     While True
         msg = Wait(0, screen.GetMessagePort())
@@ -542,11 +556,11 @@ Function RegistrationWizard_ShowWelcomeScreen() As Integer
                         If button.ID = "signUp" Then
                             Omniture().TrackEvent(signUpText, ["event19"], { v46: "roku:splash:" + LCase(signUpText) })
                             If Cbs().IsCFFlowEnabled Then
-                                If m.ShowSubscriptionSelectionScreen(upsellInfo.productCode) Then
+                                If m.ShowSubscriptionSelectionScreen(AsString(upsellInfo.productCode)) Then
                                     Return 1
                                 End If
                             Else
-                                If m.SignUp(upsellInfo.productCode) Then
+                                If m.SignUp(AsString(upsellInfo.productCode)) Then
                                     Return 1
                                 End If
                             End If
@@ -574,6 +588,10 @@ Function RegistrationWizard_ShowWelcomeScreen() As Integer
                     For i = 0 To buttons.Count() - 1
                         If i = buttonIndex Then
                             screen.SetLayer(buttonLayer + i, buttons[i].FocusedLayers)
+                            button = buttons[i]
+                            If m.AudioGuide <> invalid Then
+                                m.AudioGuide.Say(button.Text + ", button, " + (i + 1).ToStr() + " of " + buttons.Count().ToStr(), True, True)
+                            End If
                         Else
                             screen.SetLayer(buttonLayer + i, buttons[i].Layers)
                         End If
@@ -843,7 +861,7 @@ End Function
 
 Function RegistrationWizard_ShowSubscriptionSelectionScreen(defaultProductCode = "PROD1" As String) As Boolean
     pageName = "app:roku:all access:upsell"
-    Omniture().TrackPage(pageName, ["event89"], {v10: "upsell"})
+    Omniture().TrackPage(pageName, ["event89"], {v10: "upsell", v6: "cbs svod|upsell"})
 
     facade = CreateObject("roImageCanvas")
     facade.SetLayer(0, { Color: "#000000" })
@@ -859,17 +877,27 @@ Function RegistrationWizard_ShowSubscriptionSelectionScreen(defaultProductCode =
         Return m.SignUp(defaultProductCode)
     End If
     
-    lcInfo = Cbs().GetUpsellInfo("CBS_ALL_ACCESS_PACKAGE")
-    cfInfo = Cbs().GetUpsellInfo("CBS_ALL_ACCESS_AD_FREE_PACKAGE")
+    lcCampaign = Cbs().GetCampaignAvailability("CBS_ALL_ACCESS_PACKAGE")
+    lcInfo = Cbs().GetUpsellInfo("CBS_ALL_ACCESS_PACKAGE", AsString(lcCampaign.campaign))
+    cfCampaign = Cbs().GetCampaignAvailability("CBS_ALL_ACCESS_AD_FREE_PACKAGE")
+    cfInfo = Cbs().GetUpsellInfo("CBS_ALL_ACCESS_AD_FREE_PACKAGE", AsString(cfCampaign.campaign))
 
     lcTitleText = AsString(lcInfo.Response.upsellMessage)
     lcPriceText = AsString(lcInfo.Response.upsellMessage2)
     lcTrialText = AsString(lcInfo.Response.callToAction)
     lcProductID = AsString(lcInfo.Response.aaProductID, defaultProductCode)
+    lcProduct   = ChannelStore().GetProduct(lcProductID)
     cfTitleText = AsString(cfInfo.Response.upsellMessage)
     cfPriceText = AsString(cfInfo.Response.upsellMessage2)
     cfTrialText = AsString(cfInfo.Response.callToAction)
     cfProductID = AsString(cfInfo.Response.aaProductID, defaultProductCode)
+    cfProduct   = ChannelStore().GetProduct(cfProductID)
+
+   
+    If lcProduct = invalid Or cfProduct = invalid Or ChannelStore().GetPurchases().Count() > 0 Then
+        waitDialog.Close()
+        Return m.AuthenticateWithCode()
+    End If
     
     tourText    = "Take a Quick Tour"
     signInText  = "Already a Subscriber? Sign In"
@@ -886,9 +914,11 @@ Function RegistrationWizard_ShowSubscriptionSelectionScreen(defaultProductCode =
         TrialText:      lcTrialText
         ProductCode:    lcProductID
         OmnitureData:   {
-            Product: "Limited Commercial"
-            LinkName: pageName + ":Limited Commercial:click"
+            Product:  lcTitleText
+            Products: lcTitleText + ";new;1;" + AsString(lcProduct.cost).Replace("$", "")
+            LinkName: pageName + ":" + lcTitleText + ":click"
             Params: {  
+                v6: "cbs svod|upsell"
                 v10: "upsell"
             }
             Events: ["event19"]
@@ -901,9 +931,11 @@ Function RegistrationWizard_ShowSubscriptionSelectionScreen(defaultProductCode =
         TrialText:      cfTrialText
         ProductCode:    cfProductID
         OmnitureData:   {
-            Product: "Commercial Free"
-            LinkName: pageName + ":Commercial Free:click"
+            Product:  cfTitleText
+            Products: cfTitleText + ";new;1;" + AsString(cfProduct.cost).Replace("$", "")
+            LinkName: pageName + ":" + cfTitleText + ":click"
             Params: {  
+                v6: "cbs svod|upsell"
                 v10: "upsell"
             }
             Events: ["event19"]
@@ -917,6 +949,7 @@ Function RegistrationWizard_ShowSubscriptionSelectionScreen(defaultProductCode =
         OmnitureData:   {
             LinkName: pageName + ":take a tour:click"
             Params: {  
+                v6: "cbs svod|upsell"
                 v10: "upsell"
             }
             Events: ["event19"]
@@ -928,19 +961,14 @@ Function RegistrationWizard_ShowSubscriptionSelectionScreen(defaultProductCode =
         OmnitureData:   {
             LinkName: pageName + ":sign in:click"
             Params: {  
+                v6: "cbs svod|upsell"
                 v10: "upsell"
             }
             Events: ["event19"]
         }
     })
 
-    lcProduct = ChannelStore().GetProduct(lcProductID)
-    cfProduct = ChannelStore().GetProduct(cfProductID)
     waitDialog.Close()
-    
-    If lcProduct = invalid Or cfProduct = invalid Or ChannelStore().GetPurchases().Count() > 0 Then
-        Return m.AuthenticateWithCode()
-    End If
     
     optionsScreen = NewOptionsScreen()
     optionsScreen.Setup(options, buttons, "", disclaimerText, headerImage)
@@ -974,6 +1002,12 @@ Function RegistrationWizard_ShowLiveTVUpsellScreen(defaultProductCode = "PROD1" 
     priceText = AsString(liveInfo.Response.upsellMessage3)
     trialText = AsString(liveInfo.Response.callToAction)
     productID = AsString(liveInfo.Response.aaProductID, defaultProductCode)
+    product   = ChannelStore().GetProduct(productID)
+
+'    If product = invalid Or ChannelStore().GetPurchases().Count() > 0 Then
+'        waitDialog.Close()
+'        Return m.AuthenticateWithCode()
+'    End If
     
     tourText    = "Take a Quick Tour"
     signInText  = "Already a Subscriber? Sign In"
@@ -991,10 +1025,12 @@ Function RegistrationWizard_ShowLiveTVUpsellScreen(defaultProductCode = "PROD1" 
         TrialText:      trialText
         ProductCode:    productID
         OmnitureData:   {
-            Product: "Limited Commercial"
-            LinkName: pageName + ":Limited Commercial:click"
+            Product:  "Limited Commercial"
+            Products: "Limited Commercial" + ";new;1;" + AsString(product.cost).Replace("$", "")
+            LinkName: pageName + ":" + titleText + ":click"
             Params: {  
                 v10: "upsell"
+                v6: "cbs svod|upsell"
             }
             Events: ["event19"]
         }
@@ -1008,6 +1044,7 @@ Function RegistrationWizard_ShowLiveTVUpsellScreen(defaultProductCode = "PROD1" 
             LinkName: pageName + ":take a tour:click"
             Params: {  
                 v10: "upsell"
+                v6: "cbs svod|upsell"
             }
             Events: ["event19"]
         }
@@ -1019,6 +1056,7 @@ Function RegistrationWizard_ShowLiveTVUpsellScreen(defaultProductCode = "PROD1" 
             LinkName: pageName + ":sign in:click"
             Params: {  
                 v10: "upsell"
+                v6: "cbs svod|upsell"
             }
             Events: ["event19"]
         }
@@ -1027,12 +1065,7 @@ Function RegistrationWizard_ShowLiveTVUpsellScreen(defaultProductCode = "PROD1" 
     optionsScreen = NewOptionsScreen()
     optionsScreen.Setup(options, buttons, "", disclaimerText, headerImage)
     
-    product = ChannelStore().GetProduct(productID)
     waitDialog.Close()
-    
-    If product = invalid Or ChannelStore().GetPurchases().Count() > 0 Then
-        Return m.AuthenticateWithCode()
-    End If
     
     While True
         result = optionsScreen.Show()
@@ -1047,7 +1080,7 @@ End Function
 
 Function RegistrationWizard_ShowUpgradeScreen(enabled As Boolean, defaultProductCode = "PROD1" As String) As Boolean
     pageName = "app:roku:all access:upsell"
-    Omniture().TrackPage(pageName, ["event89"], {v10: "upsell_upgrade"})
+    Omniture().TrackPage(pageName, ["event89"], {v6: "cbs svod|upsell_upgrade", v10: "upsell_upgrade"})
 
     facade = CreateObject("roImageCanvas")
     facade.SetLayer(0, { Color: "#000000" })
@@ -1068,6 +1101,10 @@ Function RegistrationWizard_ShowUpgradeScreen(enabled As Boolean, defaultProduct
     priceText = AsString(upsellInfo.Response.callToAction)
     trialText = ""
     productID = AsString(upsellInfo.Response.aaProductID, defaultProductCode)
+    product   = ChannelStore().GetProduct(productID)
+    If product = invalid Then
+        product = {}
+    End If
 
     noButtonsText = AsString(upsellInfo.Response.upsellMessage3)
 
@@ -1084,7 +1121,8 @@ Function RegistrationWizard_ShowUpgradeScreen(enabled As Boolean, defaultProduct
         Enabled:        enabled
         ProductCode:    productID
         OmnitureData:   {
-            Product: "Upgrade"
+            Product:  "Upgrade"
+            Products: titleText + ";upgrade;1;" + AsString(product.cost).Replace("$", "")
             LinkName: pageName + ":upgrade:click"
             Params: {  
                 v10: "upsell_upgrade"
@@ -1113,7 +1151,7 @@ End Function
 
 Function RegistrationWizard_ShowDowngradeScreen(enabled = True As Boolean, defaultProductCode = "PROD1" As String) As Boolean
     pageName = "app:roku:all access:upsell"
-    Omniture().TrackPage(pageName, ["event89"], {v10: "upsell_downgrade"})
+    Omniture().TrackPage(pageName, ["event89"], {v6: "cbs svod|upsell_downgrade", v10: "upsell_downgrade"})
 
     facade = CreateObject("roImageCanvas")
     facade.SetLayer(0, { Color: "#000000" })
@@ -1153,12 +1191,15 @@ Function RegistrationWizard_ShowDowngradeScreen(enabled = True As Boolean, defau
     
     buttons = []
     If enabled Then
+        product = ChannelStore().GetProduct(productID)
         buttons.Push({
             ID: "downgrade"
             Text: "Switch Plan"
             ProductCode: productID
             OmnitureData:   {
-                Product: "Downgrade"
+                Product:  "Downgrade"
+                'Products: titleText + ";downgrade;1;" + AsString(product.cost).Replace("$", "")
+                Products: "Limited Commercial" + ";downgrade;1;" + AsString(product.cost).Replace("$", "")
                 LinkName: pageName + ":downgrade:click"
                 Params: {  
                     v10: "upsell_downgrade"
@@ -1210,27 +1251,27 @@ Function RegistrationWizard_ProcessOptionsScreenResult(result As Object, tourVid
             End If
         Else If result.id = "subscribe" Then
             If m.SignUp(result.productCode) Then
-                Omniture().TrackEvent("", ["event101"], { v10: "billing_confirm_" + AsString(result.OmnitureData.Product) })
+                Omniture().TrackEvent("", ["event76"], { v6: "cbs svod|billing_confirm_" + AsString(result.OmnitureData.Product), v10: "billing_confirm_" + AsString(result.OmnitureData.Product), products: AsString(result.OmnitureData.Products) })
                 Return True
             Else
-                Omniture().TrackEvent("", ["event102"], { v10: "billing_failure_" + AsString(result.OmnitureData.Product) })
+                Omniture().TrackEvent("", ["event20"], { v6: "cbs svod|billing_failure_" + AsString(result.OmnitureData.Product), v10: "billing_failure_" + AsString(result.OmnitureData.Product) })
             End If
         Else If result.id = "upgrade" Or result.id = "downgrade" Then
             upgradeTime = NowDate().AsSeconds()
             If upgradeTime - Cbs().UpgradeTime > Cbs().UpgradeCoolDown Then
                 If result.id = "upgrade" Then
                     If m.SwitchPlan(result.productCode) Then
-                        Omniture().TrackEvent("", ["event103"], { v10: "billing_confirm_" + AsString(result.OmnitureData.Product) })
+                        Omniture().TrackEvent("", ["event107"], { v6: "cbs svod|billing_confirm_" + AsString(result.OmnitureData.Product), v10: "billing_confirm_" + AsString(result.OmnitureData.Product), products: AsString(result.OmnitureData.Products) })
                         Return True
                     Else
-                        Omniture().TrackEvent("", ["event102"], { v10: "billing_failure_" + AsString(result.OmnitureData.Product) })
+                        'Omniture().TrackEvent("", ["event102"], { v6: "cbs svod|billing_failure_" + AsString(result.OmnitureData.Product), v10: "billing_failure_" + AsString(result.OmnitureData.Product) })
                     End If
                 Else If result.id = "downgrade" Then
                     If m.SwitchPlan(result.productCode) Then
-                        Omniture().TrackEvent("", ["event104"], { v10: "billing_confirm_" + AsString(result.OmnitureData.Product) })
+                        Omniture().TrackEvent("", ["event108"], { v6: "cbs svod|billing_confirm_" + AsString(result.OmnitureData.Product), v10: "billing_confirm_" + AsString(result.OmnitureData.Product), products: AsString(result.OmnitureData.Products) })
                         Return True
                     Else
-                        Omniture().TrackEvent("", ["event102"], { v10: "billing_failure_" + AsString(result.OmnitureData.Product) })
+                        'Omniture().TrackEvent("", ["event102"], { v6: "cbs svod|billing_failure_" + AsString(result.OmnitureData.Product), v10: "billing_failure_" + AsString(result.OmnitureData.Product) })
                     End If
                 End If
             Else

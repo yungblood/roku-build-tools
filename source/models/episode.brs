@@ -208,10 +208,12 @@ Function Episode_GetVmapUrl() As String
 End Function
 
 Function Episode_GetStreamUrl() As String
+    url = ""
     If Not IsNullOrEmpty(m.ID) Then
-        Return Replace(Cbs().StreamUrl, "[PID]", m.ID)
+        url = Replace(Cbs().StreamUrl, "[PID]", m.ID)
+        url = Replace(url, "[SIGNATURE]", Cbs().GetVideoStreamToken(m.ID))
     End If
-    Return ""
+    Return url
 End Function
 
 Function Episode_GetStream(resume = False As Boolean) As Object
@@ -224,7 +226,7 @@ Function Episode_GetStream(resume = False As Boolean) As Object
             StreamFormat: "hls"
             Stream: {
                 Bitrate: 0
-                Url: m.GetStreamUrl()
+                Url: streamUrl
             }
             SwitchingStrategy: "full-adaptation"
             'MinBandwidth: 800

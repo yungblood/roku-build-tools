@@ -67,6 +67,15 @@ Function GetAdvertisingID() As String
     Return m.AdvertisingID
 End Function
 
+Function GetVerimatrixID() As String
+    If m.VerimatrixID = invalid Then
+        deviceInfo = CreateObject("roDeviceInfo")
+        verimatrixID = "verimatrix-" + deviceInfo.getDeviceUniqueID()
+        m.VerimatrixID = EVPDigest(verimatrixID, "sha1")
+    End If
+    Return m.VerimatrixID
+End Function
+
 Function GetIPAddress() As String
     If m.IPAddress = invalid Then
         deviceInfo = CreateObject("roDeviceInfo")
@@ -206,6 +215,19 @@ Function GetCountryCode() As String
     Return m.CountryCode
 End Function
 
+Function GetTimeZone() As String
+    If m.TimeZone = invalid Then
+        m.TimeZone = invalid
+        deviceInfo = CreateObject("roDeviceInfo")
+        m.TimeZone = deviceInfo.GetTimeZone()
+        ' If the lookup failed, set the country to US/Eastern
+        If m.TimeZone = invalid Then
+           m.TimeZone = "US/Eastern"
+        End If
+    End If
+    Return m.TimeZone
+End Function
+
 Function GetCaptionsMode() as Dynamic
     If CheckFirmware(5, 3) >= 0 Then
         If m.CaptionsMode = invalid Then
@@ -279,4 +301,34 @@ Function GetCpuType() As String
         End If
     End If
     Return m.CpuType
+End Function
+
+Function GetDeviceCreationTime() As Object
+    deviceInfo = CreateObject("roDeviceInfo")
+    creationTime = deviceInfo.GetCreationTime()
+    If IsNullOrEmpty(creationTime) Then
+        print "Creation time is empty"
+        Return invalid
+    End If
+    regex = CreateObject("roRegex", "^\d{1,2}/\d{1,2}/\d{4} \d{1,2}:\d{1,2}:\d{1,2}.*[A|P]M$", "i")
+    If Not regex.IsMatch(creationTime) Then
+        print "Creation time " ; creationTime ; " not in expected format"
+        Return invalid
+    End If
+    regex = CreateObject("roRegex", "/+", "")
+    subStrings = regex.split(creationTime)
+    month = subStrings[0]
+    day = subStrings[1]
+    remainder = subStrings[2]
+    regex = CreateObject("roRegex", " ", "")
+    subStrings = regex.split(remainder)
+    year = subStrings[0]
+    dateString = year + "-" + month + "-" + day + " 00:00:00.000"
+    dt = CreateObject("roDateTime")
+    dt.FromISO8601String(dateString)
+    If dt.AsSeconds() <= 0 Then
+        Return invalid
+    End If
+    print "Found valid creation time:"; dt.AsSeconds()
+    Return dt
 End Function

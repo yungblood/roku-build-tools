@@ -22,6 +22,10 @@ Function IsInteger(value As Dynamic) As Boolean
     Return IsValid(value) And GetInterface(value, "ifInt") <> invalid And (Type(value) = "roInt" Or Type(value) = "roInteger" Or Type(value) = "Integer")
 End Function
 
+Function IsLongInteger(value As Dynamic) As Boolean
+    Return IsValid(value) And GetInterface(value, "ifLongInt") <> invalid
+End Function
+
 Function IsFloat(value As Dynamic) As Boolean
     Return IsValid(value) And (GetInterface(value, "ifFloat") <> invalid Or (Type(value) = "roFloat" Or Type(value) = "Float"))
 End Function
@@ -91,6 +95,8 @@ Function AsString(input As Dynamic, defaultValue = "" As String) As String
     Else If IsString(input) Then
         Return input
     Else If IsInteger(input) Then
+        Return input.ToStr()
+    Else If IsLongInteger(input) Then
         Return input.ToStr()
     Else If IsFloat(input) Then
         Return AsString(AsDouble(input))

@@ -73,7 +73,7 @@ End Function
 
 Function User_GetProductForTracking() As String
     If m.Packages.Count() > 0 Then
-        Return m.Packages[0].productCode
+        Return AsString(m.Packages[0].productCode)
     End If
     Return ""
 End Function

@@ -75,7 +75,7 @@ Function LiveTVScreen_GetContent(showLoading = True As Boolean) As Object
             content = {}
         End If
         buttons = []
-        If Cbs().IsAuthenticated() Then
+        If Cbs().IsSubscribed() Then
             buttons.Push({
                 Text: "Watch"
                 ID: "watch"
@@ -117,7 +117,7 @@ Sub LiveTVScreen_StartPlayback()
 End Sub
 
 Sub LiveTVScreen_OnShown(eventData As Object, callbackData = invalid As Object)
-    Omniture().TrackPage("app:roku:live:auth")
+    Omniture().TrackPage("app:roku:live-tv")
     m.ResetContent()
 End Sub
 
@@ -126,7 +126,7 @@ End Sub
 
 Sub LiveTVScreen_OnButtonPressed(eventData As Object, callbackData = invalid As Object)
     If eventData.Button <> invalid And Not IsString(eventData.Button) Then
-        linkName = "app:roku:live:auth:" + LCase(AsString(eventData.Button.Text))
+        linkName = "app:roku:live-tv:" + LCase(AsString(eventData.Button.Text))
         Omniture().TrackEvent(linkName, ["event19"], { v46: linkName })
 
         If eventData.Button.ID = "watch" Or eventData.Button.ID = "subscribe" Then
@@ -143,6 +143,9 @@ Sub LiveTVScreen_OnButtonPressed(eventData As Object, callbackData = invalid As 
                     playContent = NewRegistrationWizard().ShowLiveTVUpsellScreen()
                 Else
                     playContent = (NewRegistrationWizard().Show() = 1)
+                End If
+                If playContent Then
+                    playContent = Cbs().GetCurrentUser().IsSubscriber()
                 End If
             End If
             If playContent Then

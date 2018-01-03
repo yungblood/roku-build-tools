@@ -41,9 +41,6 @@ Sub Omniture_TrackPage(pageName As String, events = [] As Object, additionalPara
         params.events = Join(events, ",")
     End If
     params.Append(additionalParams)
-    If Not IsNullOrEmpty(params.v10) And IsNullOrEmpty(params.v6) Then
-        params.v6 = "cbs svod|" + params.v10
-    End If
     m.Omniture.LogEvent(params)
 End Sub
 
@@ -56,9 +53,6 @@ Sub Omniture_TrackEvent(linkName As String, events = [] As Object, additionalPar
     params.Append(additionalParams)
     If params.v46 = invalid Then
         params.v46 = linkName
-    End If
-    If Not IsNullOrEmpty(params.v10) And IsNullOrEmpty(params.v6) Then
-        params.v6 = "cbs svod|" + params.v10
     End If
     m.Omniture.LogEvent(params)
 End Sub

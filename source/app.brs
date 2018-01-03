@@ -34,6 +34,16 @@ Sub App_Run(ecp = invalid As Object)
         ShowMessageBox("Error", "An error occurred when starting this channel. Please check your network connection and try again.", ["OK"], True)
         ExitUserInterface()
     End If
+
+'Configuration().Set(Cbs().AuthTokenKey, "TEST")
+' CF Subscriber
+'SetCookie("CBS_COM", "VXNlcm5hbWUxNzcyQGNicy5jb206MTQ5NzcyMTkwNTQ3MzpjOTNjMzI1NTkxMWM1M2RkOTBkYTBmZjE3MWE3MjQ0YzoxLjA", Cbs().Endpoint)
+' LC Subscriber
+'SetCookie("CBS_COM", "VXNlcm5hbWU0NTU4MEBjYnMuY29tOjE0OTc3MjI5NjU1MTI6ODY5NmNkOGQ4NGU1Yzc5NDdhMWQ1M2QxMzI0ODBiYTU6MS4w", Cbs().Endpoint)
+' Ex-Subscriber
+'Configuration().Set("AuthToken", "blah")
+'SetCookie("CBS_COM", "YW5kQGRyb2lkLmNvbToxNTM4NzY5MDgzOTE5OjY4NGQyMjVjZTM4NWUyNzFjZjBkOGEzY2UyNmI1NjJjOjEuMA", Cbs().Endpoint)
+
     ' Initialize Omniture
     user = Cbs().GetCurrentUser()
     Omniture().Initialize(Cbs().OmnitureSuiteID, user.ID, user.GetStatusForTracking(), user.GetProductForTracking(), Cbs().OmnitureEvar5)
@@ -48,28 +58,7 @@ Sub App_Run(ecp = invalid As Object)
         m.Restart = False
      
         ' Process any passed in ECP parameters
-        ecpItem = invalid
-        If ecp <> invalid Then
-            contentID = ecp.contentID
-            If Not IsNullOrEmpty(contentID) Then
-                If ecp.mediaType = "episode" Or ecp.mediaType = "clip" Or ecp.mediaType = "season" Then
-                    ecpItem = Cbs().GetEpisode(contentID)
-                    If ecp.mediaType = "season" And ecpItem <> invalid And ecpItem.ClassName = "Episode" Then
-                        ecpItem = ecpItem.GetShow()
-                    End If
-                Else If ecp.mediaType = "show" Or ecp.mediaType = "series" Then
-                    ecpItem = Cbs().GetShow(contentID)
-                    
-                    'HACK: Workaround for Roku "My Feed" bug that specifies series for some episodes
-                    If ecpItem = invalid Then
-                        ecpItem = Cbs().GetEpisode(contentID)
-                    End If
-                Else If ecp.contentID = "live" Then
-                    ecpItem = { ClassName: "menuItem", ID: "liveTV" }
-                End If
-            End If
-        End If
-
+        ecpItem = GetEcpItem(ecp)
         ' Skip registration wizard if we're deep-linking
         If Not Cbs().IsAuthenticated() And ecpItem = invalid Then
             If NewRegistrationWizard().Show() = 0 Then
@@ -84,6 +73,13 @@ Sub App_Run(ecp = invalid As Object)
         facade = CreateObject("roPosterScreen")
         facade.ShowMessage("")
         facade.Show()
+        
+        If ecpItem = invalid Then
+            ecp = NewInterstitialScreen().Show()
+            If ecp <> invalid Then
+                ecpItem = GetEcpItem(ecp)
+            End If
+        End If
 
         ' Show the home screen
         listen = NewHomeScreen().Show(ecpItem)
@@ -119,7 +115,7 @@ Sub App_OnScreenRemoved(eventData As Object, callbackData = invalid As Object)
 End Sub
 
 Sub App_OnAuthenticationChanged(eventData As Object, callbackData = invalid As Object)
-    user = Cbs().GetCurrentUser()
+    user = Cbs().GetCurrentUser(True)
     Omniture().Initialize(Cbs().OmnitureSuiteID, user.ID, user.GetStatusForTracking(), user.GetProductForTracking(), Cbs().OmnitureEvar5)    
     Cbs().LoadDefaultContent()
 End Sub
@@ -127,4 +123,3 @@ End Sub
 Sub App_OnIdle(eventData As Object, callbackData = invalid As Object)
     CSComScore().Tick()
 End Sub
-

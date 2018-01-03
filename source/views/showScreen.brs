@@ -124,7 +124,8 @@ Sub ShowScreen_OnRowLoading(eventData As Object, callbackData = invalid As Objec
                 End If
                 If m.ShowItem.ClipCount > 0 Then
                     content.Push({
-                        ID: "clips"
+                        Title:          "Clips"
+                        ID:             "clips"
                         HDPosterUrl:    "pkg:/images/icon_clips_hd.png"
                         SDPosterUrl:    "pkg:/images/icon_clips_sd.png"
                     })
@@ -132,6 +133,7 @@ Sub ShowScreen_OnRowLoading(eventData As Object, callbackData = invalid As Objec
                 If Cbs().IsAuthenticated() Then
                     If Cbs().GetCurrentUser().ShowIsInFavorites(m.ShowItem.ID) Then
                         content.Push({
+                            Title:          "Remove from My CBS"
                             ID:             "removeFromFavorites"
                             ShowID:         m.ShowItem.ID
                             HDPosterUrl:    "pkg:/images/icon_remove_hd.png"
@@ -139,6 +141,7 @@ Sub ShowScreen_OnRowLoading(eventData As Object, callbackData = invalid As Objec
                         })
                     Else
                         content.Push({
+                            Title:          "Add to My CBS"
                             ID:             "addToFavorites"
                             ShowID:         m.ShowItem.ID
                             HDPosterUrl:    "pkg:/images/icon_add_hd.png"

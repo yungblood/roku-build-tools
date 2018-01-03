@@ -84,6 +84,7 @@ Sub SettingsScreen_SetupRows()
                 OmnitureData:   {
                     LinkName: "app:roku:CF:downgrade:settings:click"
                     Params: {  
+                        v6: "cbs svod|settings"
                         v10: "settings"
                         v4: "CIA-00-10abc7b"
                     }

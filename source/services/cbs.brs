@@ -26,6 +26,7 @@ Function NewCbs() As Object
     this.UpgradeTime                = 0
     this.UpgradeCoolDown            = 150   ' 2.5 minutes
     
+    
     this.RokuProductCode            = "com.cbsallaccess.subscription.trial" ' "PROD1"
     this.ProductCode                = "CBS_ALL_ACCESS_PACKAGE" '
     this.SignUpUrl                  = "cbs.com/all-access"
@@ -39,8 +40,8 @@ Function NewCbs() As Object
     'this.StagingEndpoint            = "https://stage-apps.cbs.com/apps-api/"
     this.StagingCodeAuthUrl         = "test-www.cbs.com/roku"
     'this.StagingCodeAuthUrl         = "stage-apps.cbs.com/roku"
-    this.StagingSyncbakKey          = "db166d252cf24aa982a220a4b8475e25"
-    this.StagingSyncbakSecret       = "40c9f215dafb43149924e75baf05b5dc"
+    this.StagingSyncbakKey          = "50d49a504117416c818d04f12b387c4c"
+    this.StagingSyncbakSecret       = "8e60ba369c7f46ba9c6b72b0f1548979"
     this.StagingSyncbakEndpoint     = "https://stage-cbsservice.aws.syncbak.com"
     this.StagingOmnitureSuiteID     = "cbsicbsott-dev,cbsicbsiall-dev"
     this.StagingOmnitureEvar5       = "cbsicbsott-dev"
@@ -53,8 +54,8 @@ Function NewCbs() As Object
     this.ProductionApiKey           = "c3d24e796cbc78c7"
     this.ProductionEndpoint         = "https://www.cbs.com/apps-api/"
     this.ProductionCodeAuthUrl      = "cbs.com/roku"
-    this.ProductionSyncbakKey       = "db166d252cf24aa982a220a4b8475e25"
-    this.ProductionSyncbakSecret    = "40c9f215dafb43149924e75baf05b5dc"
+    this.ProductionSyncbakKey       = "50d49a504117416c818d04f12b387c4c"
+    this.ProductionSyncbakSecret    = "8e60ba369c7f46ba9c6b72b0f1548979"
     this.ProductionSyncbakEndpoint  = "https://cbsservice.aws.syncbak.com"
     this.ProductionOmnitureSuiteID  = "cbsicbsott,cbsicbsiall"
     this.ProductionOmnitureEvar5    = "cbsicbsott"
@@ -65,7 +66,7 @@ Function NewCbs() As Object
     this.ProductionConvivaKey       = "87a6b28bc7823e67a5bb2a0a6728c702afcae78d"
     
     this.NielsenAppID               = "PEEF1AF93-F59E-414A-96BE-DCE421E5C92D"
-    
+
     this.AkamaiDims                 = {
         device:     "Roku"
         playerID:   GetAppVersion()
@@ -74,7 +75,8 @@ Function NewCbs() As Object
     this.PhotoImageEndpoint         = "http://wwwimage.cbsstatic.com/thumbnails/photos/w[WIDTH]/"
     this.VideoImageEndpoint         = "http://wwwimage.cbsstatic.com/thumbnails/videos/w[WIDTH]/"
     
-    this.StreamUrl                  = "http://link.theplatform.com/s/dJ5BDC/[PID]?mbr=true&manifest=m3u&format=redirect&assetTypes=StreamPack%7COTT"
+    this.AccountPid                 = "dJ5BDC"
+    this.StreamUrl                  = "http://link.theplatform.com/s/dJ5BDC/[PID]?mbr=true&manifest=m3u&format=redirect&assetTypes=StreamPack%7COTT&sig=[SIGNATURE]"
     this.VmapUrl                    = "http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/8264/vaw-can/ott/cbs_roku_app&ciu_szs=300x60,300x250&impl=s&gdfp_req=1&env=vp&output=xml_vmap1&unviewed_position_start=1&url=&description_url=&correlator=[timestamp]&scor=[timestamp]&cmsid=2289&vid=[CONTENTID]"
     
     this.ApiKey                     = this.ProductionApiKey
@@ -84,6 +86,7 @@ Function NewCbs() As Object
     this.CodeAuthUrl                = this.ProductionCodeAuthUrl
     
     this.Initialize                 = Cbs_Initialize
+    this.GetConfiguration           = Cbs_GetConfiguration
     this.LoadDefaultContent         = Cbs_LoadDefaultContent
     
     this.Verify                     = Cbs_Verify
@@ -99,6 +102,7 @@ Function NewCbs() As Object
     this.GetTosText                 = Cbs_GetTosText
     this.GetLegalText               = Cbs_GetLegalText
     
+    this.GetCampaignAvailability    = Cbs_GetCampaignAvailability
     this.GetUpsellInfo              = Cbs_GetUpsellInfo
     this.GetCodeAuthUrl             = Cbs_GetCodeAuthUrl
     
@@ -124,6 +128,8 @@ Function NewCbs() As Object
     
     this.GetBigBrotherStreams       = Cbs_GetBigBrotherStreams
     this.GetBigBrotherStreamToken   = Cbs_GetBigBrotherStreamToken
+    
+    this.GetVideoStreamToken        = Cbs_GetVideoStreamToken
     
     this.GetFeaturedShows           = Cbs_GetFeaturedShows
     this.GetAllShows                = Cbs_GetAllShows
@@ -194,7 +200,19 @@ Function Cbs_Initialize(useStaging = False As Boolean) As Boolean
         'ConvivaLivePassInit(m.StagingConvivaKey)
         'ConvivaLivePassInstance().ToggleTraces(True)
     End If
+    m.GetConfiguration()
     Return m.Verify()
+End Function
+
+Function Cbs_GetConfiguration() as object
+    If m.Config = invalid Then
+        url = m.Endpoint + "v2.0/roku/configuration.json"
+        response = m.Request(url, "GET")
+        If IsAssociativeArray(response) And response.configs <> invalid Then
+            m.Config = response.configs
+        End If
+    End If
+    Return m.Config
 End Function
 
 Function Cbs_LoadDefaultContent() As Boolean
@@ -234,13 +252,14 @@ Function Cbs_IsAuthenticated(refresh = False As Boolean) As Boolean
     refresh = refresh Or IsNullOrEmpty(GetCookiesForUrl(m.Endpoint))
     token = Configuration().Get(m.AuthTokenKey, "")
     If Not IsNullOrEmpty(token) Then
+        cookie = GetCookie("CBS_COM", m.Endpoint)
+        refresh = refresh Or IsNullOrEmpty(cookie)
         If refresh Then
             If m.CheckLinkCode(token) Then
                 cookie = GetCookie("CBS_COM", m.Endpoint)
-                Return Not IsNullOrEmpty(cookie)
             End If
         End If
-        Return True
+        Return Not IsNullOrEmpty(cookie)
     End If
     Return False
 End Function
@@ -313,11 +332,28 @@ Function Cbs_GetLegalText() As String
     Return m.LegalText
 End Function
 
-Function Cbs_GetUpsellInfo(pageUrl = "ROKU_ALL_ACCESS_TRIAL" As String) As Object
+Function Cbs_GetCampaignAvailability(pageUrl = "CBS_ALL_ACCESS_PACKAGE" As String) As Object
+    url = m.Endpoint + "v3.0/roku/upsell/campaign/availability.json?pageURL=" + UrlEncode(pageUrl)
+    result = m.Request(url, "GET")
+    If IsAssociativeArray(result) And result.upsellCampaignAvailability <> invalid Then
+        creationTime = GetDeviceCreationTime()
+        For Each campaign In AsArray(result.upsellCampaignAvailability)
+            If campaign.liveDate / 1000 <= creationTime.AsSeconds() And campaign.expiresOn / 1000 > creationTime.AsSeconds() Then
+                Return campaign
+            End If
+        Next
+    End If
+    Return {}
+End Function
+
+Function Cbs_GetUpsellInfo(pageUrl = "ROKU_ALL_ACCESS_TRIAL" As String, campaign = "" As String) As Object
     url = m.Endpoint + "roku/upsell.json?pageURL=" + UrlEncode(pageUrl) 'ROKU_SIGN_UP_SCREEN" '
+    If Not IsNullOrEmpty(campaign) Then
+        url = url + "&upsellCampaign=" + UrlEncode(campaign)
+    End If
     result = m.Request(url, "GET")
     If IsAssociativeArray(result) And result.upsellInfo <> invalid Then
-        state = m.GetCurrentUser().State
+        state = m.GetCurrentUser().Status
         If IsNullOrEmpty(state) Then
             state = "ANONYMOUS"
         End If
@@ -658,6 +694,37 @@ Function Cbs_GetBigBrotherStreamToken(id As String, debug = False As Boolean) As
     response = m.Request(url, "GET")
     If IsAssociativeArray(response) Then
         Return AsString(response.token)
+    End If
+    Return ""
+End Function
+
+Function Cbs_GetVideoStreamToken(id As String) As String
+    url = m.Endpoint + "v3.0/roku/video/signature/individualize.json"
+    response = m.Request(url, "POST")
+    If IsAssociativeArray(response) And response.success = True Then
+        iv = response.iv
+        key = response.key
+        token = response.cbsToken
+        
+        postData = {}
+        postData["cbsToken"] = token
+        postData["pids"] = m.accountPid + "/" + id
+        url = m.Endpoint + "v3.0/roku/video/signature/generate.json"
+        response = m.Request(url, "POST", postData)
+        If IsAssociativeArray(response) And response.success = True Then
+            keyBytes = createObject("roByteArray")
+            keyBytes.fromAsciiString(key)
+            ivBytes = createObject("roByteArray")
+            ivBytes.fromAsciiString(iv)
+            encBytes = createObject("roByteArray")
+            encBytes.fromBase64String(response.token)
+            
+            cipher = createObject("roEVPCipher")
+            If cipher.Setup(False, "aes-128-cbc", keyBytes.toHexString(), ivBytes.toHexString(), 1) = 0 Then
+                decrypted = cipher.process(encBytes)
+                Return decrypted.ToAsciiString()
+            End If
+        End If
     End If
     Return ""
 End Function

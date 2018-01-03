@@ -127,6 +127,7 @@ Function GetUrlHeadersEx(url As String, timeout = 30 As Integer, headers = inval
     http.SetPort(CreateObject("roMessagePort"))
     http.SetUrl(url)
     http.EnableFreshConnection(True)
+    http.EnableCookies()
     If Not IsRokuOne() Then
         http.RetainBodyOnError(True)
         http.EnableEncodings(True)
@@ -195,6 +196,7 @@ Function GetUrlToStringEx(url As String, timeout = 30 As Integer, headers = inva
         http.SetUrl(url)
         http.SetRequest(method)
         http.EnableFreshConnection(True)
+        http.EnableCookies()
         If Not IsRokuOne() Then
             http.RetainBodyOnError(True)
             http.EnableEncodings(True)
@@ -259,6 +261,7 @@ Function GetUrlToStringAsync(url As String, headers = invalid As Object, certifi
     http.SetUrl(url)
     http.SetRequest(method)
     http.EnableFreshConnection(True)
+    http.EnableCookies()
     If Not IsRokuOne() Then
         http.RetainBodyOnError(True)
         http.EnableEncodings(True)
@@ -308,6 +311,7 @@ Function GetUrlToFileEx(url As String, path As String, timeout = 30 As Integer, 
     http.SetUrl(url)
     http.SetRequest(method)
     http.EnableFreshConnection(True)
+    http.EnableCookies()
     If Not IsRokuOne() Then
         http.RetainBodyOnError(True)
         http.EnableEncodings(True)
@@ -369,6 +373,7 @@ Function GetUrlToFileAsync(url As String, path As String, headers = invalid As O
     http.SetUrl(url)
     http.SetRequest(method)
     http.EnableFreshConnection(True)
+    http.EnableCookies()
     If Not IsRokuOne() Then
         http.RetainBodyOnError(True)
         http.EnableEncodings(True)
@@ -417,6 +422,7 @@ Function PostUrlToStringEx(url As String, postData = "" As String, timeout = 30 
     http.SetUrl(url)
     http.SetRequest(method)
     http.EnableFreshConnection(True)
+    http.EnableCookies()
     If Not IsRokuOne() Then
         http.RetainBodyOnError(True)
         http.EnableEncodings(True)
@@ -477,6 +483,7 @@ Function PostUrlToStringAsync(url As String, postData = "" As String, headers = 
     http.SetUrl(url)
     http.SetRequest(method)
     http.EnableFreshConnection(True)
+    http.EnableCookies()
     If Not IsRokuOne() Then
         http.RetainBodyOnError(True)
         http.EnableEncodings(True)
@@ -600,7 +607,6 @@ Function GetBitmapFromUrlAsync(url As String, extension = "" As String) As Strin
 End Function
 
 Function GetUrlToJsonEx(url As String, timeout = 30 As Integer, headers = invalid As Object, certificates = "common:/certs/ca-bundle.crt" As String, certificatesDepth = -1 As Integer, method = "GET" As String) As Dynamic
-    xml = CreateObject("roXmlElement")
     response = GetUrlToStringEx(url, timeout, headers, certificates, certificatesDepth, method)
     If response <> invalid Then
         response.Json = invalid
@@ -619,7 +625,6 @@ Function GetUrlToJson(url As String, timeout = 30 As Integer, headers = invalid 
 End Function
 
 Function PostUrlToJsonEx(url As String, postData = "" As String, timeout = 30 As Integer, headers = invalid As Object, certificates = "common:/certs/ca-bundle.crt" As String, certificatesDepth = -1 As Integer, method = "POST" As String, requireCertVerification = True As Boolean) As Dynamic
-    xml = CreateObject("roXmlElement")
     response = PostUrlToStringEx(url, postData, timeout, headers, certificates, certificatesDepth, method, requireCertVerification)
     If response <> invalid Then
         If Not IsNullOrEmpty(response.Response) Then

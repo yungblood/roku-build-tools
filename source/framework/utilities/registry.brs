@@ -6,12 +6,6 @@
 '=====================
 ' Registry
 '=====================
-Function IsRegistryAvailable() As Boolean
-    ' Used for testing availability in the current thread
-    reg = CreateObject("roRegistry")
-    Return reg <> invalid
-End Function
-
 Function RegRead(key as String, section = invalid As Dynamic) As Dynamic
     If section = invalid Then section = "Default"
     reg = CreateObject("roRegistrySection", section)
@@ -77,6 +71,14 @@ Function GetStringArrayRegistryValue(key As String, default As Object, section A
     Return value.Tokenize(separator)
 End Function
 
+Function GetAssocArrayRegistryValue(key As String, default As Object, section As String) As Object
+    value = GetRegistryValue(key, "", section)
+    If IsNullOrEmpty(value) Then
+        Return default
+    End If
+    Return ParseJson(value)
+End Function
+
 Sub SetRegistryValue(key As String, value As Dynamic, section As String)
     RegWrite(key, AsString(value), section)
 End Sub
@@ -98,6 +100,10 @@ Sub SetStringArrayRegistryValue(key As String, value As Object, section As Strin
         valueString = valueString + item
     Next
     SetRegistryValue(key, valueString, section)
+End Sub
+
+Sub SetAssocArrayRegistryValue(key As String, value As Object, section As String)
+    SetRegistryValue(key, FormatJson(value), section)
 End Sub
 
 Sub DeleteRegistryValue(key As String, section As String)

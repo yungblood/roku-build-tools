@@ -168,6 +168,7 @@ Function Show_GetDynamicPlayEpisode() As Object
     hdPoster = invalid
     sdPoster = invalid
     episode = Cbs().GetCurrentUser().GetRecentlyWatchedForShow(m.ID)
+    title = ""
     If episode <> invalid Then
         If episode.IsFullyWatched() Then
             episode = episode.GetNextEpisode()
@@ -176,6 +177,7 @@ Function Show_GetDynamicPlayEpisode() As Object
                     ' Ensure the "next episode" is from the same show
                     hdPoster = "pkg:/images/icon_watchnext_hd.png"
                     sdPoster = "pkg:/images/icon_watchnext_sd.png"
+                    title = "Watch next"
                 Else
                     episode = invalid
                 End If
@@ -183,6 +185,7 @@ Function Show_GetDynamicPlayEpisode() As Object
         Else
             hdPoster = "pkg:/images/icon_continuewatching_hd.jpg"
             sdPoster = "pkg:/images/icon_continuewatching_sd.jpg"
+            title = "Continue watching"
         End If
     End If
     If episode = invalid Then
@@ -198,15 +201,18 @@ Function Show_GetDynamicPlayEpisode() As Object
         If m.Category = "Classics" Then
             hdPoster = "pkg:/images/icon_watchfirst_hd.png"
             sdPoster = "pkg:/images/icon_watchfirst_sd.png"
+            title = "Watch first episode"
         Else
             hdPoster = "pkg:/images/icon_watchlatest_hd.png"
             sdPoster = "pkg:/images/icon_watchlatest_sd.png"
+            title = "Watch latest"
         End If
     End If
     
     If episode <> invalid Then
         dynamicPlay = {}
         dynamicPlay.Append(episode)
+        dynamicPlay.Title = title
         dynamicPlay.ID = "dynamicPlay"
         dynamicPlay.HDPosterUrl = hdPoster
         dynamicPlay.SDPosterUrl = sdPoster

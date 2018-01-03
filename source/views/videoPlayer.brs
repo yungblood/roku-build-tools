@@ -7,14 +7,15 @@ Function NewVideoPlayer() As Object
     this.PauseTimer                 = CreateObject("roTimespan")
     this.Position                   = 0
     this.AdCount                    = 0
+    this.AdPodIndex                 = 1
     this.ResumingAfterAd            = False
     this.IsResume                   = False
     
     this.History                    = []
     
     this.LiveTimedOut               = False
-    this.LiveTimeout                = 2 * 60 * 60 * 1000 ' 2 hours
-    this.LiveCTATimeout             = 5 * 60 * 1000      ' 5 minutes
+    this.LiveTimeout                = 2 * 60 * 60 ' 2 hours
+    this.LiveCTATimeout             = 5 * 60      ' 5 minutes
     
     this.Akamai                     = AkaMA_plugin()
     this.StreamSense                = CSStreamingTag()
@@ -25,7 +26,7 @@ Function NewVideoPlayer() As Object
     this.PlayedAdDuration           = 0
 
     ' Seconds to add to ad break positions
-    this.AdPositionOffset           = 1
+    this.AdPositionOffset           = 0 '1
     
     this.Initialize                 = VideoPlayer_Initialize
     this.Play                       = VideoPlayer_Play
@@ -92,6 +93,7 @@ Function VideoPlayer_Play(episodeOrChannel As Object, resume = False As Boolean,
     End If
     
     m.Canvas.SetLayer(0, { Color: "#000000" })
+    m.Canvas.SetLayer(1, { Text: "Please wait..." })
     m.Canvas.Show()
     
     ' Clear the next episode data
@@ -138,21 +140,28 @@ Function VideoPlayer_Play(episodeOrChannel As Object, resume = False As Boolean,
         ' This will be used in OnBeforeNewContent to initialize the Conviva session
         convivaTags = {}
         convivaTags["category"]             = AsString(m.Content.TopLevelCategory)
-        convivaTags["contentId"]            = AsString(m.Content.ContentID)
+        convivaTags["contentId"]            = IIf(m.Content.ClassName = "Channel", AsString(m.Content.MediaID), AsString(m.Content.ContentID))
         convivaTags["contentType"]          = IIf(stream.Live = True, "Live", "VOD")
-        convivaTags["show"]                 = AsString(m.Content.ShowName)
-        convivaTags["site"]                 = AsString(isAutoPlay)
+        convivaTags["isEpisode"]            = IIf(IsFunction(m.Content.IsFullEpisode) And m.Content.IsFullEpisode() = True, "true", "false")
+        convivaTags["site"]                 = IIf(stream.Live = True, "false", AsString(isAutoPlay))
         convivaTags["connectionType"]       = IIf(GetEthernetInterface() = "eth0", "Ethernet", "WiFi")
-        convivaTags["playerVersion"]        = GetAppVersion()
-        convivaTags["accessType"]           = IIf(Cbs().IsAuthenticated(), IIf(Cbs().IsSubscribed(), "Premium", "Authenticated"), "Free")
+        convivaTags["Player_Version"]       = GetAppVersion()
+        convivaTags["accessType"]           = Cbs().GetCurrentUser().GetStatusForTracking()
+        If stream.Live <> True Then
+            convivaTags["seriesTitle"]      = AsString(m.Content.ShowName)
+        End If
+        convivaTags["episodeName"]          = AsString(m.Content.TrackingTitle)
     
         m.ConvivaMetadata = ConvivaContentInfo(m.Content.GetConvivaName(), convivaTags)
-        m.ConvivaMetadata["streamUrl"]        = stream.Stream.Url
-        m.ConvivaMetadata["streamFormat"]     = "hls"
-        m.ConvivaMetadata["contentLength"]    = m.Content.Length
-        m.ConvivaMetadata["isLive"]           = stream.Live = True
-        m.ConvivaMetadata["playerName"]       = "CBSAllAccess Roku"
-        m.ConvivaMetadata["viewerId"]         = Cbs().GetCurrentUser().ID
+        m.ConvivaMetadata["streamUrl"]      = stream.Stream.Url
+        m.ConvivaMetadata["streamFormat"]   = "hls"
+        m.ConvivaMetadata["contentLength"]  = m.Content.Length
+        m.ConvivaMetadata["isLive"]         = stream.Live = True
+        m.ConvivaMetadata["playerName"]     = "ROKU"
+        m.ConvivaMetadata["viewerId"]       = Cbs().GetCurrentUser().ID
+
+        m.ConvivaMetadata["defaultReportingCdnName"]    = "AKAMAI"
+        m.ConvivaMetadata["defaultReportingResource"]   = "AKAMAI"
         
         
         m.PlayerID = MD5Hash(GetDeviceID() + AsString(NowDate().AsSeconds()))
@@ -162,6 +171,13 @@ Function VideoPlayer_Play(episodeOrChannel As Object, resume = False As Boolean,
             Omniture().TrackPage("app:roku:video player")
         Else If m.Content.ClassName = "Channel" Or m.Content.ClassName = "LiveFeed" Then
             Omniture().TrackPage("app:roku:live:video player")
+            
+            config = Cbs().GetConfiguration()
+            If m.Content.ClassName = "LiveFeed" Then
+                m.LiveTimeout = AsInteger(config.playback_timeout_bblf, m.LiveTimeout) * 1000
+            Else
+                m.LiveTimeout = AsInteger(config.playback_timeout_live_tv, m.LiveTimeout) * 1000
+            End If
         End If
 
         m.Screen.EnableTrickPlay(stream.Live <> True)
@@ -175,7 +191,7 @@ Function VideoPlayer_Play(episodeOrChannel As Object, resume = False As Boolean,
             ShowMessageBox("Content Unavailable", "The content you are trying to play is currently unavailable. Please try again later.", ["OK"], True)
         End If
     End If
-    m.Canvas.Close()
+'    m.Canvas.Close()
     Return False
 End Function
 
@@ -188,8 +204,13 @@ Function VideoPlayer_PlayAd(adPods As Object, resumePosition As Integer, stream 
 
     ' Let comScore know we're playing an ad
     m.StreamSense.PlayAdvertisement()
-
-    If m.Raf.showAds(adPods)
+    
+    m.AdPods = adPods
+    m.AdPodPosition = "Mid-roll"
+    ConvivaLivePassInstance().detachStreamer()
+    adSuccess = m.Raf.showAds(adPods)
+    ConvivaLivePassInstance().attachStreamer(m.Screen.Screen)
+    If adSuccess Then
         stream.PlayStart = resumePosition
         ' Set the resuming after ad flag, so we don't track the start event again
         m.ResumingAfterAd = True
@@ -242,6 +263,7 @@ End Function
 
 Function VideoPlayer_OnBeforeNewContent(eventData As Object, callbackData As Object) As Boolean
     If Not m.ResumingAfterAd Then
+        m.Canvas.Show()
         stream = eventData.Item
         response = GetUrlToStringEx(stream.Stream.Url)
         If response <> invalid Then
@@ -256,6 +278,14 @@ Function VideoPlayer_OnBeforeNewContent(eventData As Object, callbackData As Obj
         If AsInteger(stream.PlayStart) > 0 And stream.Live <> True Then
             m.Position = stream.PlayStart
         End If
+
+        ' Create the Conviva session
+        If m.ConvivaSession <> invalid Then
+            ConvivaLivePassInstance().CleanupSession(m.ConvivaSession)
+            m.ConvivaSession = invalid
+        End If    
+        m.ConvivaSession = ConvivaLivePassInstance().createSession(invalid, m.ConvivaMetadata, 1)
+
         If Not IsNullOrEmpty(stream.VmapUrl) Then
             vmapUrl = Replace(stream.VmapUrl, "[timestamp]", NowDate().AsSeconds().ToStr())
             vmapUrl = AddQueryString(vmapUrl, "ppid", AsString(Cbs().GetCurrentUser().Ppid))
@@ -282,7 +312,13 @@ Function VideoPlayer_OnBeforeNewContent(eventData As Object, callbackData As Obj
                         ' Let comScore know we're playing an ad
                         m.StreamSense.PlayAdvertisement()
                         
-                        If Not m.Raf.ShowAds(adPods) Then
+                        m.AdPodIndex = 1
+                        m.AdPodPosition = "Pre-roll"
+                        m.AdPods = adPods
+                        ConvivaLivePassInstance().adStart()
+                        adSuccess = m.Raf.ShowAds(adPods)
+                        ConvivaLivePassInstance().adEnd()
+                        If Not adSuccess Then
                             ' The user exited the ad, so call the close event, and return false
                             m.OnClose(invalid, invalid)
                             Return False
@@ -291,13 +327,7 @@ Function VideoPlayer_OnBeforeNewContent(eventData As Object, callbackData As Obj
                 End If
             End If
         End If
-
-        ' Create the Conviva session
-        If m.ConvivaSession <> invalid Then
-            ConvivaLivePassInstance().CleanupSession(m.ConvivaSession)
-            m.ConvivaSession = invalid
-        End If    
-        m.ConvivaSession = ConvivaLivePassInstance().createSession(invalid, m.ConvivaMetadata, 1)
+        ConvivaLivePassInstance().attachStreamer(m.Screen.Screen)
 
         ' Record the play time
         PlayTimes().SetPlayTime(m.Content.ID)
@@ -393,8 +423,12 @@ Sub VideoPlayer_OnComplete(eventData As Object, callbackData As Object)
                 Next
             End If
 
+            m.AdPodPosition = "Post-roll"
+            m.AdPods = adPods
             ' We don't want to autoplay if the user exits the post-roll
-            autoPlay = m.Raf.ShowAds(adPods) And autoPlay
+            ConvivaLivePassInstance().detachStreamer()
+            adSuccess = m.Raf.ShowAds(adPods)
+            autoPlay = adSuccess And autoPlay
         End If
     End If
     
@@ -596,6 +630,19 @@ Sub VideoPlayer_OnAdStart(eventData As Object)
     m.AdCount = m.AdCount + 1
     DW().PlayerAdStart(eventData.Ad, eventData.PodIndex + 1, eventData.AdIndex, m.AdCount, m.Content, m.GetPlayerPosition(True), m.GetPlayerPosition(False))
     
+    adPods = m.AdPods
+    If IsArray(adPods) Then
+        adPods = adPods[0]
+    End If
+    If eventData.AdIndex = 1 Then
+        ' Track the pod start
+        attr = {}
+        attr["podDuration"] = AsString(adPods.Duration)
+        attr["podPosition"] = m.AdPodPosition
+        attr["podIndex"] = AsString(m.AdPodIndex)
+        ConvivaLivePassInstance().SendSessionEvent(m.ConvivaSession, "Conviva.PodStart", attr)
+    End If
+    
     ad = eventData.Ad
     ' TODO: Currently Akamai only supports pre-rolls
     If m.Position = 0 And ad <> invalid Then
@@ -635,6 +682,22 @@ End Sub
 Sub VideoPlayer_OnAdComplete(eventData As Object)
     ad = eventData.Ad
     DW().PlayerAdEnd(ad, AsInteger(ad.Duration) - 1, eventData.PodIndex + 1, eventData.AdIndex, m.AdCount, m.Content, m.GetPlayerPosition(True), m.GetPlayerPosition(False))
+    
+    adPods = m.AdPods
+    If IsArray(adPods) Then
+        adPods = adPods[0]
+    End If
+    If eventData.AdIndex = adPods.Ads.Count() Then
+        ' Track the pod end
+        attr = {}
+        attr["podDuration"] = AsString(adPods.Duration)
+        attr["podPosition"] = m.AdPodPosition
+        attr["podIndex"] = AsString(m.AdPodIndex)
+        ConvivaLivePassInstance().SendSessionEvent(m.ConvivaSession, "Conviva.PodEnd", attr)
+
+        ' HACK: RAF doesn't tell us what the pod index is, so we just count the ad plays
+        m.AdPodIndex = m.AdPodIndex + 1
+    End If
     
     ' TODO: Currently Akamai only supports pre-rolls
     If m.Position = 0 And ad <> invalid Then
