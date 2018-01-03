@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="UpsellInfo" extends="ContentNode">
+    <script type="text/brightscript" uri="pkg:/components/models/upsellInfo.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/arrays.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/debug.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/components/channelStore.brs" />
+    <interface>
+        <field id="json" type="assocarray" onChange="onJsonChanged" />
+        
+        <field id="productCode" type="string" />
+        <field id="product" type="assocarray" />
+        <field id="campaign" type="string" />
+        <field id="showID" type="string" />
+        <field id="videoID" type="string" />
+
+        <field id="logoUrl" type="string" />
+
+        <field id="liveDate" type="time" />
+        <field id="expireDate" type="time" />
+
+        <field id="message1" type="string" />
+        <field id="message2" type="string" />
+        <field id="message3" type="string" />
+        
+        <field id="frequency" type="integer" />
+        
+        <field id="actionType" type="string" />
+        <field id="actionTarget" type="string" />
+        <field id="callToAction" type="string" />
+        <field id="callToActionUrl" type="string" />
+        <field id="userStates" type="stringarray" />
+        
+        <field id="disabled" type="boolean" />
+
+        <field id="omnitureData" type="assocarray" />
+    </interface>
+</component>

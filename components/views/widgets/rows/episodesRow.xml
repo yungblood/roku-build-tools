@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="EpisodesRow" extends="BaseRow">
+    <script type="text/brightscript" uri="pkg:/components/views/widgets/rows/episodesRow.brs" />
+    <interface>
+    </interface>
+    <children>
+        <Label
+            id="rowTitle"
+            translation="[100,-10]"
+            text=""
+            color="0x999999ff">
+           <Font
+               role="font"
+               size="40"
+               uri="pkg:/fonts/Lato-Regular.ttf" />
+        </Label>
+        <Rectangle
+            id="scrollRect"
+            translation="[100,58]"
+            color="0x00000000">
+            <FocusLayoutGroup
+                id="list"
+                layoutDirection="horiz"
+                itemSpacings="[10]" />
+            <Poster
+                id="focusFrame"
+                uri="pkg:/images/frame_grid.9.png"
+                width="409"
+                height="230"
+                visible="false" />
+        </Rectangle>
+        <Animation
+            id="scrollAnimation"
+            duration="0.3"
+            delay="0"
+            repeat="false">
+            <Vector2DFieldInterpolator
+                id="scrollInterp"
+                key="[0,1]"
+                keyValue="[[0,0],[0,0]]"
+                fieldToInterp="scrollRect.translation" />
+        </Animation>
+    </children>
+</component>

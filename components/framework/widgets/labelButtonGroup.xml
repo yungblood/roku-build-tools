@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="LabelButtonGroup" extends="LayoutGroup">
+	<script type="text/brightscript" uri="pkg:/components/framework/widgets/labelButtonGroup.brs" />
+	<interface>
+        <field id="buttonSelected" type="integer" alwaysNotify="true" />
+        <field id="buttonFocused" type="integer" value="-1" alwaysNotify="true" />
+        <field id="buttonUnfocused" type="integer" value="-1" alwaysNotify="true" />
+        <field id="jumpToIndex" type="integer" onChange="jumpToIndex" alwaysNotify="true" />
+        <field id="jumpToButton" type="string" onChange="jumpToButton" alwaysNotify="true" />
+        
+        <field id="wrap" type="boolean" />
+	</interface>
+</component>
+    

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="FocusLayoutGroup" extends="LayoutGroup">
+	<script type="text/brightscript" uri="pkg:/components/framework/widgets/focusLayoutGroup.brs" />
+	<interface>
+        <field id="itemFocused" type="integer" value="-1" alwaysNotify="true" />
+        <field id="itemUnfocused" type="integer" value="-1" alwaysNotify="true" />
+        <field id="itemSelected" type="integer" value="-1" alwaysNotify="true" />
+        <field id="jumpToIndex" type="integer" onChange="jumpToIndex" alwaysNotify="true" />
+
+        <field id="pageSize" type="integer" value="4" />
+        
+        <field id="wrap" type="boolean" />
+        <field id="allowPaging" type="boolean" value="true" />
+        <field id="processKeyEvents" type="boolean" value="true" />
+	</interface>
+    <children>
+    </children>
+</component>
+    

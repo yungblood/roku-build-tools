@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="TextEntryHandler" extends="TextEditBox">
+    <script type="text/brightscript" uri="pkg:/components/framework/widgets/textEntryHandler.brs" />
+</component>

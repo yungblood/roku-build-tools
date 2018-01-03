@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="ContinuousPlayInfo" extends="ContentNode">
+    <script type="text/brightscript" uri="pkg:/components/models/continuousPlayInfo.brs" />
+    <interface>
+        <field id="episode" type="node" />
+        <field id="videos" type="nodearray" />
+    </interface>
+</component>

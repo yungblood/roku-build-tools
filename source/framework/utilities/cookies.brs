@@ -231,3 +231,13 @@ Sub ParseCookieHeaders(url As String, headerArray As Object)
         End If
     Next
 End Sub
+
+function parseCookies(cookieString as string) as object
+    cookies = {}
+    cookieStrings = cookieString.split(";")
+    for each cookie in cookieStrings
+        cookieParts = cookie.split("=")
+        cookies[cookieParts[0].trim()] = cookieParts[1]
+    next
+    return cookies
+end function

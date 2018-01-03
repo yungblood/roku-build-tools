@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="HorizontalKeyboard" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/framework/widgets/keyboards/horizontalKeyboard.brs" />
+
+    <interface>
+        <field id="text" type="string" alias="textbox.text" />
+        
+        <field id="letters" type="string" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ" />
+        <field id="numbers" type="string" value="0123456789" />
+        
+        <field id="textboxHeight" type="float" alias="textbox.height" />
+        <field id="textboxPadding" type="float" alias="textbox.padding" />
+        <field id="textboxTextColor" type="color" alias="textbox.textColor" />
+        <field id="textboxFont" type="node" alias="textbox.textFont" />
+        <field id="textboxBackgroundUri" type="string" alias="textbox.backgroundUri" />
+        <field id="textboxBackgroundBlendColor" type="string" alias="textbox.backgroundBlendColor" />
+
+        <field id="keyBackgroundColor" type="color" value="0x00000000" />
+        <field id="keyFocusedBackgroundColor" type="color" value="0xccccccff" />
+        <field id="keyFont" type="node" />
+        <field id="keyTextColor" type="color" value="0x808080ff" />
+        <field id="keyFocusedTextColor" type="color" value="0x2b2b2bff" />
+        <field id="keyWidth" type="float" value="66" />
+        <field id="keyHeight" type="float" value="76" />
+        <field id="keySpacing" type="float" value="-10" />
+    </interface>
+    
+    <children>
+        <LayoutGroup
+            layoutDirection="vert"
+            itemSpacings="[-10]"
+            horizAlignment="center">
+            <TextBox
+                id="textbox"
+                height="60"
+                textColor="0x2b2b2bff" />
+            <Rectangle
+                id="spacer"
+                width="1"
+                height="1"
+                color="0x00000000" />
+            <FocusLayoutGroup
+                id="letters"
+                layoutDirection="horiz"
+                itemSpacings="[0]"
+                horizAlignment="center"
+                wrap="true" />
+            <FocusLayoutGroup
+                id="numbers"
+                layoutDirection="horiz"
+                itemSpacings="[0]"
+                horizAlignment="center"
+                wrap="true" />
+        </LayoutGroup>
+    </children>
+</component>

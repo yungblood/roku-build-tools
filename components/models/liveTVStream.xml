@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="LiveTVStream" extends="ContentNode">
+    <interface>
+        <field id="station" type="node" />
+    </interface>
+</component>

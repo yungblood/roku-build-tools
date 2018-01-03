@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="LoadFavoritesTask" extends="ApiTask">
+    <script type="text/brightscript" uri="pkg:/components/tasks/favorites/loadFavoritesTask.brs" />
+    <interface>
+        <field id="favorites" type="nodearray" alwaysNotify="true" />
+    </interface>
+</component>

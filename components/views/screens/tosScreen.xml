@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="TOSScreen" extends="BaseScreen">
+    <script type="text/brightscript" uri="pkg:/components/views/screens/tosScreen.brs" />
+    <interface>
+        <field id="productCode" type="string" />
+        <field id="accountDetails" type="assocarray" />
+        <field id="buttonSelected" type="string" alwaysNotify="true" />
+    </interface>
+    <children>
+        <Font
+            id="buttonFont"
+            size="32"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+          <Font
+              id="focusedButtonFont"
+            size="32" 
+              uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="textFont"
+            size="28" 
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Label
+            translation="[0,100]"
+            width="1920"
+            horizAlign="center"
+            text="Terms of Service"
+            color="0xe5e5e5ff">
+              <Font
+                  role="font"
+                  uri="pkg:/fonts/Lato-Bold.ttf"
+                  size="50" />
+        </Label>
+        <Rectangle
+            translation="[180,180]"
+            width="1560"
+            height="645"
+            color="0xffffff11" />
+        <Rectangle
+            id="textFocus"
+            translation="[180,180]"
+            width="1560"
+            height="645"
+            color="0xffffff11"
+            visible="false" />
+        
+        <ScrollableText
+            id="text"
+            translation="[200,200]"
+            width="1520"
+            height="605"
+            color="0xffffff99"
+            lineSpacing="0"
+            font="dictionary:textFont" />
+
+        <LabelButtonGroup
+            id="buttons"
+            translation="[1740,850]"
+            layoutDirection="horiz"
+            itemSpacings="[20]"
+            horizAlignment="right">
+            <LabelButton
+                id="cancel"
+                width="400"
+                height="88"
+                text="Cancel"
+                textColor="0xffffffff"
+                focusedTextColor="0xffffffff"
+                backgroundUri="pkg:/images/upsell_button.9.png"
+                focusedBackgroundUri="pkg:/images/upsell_button_focused.9.png"
+                font="dictionary:buttonFont"
+                focusedFont="dictionary:focusedButtonFont"
+                processKeyEvents="false" />
+            <LabelButton
+                id="agree"
+                width="400"
+                height="88"
+                text="I Agree"
+                textColor="0xffffffff"
+                focusedTextColor="0xffffffff"
+                backgroundUri="pkg:/images/upsell_button.9.png"
+                focusedBackgroundUri="pkg:/images/upsell_button_focused.9.png"
+                font="dictionary:buttonFont"
+                focusedFont="dictionary:focusedButtonFont"
+                processKeyEvents="false" />
+        </LabelButtonGroup>
+    </children>
+</component>

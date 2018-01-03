@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="LoadSearchResultsTask" extends="ApiTask">
+    <script type="text/brightscript" uri="pkg:/components/tasks/loadSearchResultsTask.brs" />
+    <interface>
+        <field id="searchTerm" type="string" />
+        <field id="results" type="node" />
+    </interface>
+</component>

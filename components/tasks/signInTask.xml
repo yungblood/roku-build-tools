@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="SignInTask" extends="ApiTask">
+    <script type="text/brightscript" uri="pkg:/components/tasks/signInTask.brs" />
+    <script type="text/brightscript" uri="pkg:/components/services/syncbak.brs" />
+    <interface>
+        <field id="authToken" type="string" />
+        <field id="username" type="string" />
+        <field id="password" type="string" />
+        <field id="signedIn" type="boolean" alwaysNotify="true" />
+    </interface>
+</component>

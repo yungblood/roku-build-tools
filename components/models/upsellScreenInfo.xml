@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="UpsellScreenInfo" extends="ContentNode">
+    <script type="text/brightscript" uri="pkg:/components/models/upsellScreenInfo.brs" />
+    <interface>
+        <field id="backgroundInfo" type="node" />
+        <field id="options" type="nodearray" />
+        <field id="buttons" type="stringarray" />
+    </interface>
+</component>

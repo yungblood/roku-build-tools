@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="SubscriptionOptionButton" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/views/widgets/subscriptionOptionButton.brs" />
+    
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <interface>
+        <field id="width" type="float" onChange="updateLayout" />
+        <field id="height" type="float" onChange="updateLayout" />
+        <field id="title" type="string" alias="title.text" />
+        <field id="subtitle" type="string" alias="subtitle.text" />
+        <field id="cta" type="string" alias="cta.text" />
+        <!-- field id="disclaimer" type="string" alias="disclaimer.text" / -->
+        
+        <field id="disabled" type="boolean" />
+        <field id="upsellInfo" type="node" onChange="onUpsellInfoChanged" />
+        
+        <field id="processKeyEvents" type="boolean" value="true" alwaysNotify="true" />
+        <field id="buttonSelected" type="boolean" alwaysNotify="true" />
+    </interface>
+    <children>
+        <Font
+            id="titleFont"
+            size="68"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="subtitleFont"
+            size="43"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="ctaFont"
+            size="32"
+            uri="pkg:/fonts/Lato-Bold.ttf" />
+        <Font
+            id="disclaimerFont"
+            size="24"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Rectangle
+            id="backgroundRect"
+            color="0x000000ff"
+            opacity=".65" />
+        <Poster
+            id="background"
+            uri="pkg:/images/upsell_button.9.png" />
+        <Poster
+            id="focusedBackground"
+            uri="pkg:/images/upsell_button_focused.9.png"
+            visible="false" />
+        <LayoutGroup
+            id="content"
+            layoutDirection="vert"
+            itemSpacings="[30]"
+            horizAlignment="center"
+            vertAlignment="center">
+            <Label
+                id="title"
+                color="0xffffffff"
+                horizAlign="center"
+                lineSpacing="-20"
+                wrap="true"
+                text=""
+                font="dictionary:titleFont" />
+            <Label
+                id="subtitle"
+                color="0xbab9b9ff"
+                horizAlign="center"
+                lineSpacing="-10"
+                wrap="true"
+                text=""
+                font="dictionary:subtitleFont" />
+            <Label
+                id="cta"
+                color="0xffffffff"
+                horizAlign="center"
+                wrap="false"
+                text=""
+                font="dictionary:ctaFont" />
+<!--             <Label -->
+<!--                 id="disclaimer" -->
+<!--                 width="575" -->
+<!--                 color="0xbab9b9ff" -->
+<!--                 horizAlign="center" -->
+<!--                 lineSpacing="0" -->
+<!--                 wrap="true" -->
+<!--                 text="" -->
+<!--                 font="dictionary:disclaimerFont" /> -->
+        </LayoutGroup>
+    </children>
+</component>

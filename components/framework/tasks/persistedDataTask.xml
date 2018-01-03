@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="PersistedDataTask" extends="Task">
+    <script type="text/brightscript" uri="pkg:/components/framework/tasks/persistedDataTask.brs" />
+    <script type="text/brightscript" uri="pkg:/components/framework/utilities/persistedData.brs" />
+    
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/registry.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+
+    <interface>
+        <field id="mode" type="string" onChange="onModeChanged"/>
+    </interface>
+</component>

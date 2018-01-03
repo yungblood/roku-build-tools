@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="ShowInfoTile" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/views/widgets/tiles/showInfoTile.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    <interface>
+        <field id="show" type="node" onChange="onShowChanged" />
+        <field id="buttonSelected" type="string" alwaysNotify="true" />
+    </interface>
+    <children>
+        <Label
+            id="title"
+            horizAlign="right"
+            vertAlign="bottom"
+            width="550"
+            height="237"
+            wrap="true"
+            lineSpacing="0"
+            color="0xffffffff">
+            <Font
+                role="font"
+                size="42"
+                uri="pkg:/fonts/Lato-Regular.ttf" />
+        </Label>
+        <Label
+            id="airtime"
+            translation="[0,229]"
+            horizAlign="right"
+            vertAlign="bottom"
+            width="550"
+            height="45"
+            color="0xffffffff">
+            <Font
+                role="font"
+                size="26"
+                uri="pkg:/fonts/Lato-Regular.ttf" />
+        </Label>
+        <LabelButtonGroup
+            id="buttons"
+            translation="[550,343]"
+            layoutDirection="horiz"
+            itemSpacings="[45]"
+            horizAlignment="right"
+            vertAlignment="bottom">
+            <LabelButton
+                id="showInfo"
+                width="60"
+                height="70"
+                foregroundUri="pkg:/images/icon-info-unselected-unfocused.png"
+                foregroundImageWidth="45"
+                foregroundImageHeight="45"
+                focusedForegroundUri="pkg:/images/icon-info-unselected-focused.png"
+                focusedForegroundImageWidth="45"
+                focusedForegroundImageHeight="45"
+                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png" />
+            <LabelButton
+                id="favorite"
+                width="66"
+                height="70"
+                foregroundUri="pkg:/images/icon-fav-unselected-unfocused.png"
+                foregroundImageWidth="51"
+                foregroundImageHeight="48"
+                focusedForegroundUri="pkg:/images/icon-fav-unselected-focused.png"
+                focusedForegroundImageWidth="51"
+                focusedForegroundImageHeight="48"
+                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png" />
+        </LabelButtonGroup>
+    </children>
+</component>

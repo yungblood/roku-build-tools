@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="DateDialog" extends="Dialog">
+    <script type="text/brightscript" uri="pkg:/components/framework/widgets/dateDialog.brs" />
+    <interface>
+        <field id="text" type="string" />
+    </interface>
+</component>

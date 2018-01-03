@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="User" extends="ContentNode">
+    <script type="text/brightscript" uri="pkg:/components/models/user.brs" />
+
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <interface>
+        <field id="json" type="assocarray" onChange="onJsonChanged" />
+        
+        <field id="ppid" type="string" />
+        <field id="firstName" type="string" />
+        <field id="lastName" type="string" />
+        <field id="fullName" type="string" />
+        <field id="gender" type="string" />
+        
+        <field id="status" type="string" value="ANONYMOUS" />
+        
+        <field id="isSubscriber" type="boolean" />
+        <field id="isRokuSubscriber" type="boolean" />
+        <field id="packageName" type="string" />
+        <field id="eligibleProducts" type="assocarray" onChange="onEligibleProductsChanged" />
+        <field id="canUpgrade" type="boolean" />
+        <field id="canDowngrade" type="boolean" />
+        
+        <field id="trackingProduct" type="string" />
+        <field id="trackingStatus" type="string" value="sb|0" />
+        <field id="adStatus" type="string" />
+
+        <field id="favorites" type="node" />
+        <field id="recentlyWatched" type="node" />
+    </interface>
+</component>

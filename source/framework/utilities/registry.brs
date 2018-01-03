@@ -6,6 +6,12 @@
 '=====================
 ' Registry
 '=====================
+function isRegistryAvailable() as boolean
+    ' Used for testing availability in the current thread
+    reg = createObject("roRegistry")
+    return reg <> invalid
+end function
+
 Function RegRead(key as String, section = invalid As Dynamic) As Dynamic
     If section = invalid Then section = "Default"
     reg = CreateObject("roRegistrySection", section)
@@ -115,3 +121,12 @@ Sub DeleteRegistrySection(section As String)
     registry.Delete(section)
     registry.Flush()
 End Sub
+
+function getRegistryKeys(section As String) as object
+    reg = CreateObject("roRegistrySection", section)
+    if reg <> invalid then
+        return reg.getKeyList()
+    end if
+    return []
+end function
+

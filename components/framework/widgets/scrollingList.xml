@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ScrollingList" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/framework/widgets/scrollingList.brs" />
+    
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <interface>
+        <field id="width" type="integer" onChange="updateLayout" />
+        <field id="height" type="integer" onChange="updateLayout" />
+
+        <field id="numItems" type="integer" onChange="onNumItemsChanged" />
+        <field id="leadingPlaceholders" type="integer" onChange="onLeadingPlaceholdersChanged" />
+        <field id="trailingPlaceholders" type="integer" />
+
+        <field id="itemComponentName" type="string" />
+        <field id="content" type="node" onChange="onContentChanged" />
+        <field id="itemSize" type="vector2d" value="[100,100]" onChange="onItemSizeChanged" />
+        <field id="itemSpacing" type="integer" value="0" />
+        <field id="layoutDirection" type="string" value="vert" />
+        <field id="focusAnimationStyle" type="string" value="fixedFocusWrap" />
+        <field id="focusOffset" type="integer" value="0" />
+
+        <field id="animateToItem" type="integer" onChange="onAnimateToItem" alwaysNotify="true" />
+        <field id="jumpToItem" type="integer" onChange="onJumpToItem" alwaysNotify="true" />
+        
+        <field id="itemSelected" type="integer" alwaysNotify="true" />
+        <field id="itemFocused" type="integer" alwaysNotify="true" />
+
+        <field id="scrollSpeed" type="float" value=".25" />
+        <field id="scrollDelay" type="float" value="0" alias="scrollAnimation.delay" />
+        <field id="updateFocusBeforeScroll" type="boolean" value="false" />
+    </interface>
+    
+    <children>
+        <Group
+            id="list" />
+            
+        <Rectangle
+            id="focus"
+            color="0x00000022" />
+            
+        <PlaceholderNode
+            id="placeholder" />
+
+        <Animation
+        	id="scrollAnimation"
+            duration="0.3"
+            delay="0"
+            repeat="false"
+            easeFunction="linear" >
+            <Vector2DFieldInterpolator
+                id="scrollInterpolator"
+                key="[0.0, 1.0]"
+                fieldToInterp="list.translation" />
+        </Animation>
+    </children>
+</component>

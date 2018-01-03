@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="SignOutTask" extends="ApiTask">
+    <script type="text/brightscript" uri="pkg:/components/tasks/signOutTask.brs" />
+    <interface>
+        <field id="signedOut" type="boolean" alwaysNotify="true" />
+    </interface>
+</component>

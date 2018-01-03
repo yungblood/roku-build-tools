@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="AccountPanel" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/views/widgets/panels/accountPanel.brs" />
+    <interface>
+        <field id="buttonSelected" type="string" alwaysNotify="true" />
+    </interface>
+    <children>
+        <Font
+            id="buttonFont"
+            size="24"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+
+        <LayoutGroup
+            id="content"
+            layoutDirection="vert"
+            translation="[0,375]"
+            itemSpacings="[69]"
+            vertAlignment="center">
+            <SettingsLabel
+                id="name"
+                title="SIGNED IN AS"
+                value="" />
+            <SettingsLabel
+                id="level"
+                title="ACCOUNT LEVEL"
+                value="" />
+            <LabelButtonGroup
+                id="buttons"
+                layoutDirection="horiz"
+                itemSpacings="50">
+                <LabelButton
+                    id="freeTrial"
+                    width="300"
+                    height="300"
+                    backgroundUri="pkg:/images/upsell_button.9.png"
+                    focusedBackgroundUri="pkg:/images/upsell_button_focused.9.png"
+                    foregroundUri="pkg:/images/icon_upgrade.png"
+                    focusedForegroundUri="pkg:/images/icon_upgrade.png"
+                    foregroundImageWidth="140"
+                    foregroundImageHeight="140"
+                    focusedForegroundImageWidth="140"
+                    focusedForegroundImageHeight="140"
+                    padding="25"
+                    vertAlignment="bottom"
+                    text="START YOUR FREE TRIAL"
+                    font="dictionary:buttonFont"
+                    processKeyEvents="false" />
+                <LabelButton
+                    id="upgrade"
+                    width="300"
+                    height="300"
+                    backgroundUri="pkg:/images/upsell_button.9.png"
+                    focusedBackgroundUri="pkg:/images/upsell_button_focused.9.png"
+                    foregroundUri="pkg:/images/icon_upgrade.png"
+                    focusedForegroundUri="pkg:/images/icon_upgrade.png"
+                    foregroundImageWidth="140"
+                    foregroundImageHeight="140"
+                    focusedForegroundImageWidth="140"
+                    focusedForegroundImageHeight="140"
+                    padding="25"
+                    vertAlignment="bottom"
+                    text="UPGRADE"
+                    font="dictionary:buttonFont"
+                    processKeyEvents="false" />
+                <LabelButton
+                    id="manageAccount"
+                    width="300"
+                    height="300"
+                    backgroundUri="pkg:/images/upsell_button.9.png"
+                    focusedBackgroundUri="pkg:/images/upsell_button_focused.9.png"
+                    foregroundUri="pkg:/images/icon_account.png"
+                    focusedForegroundUri="pkg:/images/icon_account.png"
+                    foregroundImageWidth="140"
+                    foregroundImageHeight="140"
+                    focusedForegroundImageWidth="140"
+                    focusedForegroundImageHeight="140"
+                    padding="25"
+                    vertAlignment="bottom"
+                    text="MANAGE ACCOUNT"
+                    font="dictionary:buttonFont"
+                    processKeyEvents="false" />
+                <LabelButton
+                    id="signIn"
+                    width="300"
+                    height="300"
+                    backgroundUri="pkg:/images/upsell_button.9.png"
+                    focusedBackgroundUri="pkg:/images/upsell_button_focused.9.png"
+                    foregroundUri="pkg:/images/icon_account.png"
+                    focusedForegroundUri="pkg:/images/icon_account.png"
+                    foregroundImageWidth="140"
+                    foregroundImageHeight="140"
+                    focusedForegroundImageWidth="140"
+                    focusedForegroundImageHeight="140"
+                    padding="25"
+                    vertAlignment="bottom"
+                    text="SIGN IN"
+                    font="dictionary:buttonFont"
+                    processKeyEvents="false" />
+                <LabelButton
+                    id="signOut"
+                    width="300"
+                    height="300"
+                    backgroundUri="pkg:/images/upsell_button.9.png"
+                    focusedBackgroundUri="pkg:/images/upsell_button_focused.9.png"
+                    foregroundUri="pkg:/images/icon_account.png"
+                    focusedForegroundUri="pkg:/images/icon_account.png"
+                    foregroundImageWidth="140"
+                    foregroundImageHeight="140"
+                    focusedForegroundImageWidth="140"
+                    focusedForegroundImageHeight="140"
+                    padding="25"
+                    vertAlignment="bottom"
+                    text="SIGN OUT"
+                    font="dictionary:buttonFont"
+                    processKeyEvents="false" />
+            </LabelButtonGroup>
+        </LayoutGroup>
+    </children>
+</component>

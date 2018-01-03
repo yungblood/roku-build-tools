@@ -1,0 +1,29 @@
+sub init()
+    m.time = m.top.findNode("time")
+    m.showTitle = m.top.findNode("showTitle")
+    m.episodeTitle = m.top.findNode("episodeTitle")
+    m.bar = m.top.findNode("bar")
+end sub
+
+sub onContentChanged()
+    if m.content = invalid or not m.content.isSameNode(m.top.itemContent) then
+        m.content = m.top.itemContent
+        
+        time = createObject("roDateTime")
+        time.fromSeconds(m.content.startTime)
+        time.toLocalTime()
+        m.time.text = getTimeString(time)
+        
+        m.showTitle.text = m.content.title
+        m.episodeTitle.text = m.content.episodeTitle
+    end if
+end sub
+
+sub updateLayout()
+    if m.top.width > 0 and m.top.height > 0 then
+        m.time.width = m.top.width - 100
+        m.showTitle.width = m.top.width - 100
+        m.episodeTitle.width = m.top.width - 100
+        m.bar.translation = [m.top.width - 2, 0]
+    end if
+end sub

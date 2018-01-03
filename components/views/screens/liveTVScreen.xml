@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="LiveTVScreen" extends="BaseScreen">
+    <script type="text/brightscript" uri="pkg:/components/views/screens/liveTVScreen.brs" />
+    <interface>
+        <field id="content" type="node" alias="video.content" />
+        <field id="control" type="string" alias="video.control" />
+        <field id="notificationInterval" type="time" alias="video.notificationInterval" />
+        <field id="state" type="string" alias="video.state" />
+        <field id="position" type="float" alias="video.position" />
+
+        <field id="station" type="node" onChange="onStationChanged" alwaysNotify="true" />
+        <field id="channel" type="node" onChange="onChannelChanged" alwaysNotify="true" />
+        <field id="menuItemSelected" type="string" alwaysNotify="true" />
+        
+        <field id="showNowPlaying" type="boolean" alwaysNotify="true" onChange="showNowPlaying" />
+        <field id="showChannels" type="boolean" alwaysNotify="true" onChange="showChannelSelection" />
+    </interface>
+    <children>
+        <Font
+            id="buttonFont"
+            size="24"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Group
+            id="liveTV"
+            visible="false">
+            <Video
+                id="video"
+                width="1920"
+                height="1080"
+                enableUI="false"
+                enableTrickPlay="false"
+                notificationInterval="1" />
+            <LayoutGroup
+                id="unavailable"
+                translation="[67,270]"
+                layoutDirection="vert"
+                itemSpacings="[65]"
+                visible="false">
+                <Label
+                    text="Station Unavailable"
+                    color="0xffffffff"
+                    lineSpacing="0">
+                    <Font
+                        role="font"
+                        size="65"
+                        uri="pkg:/fonts/Lato-Regular.ttf" />
+                </Label>
+                <Label
+                    text="We're sorry, but live TV is not currently supported in your area."
+                    color="0xa9a9a9ff"
+                    width="600"
+                    wrap="true"
+                    lineSpacing="0">
+                    <Font
+                        role="font"
+                        size="38"
+                        uri="pkg:/fonts/Lato-Regular.ttf" />
+                </Label>
+            </LayoutGroup>
+            <Group
+                id="overlay">
+                <Poster
+                    id="darkenTop"
+                    width="1920"
+                    height="398"
+                    uri="pkg:/images/overlay_livetv_top.png" />
+                <Group
+                    id="channelOverlay"
+                    translation="[0,645]"
+                    visible="true">
+                    <Poster
+                        translation="[0,-200]"
+                        width="1920"
+                        height="810"
+                        uri="pkg:/images/overlay_livetv_bottom.png" />
+                    <Label
+                        translation="[67,0]"
+                        text="Live Channels"
+                        color="0xffffffff"
+                        vertAlign="top">
+                       <Font
+                           role="font"
+                           size="40"
+                           uri="pkg:/fonts/Lato-Regular.ttf" />
+                    </Label>
+                    <MarkupGrid
+                        id="channelGrid"
+                        translation="[67,60]"
+                        numRows="1"
+                        numColumns="4"
+                        itemComponentName="ChannelTile"
+                        itemSize="[399,238]"
+                        itemSpacing="[62,0]"
+                        horizFocusAnimationStyle="floatingFocus"
+                        drawFocusFeedback="false" />
+                </Group>
+<!--  485  -->
+<!--  645  -->
+                <Group
+                    id="scheduleOverlay"
+                    translation="[0,645]"
+                    visible="false">
+                    <Poster
+                        translation="[0,-200]"
+                        width="1920"
+                        height="810"
+                        uri="pkg:/images/overlay_livetv_bottom.png" />
+                    <Label
+                        translation="[67,0]"
+                        text="Schedule"
+                        color="0xffffffff"
+                        vertAlign="top">
+                       <Font
+                           role="font"
+                           size="40"
+                           uri="pkg:/fonts/Lato-Regular.ttf" />
+                    </Label>
+                    <LayoutGroup
+                        translation="[1855,25]"
+                        layoutDirection="horiz"
+                        itemSpacings="[18]"
+                        horizAlignment="right"
+                        vertAlignment="center">
+                        <Label
+                            id="scheduleChannelName"
+                            color="0xffffffff"
+                            horizAlign="right"
+                            width="250"
+                            wrap="false" >
+                            <Font
+                                role="font"
+                                size="34"
+                                uri="pkg:/fonts/Lato-Regular.ttf" />
+                        </Label>
+                        <Poster
+                            id="scheduleChannelLogo"
+                            height="30"
+                            loadDisplayMode="scaleToFit" />
+                    </LayoutGroup>
+                    <MarkupGrid
+                        id="scheduleGrid"
+                        translation="[67,60]"
+                        numRows="1"
+                        numColumns="4"
+                        itemComponentName="ScheduleTile"
+                        itemSize="[399,238]"
+                        itemSpacing="[62,0]"
+                        horizFocusAnimationStyle="floatingFocus"
+                        drawFocusFeedback="false" />
+                    <Poster
+                        id="scheduleDismiss"
+                        translation="[851,337]"
+                        width="218"
+                        height="50"
+                        uri="pkg:/images/text_dismiss.png" />
+                    <Group
+                        id="scheduleDetails"
+                        translation="[0,355]">
+                        
+                        <LayoutGroup
+                            translation="[67,0]"
+                            layoutDirection="horiz"
+                            itemSpacings="[0]">
+                            <Label
+                                id="scheduleShowTitle"
+                                height="60"
+                                text=""
+                                color="0xffffffff"
+                                vertAlign="center" >
+                                <Font
+                                    role="font"
+                                    size="35"
+                                    uri="pkg:/fonts/Lato-Regular.ttf" />
+                            </Label>
+                            <Label
+                                id="scheduleEpisodeTitle"
+                                height="60"
+                                text=""
+                                color="0xffffffff"
+                                vertAlign="center" >
+                                <Font
+                                    role="font"
+                                    size="35"
+                                    uri="pkg:/fonts/Lato-Light.ttf" />
+                            </Label>
+                        </LayoutGroup>
+                        <Label
+                            id="scheduleDescription"
+                            translation="[67,76]"
+                            width="1786"
+                            wrap="true"
+                            lineSpacing="0"
+                            maxLines="2"
+                            text=""
+                            color="0xffffffff"
+                            vertAlign="center" >
+                            <Font
+                                role="font"
+                                size="26"
+                                uri="pkg:/fonts/Lato-Regular.ttf" />
+                        </Label>
+                        <Poster
+                            translation="[851,142]"
+                            width="218"
+                            height="50"
+                            uri="pkg:/images/text_dismiss.png" />
+                    </Group>
+                </Group>
+                <Group
+                    id="nowPlayingOverlay"
+                    translation="[0,906]"
+                    visible="false">
+                    <Rectangle
+                        color="0x000000aa"
+                        width="1920"
+                        height="400" />
+                    <Rectangle
+                        color="0x000000ff"
+                        width="1920"
+                        height="60">
+                        <LayoutGroup
+                            translation="[65,0]"
+                            layoutDirection="horiz"
+                            itemSpacings="[0]">
+                            <Label
+                                id="showTitle"
+                                height="60"
+                                text=""
+                                color="0xffffffff"
+                                vertAlign="center" >
+                                <Font
+                                    role="font"
+                                    size="35"
+                                    uri="pkg:/fonts/Lato-Regular.ttf" />
+                            </Label>
+                            <Label
+                                id="episodeTitle"
+                                height="60"
+                                text=""
+                                color="0xffffffff"
+                                vertAlign="center" >
+                                <Font
+                                    role="font"
+                                    size="35"
+                                    uri="pkg:/fonts/Lato-Light.ttf" />
+                            </Label>
+                        </LayoutGroup>
+                        <LayoutGroup
+                            translation="[1855,30]"
+                            layoutDirection="horiz"
+                            itemSpacings="[18]"
+                            horizAlignment="right"
+                            vertAlignment="center">
+                            <Label
+                                id="channelName"
+                                color="0xffffffff"
+                                horizAlign="right" >
+                                <Font
+                                    role="font"
+                                    size="34"
+                                    uri="pkg:/fonts/Lato-Regular.ttf" />
+                            </Label>
+                            <Poster
+                                id="channelLogo"
+                                height="30"
+                                loadDisplayMode="scaleToFit" />
+                        </LayoutGroup>
+                    </Rectangle>
+                    <Poster
+                        translation="[854,76]"
+                        width="212"
+                        height="50"
+                        uri="pkg:/images/text_schedule.png" />
+                </Group>
+            </Group>
+        </Group>
+        <Group
+            id="liveTVSelection"
+            visible="false">
+            <LayoutGroup
+                translation="[102,400]"
+                layoutDirection="vert"
+                itemSpacings="[40]">
+                <Label
+                    text="Watch LIVE TV"
+                    color="0xffffffff">
+                    <Font
+                        role="font"
+                        size="60"
+                        uri="pkg:/fonts/Lato-Regular.ttf" />
+                </Label>
+                <LabelButtonGroup
+                    id="stations"
+                    layoutDirection="horiz"
+                    itemSpacings="[20]" />
+            </LayoutGroup>
+        </Group>
+        <LayoutGroup
+            id="concurrent"
+            translation="[960,540]"
+            horizAlignment="center"
+            vertAlignment="center"
+            visible="false">
+            <Label
+                width="1000"
+                text="You've reached the maximum number of simultaneous video streams for your account. To view this video, close the other videos you're watching and try again."
+                color="0xffffffff"
+                opacity=".75"
+                wrap="true"
+                lineSpacing="0">
+                <Font
+                    role="font"
+                    size="42"
+                    uri="pkg:/fonts/Lato-Regular.ttf" />
+            </Label>
+        </LayoutGroup>
+        
+        <TopMenu
+            id="menu"
+            focusedID="liveTV" />
+        <Timer
+            id="updateTimer"
+            duration="5"
+            repeat="true" />
+        <Timer
+            id="overlayTimer"
+            duration="3.5"
+            repeat="false" />
+        <Timer
+            id="timeoutTimer"
+            duration="300"
+            repeat="false" />
+    </children>
+</component>

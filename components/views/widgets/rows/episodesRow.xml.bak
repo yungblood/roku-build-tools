@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="EpisodesRow" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/views/widgets/rows/episodesRow.brs" />
+    <script type="text/brightscript" uri="pkg:/components/services/utils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/device.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/debug.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <interface>
+        <field id="rowHeight" type="float" value="339" />
+        
+        <field id="content" type="node" onChange="onContentChanged" />
+        <field id="itemSelected" type="integer" alwaysNotify="true" />
+    </interface>
+    <children>
+        <RowList
+            id="list"
+            itemComponentName="EpisodeTile"
+            itemSize="[1920,339]"
+            numRows="1"
+            rowItemSize="[[419,236]]"
+            rowItemSpacing="[[9,0]]"
+            focusXOffset="[95]"
+            rowLabelOffset="[[95,16]]"
+            showRowLabel="[true]"
+            showRowCounter="[false]"
+            rowFocusAnimationStyle="floatingFocus"
+            rowLabelColor="0x999999ff"
+            drawFocusFeedbackOnTop="true"
+            focusBitmapUri="pkg:/images/frame_grid.9.png">
+            <Font 
+                id="rowTitleFont"
+                role="rowLabelFont"
+                uri="pkg:/fonts/Lato-Light.ttf"
+                size="40" />
+        </RowList>
+    </children>
+</component>

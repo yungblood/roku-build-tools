@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="Movie" extends="Episode">
+    <script type="text/brightscript" uri="pkg:/components/models/movie.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    <interface>
+        <field id="trailer" type="node" />
+        <field id="subtitle" type="string" />
+    </interface>
+</component>

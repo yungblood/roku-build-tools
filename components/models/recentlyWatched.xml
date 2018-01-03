@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="RecentlyWatched" extends="ContentNode">
+    <script type="text/brightscript" uri="pkg:/components/models/recentlyWatched.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    <interface>
+        <field id="update" type="boolean" onChange="update" alwaysNotify="true" />
+    </interface>
+</component>

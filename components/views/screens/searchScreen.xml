@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="SearchScreen" extends="BaseScreen">
+    <script type="text/brightscript" uri="pkg:/components/views/screens/searchScreen.brs" />
+    <interface>
+        <field id="itemSelected" type="node" alwaysNotify="true" />
+        <field id="menuItemSelected" type="string" alwaysNotify="true" />
+    </interface>
+    <children>
+        <TextBox
+            id="searchText"
+            translation="[95,166]"
+            width="1731"
+            height="80"
+            padding="30"
+            textColor="0xffffffff"
+            hintTextColor="0xffffff4c"
+            hintText="Search for a Show"
+            backgroundUri="pkg:/images/frame_generic.9.png">
+            <Font
+                role="hintTextFont"
+                size="36"
+                uri="pkg:/fonts/Lato-Regular.ttf" />
+            <Font
+                role="textFont"
+                size="40"
+                uri="pkg:/fonts/Lato-Regular.ttf" />
+        </TextBox>
+
+        <LabelButtonGroup
+            id="keyboard"
+            translation="[960,305]"
+            layoutDirection="horiz"
+            itemSpacings="[-18]"
+            horizAlignment="center"
+            vertAlignment="center"
+            wrap="true">
+            <LabelButton
+                id="backspace"
+                height="50"
+                width="100"
+                foregroundUri="pkg:/images/icon_backspace.png"
+                foregroundImageWidth="45"
+                foregroundImageHeight="24"
+                focusedForegroundUri="pkg:/images/icon_backspace_focused.png"
+                focusedForegroundImageWidth="81"
+                focusedForegroundImageHeight="43"
+                processKeyEvents="false" />
+            <LabelButton
+                id="space"
+                height="50"
+                width="100"
+                foregroundUri="pkg:/images/icon_space.png"
+                foregroundImageWidth="62"
+                foregroundImageHeight="20"
+                focusedForegroundUri="pkg:/images/icon_space_focused.png"
+                focusedForegroundImageWidth="94"
+                focusedForegroundImageHeight="30"
+                processKeyEvents="false" />
+        </LabelButtonGroup>
+
+        <Label
+            id="noResults"
+            translation="[0,465]"
+            width="1920"
+            color="0xc5c5c5ff"
+            wrap="false"
+            text="No Results Found"
+            horizAlign="center"
+            visible="false">
+            <Font
+                role="font"
+                size="50"
+                uri="pkg:/fonts/Lato-Regular.ttf" />
+        </Label>
+        
+        <MarkupGrid
+            id="grid"
+            translation="[97,375]"
+            itemComponentName="ShowTile"
+            itemSize="[417,626]"
+            itemSpacing="[18,20]"
+            numColumns="4"
+            numRows="2"
+            vertFocusAnimationStyle="fixedFocus"
+            focusBitmapUri="pkg:/images/frame_grid.9.png"
+            visible="false" />
+        
+        <TopMenu
+            id="menu"
+            focusedID="search" />
+    </children>
+</component>

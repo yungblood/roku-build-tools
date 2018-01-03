@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="TopMenu" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/views/widgets/topMenu.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <interface>
+        <field id="focusedID" type="string" onChange="onFocusedIDChanged" />
+        <field id="buttonSelected" type="string" alwaysNotify="true" />
+    </interface>
+    <children>
+        <Font
+           id="buttonFont"
+           size="25"
+           uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Poster
+            id="logo"
+            translation="[95,51]"
+            width="131"
+            height="39"
+            uri="pkg:/images/cbsNavLogoConsole.png" />
+        <LayoutGroup
+            id="navButtons"
+            translation="[304,47]"
+            layoutDirection="horiz"
+            itemSpacings="[70]">
+            <LabelButton
+                id="home"
+                text="HOME"
+                textColor="0xffffff66"
+                focusedTextColor="0xffffffff"
+                width="77"
+                height="46"
+                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
+                font="dictionary:buttonFont"
+                processKeyEvents="false" />
+            <LabelButton
+                id="shows"
+                text="SHOWS"
+                textColor="0xffffff66"
+                focusedTextColor="0xffffffff"
+                width="93"
+                height="46"
+                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
+                font="dictionary:buttonFont"
+                processKeyEvents="false" />
+            <LabelButton
+                id="liveTV"
+                text="LIVE TV"
+                textColor="0xffffff66"
+                focusedTextColor="0xffffffff"
+                width="89"
+                height="46"
+                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
+                font="dictionary:buttonFont"
+                processKeyEvents="false" />
+            <LabelButton
+                id="movies"
+                text="MOVIES"
+                textColor="0xffffff66"
+                focusedTextColor="0xffffffff"
+                width="95"
+                height="46"
+                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
+                font="dictionary:buttonFont"
+                processKeyEvents="false" />
+            <LabelButton
+                id="search"
+                text="SEARCH"
+                textColor="0xffffff66"
+                focusedTextColor="0xffffffff"
+                width="97"
+                height="46"
+                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
+                font="dictionary:buttonFont"
+                processKeyEvents="false" />
+            <LabelButton
+                id="settings"
+                text="SETTINGS"
+                textColor="0xffffff66"
+                focusedTextColor="0xffffffff"
+                width="116"
+                height="46"
+                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
+                font="dictionary:buttonFont"
+                processKeyEvents="false" />
+        </LayoutGroup>
+    </children>
+</component>

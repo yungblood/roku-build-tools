@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="TestItem" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/views/widgets/testItem.brs" />
+    <interface>
+        <field id="itemContent" type="node" onChange="onItemContentChanged" />
+        <field id="content" type="node" onChange="onContentChanged" />
+        <field id="focusPercent" type="float" onChange="onFocusPercentChanged" />
+    </interface>
+    <children>
+        <Poster
+            id="poster"
+            width="420"
+            height="228" />
+    </children>
+</component>

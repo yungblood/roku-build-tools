@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="MovieScreen" extends="BaseScreen">
+    <script type="text/brightscript" uri="pkg:/components/views/screens/movieScreen.brs" />
+    <interface>
+        <field id="autoPlay" type="boolean" />
+        <field id="movieID" type="string" onChange="onMovieIDChanged" />
+        <field id="movie" type="node" onChange="onMovieChanged" alwaysNotify="true" />
+        <field id="buttonSelected" type="string" alwaysNotify="true" />
+    </interface>
+    <children>
+        <Font
+            id="movieTitleFont"
+            size="42"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="movieSubtitleFont"
+            size="24"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="movieDescriptionFont"
+            size="22"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="buttonFont"
+            size="24"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+
+        <Poster
+            id="background"
+            width="1920"
+            height="1080"
+            loadDisplayMode="scaleToZoom" />
+        <Rectangle
+            id="backgroundDarken"
+            width="1920"
+            height="1080"
+            color="0x000000c0" />
+        <Poster
+            id="poster"
+            translation="[118,278]"
+            width="844"
+            height="475"
+            loadDisplayMode="scaleToZoom" />
+            
+        <LayoutGroup
+            translation="[991,278]"
+            layoutDirection="vert"
+            itemSpacings="[10]">
+            <Label
+                id="movieTitle"
+                width="815"
+                color="0xffffffff"
+                wrap="true"
+                maxLines="2"
+                lineSpacing="0"
+                font="dictionary:movieTitleFont" />
+            <Label
+                id="movieSubtitle"
+                height="24"
+                width="750"
+                color="0xb3b1b0ff"
+                wrap="false"
+                font="dictionary:movieSubtitleFont" />
+            <Label
+                id="movieDescription"
+                height="219"
+                width="750"
+                color="0xffffffff"
+                lineSpacing="-1"
+                wrap="true"
+                maxLines="7"
+                font="dictionary:movieDescriptionFont" />
+        </LayoutGroup>
+        <LabelButtonGroup
+            id="buttons"
+            translation="[991,691]"
+            layoutDirection="horiz"
+            itemSpacings="[24]"
+            visible="false">
+            <LabelButton
+                id="watch"
+                width="305"
+                height="62"
+                text="WATCH"
+                textColor="0xffffff99"
+                focusedTextColor="0xffffffff"
+                backgroundUri="pkg:/images/frame_generic.9.png"
+                focusedBackgroundUri="pkg:/images/button_focus.9.png"
+                font="dictionary:buttonFont"
+                processKeyEvents="false" />
+            <LabelButton
+                id="trailer"
+                width="305"
+                height="62"
+                text="PREVIEW TRAILER"
+                textColor="0xffffff99"
+                focusedTextColor="0xffffffff"
+                backgroundUri="pkg:/images/frame_generic.9.png"
+                focusedBackgroundUri="pkg:/images/button_focus.9.png"
+                font="dictionary:buttonFont"
+                processKeyEvents="false" />
+        </LabelButtonGroup>
+    </children>
+</component>

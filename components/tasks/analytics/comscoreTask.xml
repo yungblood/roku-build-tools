@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ComscoreTask" extends="ApiTask">
+    <script type="text/brightscript" uri="pkg:/components/tasks/analytics/comscoreTask.brs" />
+    <script type="text/brightscript" uri="pkg:/components/services/comscore/comscore.brs" />
+    <interface>
+        <field id="reset" type="boolean" onChange="reset" alwaysNotify="true" />
+
+        <field id="c2" type="string" />
+        <field id="c3" type="string" />
+        <field id="c4" type="string" />
+
+        <field id="content" type="node" />
+        <field id="videoStart" type="boolean" alwaysNotify="true" />
+        <field id="videoEnd" type="boolean" alwaysNotify="true" />
+        <field id="adStart" type="boolean" alwaysNotify="true" />
+        <field id="adEnd" type="boolean" alwaysNotify="true" />
+    </interface>
+</component>

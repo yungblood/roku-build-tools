@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="BaseRow" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/views/widgets/rows/baseRow.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/device.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/debug.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <interface>
+        <field id="rowHeight" type="float" value="100" />
+        <field id="content" type="node" onChange="onBaseContentChanged" />
+        <field id="itemSelected" type="integer" alwaysNotify="true" />
+        <field id="hideIfEmpty" type="boolean" value="true" />
+    </interface>
+    <children>
+    </children>
+</component>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="Marquee" extends="ContentNode">
+    <script type="text/brightscript" uri="pkg:/components/models/marquee.brs" />
+    <interface>
+        <field id="json" type="assocarray" onChange="onJsonChanged" />
+    </interface>
+</component>

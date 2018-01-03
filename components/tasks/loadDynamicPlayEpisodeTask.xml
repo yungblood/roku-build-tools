@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="LoadDynamicPlayEpisodeTask" extends="ApiTask">
+    <script type="text/brightscript" uri="pkg:/components/tasks/loadDynamicPlayEpisodeTask.brs" />
+    <interface>
+        <field id="show" type="node" />
+        <field id="episode" type="node" alwaysNotify="true" />
+    </interface>
+</component>

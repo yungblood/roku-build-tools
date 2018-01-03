@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="ShowInfoScreen" extends="BaseScreen">
+    <script type="text/brightscript" uri="pkg:/components/views/screens/showInfoScreen.brs" />
+    <interface>
+        <field id="showID" type="string" onChange="onShowIDChanged" />
+        <field id="show" type="node" onChange="onShowChanged" />
+        <field id="buttonSelected" type="string" alwaysNotify="true" />
+    </interface>
+    <children>
+        <Font
+            id="titleFont"
+            size="42"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="descriptionFont"
+            size="22"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+
+        <Poster
+            id="background"
+            width="1920"
+            height="1080"
+            loadDisplayMode="scaleToZoom" />
+        <Rectangle
+            id="backgroundDarken"
+            width="1920"
+            height="1080"
+            color="0x000000c0" />
+        <Poster
+            id="poster"
+            translation="[279,180]"
+            width="587"
+            height="740"
+            loadDisplayMode="scaleToZoom" />
+            
+        <Rectangle
+            id="descriptionRect"
+            translation="[909,181]"
+            width="731"
+            height="738"
+            color="0xffffff20" />
+        <Label
+            id="title"
+            translation="[947,263]"
+            width="655"
+            color="0xffffffff"
+            wrap="false"
+            font="dictionary:titleFont" />
+        <ScrollableText
+            id="description"
+            translation="[947,351]"
+            width="655"
+            height="528"
+            color="0xe5e6e7ff"
+            lineSpacing="0"
+            font="dictionary:descriptionFont"
+            scrollbarTrackBitmapUri="invalid"
+            scrollbarThumbBitmapUri="invalid" />
+
+    </children>
+</component>

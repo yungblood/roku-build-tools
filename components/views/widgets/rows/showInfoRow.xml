@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="ShowInfoRow" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/views/widgets/rows/showInfoRow.brs" />
+    <interface>
+        <field id="rowHeight" type="float" value="343" />
+        <field id="content" type="node" onChange="onContentChanged" />
+        <field id="itemSelected" type="integer" alwaysNotify="true" />
+        <field id="buttonSelected" type="string" alwaysNotify="true" />
+    </interface>
+    <children>
+        <DynamicPlayTile
+            id="dynamicPlay"
+            translation="[95,107]"
+            visible="false" />
+        <ShowInfoTile
+            id="showInfo"
+            translation="[1272,0]" />
+    </children>
+</component>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="RowListWithVisibility" extends="RowList">
+    <script type="text/brightscript" uri="pkg:/components/framework/widgets/rowListWithVisibility.brs" />
+
+    <script type="text/brightscript" uri="pkg:/components/framework/utilities/nodes.brs" />
+    
+    <interface>
+        <field id="managedContent" type="node" onChange="onManagedContentChanged" />
+        <field id="hiddenRows" type="intarray" onChange="onHiddenRowsChanged" />
+    </interface>
+</component>

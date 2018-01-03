@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="SignInScreen" extends="BaseScreen">
+    <script type="text/brightscript" uri="pkg:/components/views/screens/signInScreen.brs" />
+    <interface>
+        <field id="buttonSelected" type="string" alwaysNotify="true" />
+    </interface>
+    <children>
+        <Font
+            id="buttonFont"
+            size="32"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+            
+        <Poster
+            id="background"
+            width="1920"
+            height="1080"
+            uri="pkg:/images/bg_upsell.jpg"
+            loadDisplayMode="scaleToZoom" />
+        <Label
+            translation="[0,100]"
+            width="1920"
+            horizAlign="center"
+            text="Sign In"
+            color="0xe5e5e5ff">
+            <Font
+                role="font"
+                uri="pkg:/fonts/Lato-Bold.ttf"
+                size="50" />
+        </Label>
+<!--         <CenteredPoster -->
+<!--             id="header" -->
+<!--             width="1920" -->
+<!--             height="250" /> -->
+        <LabelButtonGroup
+            id="options"
+            translation="[960,446]"
+            layoutDirection="horiz"
+            itemSpacings="[60]"
+            horizAlignment="center"
+            vertAlignment="center">
+            <SubscriptionOptionButton
+                id="signInWithEmail"
+                width="734"
+                height="444"
+                title="On Roku"
+                subtitle="Using your CBS All Access email and password"
+                processKeyEvents="false" />
+            <SubscriptionOptionButton
+                id="signInOnWeb"
+                width="734"
+                height="444"
+                title="On the Web"
+                subtitle="Using your CBS All Access email and password or social account"
+                processKeyEvents="false" />
+        </LabelButtonGroup>
+    </children>
+</component>

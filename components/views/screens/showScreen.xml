@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="ShowScreen" extends="BaseScreen">
+    <script type="text/brightscript" uri="pkg:/components/views/screens/showScreen.brs" />
+    
+    <interface>
+        <field id="showID" type="string" onChange="onShowIDChanged" alwaysNotify="true" />
+        <field id="show" type="node" onChange="onShowChanged" alwaysNotify="true" />
+
+        <field id="itemSelected" type="node" alwaysNotify="true" />
+        <field id="buttonSelected" type="string" alwaysNotify="true" />
+
+        <field id="content" type="assocarray" onChange="onContentChanged" />
+    </interface>
+    <children>
+        <Poster
+            id="hero"
+            width="1920"
+            height="1080"
+            loadDisplayMode="scaleToZoom" />
+        <Poster
+            id="heroDarken"
+            width="1920"
+            height="1080"
+            uri="pkg:/images/show-detail-hero-darken.png" />
+        <Rectangle
+            id="heroFadeRect"
+            width="1920"
+            height="1080"
+            color="0x000000ff"
+            opacity="0" />
+        
+        <FocusGroup
+            id="list"
+            translation="[0,482]"
+            advanceKey="down"
+            reverseKey="up" />
+
+        <Animation
+            id="scrollAnimation"
+            duration="0.3"
+            delay="0"
+            repeat="false">
+            <Vector2DFieldInterpolator
+                id="scrollInterp"
+                key="[0,1]"
+                keyValue="[[0,0],[0,0]]"
+                fieldToInterp="list.translation" />
+        </Animation>
+
+        <ParallelAnimation
+            id="fadeOutAnimation">
+            <Animation
+                id="marqueeFadeOutAnimation"
+                duration=".3"
+                delay="0"
+                repeat="false">
+                <FloatFieldInterpolator
+                    key="[0,1]"
+                    keyValue="[0,1]"
+                    fieldToInterp="heroFadeRect.opacity" />
+            </Animation>
+        </ParallelAnimation>
+        <ParallelAnimation
+            id="fadeInAnimation">
+            <Animation
+                id="marqueeFadeInAnimation"
+                duration=".3"
+                delay="0"
+                repeat="false">
+                <FloatFieldInterpolator
+                    key="[0,1]"
+                    keyValue="[1,0]"
+                    fieldToInterp="heroFadeRect.opacity" />
+            </Animation>
+        </ParallelAnimation>
+    </children>
+</component>

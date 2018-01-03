@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ValidateAccountDetailsTask" extends="ApiTask">
+    <script type="text/brightscript" uri="pkg:/components/tasks/upsell/validateAccountDetailsTask.brs" />
+    <interface>
+        <field id="accountDetails" type="assocarray" />
+        <field id="error" type="string" />
+        <field id="success" type="boolean" alwaysNotify="true" />
+    </interface>
+</component>

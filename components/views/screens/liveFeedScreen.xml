@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="LiveFeedScreen" extends="BaseScreen">
+    <script type="text/brightscript" uri="pkg:/components/views/screens/liveFeedScreen.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/web.brs" />
+    <interface>
+        <field id="liveFeed" type="node" onChange="onLiveFeedChanged" alwaysNotify="true" />
+        <field id="autoPlay" type="boolean" />
+        <field id="buttonSelected" type="string" alwaysNotify="true" />
+        <field id="trackingRow" type="node" />
+        <field id="trackingIndex" type="integer" />
+    </interface>
+    <children>
+        <Font
+            id="showTitleFont"
+            size="42"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="episodeTitleFont"
+            size="40"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="episodeSubtitleFont"
+            size="24"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="episodeDescriptionFont"
+            size="22"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="buttonFont"
+            size="24"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+
+        <Poster
+            id="background"
+            width="1920"
+            height="1080"
+            loadDisplayMode="scaleToZoom" />
+        <Rectangle
+            id="backgroundDarken"
+            width="1920"
+            height="1080"
+            color="0x000000c0" />
+        <CrossfadePoster
+            id="poster"
+            translation="[118,278]"
+            width="844"
+            height="475"
+            loadDisplayMode="scaleToZoom" />
+
+        <Label
+            id="showTitle"
+            translation="[991,278]"
+            height="30"
+            width="815"
+            color="0xffffffff"
+            wrap="false"
+            font="dictionary:showTitleFont" />
+        <Label
+            id="episodeTitle"
+            translation="[991,336]"
+            height="36"
+            width="815"
+            color="0xb3b1b0ff"
+            wrap="false"
+            font="dictionary:episodeTitleFont" />
+        <Label
+            id="episodeSubtitle"
+            translation="[991,382]"
+            height="24"
+            width="815"
+            color="0xb3b1b0ff"
+            wrap="false"
+            font="dictionary:episodeSubtitleFont" />
+        <Label
+            id="episodeDescription"
+            translation="[991,439]"
+            height="219"
+            width="750"
+            color="0xffffffff"
+            lineSpacing="-1"
+            wrap="true"
+            font="dictionary:episodeDescriptionFont" />
+
+        <LabelButtonGroup
+            id="buttons"
+            translation="[991,691]"
+            layoutDirection="horiz"
+            itemSpacings="[24]"
+            visible="false">
+            <LabelButton
+                id="watch"
+                width="305"
+                height="62"
+                text="WATCH"
+                textColor="0xffffff99"
+                focusedTextColor="0xffffffff"
+                backgroundUri="pkg:/images/frame_generic.9.png"
+                focusedBackgroundUri="pkg:/images/button_focus.9.png"
+                font="dictionary:buttonFont"
+                processKeyEvents="false" />
+            <LabelButton
+                id="show"
+                width="305"
+                height="62"
+                text="MORE FROM SHOW"
+                textColor="0xffffff99"
+                focusedTextColor="0xffffffff"
+                backgroundUri="pkg:/images/frame_generic.9.png"
+                focusedBackgroundUri="pkg:/images/button_focus.9.png"
+                font="dictionary:buttonFont"
+                processKeyEvents="false" />
+        </LabelButtonGroup>
+    </children>
+</component>

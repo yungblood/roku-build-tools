@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ScrollableList" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/framework/widgets/rowListEx/scrollableList.brs" />
+    <script type="text/brightscript" uri="pkg:/components/framework/utilities/nodes.brs" />
+    <interface>
+		<field id="initialPositions" type="floatarray" onChange="onInitialPositionsChanged" />
+		<field id="forwardIntermediatePositions" type="floatarray" onChange="onForwardIntermediatePositionsChanged" />
+		<field id="reverseIntermediatePositions" type="floatarray" onChange="onReverseIntermediatePositionsChanged" />
+		<field id="finalPositions" type="floatarray" onChange="onFinalPositionsChanged" />
+
+		<field id="forwardIntermediateFocusIndex" type="integer" />
+		<field id="reverseIntermediateFocusIndex" type="integer" />
+
+		<field id="duration" type="float" value=".3" />
+
+		<field id="listItemSelected" type="intarray" alwaysNotify="true" />
+        <field id="buttonSelected" type="string" alwaysNotify="true" />
+		<field id="itemComponentName" type="string" />
+		<field id="content" type="node" onChange="onContentChanged" />
+        <field id="contentField" type="string" />
+    </interface>
+    
+    <children>
+    	<TargetGroup
+    		id="list"
+    		itemComponentName="ScrollableListItemControllerNode" />
+        <Group
+            id="components" />
+    </children>
+</component>

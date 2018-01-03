@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="SettingsLabel" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/views/widgets/settingsLabel.brs" />
+    <interface>
+        <field id="title" type="string" alias="title.text" />
+        <field id="value" type="string" alias="value.text" />
+    </interface>
+    <children>
+        <Font
+           id="titleFont"
+           size="24"
+           uri="pkg:/fonts/Lato-Bold.ttf" />
+        <Font
+           id="valueFont"
+           size="60"
+           uri="pkg:/fonts/Lato-Light.ttf" />
+
+        <LayoutGroup
+            layoutDirection="vert"
+            itemSpacings="[0]">
+            <Label
+                id="title"
+                color="0x0092f3ff"
+                font="dictionary:titleFont" />
+            <Label
+                id="value"
+                color="0xffffffff"
+                opacity=".5"
+                font="dictionary:valueFont" />
+        </LayoutGroup>
+    </children>
+</component>

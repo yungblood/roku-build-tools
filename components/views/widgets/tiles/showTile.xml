@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="ShowTile" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/views/widgets/tiles/showTile.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
+    <interface>
+        <field id="itemContent" type="node" onChange="onContentChanged" />
+        <field id="width" type="float" onChange="updateLayout" />
+        <field id="height" type="float" onChange="updateLayout" />
+    </interface>
+    <children>
+        <Font
+            id="titleFont"
+            size="36"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="countFont"
+            size="25.6"
+            uri="pkg:/fonts/Lato-Bold.ttf" />
+        <Rectangle
+            id="whiteRect"
+            translation="[1,1]"
+            color="0xffffffff" />
+        <Rectangle
+            id="blackRect"
+            translation="[3,3]"
+            color="0x000000ff" />
+        <Label
+            id="title"
+            translation="[20,20]"
+            color="0xffffff80"
+            vertAlign="center"
+            horizAlign="center"
+            wrap="true"
+            lineSpacing="0"
+            font="dictionary:titleFont" />
+        <Poster
+            id="poster"
+            loadDisplayMode="scaleToZoom" />
+        <LayoutGroup
+            id="metadata"
+            layoutDirection="vert"
+            vertAlignment="bottom"
+            itemSpacings="[0]">
+            <Label
+                id="count"
+                color="0xfefefeff"
+                vertAlign="bottom"
+                horizAlign="center"
+                wrap="false"
+                font="dictionary:countFont" />
+        </LayoutGroup>
+    </children>
+</component>

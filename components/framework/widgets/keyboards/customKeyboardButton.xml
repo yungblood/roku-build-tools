@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="CustomKeyboardButton" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/framework/widgets/keyboards/customKeyboardButton.brs" />
+    <interface>
+        <field id="width" type="float" onChange="updateLayout" />
+        <field id="height" type="float" onChange="updateLayout" />
+        <field id="itemContent" type="node" onChange="onItemContentChanged" />
+        <field id="focusPercent" type="float" onChange="onFocusChanged" /> 
+        <field id="gridHasFocus" type="bool" onChange="onFocusChanged" />
+  
+        <field id="backgroundUri" type="string" alias="background.uri" />
+        <field id="focusedBackgroundUri" type="string" alias="focusedBackground.uri" />
+        <field id="backgroundColor" type="color" alias="backgroundRect.color" />
+        <field id="focusedBackgroundColor" type="color" alias="focusedBackgroundRect.color" />
+        
+        <field id="font" type="node" alias="text.font" />
+        <field id="text" type="string" alias="text.text" />
+        <field id="textColor" type="color" alias="text.color" />
+        <field id="iconUri" type="string" alias="icon.uri" />
+    </interface>
+    <children>
+        <Rectangle
+            id="backgroundRect"
+            color="0x00000000" />
+        <Poster
+            id="background"
+            uri="pkg:/images/button_keyboard.9.png" />
+        <Rectangle
+            id="focusedBackgroundRect"
+            color="0x00000000" />
+        <Poster
+            id="focusedBackground"
+            uri="pkg:/images/button_keyboard_focused.9.png" 
+            opacity="0.0" />
+        <Label
+            id="text"
+            color="0xffffffff"
+            font="font:SmallestSystemFont"
+            horizAlign="center"
+            vertAlign="center"
+            numLines="1" />
+        <CenteredPoster
+            id="icon" />
+    </children>
+</component>

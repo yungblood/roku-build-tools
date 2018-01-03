@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ScrollableLayoutGroup" extends="LayoutGroup">
+    <script type="text/brightscript" uri="pkg:/components/framework/widgets/rowListEx/scrollableLayoutGroup.brs" />
+    <script type="text/brightscript" uri="pkg:/components/framework/utilities/nodes.brs" />
+    <interface>
+		<field id="scrollDuration" type="float" value=".25" onChange="onScrollDurationChanged" />
+		<field id="scrollEaseFunction" type="string" value="inOutQuad" onChange="onScrollEaseFunctionChanged" />
+		
+		<field id="scrollMargin" type="float" />
+		<field id="ignoreScrollMarginForFirstChild" type="boolean" value="false" />
+		<field id="scrollExtent" type="float" />
+
+		<field id="pendingChildScrolled" type="integer" alwaysNotify="true" />
+		<field id="childScrolled" type="integer" alwaysNotify="true" />
+		<field id="scrollToChild" type="integer" onChange="onScrollToChild" alwaysNotify="true" />
+		<field id="jumpToChild" type="integer" onChange="onJumpToChild" alwaysNotify="true" />
+		
+		<field id="scrollPercentage" type="float" alwaysNotify="true" />
+    </interface>
+    
+    <children>
+    	<ParallelAnimation
+    		id="parentAnimation">
+		    <Animation
+		        id="scrollAnimation"
+		        duration=".25"
+		        delay="0"
+		        repeat="false"
+		        easeFunction="inOutQuad" >
+		        <Vector2DFieldInterpolator
+		            id="scrollInterpolator"
+		            key="[0.0,1.0]"
+		            keyValue="[[0,0],[100,100]]"
+		            fieldToInterp="translation" />
+		    </Animation>
+		    <Animation
+		        id="percentAnimation"
+		        duration=".25"
+		        delay="0"
+		        repeat="false"
+		        easeFunction="inOutQuad" >
+		        <FloatFieldInterpolator
+		            id="percentInterpolator"
+		            key="[0.0,1.0]"
+		            keyValue="[0.0,1.0]"
+		            fieldToInterp="scrollPercentage" />
+		    </Animation>
+	    </ParallelAnimation>
+    </children>
+</component>

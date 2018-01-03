@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="LoadSectionPageTask" extends="ApiTask">
+    <script type="text/brightscript" uri="pkg:/components/tasks/loadSectionPageTask.brs" />
+    <interface>
+        <field id="sectionID" type="string" />
+        <field id="excludeShow" type="boolean" />
+        <field id="params" type="assocarray" />
+        <field id="page" type="integer" />
+        <field id="pageSize" type="integer" />
+
+        <field id="videos" type="nodearray" alwaysNotify="true" />
+    </interface>
+</component>

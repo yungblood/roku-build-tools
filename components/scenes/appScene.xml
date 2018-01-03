@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="AppScene" extends="Scene">
+    <script type="text/brightscript" uri="pkg:/components/scenes/appScene.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/constants.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/omniture.brs" />
+    <script type="text/brightscript" uri="pkg:/components/framework/utilities/dialogs.brs" />
+
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/debug.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/device.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/web.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/base64.brs" />
+    
+    <interface>
+        <field id="config" type="assocarray" onChange="onConfigurationSet" />
+        <field id="ecp" type="assocarray" />
+        <field id="close" type="boolean" alwaysNotify="true" />
+    </interface>
+    <children>
+<!--         <UvpVideoScreen -->
+<!--             id="uvpVideoScreen" -->
+<!--             visible="false" /> -->
+<!--         <VideoScreen -->
+<!--             id="videoScreen" -->
+<!--             visible="false" /> -->
+<!--         <LiveTVScreen -->
+<!--             id="liveTVScreen" -->
+<!--             visible="false" /> -->
+        <Group
+            id="screens" />
+        <Group
+            id="dialogs" />
+            
+        <Rectangle
+            id="waitRect"
+            width="1920"
+            height="1080"
+            color="0x000000ff"
+            visible="false" />
+        <LayoutGroup
+            id="loading"
+            translation="[960,540]"
+            vertAlignment="center"
+            horizAlignment="center"
+            visible="false">
+            <AnimatedSprite
+                id="spinner"
+                width="150"
+                height="150"
+                frames="24"
+                frameUri="pkg:/images/loading/loading_{0}.png"
+                frameDelay="0.05" />
+        </LayoutGroup>
+
+        <Timer
+            id="dialogTimer"
+            repeat="false"
+            duration=".25" />
+    </children>
+</component>

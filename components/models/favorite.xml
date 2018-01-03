@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="Favorite" extends="ContentNode">
+    <script type="text/brightscript" uri="pkg:/components/models/favorite.brs" />
+    <interface>
+        <field id="json" type="assocarray" onChange="onJsonChanged" />
+        <field id="showID" type="string" />
+        <field id="show" type="node" />
+        <field id="displayOrder" type="integer" />
+        <field id="dateAdded" type="integer" />
+    </interface>
+</component>

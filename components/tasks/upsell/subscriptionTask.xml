@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="SubscriptionTask" extends="ApiTask">
+    <script type="text/brightscript" uri="pkg:/components/tasks/upsell/subscriptionTask.brs" />
+    <interface>
+        <field id="productCode" type="string" />
+        <field id="type" type="string" />
+        <field id="error" type="string" />
+        <field id="product" type="assocarray" />
+        <field id="transactionID" type="string" />
+        <field id="success" type="boolean" alwaysNotify="true" />
+    </interface>
+</component>

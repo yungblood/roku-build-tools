@@ -1,58 +1,59 @@
-Function Omniture() As Object
-    If m.Omniture = invalid Then
-        m.Omniture = NewOmniture()
-    End If
-    Return m.Omniture
-End Function
+function omniture() as object
+    if m.omniture = invalid then
+        m.omniture = NewOmniture()
+    end if
+    return m.omniture
+end function
 
-Function NewOmniture() As Object
+function NewOmniture() as object
     this                = {}
-    this.ClassName      = "Omniture"
+    this.className      = "Omniture"
     
-    this.Omniture       = invalid
+    this.omniture       = invalid
     
-    this.BaseUrl        = "http://om.cbsi.com/b/ss/[SUITE_ID]/1/H.27.4/s06757860819343"
+    this.baseUrl        = "http://om.cbsi.com/b/ss/[SUITE_ID]/1/H.27.4/s06757860819343"
     
-    this.Initialize     = Omniture_Initialize
-    this.TrackPage      = Omniture_TrackPage
-    this.TrackEvent     = Omniture_TrackEvent
+    this.initialize     = omniture_initialize
+    this.trackPage      = omniture_trackPage
+    this.trackEvent     = omniture_trackEvent
     
-    Return this
-End Function
+    return this
+end function
 
-Sub Omniture_Initialize(suiteID As String, userID As String, subscriberStatus As String, subscriberProduct As String, evar5 = suiteID As String)
-    url = Replace(m.BaseUrl, "[SUITE_ID]", suiteID)
-    m.Omniture = NWM_Omniture(url)
-    m.Omniture.debug = False
-    m.Omniture.persistentParams.v1 = "CBS"
-    m.Omniture.persistentParams.v3 = "roku tv ott|" + LCase(GetModel())
-    m.Omniture.persistentParams.v5 = evar5
-    'm.Omniture.persistentParams.v15 = subscriberStatus
-    m.Omniture.persistentParams.v32 = "cbs_roku_app"
-    m.Omniture.persistentParams.v69 = userID
-    m.Omniture.persistentParams.l1 = subscriberStatus
-    m.Omniture.persistentParams.pl = subscriberProduct
-End Sub
+sub omniture_initialize(suiteID as string, userID as string, subscriberStatus as string, subscriberProduct as string, evar5 = suiteID as string)
+    url = m.baseUrl.replace("[SUITE_ID]", suiteID)
+    m.omniture = NWM_Omniture(url, true)
+    m.omniture.debug = true
+    m.omniture.persistentParams.v1 = "CBS"
+    m.omniture.persistentParams.v3 = "roku tv ott|" + lCase(getModel())
+    m.omniture.persistentParams.v5 = evar5
+    m.omniture.persistentParams.v15 = subscriberStatus
+    m.omniture.persistentParams.v32 = "cbs_roku_app|can"
+    m.omniture.persistentParams.v58 = getDeviceID()
+    m.omniture.persistentParams.v69 = userID
+    m.omniture.persistentParams.l1 = subscriberStatus
+    m.omniture.persistentParams.pl = subscriberProduct
+end sub
 
-Sub Omniture_TrackPage(pageName As String, events = [] As Object, additionalParams = {} As Object)
+sub omniture_trackPage(pageName as string, events = [] as object, additionalParams = {} as object)
     params = {}
     params.pageName = pageName
-    If events <> invalid And events.Count() > 0 Then
-        params.events = Join(events, ",")
-    End If
-    params.Append(additionalParams)
-    m.Omniture.LogEvent(params)
-End Sub
+    if events <> invalid and events.Count() > 0 then
+        params.events = join(events, ",")
+    end if
+    params.append(additionalParams)
+    m.omniture.logEvent(params)
+end sub
 
-Sub Omniture_TrackEvent(linkName As String, events = [] As Object, additionalParams = {} As Object)
+sub omniture_trackEvent(linkName as string, events = [] as object, additionalParams = {} as object)
     params = {}
     params.pev2 = linkName
-    If events <> invalid And events.Count() > 0 Then
-        params.events = Join(events, ",")
-    End If
-    params.Append(additionalParams)
-    If params.v46 = invalid Then
+    if events <> invalid and events.Count() > 0 then
+        params.events = join(events, ",")
+    end if
+    params.append(additionalParams)
+    if params.v46 = invalid then
         params.v46 = linkName
-    End If
-    m.Omniture.LogEvent(params)
-End Sub
+    end if
+    m.omniture.logEvent(params)
+end sub

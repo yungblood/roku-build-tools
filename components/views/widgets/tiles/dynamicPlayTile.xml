@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="DynamicPlayTile" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/views/widgets/tiles/dynamicPlayTile.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <interface>
+        <field id="show" type="node" onChange="onShowChanged" />
+        <field id="episode" type="node" />
+        <field id="itemSelected" type="boolean" alwaysNotify="true" />
+    </interface>
+    <children>
+        <Font
+            id="overlayFont"
+            size="24"
+            uri="pkg:/fonts/Lato-Bold.ttf" />
+        <Font
+            id="titleFont"
+            size="40"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="episodeFont"
+            size="26"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="descriptionFont"
+            size="26"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+
+        <Group
+            id="playTile">
+            <Poster
+                id="poster"
+                width="418"
+                height="236"
+                loadDisplayMode="scaleToZoom" />
+            <Poster
+                id="smallDarken"
+                width="418"
+                height="236"
+                uri="pkg:/images/small-thumb-darken.png" />
+            <LayoutGroup
+                id="metadata"
+                translation="[16,213]"
+                layoutDirection="vert"
+                vertAlignment="bottom"
+                itemSpacings="[10]">
+                <Label
+                    id="overlayText"
+                    color="0xffffffff"
+                    vertAlign="bottom"
+                    wrap="false"
+                    font="dictionary:overlayFont" />
+                <ProgressBar
+                    id="progressBar"
+                    backgroundColor="0xffffff33"
+                    barColor="0x0092f3ff"
+                    width="382"
+                    height="4"
+                    visible="false" />
+            </LayoutGroup>
+            <Poster
+                id="focusFrame"
+                width="418"
+                height="236"
+                uri="pkg:/images/frame_grid.9.png"
+                visible="false" />
+        </Group>
+        <Group
+            id="metadataTile"
+            translation="[440,-10]">
+            <Label
+                id="title"
+                color="0xffffffff"
+                wrap="false"
+                width="570"
+                font="dictionary:titleFont" />
+            <Label
+                id="episodeNumber"
+                translation="[0,47]"
+                color="0xb3b1b0ff"
+                wrap="false"
+                font="dictionary:episodeFont" />
+            <Rectangle
+                id="descriptionFocusRect"
+                translation="[-5,89]"
+                width="570"
+                height="162"
+                color="0xffffff20"
+                visible="false" />
+            <ScrollableText
+                id="description"
+                translation="[0,89]"
+                width="570"
+                height="157"
+                color="0xe5e6e7ff"
+                lineSpacing="0"
+                font="dictionary:descriptionFont"
+                scrollbarTrackBitmapUri="invalid"
+                scrollbarThumbBitmapUri="invalid" />
+        </Group>
+    </children>
+</component>

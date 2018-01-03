@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="CenteredPoster" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/framework/widgets/centeredPoster.brs" />
+    <interface>
+        <field id="width" type="float" onChange="updatePosition" />
+        <field id="height" type="float" onChange="updatePosition" />
+        <field id="uri" type="string" alias="poster.uri" />
+        <field id="loadSync" type="boolean" alias="poster.loadSync" />
+    </interface>
+    <children>
+        <LayoutGroup
+            id="group"
+            horizAlignment="center"
+            vertAlignment="center">
+            <ResolutionAwarePoster
+                id="poster" />
+        </LayoutGroup>
+    </children>
+</component>

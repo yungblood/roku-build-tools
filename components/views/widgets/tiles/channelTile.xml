@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="ChannelTile" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/views/widgets/tiles/channelTile.brs" />
+
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
+    <interface>
+        <field id="itemContent" type="node" onChange="onContentChanged" />
+        <field id="gridHasFocus" type="boolean" onChange="onFocusChanged" />
+        <field id="focusPercent" type="float" onChange="onFocusChanged" />
+    </interface>
+    <children>
+        <Rectangle
+            translation="[0,13]"
+            width="399"
+            height="225"
+            color="0x2b2b2bff" />
+        <Poster
+            id="logo"
+            translation="[0,77]"
+            width="399"
+            height="80"
+            loadDisplayMode="scaleToFit" />
+        <Label
+            id="error"
+            translation="[90,65]"
+            width="199"
+            color="0xffffffff"
+            wrap="true"
+            lineSpacing="0"
+            text="">
+            <Font
+                role="font"
+                size="38"
+                uri="pkg:/fonts/Lato-Regular.ttf" />
+        </Label>
+        <Label
+            id="showTitle"
+            translation="[20,188]"
+            width="359"
+            horizAlign="center"
+            color="0xffffffff"
+            wrap="false"
+            text="">
+            <Font
+                role="font"
+                size="28"
+                uri="pkg:/fonts/Lato-Bold.ttf" />
+        </Label>
+        <Rectangle
+            id="liveNow"
+            translation="[0,13]"
+            width="223"
+            height="37"
+            color="0x0092f3ff"
+            visible="false">
+            <Label
+                width="223"
+                height="37"
+                color="0xffffffff"
+                wrap="false"
+                text="Live Now"
+                horizAlign="center"
+                vertAlign="center">
+                <Font
+                    role="font"
+                    size="27"
+                    uri="pkg:/fonts/Lato-Bold.ttf" />
+            </Label>
+        </Rectangle>
+        <Poster
+            id="focusFrame"
+            translation="[0,13]"
+            width="399"
+            height="225"
+            uri="pkg:/images/frame_grid.9.png"
+            visible="false" />
+
+        <Timer
+            id="updateTimer"
+            duration="5"
+            repeat="true" />
+    </children>
+</component>

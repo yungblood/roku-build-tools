@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="CenterScaledCarousel2" extends="Group">
+	<script type="text/brightscript" uri="pkg:/components/framework/widgets/centerScaledCarousel.brs" />
+	<interface>
+		<field id="focusedItemWidth" type="float" value="576" />
+		<field id="focusedItemHeight" type="float" value="576" />
+		<field id="unfocusedItemWidth" type="float" value="420" />
+		<field id="unfocusedItemHeight" type="float" value="420" />
+		
+		<field id="itemSpacing" type="float" value="48" />
+
+		<field id="focusBitmapUri" type="string" alias="focus.uri" />
+        <field id="focusBitmapPadding" type="float" />
+
+		<field id="content" type="node" onChange="onContentChanged" />
+        <field id="itemComponentName" type="string" alias="list.itemComponentName" />
+		<field id="itemFocused" type="integer" alias="list.itemFocused" alwaysNotify="true" />
+		<field id="itemSelected" type="integer" alias="list.itemSelected" alwaysNotify="true" />
+		
+		<field id="jumpToItem" type="integer" alias="list.jumpToItem" alwaysNotify="true" />
+		<field id="animateToItem" type="integer" alias="list.animateToItem" alwaysNotify="true" />
+        <field id="currFocusItemIndex" type="float" alias="list.currFocusItemIndex" alwaysNotify="true" />
+	</interface>
+    <children>
+    	<TargetList
+            id="list" />
+        <Poster
+            id="focus"
+            visible="false" />
+    </children>
+</component>

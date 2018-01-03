@@ -58,6 +58,10 @@ Function IsHttpAgent(value As Dynamic) As Boolean
     Return IsValid(value) And GetInterface(value, "ifHttpAgent") <> invalid
 End Function
 
+Function IsSGNode(value As Dynamic) As Boolean
+    Return IsValid(value) And GetInterface(value, "ifSGNodeField") <> invalid
+End Function
+
 Function IsValid(value As Dynamic) As Boolean
     Return Type(value) <> "<uninitialized>" And value <> invalid
 End Function

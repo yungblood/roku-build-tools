@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="ErrorNode" extends="Node">
+	<interface>
+		<field id="code" type="string" />
+		<field id="message" type="string" />
+	</interface>
+</component>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="RecommendationTile" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/views/widgets/tiles/recommendationTile.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
+    <interface>
+        <field id="itemContent" type="node" onChange="onContentChanged" />
+        <field id="countdown" type="integer" onChange="onCountdownChanged" />
+    </interface>
+    <children>
+        <Font
+            id="titleFont"
+            size="30"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="subtitleFont"
+            size="27"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="buttonFont"
+            size="24"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="countdownFont"
+            size="24"
+            uri="pkg:/fonts/Lato-Light.ttf" />
+
+        <Poster
+            id="poster"
+            width="350"
+            height="197"
+            loadDisplayMode="scaleToZoom" />
+        <Rectangle
+            id="countdown"
+            translation="[0,152]"
+            width="350"
+            height="45"
+            color="0x000000cc"
+            visible="false">
+            <LayoutGroup
+                translation="[175,22.5]"
+                layoutDirection="horiz"
+                itemSpacings="[5]"
+                horizAlignment="center"
+                vertAlignment="center">
+                <Label
+                    text="STARTS IN"
+                    color="0xffffffff"
+                    font="dictionary:countdownFont" />
+                <Label
+                    id="countdownLabel"
+                    color="0x0092f3ff"
+                    font="dictionary:countdownFont" />
+            </LayoutGroup>
+        </Rectangle>
+        <LayoutGroup
+            id="metadata"
+            translation="[389,0]"
+            layoutDirection="vert"
+            vertAlignment="top"
+            itemSpacings="[0]">
+            <Label
+                id="title"
+                width="447"
+                color="0xffffffff"
+                wrap="true"
+                font="dictionary:titleFont" />
+            <Label
+                id="subtitle"
+                width="447"
+                color="0xbebebeff"
+                wrap="true"
+                font="dictionary:subtitleFont" />
+        </LayoutGroup>
+        <LabelButton
+            id="ctaButton"
+            translation="[389,134]"
+            width="447"
+            height="63"
+            text=""
+            textColor="0xffffffff"
+            focusedTextColor="0xffffffff"
+            backgroundUri="pkg:/images/frame_generic.9.png"
+            focusedBackgroundUri="pkg:/images/button_focus.9.png"
+            font="dictionary:buttonFont"
+            processKeyEvents="false" />
+    </children>
+</component>

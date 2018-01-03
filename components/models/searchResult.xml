@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="SearchResult" extends="ContentNode">
+    <script type="text/brightscript" uri="pkg:/components/models/searchResult.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    <interface>
+        <field id="json" type="assocarray" onChange="onJsonChanged" />
+        <field id="type" type="string" />
+        <field id="episodeCount" type="integer" />
+        <field id="clipCount" type="integer" />
+        <field id="browseImageUrl" type="string" />
+    </interface>
+</component>

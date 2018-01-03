@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="LoadLiveStreamTask" extends="ApiTask">
+    <script type="text/brightscript" uri="pkg:/components/tasks/liveTV/loadLiveStreamTask.brs" />
+    <script type="text/brightscript" uri="pkg:/components/services/syncbak.brs" />
+    <interface>
+        <field id="station" type="node" />
+        <field id="stream" type="node" />
+        <field id="schedule" type="nodearray" />
+    </interface>
+</component>

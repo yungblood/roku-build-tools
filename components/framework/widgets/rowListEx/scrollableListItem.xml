@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ScrollableListItem" extends="ContentNode">
+    <script type="text/brightscript" uri="pkg:/components/framework/widgets/rowListEx/scrollableListItem.brs" />
+    <interface>
+    	<field id="index" type="integer" />
+    	<field id="itemContent" type="node" />
+    	<field id="itemComponentName" type="string" />
+    	<field id="itemComponent" type="node" onChange="onComponentChanged" />
+    	<field id="parentGroup" type="node" />
+    	
+    	<field id="itemSelected" type="integer" alwaysNotify="true" />
+        <field id="buttonSelected" type="string" alwaysNotify="true" />
+    </interface>
+</component>

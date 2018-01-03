@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="LiveTVPanel" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/views/widgets/panels/liveTVPanel.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <interface>
+    </interface>
+    <children>
+        <Font
+           id="titleFont"
+           size="24"
+           uri="pkg:/fonts/Lato-Bold.ttf" />
+        <LayoutGroup
+            id="content"
+            layoutDirection="vert"
+            translation="[0,375]"
+            itemSpacings="[0]"
+            vertAlignment="center">
+            <Label
+                id="signedOut"
+                text="You must be signed in to choose a local station"
+                color="0xffffffff"
+                opacity=".75">
+                <Font
+                    role="font"
+                    size="35"
+                    uri="pkg:/fonts/Lato-Regular.ttf" />
+            </Label>
+            <Label
+                id="unavailable"
+                width="1000"
+                text="Live TV streams are currently not available in your area. Be sure to check back as we are always adding more stations."
+                color="0xffffffff"
+                opacity=".75"
+                wrap="true"
+                lineSpacing="0">
+                <Font
+                    role="font"
+                    size="35"
+                    uri="pkg:/fonts/Lato-Regular.ttf" />
+            </Label>
+            <LayoutGroup
+                id="signedIn"
+                layoutDirection="vert"
+                itemSpacings="[30]">
+                <Label
+                    text="LOCAL STATION"
+                    color="0x0092f3ff"
+                    font="dictionary:titleFont" />
+                <LabelButtonGroup
+                    id="channels"
+                    layoutDirection="horiz"
+                    itemSpacings="[20]" />
+            </LayoutGroup>
+        </LayoutGroup>
+    </children>
+</component>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="DrmSession" extends="ContentNode">
+    <script type="text/brightscript" uri="pkg:/components/models/drmSession.brs" />
+    <interface>
+        <field id="json" type="assocarray" onChange="onJsonChanged" />
+
+        <field id="sessionID" type="string" />
+        <field id="ticket" type="string" />
+    </interface>
+</component>

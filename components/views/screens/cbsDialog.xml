@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="CbsDialog" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/views/screens/cbsDialog.brs" />
+    <interface>
+        <field id="title" type="string" alias="title.text" />
+        <field id="titleFont" type="node" alias="title.font" />
+        <field id="titleColor" type="color" alias="title.color" />
+        <field id="message" type="string" alias="message.text" />
+        <field id="messageFont" type="intarray" alias="message.font" />
+        <field id="messageColor" type="color" alias="message.color" />
+        <field id="messageAlignment" type="color" alias="message.horizAlign" />
+        <field id="buttons" type="stringarray" onChange="onButtonsChanged" />
+        <field id="itemSpacings" type="intarray" alias="controls.itemSpacings" />
+        <field id="contentGroup" type="node" />
+        
+        <field id="buttonSelected" type="string" alwaysNotify="true" />
+        <field id="autoClose" type="boolean" />
+        <field id="allowBack" type="boolean" />
+
+        <field id="close" type="boolean" alwaysNotify="true" />
+    </interface>
+    <children>
+        <Font
+            id="buttonFont"
+            size="24"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Rectangle
+            width="1920"
+            height="1080"
+            color="0x000000e6">
+            <LayoutGroup
+                id="controls"
+                translation="[960,540]"
+                layoutDirection="vert"
+                itemSpacings="[30]"
+                horizAlignment="center"
+                vertAlignment="center">
+                <Label
+                    id="title"
+                    width="1920"
+                    wrap="false"
+                    horizAlign="center"
+                    color="0xffffffff">
+                       <Font
+                           role="font"
+                           size="40"
+                           uri="pkg:/fonts/Lato-Regular.ttf" />
+                </Label>
+                <Label
+                    id="message"
+                    width="1250"
+                    lineSpacing="0"
+                    color="0xffffffff"
+                    horizAlign="center"
+                    wrap="true">
+                       <Font
+                           role="font"
+                           size="40"
+                           uri="pkg:/fonts/Lato-Light.ttf" />
+                </Label>
+                <Group
+                    id="additionalContent" />
+                <Rectangle
+                    id="spacer"
+                    color="0x00000000"
+                    width="1"
+                    height="1" />
+                <LabelButtonGroup
+                    id="buttons"
+                    layoutDirection="horiz"
+                    itemSpacings="[20]"
+                    horizAlignment="center" />
+            </LayoutGroup>
+        </Rectangle>
+    </children>
+</component>

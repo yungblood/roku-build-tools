@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="TestScreen" extends="BaseScreen">
+    <script type="text/brightscript" uri="pkg:/components/views/screens/testScreen.brs" />
+    
+    <interface>
+        <field id="itemSelected" type="node" alwaysNotify="true" />
+        <field id="menuItemSelected" type="string" alwaysNotify="true" />
+    </interface>
+    <children>
+        <ScrollableList
+            id="list"
+            translation="[0,0]"
+            itemComponentName="TestItem" />
+        <Rectangle
+            translation="[0,192]"
+            width="1920"
+            height="2"
+            color="0xff0000ff" />
+        <Rectangle
+            translation="[0,188]"
+            width="1920"
+            height="2"
+            color="0x00ff00ff" />
+        <Rectangle
+            translation="[0,446]"
+            width="1920"
+            height="2"
+            color="0x0000ffff" />
+    </children>
+</component>

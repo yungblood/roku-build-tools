@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="Favorites" extends="ContentNode">
+    <script type="text/brightscript" uri="pkg:/components/models/favorites.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    <interface>
+        <field id="addFavorite" type="string" onChange="onAddFavorite" />
+        <field id="removeFavorite" type="string" onChange="onRemoveFavorite" />
+        <field id="update" type="boolean" onChange="update" alwaysNotify="true" />
+    </interface>
+</component>

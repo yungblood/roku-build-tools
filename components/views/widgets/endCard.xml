@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="EndCard" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/views/widgets/endCard.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <interface>
+        <field id="jumpToIndex" type="integer" alias="autoplayButtons.jumpToIndex" />
+        <field id="buttonSelected" type="node" />
+        <field id="buttonFocused" type="node" />
+
+        <field id="viewport" type="rect2D" />
+        
+        <field id="countdown" type="integer" onChange="onCountdownChanged" />
+        <field id="continuousPlayInfo" type="node" onChange="onContinuousPlayInfoChanged" />
+    </interface>
+    <children>
+        <Font
+            id="endCardEpisodeNumberFont"
+            uri="pkg:/fonts/Lato-Light.ttf"
+            size="46" />
+        <Font
+            id="endCardEpisodeTitleFont"
+            uri="pkg:/fonts/Lato-Light.ttf"
+            size="34" />
+        <Font
+            id="endCardShowTitleFont"
+            uri="pkg:/fonts/Lato-Bold.ttf"
+            size="46" />
+        <Font
+            id="headerFont"
+            uri="pkg:/fonts/Lato-Regular.ttf"
+            size="30" />
+
+        <CrossfadePoster
+            id="background"
+            width="1920"
+            height="1080" />
+        <Rectangle
+            width="1920"
+            height="1080"
+            color="0x000000ff"
+            opacity=".75" />
+        <Group
+            id="autoplay">
+            <LabelButtonGroup
+                id="autoplayButtons"
+                translation="[245,270]"
+                layoutDirection="horiz"
+                itemSpacings="[160]">
+                <LabelButton
+                    id="autoplayZoom"
+                    width="635"
+                    height="357"
+                    backgroundColor="0x222222ff"
+                    focusedForegroundUri="pkg:/images/frame_grid.9.png"
+                    processKeyEvents="false" />
+                <LabelButton
+                    id="upNext"
+                    width="635"
+                    height="357"
+                    foregroundUri="pkg:/images/frame_generic.9.png"
+                    foregroundBlendColor="0x222222ff"
+                    focusedForegroundUri="pkg:/images/frame_grid.9.png"
+                    processKeyEvents="false" />
+            </LabelButtonGroup>
+            <Group
+                translation="[1040,175]">
+                <LayoutGroup
+                    layoutDirection="horiz"
+                    itemSpacings="[15]">
+                    <Label
+                        color="0xffffffff"
+                        text="UP NEXT IN"
+                        font="dictionary:endCardEpisodeNumberFont" />
+                    <Label
+                        id="countdown"
+                        color="0x0092f3ff"
+                        text="XX SECONDS"
+                        font="dictionary:endCardShowTitleFont" />
+                </LayoutGroup>
+                <LayoutGroup
+                    translation="[0,497]"
+                    layoutDirection="vert"
+                    itemSpacings="[10]">
+                    <Label
+                        id="upNextShowName"
+                        width="700"
+                        color="0xffffffff"
+                        wrap="true"
+                        lineSpacing="0"
+                        font="dictionary:endCardShowTitleFont" />
+                    <Label
+                        id="upNextEpisodeNumber"
+                        width="700"
+                        color="0xffffffff"
+                        wrap="true"
+                        lineSpacing="0"
+                        font="dictionary:endCardEpisodeNumberFont" />
+                    <Label
+                        id="upNextEpisodeName"
+                        width="700"
+                        translation="[0,562]"
+                        color="0xffffffff"
+                        wrap="true"
+                        lineSpacing="0"
+                        font="dictionary:endCardEpisodeTitleFont" />
+                </LayoutGroup>
+            </Group>
+        </Group>
+        <Group
+            id="selector">
+            <Label
+                id="thankYouLabel"
+                translation="[180,141]"
+                width="650"
+                height="59"
+                horizAlign="left"
+                vertAlign="top"
+                wrap="true"
+                lineSpacing="0"
+                font="dictionary:headerFont"
+                text="Thank you for watching" />
+            <LabelButton
+                id="selectorZoom"
+                translation="[180,200]"
+                width="650"
+                height="366"
+                backgroundColor="0x222222ff"
+                focusedForegroundUri="pkg:/images/frame_grid.9.png" />
+            <Label
+                translation="[904,141]"
+                width="836"
+                height="59"
+                horizAlign="left"
+                vertAlign="top"
+                wrap="true"
+                lineSpacing="0"
+                font="dictionary:headerFont"
+                text="Related shows for you:" />
+            <LabelButtonGroup
+                id="selectorButtons"
+                translation="[904,200]"
+                layoutDirection="vert"
+                itemSpacings="[73]" />
+        </Group>
+    </children>
+</component>

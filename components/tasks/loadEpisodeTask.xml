@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="LoadEpisodeTask" extends="ApiTask">
+    <script type="text/brightscript" uri="pkg:/components/tasks/loadEpisodeTask.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/hls.brs" />
+    <interface>
+        <field id="episodeID" type="string" />
+        <field id="episode" type="node" alwaysNotify="true" />
+        <field id="error" type="string" />
+        <field id="nextEpisode" type="node" alwaysNotify="true" />
+        <field id="populateStream" type="boolean" />
+        <field id="loadNextEpisode" type="boolean" />
+    </interface>
+</component>

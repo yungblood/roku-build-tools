@@ -1,0 +1,82 @@
+{
+  "version": "1.0",
+  "analytics": {
+    "rsids": "cbsicbsott-dev,cbsicbsiall-dev",
+    "server": "om.cbsi.com",
+    "charset": "UTF-8",
+    "ssl": false,
+    "offlineEnabled": false,
+    "lifecycleTimeout": 300,
+    "referrerTimeout": 0,
+    "batchLimit": 0,
+    "privacyDefault": "optedin",
+    "poi": []
+  },
+   "marketingCloud": {
+   "org": "10D31225525FF5790A490D4D@AdobeOrg"
+  },
+  "target": {
+    "clientCode": "",
+    "timeout": 5
+  },
+  "audienceManager": {
+    "server": "cbsi.demdex.net"
+  },
+  "acquisition": {
+    "server": "",
+    "appid": ""
+  },
+  "mediaHeartbeat": {
+    "server": "cbsinteractive.hb.omtrdc.net",
+    "publisher": "10D31225525FF5790A490D4D@AdobeOrg",
+    "channel": "CBS Entertainment",
+    "ssl": false,
+    "ovp": "Native Roku Player",
+    "sdkVersion": "2.0.0",
+    "playerName": "Roku"
+  },
+  "messages": [{
+    "messageId": "",
+    "recipient": "Custom",
+    "payload": {
+      "templateurl": "",
+      "templatebody": "",
+      "contenttype": "",
+      "timeout": 2
+    },
+    "showOffline": true,
+    "showRule": "always",
+    "endDate": 2524730400,
+    "template": "callback",
+    "audiences": [],
+    "triggers": [{
+      "key": "",
+      "matches": "eq",
+      "values": [
+        ""
+      ]
+    }]
+  }, {
+    "messageId": "",
+    "recipient": "",
+    "payload": {
+      "templateurl": "",
+      "templatebody": "",
+      "contenttype": "",
+      "timeout": 2
+    },
+    "showOffline": true,
+    "showRule": "always",
+    "endDate": 2524730400,
+    "startDate": 0,
+    "template": "callback",
+    "audiences": [],
+    "triggers": [{
+      "key": "",
+      "matches": "eq",
+      "values": [
+        ""
+      ]
+    }]
+  }]
+}

@@ -1,0 +1,223 @@
+sub init()
+    m.top.omnitureName = "/"
+    m.top.omniturePageType = "front_door"
+
+    m.top.observeField("focusedChild", "onFocusChanged")
+    m.top.observeField("visible", "onVisibleChanged")
+    
+    m.marquee = m.top.findNode("marquee")
+    m.marquee.observeField("itemSelected", "onItemSelected")
+    m.marquee.observeField("opacity", "onMarqueeOpacityChanged")
+
+    m.marqueeTimer = m.top.findNode("marqueeTimer")
+    m.marqueeTimer.observeField("fire", "onMarqueeTimerFired")
+    
+    m.menu = m.top.findNode("menu")
+    m.menu.observeField("buttonSelected", "onMenuItemSelected")
+    
+    m.list = m.top.findNode("list")
+    m.list.observeField("itemFocused", "onRowFocused")
+'    m.list.observeField("listItemSelected", "onListItemSelected")
+'    m.list.initialPositions             = [ -390,  0,  774, 1356, 1938]
+'    m.list.forwardIntermediatePositions = [ -774, -774,  188,  770, 1352]
+'    m.list.finalPositions               = [-1300, -718, -136,  446, 1028]
+'    m.list.content = createObject("roSGNode", "ContentNode")
+
+    m.global.showSpinner = true
+
+    m.fadeOutAnimation = m.top.findNode("fadeOutAnimation")
+    m.fadeInAnimation = m.top.findNode("fadeInAnimation")
+    m.scrollAnimation = m.top.findNode("scrollAnimation")
+    m.scrollInterp = m.top.findNode("scrollInterp")
+    
+    m.lastFocus = m.marquee
+    
+    m.concurrentRowLoads = 3
+end sub
+
+sub onFocusChanged()
+    if m.top.hasFocus() then
+        m.lastFocus.setFocus(true)
+    end if
+end sub
+
+sub onVisibleChanged()
+    if m.top.visible then
+        m.marqueeTimer.control = "start"
+        m.marquee.visible = true
+        if m.top.content = invalid then
+            m.global.showSpinner = true
+            m.contentTask = createObject("roSGNode", "HomeScreenTask")
+            m.contentTask.observeField("content", "onContentLoaded")
+            m.contentTask.control = "run"
+        end if
+    else
+        m.marqueeTimer.control = "stop"
+        m.marquee.visible = false
+    end if
+end sub
+
+function onKeyEvent(key as string, press as boolean) as boolean
+    ?"HomeScreen.onKeyEvent: ";key,press
+    if press then
+        if key = "down" then
+            if m.menu.isInFocusChain() then
+                m.marquee.setFocus(true)
+                m.lastFocus = m.marquee
+                return true
+            else if m.marquee.isInFocusChain() then
+                m.list.setFocus(true)
+                m.lastFocus = m.list
+                scrollToRow(true)
+                return true
+            end if
+        else if key = "up" then
+            if m.marquee.isInFocusChain() then
+                m.menu.setFocus(true)
+                m.lastFocus = m.menu
+                return true
+            else if m.list.isInFocusChain() then
+                m.marquee.setFocus(true)
+                m.lastFocus = m.marquee
+                scrollToRow()
+                return true
+            end if
+        end if
+    end if
+    return false
+end function
+
+sub loadContent(content as object)
+    m.marquee.content = content.marquee
+    m.marquee.visible = true
+    m.marqueeTimer.control = "start"
+
+    rows = content.rows
+
+timer = createObject("roTimespan")    
+    for i = 0 to rows.count() - 1
+        row = invalid
+        content = rows[i]
+        contentType = content.subtype()
+        if contentType = "Section" then
+            if content.title.inStr("Movies") >= 0 then
+                row = m.list.createChild("PostersRow")
+            else
+                if content.excludeShow then
+                    row = m.list.createChild("FeaturedRow")
+                else
+                    row = m.list.createChild("EpisodesRow")
+                end if
+            end if
+        else if contentType = "Favorites" then
+            row = m.list.createChild("FavoritesRow")
+        else if contentType = "RecentlyWatched" then
+            row = m.list.createChild("RecentlyWatchedRow")
+        else if contentType = "Show" then
+            row = m.list.createChild("ShowInfoRow")
+        else
+            ?"Unrecognized content type: ";contentType
+        end if
+        if row <> invalid then
+            if content.subtype() = "Section" and i <= m.concurrentRowLoads then
+                content.loadIndex = 0
+            end if
+            row.content = content
+            row.observeField("itemSelected", "onItemSelected")
+            row.observeField("visible", "updateRowLayout")
+        end if
+    next
+?"Rows created:";timer.totalMilliseconds():timer.mark()
+    updateRowLayout()
+?"Rows updated:";timer.totalMilliseconds():timer.mark()    
+    m.global.showSpinner = false
+end sub
+
+sub onContentChanged()
+    m.global.showSpinner = true
+    loadContent(m.top.content)
+end sub
+
+sub onContentLoaded()
+    m.top.content = m.contentTask.content
+    m.contentTask = invalid
+end sub
+
+sub updateRowLayout()
+    offset = 0
+    for i = 0 to m.list.getChildCount() - 1
+        row = m.list.getChild(i)
+        if row.visible then
+            row.translation = [0, offset]
+            offset = offset + row.rowHeight + 50
+        end if
+    next
+end sub
+
+sub onRowFocused()
+    scrollToRow()
+end sub
+
+sub scrollToRow(fade = false as boolean)
+    for i = 0 to m.concurrentRowLoads - 1
+        row = m.list.getChild(m.list.itemFocused + i)
+        if row <> invalid and row.content <> invalid and row.content.subtype() = "Section" then
+            row.content.loadIndex = 0
+        end if
+    next
+
+    if m.list.isInFocusChain() then
+        row = m.list.getChild(m.list.itemFocused)
+        if row <> invalid then
+            rect = row.boundingRect()
+            m.scrollInterp.keyValue = [m.list.translation, [0, 188 - rect.y]]
+            if m.marquee.visible and fade then
+                m.fadeOutAnimation.appendChild(m.scrollAnimation)
+                m.fadeOutAnimation.control = "start"
+            else
+                m.scrollAnimation.control = "start"
+            end if
+        end if
+    else if m.marquee.isInFocusChain() then
+        m.scrollInterp.keyValue = [m.list.translation, [0, 772]]
+        m.fadeInAnimation.appendChild(m.scrollAnimation)
+        m.fadeInAnimation.control = "start"
+    end if
+end sub
+
+sub onItemSelected(nodeEvent as object)
+    row = nodeEvent.getRoSGNode()
+    if row <> invalid then
+        index = nodeEvent.getData()
+        item = row.content.getChild(index)
+        if item <> invalid then
+            trackScreenAction("trackPodSelect", getOmnitureData(row, index, iif(isSubscriber(m.global), "pay", "free")))
+            if item.subtype() = "Episode" or item.subtype() = "Movie" then
+                omnitureData = getOmnitureData(row, index, "more info", "overlay")
+                m.top.omnitureData = omnitureData
+                trackScreenAction("trackPodSelect", omnitureData)
+            end if
+            m.top.itemSelected = item
+        end if
+    end if
+end sub
+
+sub onMenuItemSelected(nodeEvent as object)
+    m.top.menuItemSelected = nodeEvent.getData()
+end sub
+
+sub onMarqueeOpacityChanged()
+    m.marquee.visible = (m.marquee.opacity > 0)
+end sub
+
+sub onMarqueeTimerFired()
+    if m.marquee.isInFocusChain() and m.marquee.content <> invalid then
+        if createObject("roDeviceInfo").timeSinceLastKeyPress() > 5 then
+            index = m.marquee.itemFocused + 1
+            if index >= m.marquee.content.getChildCount() - 1 then
+                index = 0
+            end if
+            m.marquee.animateToItem = index
+        end if
+    end if
+end sub

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="CustomKeyboard" extends="Group" initialFocus="keyboard">
+    <script type="text/brightscript" uri="pkg:/components/framework/widgets/keyboards/customKeyboard.brs" />
+
+    <interface>
+        <field id="text" type="string" />
+        
+        <field id="keySelected" type="string" alwaysNotify="true" />
+        <field id="keyHandled" type="boolean" value="false" />
+        <field id="currentKeyboard" type="string" onChange="onKeyboardChanged" />
+        <field id="jumpToKey" type="integer" alias="keyboard.jumpToItem" />
+        
+        <field id="disabledKeys" type="stringarray" value="[]" onChange="onDisabledKeysChanged" />
+
+        <field id="alphaKeys" type="string" value="1234567890.:_/abcdefghijklmnopqrstuvwxyz{{SPACE,1}}{{BACKSPACE,1}}{{UPPERALPHA,1}}{{SYMBOLS,1}}{{CLEAR,2}}{{DONE,3}}" onChange="onAlphaKeysChanged" />
+        <field id="upperAlphaKeys" type="string" value="1234567890.:_/ABCDEFGHIJKLMNOPQRSTUVWXYZ{{SPACE,1}}{{BACKSPACE,1}}{{ALPHA,1}}{{SYMBOLS,1}}{{CLEAR,2}}{{DONE,3}}" onChange="onUpperAlphaKeysChanged" />
+        <field id="symbolsKeys" type="string" value="1234567890.!?,:;*@#$%^&amp;'&quot;=+-_(){}[]&lt;&gt;|\/{{SPACE,1}}{{BACKSPACE,1}}{{ALPHA,1}}{{SPECIALS,1}}{{CLEAR,2}}{{DONE,3}}" onChange="onSymbolsKeysChanged" />
+        <field id="upperSymbolsKeys" type="string" value="1234567890.!?,:;*@#$%^&amp;'&quot;=+-_(){}[]&lt;&gt;|\/{{SPACE,1}}{{BACKSPACE,1}}{{ALPHA,1}}{{SPECIALS,1}}{{CLEAR,2}}{{DONE,3}}" onChange="onUpperSymbolsKeysChanged" />
+        <field id="specialKeys" type="string" value="1234567890àáâãäåæèéêëìíîïòóôõöøùúûüçćñýÿ{{SPACE,1}}{{BACKSPACE,1}}{{ALPHA,1}}{{SYMBOLS,1}}{{CLEAR,2}}{{DONE,3}}" onChange="onSpecialKeysChanged" />
+        <field id="upperSpecialKeys" type="string" value="1234567890ÀÁÂÃÄÅÆÈÉÊËÌÍÎÏÒÓÔÕÖØÙÚÛÜÇĆÑÝŸ{{SPACE,1}}{{BACKSPACE,1}}{{ALPHA,1}}{{SYMBOLS,1}}{{CLEAR,2}}{{DONE,3}}" onChange="onUpperSpecialKeysChanged" />
+
+        <field id="keyFont" type="node" />
+        <field id="controlKeyFont" type="node" />
+
+        <field id="alphaText" type="string" value="abc" />
+        <field id="upperAlphaText" type="string" value="ABC" />
+        <field id="symbolsText" type="string" value="#+=" />
+        <field id="upperSymbolsText" type="string" value="#+=" />
+        <field id="specialText" type="string" value="àêñ" />
+        <field id="upperSpecialText" type="string" value="ÀÊÑ" />
+        <field id="spaceText" type="string" value="" />
+        <field id="backspaceText" type="string" value="" />
+        
+        <field id="alphaIconUri" type="string" value="" />
+        <field id="upperAlphaIconUri" type="string" value="" />
+        <field id="symbolsIconUri" type="string" value="" />
+        <field id="upperSymbolsIconUri" type="string" value="" />
+        <field id="specialIconUri" type="string" value="" />
+        <field id="upperSpecialIconUri" type="string" value="" />
+        <field id="spaceIconUri" type="string" value="pkg:/images/key_space.png" />
+        <field id="backspaceIconUri" type="string" value="pkg:/images/key_backspace.png" />
+        
+        <field id="numColumns" type="int" value="7" alias="keyboard.numColumns"/>
+        <field id="keySize" type="vector2d" alias="keyboard.itemSize" />
+        <field id="keySpacing" type="vector2d" alias="keyboard.itemSpacing" />
+        <field id="keyBackgroundColor" type="color" value="0" />
+        <field id="keyFocusedBackgroundColor" type="color" value="0" />
+        <field id="keyBackgroundUri" type="string" />
+        <field id="keyFocusedBackgroundUri" type="string" />
+        
+        <field id="focusBitmapUri" type="string" alias="keyboard.focusBitmapUri" />
+        <field id="drawFocusFeedback" type="boolean" value="false" alias="keyboard.drawFocusFeedback" />
+        
+        <field id="wrap" type="boolean" value="false" />
+    </interface>
+    
+    <children>
+        <MarkupGrid
+            id="keyboard"
+            itemComponentName="CustomKeyboardButton"
+            itemSize="[66,66]"
+            itemSpacing="[3,3]"
+            numColumns="7"
+            numRows="25"
+            fixedLayout="true"
+            drawFocusFeedback="false"
+            horizFocusAnimationStyle="floatingFocus"
+            vertFocusAnimationStyle="floatingFocus" />
+    </children>
+</component>

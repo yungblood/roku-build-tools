@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="EmailSignInScreen" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/views/screens/emailSignInScreen.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    <script type="text/brightscript" uri="pkg:/components/framework/utilities/dialogs.brs" />
+
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/debug.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <interface>
+        <field id="buttonSelected" type="string" alwaysNotify="true" />
+        <field id="success" type="boolean" alwaysNotify="true" />
+    </interface>
+    <children>
+        <Font
+            id="buttonFont"
+            size="32"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+          <Font
+              id="focusedButtonFont"
+            size="32" 
+              uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Label
+            translation="[0,100]"
+            width="1920"
+            horizAlign="center"
+            text="Sign In"
+            color="0xe5e5e5ff">
+              <Font
+                  role="font"
+                  uri="pkg:/fonts/Lato-Bold.ttf"
+                  size="50" />
+        </Label>
+
+        <LabelButtonGroup
+            id="form"
+            translation="[960,540]"
+            layoutDirection="vert"
+            itemSpacings="[20]"
+            horizAlignment="center"
+            vertAlignment="center">
+            <TextBox
+                id="email"
+                width="700"
+                height="70"
+                padding="20"
+                hintText="Email Address"
+                textColor="0xe6e6e6ff"
+                textFont="dictionary:buttonFont"
+                focusedTextColor="0xffffffff"
+                focusedTextFont="dictionary:focusedButtonFont"
+                hintTextFont="dictionary:buttonFont"
+                hintTextColor="0x5d5d5dff"
+                focusedHintTextFont="dictionary:focusedButtonFont"
+                focusedHintTextColor="0xa5a5a5ff"
+                backgroundUri="pkg:/images/frame_generic.9.png"
+                backgroundColor="0xffffff22"
+                focusedBackgroundUri="pkg:/images/frame_grid.9.png"
+                focusedBackgroundColor="0xffffff22"
+                inputMask="^([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6})$"
+                validationError="Please enter a valid email address."
+                processKeyEvents="false" />
+            <TextBox
+                id="password"
+                width="700"
+                height="70"
+                padding="20"
+                hintText="Password"
+                textColor="0xe6e6e6ff"
+                textFont="dictionary:buttonFont"
+                focusedTextColor="0xffffffff"
+                focusedTextFont="dictionary:focusedButtonFont"
+                hintTextFont="dictionary:buttonFont"
+                hintTextColor="0x5d5d5dff"
+                focusedHintTextFont="dictionary:focusedButtonFont"
+                focusedHintTextColor="0xa5a5a5ff"
+                backgroundUri="pkg:/images/frame_generic.9.png"
+                backgroundColor="0xffffff22"
+                focusedBackgroundUri="pkg:/images/frame_grid.9.png"
+                focusedBackgroundColor="0xffffff22"
+                secureMode="true"
+                inputMask="^(.{6,128})$"
+                validationError="Please enter a valid password that is at least 6 characters."
+                processKeyEvents="false" />
+    
+            <LabelButton
+                id="signIn"
+                width="700"
+                height="88"
+                text="Sign In"
+                textColor="0xffffffff"
+                focusedTextColor="0xffffffff"
+                backgroundUri="pkg:/images/upsell_button.9.png"
+                focusedBackgroundUri="pkg:/images/upsell_button_focused.9.png"
+                processKeyEvents="false"
+                font="dictionary:buttonFont"
+                focusedFont="dictionary:focusedButtonFont"
+                disabledOpacity=".5"
+                disabled="false" />
+            <LabelButton
+                id="forgotPassword"
+                width="700"
+                height="88"
+                text="Forgot Password?"
+                textColor="0xffffffff"
+                focusedTextColor="0xffffffff"
+                backgroundUri="pkg:/images/upsell_button.9.png"
+                focusedBackgroundUri="pkg:/images/upsell_button_focused.9.png"
+                processKeyEvents="false"
+                font="dictionary:buttonFont"
+                focusedFont="dictionary:focusedButtonFont"
+                disabledOpacity=".5"
+                disabled="false" />
+        </LabelButtonGroup>
+        <Label
+            translation="[0,800]"
+            width="1920"
+            horizAlign="center"
+            text="To return to the previous screen, press the back button on your remote."
+            color="0xe5e5e5ff">
+            <Font
+                role="font"
+                uri="pkg:/fonts/Lato-Regular.ttf"
+                size="30" />
+        </Label>
+
+        <ChannelStore
+            id="store" />
+    </children>
+</component>

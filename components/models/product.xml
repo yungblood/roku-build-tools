@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="Product" extends="ContentNode">
+    <script type="text/brightscript" uri="pkg:/components/models/product.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
+    <interface>
+        <field id="json" type="assocarray" onChange="onJsonChanged" />
+        
+        <field id="productCode" type="string" />
+        <field id="vendor" type="string" />
+        <field id="vendorProductCode" type="string" />
+    </interface>
+</component>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="LiveTVButton" extends="LabelButton">
+    <script type="text/brightscript" uri="pkg:/components/views/widgets/liveTVButton.brs" />
+    <interface>
+        <field id="station" type="node" onChange="onStationChanged" />
+    </interface>
+    <children>
+        <LayoutGroup
+            id="group"
+            horizAlignment="center"
+            vertAlignment="center">
+            <Poster
+                id="logo" />
+        </LayoutGroup>
+    </children>
+</component>

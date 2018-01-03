@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="FadeInPoster" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/framework/widgets/fadeInPoster.brs" />
+    <interface>
+        <field id="itemContent" type="node" onChange="onItemContentChanged" />
+        <field id="currRect" type="rect2D" onChange="onCurrRectChanged" />
+
+        <field id="uri" type="string" onChange="onUriChanged" />
+        <field id="width" type="float" onChange="updateLayout" />
+        <field id="height" type="float" onChange="updateLayout" />
+        <field id="loadWidth" type="float" alias="poster.loadWidth" />
+        <field id="loadHeight" type="float" alias="poster.loadHeight" />
+        <field id="loadDisplayMode" type="string" onChange="onLoadDisplayModeChanged" />
+        <field id="loadStatus" type="string" alias="poster.loadStatus" />
+        <field id="bitmapWidth" type="float" alias="poster.bitmapWidth" />
+        <field id="bitmapHeight" type="float" alias="poster.bitmapHeight" />
+        <!-- field id="bitmapMargin" type="assocarray" alias="poster.bitmapMargin" / -->
+        <field id="blendColor" type="color" alias="poster.blendColor" />
+
+        <field id="loadingBitmapUri" type="string" alias="loading.uri" />
+        <field id="failedBitmapUri" type="string" />
+        <field id="retries" type="integer" value="5" />
+        
+        <field id="startingOpacity" type="float" />
+        <field id="fadeDuration" type="float" alias="fadeIn.duration" />
+    </interface>
+    <children>
+        <Poster
+            id="loading" />
+        <Poster
+            id="poster"
+            opacity="0" />
+        <Animation
+            id="fadeIn"
+            duration=".25"
+            repeat="false">
+            <FloatFieldInterpolator
+                id="fadeInInterp"
+                key="[0,1]"
+                keyValue="[0,1]"
+                fieldToInterp="poster.opacity" />
+        </Animation>
+    </children>
+</component>

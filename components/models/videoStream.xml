@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="VideoStream" extends="ContentNode">
+    <interface>
+        <field id="apiKey" type="string" />
+        <field id="contentSourceID" type="string" />
+        <field id="videoID" type="string" />
+        <field id="ppid" type="string" />
+        <field id="adTagParameters" type="string" />
+        
+        <field id="streamDetails" type="assocarray" />
+    </interface>
+</component>

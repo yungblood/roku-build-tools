@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ScrollingGroup" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/framework/widgets/scrollingGroup.brs" />
+    
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <interface>
+        <field id="itemComponentName" type="string" />
+        <field id="content" type="node" onChange="onContentChanged" />
+        
+        <field id="width" type="float" />
+        <field id="height" type="float" />
+        
+        <field id="itemSizes" type="vector2darray" value="[[100,100]]" />
+        
+        <field id="itemSpacings" type="floatarray" />
+        <field id="layoutDirection" type="string" alias="group.layoutDirection" onChange="onLayoutDirectionChanged" />
+        <field id="visibleItemCount" type="integer" value="12" />
+        
+        <field id="focusAnimationStyle" type="string" value="fixedFocusWrap" />
+        <field id="focusOffset" type="integer" value="0" />
+        <field id="scrollMargin" type="float" value="0" />
+
+        <field id="animateToItem" type="integer" onChange="onAnimateToItem" alwaysNotify="true" />
+        <field id="jumpToItem" type="integer" onChange="onJumpToItem" alwaysNotify="true" />
+        
+        <field id="itemSelected" type="integer" alwaysNotify="true" />
+        <field id="itemFocused" type="integer" alwaysNotify="true" />
+        <field id="subItemSelected" type="intarray" alwaysNotify="true" />
+        <field id="subItemFocused" type="intarray" alwaysNotify="true" />
+
+        <field id="scrollSpeed" type="float" value=".25" />
+        <field id="scrollDelay" type="float" value="0" alias="scrollAnimation.delay" />
+        <field id="updateFocusBeforeScroll" type="boolean" value="false" />
+    </interface>
+    
+    <children>
+        <LayoutGroup
+            id="group"
+            layoutDirection="vert" />
+            
+        <Rectangle
+            id="focus"
+            color="0x00000022" />
+            
+        <PlaceholderNode
+            id="placeholder" />
+
+        <Animation
+        	id="scrollAnimation"
+            duration=".25"
+            delay="0"
+            repeat="false"
+            easeFunction="inOutQuad" >
+            <Vector2DFieldInterpolator
+                id="scrollInterpolator"
+                key="[0.0,1.0]"
+                keyValue="[[0,0],[0,0]]"
+                fieldToInterp="group.translation" />
+        </Animation>
+    </children>
+</component>

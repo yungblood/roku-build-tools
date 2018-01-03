@@ -1,0 +1,37 @@
+function init()
+    m.top.observeField("focusedChild", "onFocusChanged")
+    
+    m.list = m.top.findNode("list")
+    m.list.content = createObject("roSGNode", "ContentNode")
+    m.list.observeField("rowItemSelected", "onRowItemSelected")
+end function
+
+sub onFocusChanged()
+    if m.top.hasFocus() then
+        m.list.setFocus(true)
+    end if
+end sub
+
+sub onContentChanged()
+    if m.content = invalid or not m.content.isSameNode(m.top.content) or (m.top.content.getChildCount() > 0 and not m.list.visible) then
+        m.content = m.top.content
+        content = createObject("roSGNode", "ContentNode")
+        content.appendChild(m.content)
+        m.list.content = content
+
+        history = m.global.user.recentlyWatched
+        for i = 0 to m.content.getChildCount() - 1
+            child = m.content.getChild(i)
+            if child.subtype() = "Episode" or child.subtype() = "Movie" then
+                historyItem = getChildByID(child.id, history)
+                if historyItem <> invalid then
+                    child.resumePoint = historyItem.resumePoint
+                end if
+            end if
+        next
+    end if
+end sub
+
+sub onRowItemSelected()
+    m.top.itemSelected = m.list.rowItemSelected[1]
+end sub

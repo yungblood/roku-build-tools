@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="SettingsScreen" extends="BaseScreen">
+    <script type="text/brightscript" uri="pkg:/components/views/screens/settingsScreen.brs" />
+    <interface>
+        <field id="itemSelected" type="node" alwaysNotify="true" />
+        <field id="menuItemSelected" type="string" alwaysNotify="true" />
+        <field id="buttonSelected" type="string" alwaysNotify="true" />
+    </interface>
+    <children>
+        <Font
+           id="buttonFont"
+           size="30"
+           uri="pkg:/fonts/Lato-Regular.ttf" />
+
+        <LabelButtonGroup
+            id="settingsButtons"
+            translation="[95,389]"
+            layoutDirection="vert"
+            itemSpacings="[30]">
+            <LabelButton
+                id="account"
+                text="My Account"
+                textColor="0xffffff66"
+                focusedTextColor="0xffffffff"
+                horizAlignment="left"
+                width="165"
+                height="46"
+                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
+                font="dictionary:buttonFont"
+                processKeyEvents="false" />
+            <LabelButton
+                id="legal"
+                text="Legal Notices"
+                textColor="0xffffff66"
+                focusedTextColor="0xffffffff"
+                horizAlignment="left"
+                width="180"
+                height="46"
+                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
+                font="dictionary:buttonFont"
+                processKeyEvents="false" />
+            <LabelButton
+                id="support"
+                text="Support"
+                textColor="0xffffff66"
+                focusedTextColor="0xffffffff"
+                horizAlignment="left"
+                width="110"
+                height="46"
+                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
+                font="dictionary:buttonFont"
+                processKeyEvents="false" />
+            <LabelButton
+                id="liveTV"
+                text="Live TV"
+                textColor="0xffffff66"
+                focusedTextColor="0xffffffff"
+                horizAlignment="left"
+                width="100"
+                height="46"
+                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
+                font="dictionary:buttonFont"
+                processKeyEvents="false" />
+        </LabelButtonGroup>
+        <Rectangle
+            translation="[463,176]"
+            width="2"
+            height="832"
+            color="0xffffffff"
+            opacity=".23" />
+        <Group
+            id="panels"
+            translation="[570,176]">
+            <AccountPanel
+                id="accountPanel"
+                visible="false" />
+            <LegalPanel
+                id="legalPanel"
+                visible="false" />
+            <SupportPanel
+                id="supportPanel"
+                visible="false" />
+            <LiveTVPanel
+                id="liveTVPanel"
+                visible="false" />
+        </Group>
+        
+        <TopMenu
+            id="menu"
+            focusedID="settings" />
+    </children>
+</component>

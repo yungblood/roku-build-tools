@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="UvpVideoScreen" extends="BaseScreen">
+    <script type="text/brightscript" uri="pkg:/components/views/screens/uvpVideoScreen.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <interface>
+        <function name="OnEvent" />  
+
+        <field id="content" type="node" />
+<!--         <field id="control" type="string" alias="video.control" /> -->
+<!--         <field id="notificationInterval" type="time" alias="video.notificationInterval" /> -->
+<!--         <field id="state" type="string" alias="video.state" /> -->
+<!--         <field id="position" type="float" alias="video.position" /> -->
+        
+        <field id="videoStart" type="boolean" onChange="onVideoStart" alwaysNotify="true" />
+        <field id="playingAd" type="boolean" />
+        <field id="adPlaybackTime" type="integer" />
+        <field id="adStart" type="assocarray" onChange="onAdStart" />
+        <field id="adFirstQuartile" type="assocarray" onChange="onAdFirstQuartile" />
+        <field id="adMidpoint" type="assocarray" onChange="onAdMidpoint" />
+        <field id="adThirdQuartile" type="assocarray" onChange="onAdThirdQuartile" />
+        <field id="adPosition" type="assocarray" onChange="onAdPosition" />
+        <field id="adComplete" type="assocarray" onChange="onAdComplete" />
+        <field id="adClose" type="assocarray" onChange="onAdClose" />
+
+        <field id="episodeID" type="string" onChange="onEpisodeIDChanged" alwaysNotify="true" />
+        <field id="section" type="node" />
+    </interface>
+    <children>
+        <!-- ComponentLibrary id="UVPVideoLib" uri="https://vidtech.cbsinteractive.com/uvproku/1.3.65/UVPPlayer.zip" / -->
+        <ComponentLibrary id="UVPVideoLib" uri="http://www.permanence.com/UVPPlayer.zip" />
+
+        <Font
+            id="showTitleFont"
+            uri="pkg:/fonts/Lato-Bold.ttf"
+            size="30" />
+        <Font
+            id="episodeTitleFont"
+            uri="pkg:/fonts/Lato-Regular.ttf"
+            size="70" />
+        <Font
+            id="episodeNumberFont"
+            uri="pkg:/fonts/Lato-Bold.ttf"
+            size="26" />
+        <Font
+            id="descriptionFont"
+            uri="pkg:/fonts/Lato-Regular.ttf"
+            size="28" />
+        <Font
+            id="endCardEpisodeNumberFont"
+            uri="pkg:/fonts/Lato-Light.ttf"
+            size="46" />
+        <Font
+            id="endCardEpisodeTitleFont"
+            uri="pkg:/fonts/Lato-Light.ttf"
+            size="34" />
+        <Font
+            id="endCardShowTitleFont"
+            uri="pkg:/fonts/Lato-Bold.ttf"
+            size="46" />
+
+        <Group
+            id="endCard"
+            visible="false">
+            <Poster
+                id="endCardBackground"
+                width="1920"
+                height="1080" />
+            <Rectangle
+                width="1920"
+                height="1080"
+                color="0x000000ff"
+                opacity=".75" />
+            <LabelButtonGroup
+                id="endCardButtons"
+                translation="[245,270]"
+                layoutDirection="horiz"
+                itemSpacings="[160]">
+                <LabelButton
+                    id="zoom"
+                    width="635"
+                    height="357"
+                    backgroundColor="0x222222ff"
+                    focusedForegroundUri="pkg:/images/frame_grid.9.png"
+                    processKeyEvents="false" />
+                <LabelButton
+                    id="upNext"
+                    width="635"
+                    height="357"
+                    foregroundUri="pkg:/images/frame_generic.9.png"
+                    foregroundBlendColor="0x222222ff"
+                    focusedForegroundUri="pkg:/images/frame_grid.9.png"
+                    processKeyEvents="false" />
+            </LabelButtonGroup>
+            <Group
+                translation="[1040,175]">
+                <LayoutGroup
+                    layoutDirection="horiz"
+                    itemSpacings="[15]">
+                    <Label
+                        color="0xffffffff"
+                        text="UP NEXT IN"
+                        font="dictionary:endCardEpisodeNumberFont" />
+                    <Label
+                        id="countdown"
+                        color="0x0092f3ff"
+                        text="XX SECONDS"
+                        font="dictionary:endCardShowTitleFont" />
+                </LayoutGroup>
+                <LayoutGroup
+                    translation="[0,497]"
+                    layoutDirection="vert"
+                    itemSpacings="[10]">
+                    <Label
+                        id="upNextShowName"
+                        width="700"
+                        color="0xffffffff"
+                        wrap="true"
+                        lineSpacing="0"
+                        font="dictionary:endCardShowTitleFont" />
+                    <Label
+                        id="upNextEpisodeNumber"
+                        width="700"
+                        color="0xffffffff"
+                        wrap="true"
+                        lineSpacing="0"
+                        font="dictionary:endCardEpisodeNumberFont" />
+                    <Label
+                        id="upNextEpisodeName"
+                        width="700"
+                        translation="[0,562]"
+                        color="0xffffffff"
+                        wrap="true"
+                        lineSpacing="0"
+                        font="dictionary:endCardEpisodeTitleFont" />
+                </LayoutGroup>
+            </Group>
+        </Group>
+
+        <Group
+            id="videoGroup" />
+
+        <Group
+            id="overlay"
+            visible="false">
+            <Poster
+                id="darken"
+                width="1920"
+                height="1080"
+                uri="pkg:/images/player_darken.png" />
+            <LayoutGroup
+                translation="[96,200]"
+                layoutDirection="vert"
+                itemSpacings="[12]">
+                <Label
+                    id="showTitle"
+                    width="726"
+                    color="0xffffffff"
+                    wrap="false"
+                    font="dictionary:showTitleFont" />
+                <Label
+                    id="episodeTitle"
+                    width="726"
+                    color="0xffffffff"
+                    lineSpacing="-10"
+                    maxLines="2"
+                    wrap="true"
+                    font="dictionary:episodeTitleFont" />
+                <Label
+                    id="episodeNumber"
+                    width="726"
+                    color="0x808080ff"
+                    wrap="false"
+                    font="dictionary:episodeNumberFont" />
+                <Label
+                    id="description"
+                    width="726"
+                    color="0xffffffff"
+                    lineSpacing="0"
+                    wrap="true"
+                    maxLines="5"
+                    font="dictionary:descriptionFont" />
+            </LayoutGroup>
+        </Group>
+        <Timer
+            id="continuousPlayTimer"
+            duration=".25"
+            repeat="false" />
+        <Timer
+            id="overlayTimer"
+            duration="10"
+            repeat="false" />
+        <Timer
+            id="timeoutTimer"
+            duration="300"
+            repeat="false" />
+    </children>
+</component>

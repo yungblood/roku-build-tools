@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="ShowsScreen" extends="BaseScreen">
+    <script type="text/brightscript" uri="pkg:/components/views/screens/showsScreen.brs" />
+    
+    <interface>
+        <field id="category" type="string" />
+        <field id="itemSelected" type="node" alwaysNotify="true" />
+        <field id="menuItemSelected" type="string" alwaysNotify="true" />
+    </interface>
+    <children>
+        <LabelButtonGroup
+            id="groups"
+            translation="[95,150]"
+            layoutDirection="horiz"
+            itemSpacings="[53]">
+        </LabelButtonGroup>
+        
+        <MarkupGrid
+            id="grid"
+            translation="[95,256]"
+            itemComponentName="ShowTile"
+            itemSize="[417,626]"
+            itemSpacing="[18,20]"
+            numColumns="4"
+            numRows="2"
+            vertFocusAnimationStyle="fixedFocus"
+            focusBitmapUri="pkg:/images/frame_grid.9.png" />
+        
+        <TopMenu
+            id="menu"
+            focusedID="shows" />
+    </children>
+</component>

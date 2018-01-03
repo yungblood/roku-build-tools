@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="AccountUpsellScreen" extends="BaseScreen">
+    <script type="text/brightscript" uri="pkg:/components/views/screens/accountUpsellScreen.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/constants.brs" />
+    <interface>
+        <field id="mode" type="string" onChange="onModeChanged" />
+        <field id="tourVideoID" type="string" />
+        <field id="options" type="nodearray" onChange="onOptionsChanged" />
+        <field id="buttons" type="stringarray" onChange="onButtonsChanged" />
+        <field id="buttonSelected" type="string" alwaysNotify="true" />
+        <field id="optionSelected" type="node" alwaysNotify="true" />
+    </interface>
+    <children>
+        <Font
+            id="buttonFont"
+            size="32"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="disclaimerFont"
+            size="24"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="noButtonsFont"
+            size="43"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+            
+        <Poster
+            id="background"
+            width="1920"
+            height="1080"
+            uri="pkg:/images/bg_upsell.jpg"
+            loadDisplayMode="scaleToZoom" />
+        <CenteredPoster
+            id="header"
+            width="1920"
+            height="250" />
+        <LabelButtonGroup
+            id="options"
+            translation="[960,446]"
+            layoutDirection="horiz"
+            itemSpacings="[60]"
+            horizAlignment="center"
+            vertAlignment="center">
+        </LabelButtonGroup>
+        <LabelButtonGroup
+            id="buttons"
+            translation="[960,720]"
+            layoutDirection="vert"
+            itemSpacings="[25]"
+            horizAlignment="center" />
+        <Label
+            id="noButtons"
+            translation="[335,750]"
+            width="1250"
+            wrap="true"
+            lineSpacing="-10"
+            color="0xbab9b9ff"
+            horizAlign="center"
+            text="It looks like you signed up for CBS All Access on another device. Please return there to manage your subscription. For additional help, please call customer service at 1.888. 274.5343."
+            font="dictionary:noButtonsFont"
+            visible="false" />
+        <Label
+            id="disclaimer"
+            translation="[0,960]"
+            width="1920"
+            wrap="true"
+            lineSpacing="0"
+            color="0xbab9b9ff"
+            horizAlign="center"
+            font="dictionary:disclaimerFont" />
+    </children>
+</component>

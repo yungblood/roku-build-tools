@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="ShowScreen" extends="BaseScreen">
+    <script type="text/brightscript" uri="pkg:/components/views/screens/showScreen.brs" />
+    
+    <interface>
+        <field id="showID" type="string" onChange="onShowIDChanged" alwaysNotify="true" />
+        <field id="show" type="node" onChange="onShowChanged" />
+
+        <field id="itemSelected" type="node" alwaysNotify="true" />
+        <field id="buttonSelected" type="node" alias="list.buttonSelected" alwaysNotify="true" />
+    </interface>
+    <children>
+        <Poster
+            id="hero"
+            width="1920"
+            height="1080"
+            loadDisplayMode="scaleToZoom" />
+        <Poster
+            id="heroDarken"
+            width="1920"
+            height="1080"
+            uri="pkg:/images/show-detail-hero-darken.png" />
+        <Rectangle
+            id="heroFadeRect"
+            width="1920"
+            height="891"
+            color="0x000000ff"
+            opacity="0" />
+        <Label
+            id="title"
+            translation="[1283,263]"
+            horizAlign="right"
+            vertAlign="bottom"
+            width="525"
+            height="300"
+            wrap="true"
+            lineSpacing="0"
+            color="0xffffffff">
+            <Font
+                role="font"
+                size="42"
+                uri="pkg:/fonts/Lato-Light.ttf" />
+        </Label>
+        <Label
+            id="airtime"
+            translation="[1283,563]"
+            horizAlign="right"
+            vertAlign="bottom"
+            width="525"
+            height="45"
+            color="0xffffffff">
+            <Font
+                role="font"
+                size="26"
+                uri="pkg:/fonts/Lato-Regular.ttf" />
+        </Label>
+
+        <ScrollableList
+            id="list"
+            itemComponentName="ContentAwareRow"
+            contentField="sections" />
+
+    </children>
+</component>

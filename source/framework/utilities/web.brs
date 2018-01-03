@@ -567,6 +567,38 @@ Function PutUrlToXml(url As String, postData = "" As String, timeout = 30 As Int
     Return PostUrlToXml(url, postData, timeout, headers, certificates, certificatesDepth, "PUT", requireCertVerification)
 End Function
 
+Function PutUrlToJsonEx(url As String, postData = "" As String, timeout = 30 As Integer, headers = invalid As Object, certificates = "common:/certs/ca-bundle.crt" As String, certificatesDepth = -1 As Integer, requireCertVerification = True As Boolean) As Dynamic
+    Return PostUrlToJsonEx(url, postData, timeout, headers, certificates, certificatesDepth, "PUT", requireCertVerification)
+End Function
+
+Function PutUrlToJson(url As String, postData = "" As String, timeout = 30 As Integer, headers = invalid As Object, certificates = "common:/certs/ca-bundle.crt" As String, certificatesDepth = -1 As Integer, requireCertVerification = True As Boolean) As Dynamic
+    Return PostUrlToJson(url, postData, timeout, headers, certificates, certificatesDepth, "PUT", requireCertVerification)
+End Function
+
+Function DeleteUrlToStringEx(url As String, postData = "" As String, timeout = 30 As Integer, headers = invalid As Object, certificates = "common:/certs/ca-bundle.crt" As String, certificatesDepth = -1 As Integer, requireCertVerification = True As Boolean) As Object
+    Return PostUrlToStringEx(url, postData, timeout, headers, certificates, certificatesDepth, "DELETE", requireCertVerification)
+End Function
+
+Function DeleteUrlToString(url As String, postData = "" As String, timeout = 30 As Integer, headers = invalid As Object, certificates = "common:/certs/ca-bundle.crt" As String, certificatesDepth = -1 As Integer, requireCertVerification = True As Boolean) As String
+    Return PostUrlToString(url, postData, timeout, headers, certificates, certificatesDepth, "DELETE", requireCertVerification)
+End Function
+
+Function DeleteUrlToXmlEx(url As String, postData = "" As String, timeout = 30 As Integer, headers = invalid As Object, certificates = "common:/certs/ca-bundle.crt" As String, certificatesDepth = -1 As Integer, requireCertVerification = True As Boolean) As Dynamic
+    Return PostUrlToXmlEx(url, postData, timeout, headers, certificates, certificatesDepth, "DELETE", requireCertVerification)
+End Function
+
+Function DeleteUrlToXml(url As String, postData = "" As String, timeout = 30 As Integer, headers = invalid As Object, certificates = "common:/certs/ca-bundle.crt" As String, certificatesDepth = -1 As Integer, requireCertVerification = True As Boolean) As Dynamic
+    Return PostUrlToXml(url, postData, timeout, headers, certificates, certificatesDepth, "DELETE", requireCertVerification)
+End Function
+
+Function DeleteUrlToJsonEx(url As String, postData = "" As String, timeout = 30 As Integer, headers = invalid As Object, certificates = "common:/certs/ca-bundle.crt" As String, certificatesDepth = -1 As Integer, requireCertVerification = True As Boolean) As Dynamic
+    Return PostUrlToJsonEx(url, postData, timeout, headers, certificates, certificatesDepth, "DELETE", requireCertVerification)
+End Function
+
+Function DeleteUrlToJson(url As String, postData = "" As String, timeout = 30 As Integer, headers = invalid As Object, certificates = "common:/certs/ca-bundle.crt" As String, certificatesDepth = -1 As Integer, requireCertVerification = True As Boolean) As Dynamic
+    Return PostUrlToJson(url, postData, timeout, headers, certificates, certificatesDepth, "DELETE", requireCertVerification)
+End Function
+
 Function GetBitmapFromUrl(url As String, timeout = 30 As Integer, extension = "" As String) As Object
     imageUrl = url
     If url.InStr("http") = 0 Then
