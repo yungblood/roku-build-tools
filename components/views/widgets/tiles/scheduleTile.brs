@@ -16,21 +16,23 @@ sub onContentChanged()
         m.content = m.top.itemContent
         m.content.observeField("isLive", "onLiveChanged")
         
-        if m.content.subtype() = "Program" and m.content.startTime > 0 then
+        if m.content.subtype() = "Program" and m.content.startTime > 0 and m.content.endTime > 0 then
             time = createObject("roDateTime")
             time.fromSeconds(m.content.startTime)
             time.toLocalTime()
             m.time.text = getTimeString(time)
-        else
-            m.time.text = ""
-        end if
+            
+            m.showTitle.text = m.content.title
 
-        m.showTitle.text = m.content.title
+            now = createObject("roDateTime").asSeconds()
+            m.liveNow.visible = asBoolean(m.content.isLive) or (m.content.startTime <= now and m.content.endTime > now) 
+            'm.comingUp.visible = asBoolean(m.content.isNext)
+        else
+            m.time.text = m.content.title
+            
+            m.showTitle.text = ""
+        end if
         m.episodeTitle.text = m.content.episodeTitle
-        
-        now = createObject("roDateTime").asSeconds()
-        m.liveNow.visible = asBoolean(m.content.isLive) or (m.content.startTime <= now and m.content.endTime > now) 
-        'm.comingUp.visible = asBoolean(m.content.isNext)
     end if
 end sub
 

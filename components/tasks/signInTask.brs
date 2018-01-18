@@ -43,8 +43,19 @@ sub doWork()
         api.setCookies(cookies)
     end if
 
-    syncbak().initialize(config.syncbakKey, config.syncbakSecret, config.syncbakBaseUrl)
-    stations = syncbak().getChannels()
+    stations = []
+    if asBoolean(config.syncbak_enabled, true) then
+        syncbak().initialize(config.syncbakKey, config.syncbakSecret, config.syncbakBaseUrl)
+        stations = syncbak().getChannels()
+    else
+        nationalFeedID = config.live_tv_national_feed_content_id
+        if not isNullOrEmpty(nationalFeedID) then
+            nationalFeed = api.getEpisode(nationalFeedID)
+            if nationalFeed <> invalid then
+                stations.push(nationalFeed)
+            end if
+        end if
+    end if
     channels =  invalid
     if config.liveTVChannels <> invalid then
         channels = createObject("roSGNode", "ContentNode")

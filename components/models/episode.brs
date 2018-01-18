@@ -68,8 +68,12 @@ sub onJsonChanged()
         
         if thumbnails.count() > 0 then
             m.top.thumbnailUrl = thumbnails[0].url
+            m.top.hdPosterUrl = thumbnails[0].url
+        else
+            m.top.thumbnailUrl = json.thumbnail
+            m.top.hdPosterUrl = json.thumbnail
         end if
-        
+                
 '        if json.thumbnailSheetSet <> invalid then
 '            for each set in asArray(json.thumbnailSheetSet)
 '                if isAssociativeArray(set) then

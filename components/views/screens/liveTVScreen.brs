@@ -246,16 +246,21 @@ sub playChannel(channel as object)
             channel = m.top.station
         end if
         m.channel = channel
-        if channel.subtype() = "Station" then
+        if channel.subtype() = "Station" or channel.subtype() = "LiveFeed" then
             channels = m.channelGrid.content
             for i = 0 to channels.getChildCount() - 1
                 channelItem = channels.getChild(i)
                 if channelItem.id = "local" then
-                    affiliate = channel.affiliate
                     m.channel = channelItem
-                    channelItem.title = channel.station
-                    channelItem.affiliate = affiliate
-                    channelItem.scheduleUrl = channel.scheduleUrl
+                    if channel.subtype() = "LiveFeed" then
+                        channelItem.title = ""
+                        channelItem.affiliate = channel
+                    else
+                        affiliate = channel.affiliate
+                        channelItem.title = channel.station
+                        channelItem.affiliate = affiliate
+                        channelItem.scheduleUrl = channel.scheduleUrl
+                    end if
                     channelItem.isTuned = true
                 else
                     channelItem.isTuned = false
@@ -274,13 +279,28 @@ sub playChannel(channel as object)
         trackScreenView()
     '
         m.omnitureParams = {}
-        m.omnitureParams["showEpisodeTitle"] = channel.trackingTitle
-        m.omnitureParams.v24 = channel.trackingContentID
-        m.omnitureParams.v25 = channel.omnitureTrackingTitle
-        m.omnitureParams.v38 = "live"
-        m.omnitureParams.v46 = ""
-        m.omnitureParams.pev2 = "video"
-        m.omnitureParams.pev3 = "video"
+        if channel.subtype() = "LiveFeed" then
+            m.omnitureParams = {}
+            m.omnitureParams["showEpisodeTitle"] = channel.title
+            if channel.showName <> "" then
+                m.omnitureParams["showEpisodeTitle"] = channel.showName + " - " + m.omnitureParams["showEpisodeTitle"]
+            end if
+            m.omnitureParams["showEpisodeId"] = channel.id
+            m.omnitureParams.v38 = "live"
+            m.omnitureParams.v36 = "false"
+            m.omnitureParams.v46 = ""
+            m.omnitureParams.v59 = iif(channel.subscriptionLevel = "FREE", "non-svod", "svod")
+            m.omnitureParams.pev2 = "video"
+            m.omnitureParams.pev3 = "video"
+        else
+            m.omnitureParams["showEpisodeTitle"] = channel.trackingTitle
+            m.omnitureParams.v24 = channel.trackingContentID
+            m.omnitureParams.v25 = channel.omnitureTrackingTitle
+            m.omnitureParams.v38 = "live"
+            m.omnitureParams.v46 = ""
+            m.omnitureParams.pev2 = "video"
+            m.omnitureParams.pev3 = "video"
+        end if
     
         trackScreenAction("trackVideoLoad", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event52"])
         
@@ -304,7 +324,7 @@ sub onStreamLoaded(nodeEvent as object)
     m.video.content = stream
     resetOverlayTimer(true)
 
-    if m.channel.subtype() <> "Station" then
+    if m.channel.id <> "local" then
         m.station = m.channel
     end if
     sendDWAnalytics({method: "playerInit", params: [true, m.station.trackingContentID] })
@@ -350,7 +370,6 @@ sub onScheduleLoaded(nodeEvent as object)
     m.scheduleTask = invalid
 
     schedule = nodeEvent.getData()
-    
     if schedule = invalid or schedule.count() = 0 then
         unavailable = createObject("roSGNode", "ContentNode")
         unavailable.title = "Schedule"
@@ -381,6 +400,9 @@ sub onVideoStateChanged(nodeEvent as object)
         if m.global.comscore <> invalid then
             m.global.comscore.videoEnd = true
         end if
+        if m.convivaTask <> invalid then
+            m.convivaTask.control = "stop"
+        end if
     else if state = "stopped" then
         if m.station <> invalid then
             if m.timedOut then
@@ -391,11 +413,17 @@ sub onVideoStateChanged(nodeEvent as object)
             if m.global.comscore <> invalid then
                 m.global.comscore.videoEnd = true
             end if
+            if m.convivaTask <> invalid then
+                m.convivaTask.control = "stop"
+            end if
         end if
     else if state = "error" then
         sendDWAnalytics({method: "playerLiveError", params: [m.video.errorMsg, m.station, getPlayerPosition(), getPlayerPosition()] })
         if m.global.comscore <> invalid then
             m.global.comscore.videoEnd = true
+        end if
+        if m.convivaTask <> invalid then
+            m.convivaTask.control = "stop"
         end if
 
         error = "Unfortunately, an error occurred during playback."

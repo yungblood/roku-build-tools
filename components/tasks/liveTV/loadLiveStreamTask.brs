@@ -7,7 +7,10 @@ sub doWork()
     
     stream = invalid
 
-    schedule = syncbak().getSchedule(m.top.station.scheduleUrl)
+    schedule = []
+    if not isNullOrEmpty(m.top.station.scheduleUrl) then
+        schedule = syncbak().getSchedule(m.top.station.scheduleUrl)
+    end if
     m.top.schedule = schedule
 
     if m.top.station.subtype() = "LiveTVChannel" then
@@ -19,6 +22,14 @@ sub doWork()
         stream.subtitleConfig = { trackName: "eia608/1" }
         stream.title = m.top.station.title
         stream.url = m.top.station.streamUrl
+    else if m.top.station.subtype() = "LiveFeed" then
+        config = m.global.config
+        api = cbs()
+        api.initialize(config)
+        
+        station = m.top.station
+        cbs().populateStream(station)
+        stream = station.videoStream
     else
         syncbak().initialize(config.syncbakKey, config.syncbakSecret, config.syncbakBaseUrl)
         stream = syncbak().getStream(m.top.station.id, m.top.station.mediaID)

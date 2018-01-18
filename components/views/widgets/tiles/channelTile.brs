@@ -84,7 +84,7 @@ sub updateSchedule()
         m.nowPlaying = m.schedule.getChild(0)
         updateNowPlaying()
         
-        if m.nowPlaying.endTime = 0 then
+        if m.nowPlaying = invalid or m.nowPlaying.endTime = 0 then
             m.scheduleReload--
         end if
         if m.scheduleReload = 0 then

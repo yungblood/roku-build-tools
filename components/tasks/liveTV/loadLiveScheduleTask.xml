@@ -4,6 +4,6 @@
     <script type="text/brightscript" uri="pkg:/components/services/syncbak.brs" />
     <interface>
         <field id="scheduleUrl" type="string" />
-        <field id="schedule" type="nodearray" />
+        <field id="schedule" type="nodearray" alwaysNotify="true" />
     </interface>
 </component>
