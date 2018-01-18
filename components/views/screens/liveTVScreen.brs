@@ -10,13 +10,42 @@ sub init()
     m.video = m.top.findNode("video")
 
     m.overlay = m.top.findNode("overlay")
+    m.darkenTop = m.top.findNode("darkenTop")
     m.channelOverlay = m.top.findNode("channelOverlay")
     m.channelGrid = m.top.findNode("channelGrid")
     m.channelGrid.observeField("itemFocused", "resetOverlayTimer")
     m.channelGrid.observeField("itemSelected", "onChannelSelected")
 
-    m.channelGrid.content = m.global.liveTVChannels
-
+    stations = m.global.stations
+    channels = m.global.liveTVChannels
+    for i = 0 to channels.getChildCount() - 1
+        channelItem = channels.getChild(i)
+        if channelItem.id = "local" then
+            if stations.count() > 1 then
+                if m.global.station <> invalid and m.global.station <> "" then
+                    for each station in stations
+                        if station.id = m.global.station then
+                            channelItem.title = station.station
+                            channelItem.affiliate = station.affiliate
+                            channelItem.scheduleUrl = station.scheduleUrl
+                            exit for
+                        end if
+                    next
+                end if
+            else
+                station = stations[0]
+                if station <> invalid then
+                    channelItem.affiliate = station.affiliate
+                    channelItem.title = station.title
+                    channelItem.affiliate = station.affiliate
+                    channelItem.scheduleUrl = station.scheduleUrl
+                end if
+            end if
+            exit for
+        end if
+    next
+    m.channelGrid.content = channels
+            
     m.scheduleOverlay = m.top.findNode("scheduleOverlay")
     m.scheduleGrid = m.top.findNode("scheduleGrid")
     m.scheduleGrid.observeField("itemFocused", "onScheduleItemFocused")
@@ -77,7 +106,21 @@ sub onVisibleChanged()
         m.station = invalid
         m.firstLoad = true
         m.menu.focusedID = "liveTV"
-        selectStation()
+        if m.global.liveTVChannel = "local" then
+            selectStation()
+        else
+            channels = m.global.liveTVChannels
+            for i = 0 to channels.getChildCount() - 1
+                channelItem = channels.getChild(i)
+                if channelItem.id = m.global.liveTVChannel then
+                    selectChannel(channelItem)
+                    return
+                end if
+            next
+            ' if we get this far, we couldn't find a matching channel,
+            ' so play the local live stream
+            selectStation()
+        end if
     else
         m.video.control = "stop"
     end if
@@ -86,13 +129,14 @@ end sub
 sub onFocusChanged()
     if m.top.hasFocus() then
         if m.firstFocus then
-            m.menu.setFocus(true)
+            showMenu(true)
             m.firstFocus = false
         else
             if m.liveTV.visible then
             else if m.liveTVSelection.visible then
                 m.stations.setFocus(true)
             else
+                showMenu(true)
                 m.menu.setFocus(true)
             end if
         end if
@@ -134,7 +178,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
                 if m.nowPlayingOverlay.visible then
                     showOverlay(false)
                 else
-                    m.menu.setFocus(true)
+                    showMenu(true)
                 end if
                 return true
             end if
@@ -195,6 +239,14 @@ sub selectChannel(channel as object)
             m.channel.isTuned = true
             playChannel(m.channel)
         end if
+
+        m.global.liveTVChannel = m.channel.id
+        m.regTask = createObject("roSGNode", "RegistryTask")
+        m.regTask.key = "liveTVChannel"
+        m.regTask.value = m.channel.id
+        m.regTask.section = m.global.config.registrySection
+        m.regTask.mode = "save"
+
     else if m.video.state <> "stopped" then
         showNowPlaying()
     end if
@@ -278,32 +330,44 @@ sub playChannel(channel as object)
         m.top.omniturePageType = "livetv_stream"
         trackScreenView()
     '
+        m.heartbeatContext = {}
         m.omnitureParams = {}
         if channel.subtype() = "LiveFeed" then
+            m.heartbeatContext = {}
+            m.heartbeatContext["screenName"] = m.top.omnitureName
+            m.heartbeatContext["showId"] = channel.showID
             m.omnitureParams = {}
             m.omnitureParams["showEpisodeTitle"] = channel.title
+            m.heartbeatContext["showEpisodeTitle"] = channel.title
             if channel.showName <> "" then
                 m.omnitureParams["showEpisodeTitle"] = channel.showName + " - " + m.omnitureParams["showEpisodeTitle"]
+                m.heartbeatContext["showEpisodeTitle"] = channel.showName + " - " + m.omnitureParams["showEpisodeTitle"]
             end if
             m.omnitureParams["showEpisodeId"] = channel.id
+            m.heartbeatContext["showEpisodeId"] = channel.id
             m.omnitureParams.v38 = "live"
+            m.heartbeatContext["mediaContentType"] = "live"
             m.omnitureParams.v36 = "false"
             m.omnitureParams.v46 = ""
             m.omnitureParams.v59 = iif(channel.subscriptionLevel = "FREE", "non-svod", "svod")
             m.omnitureParams.pev2 = "video"
             m.omnitureParams.pev3 = "video"
         else
+            m.heartbeatContext["showEpisodeTitle"] = channel.trackingTitle
             m.omnitureParams["showEpisodeTitle"] = channel.trackingTitle
+            m.heartbeatContext["showEpisodeId"] = channel.trackingContentID
             m.omnitureParams.v24 = channel.trackingContentID
+            m.heartbeatContext["showTitle"] = channel.omnitureTrackingTitle
             m.omnitureParams.v25 = channel.omnitureTrackingTitle
+            m.heartbeatContext["mediaContentType"] = "live"
             m.omnitureParams.v38 = "live"
             m.omnitureParams.v46 = ""
             m.omnitureParams.pev2 = "video"
             m.omnitureParams.pev3 = "video"
         end if
-    
-        trackScreenAction("trackVideoLoad", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event52"])
-        
+
+        'trackScreenAction("trackVideoLoad", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event52"])
+
         hideOverlay()
         loadSchedule()
     end if
@@ -329,6 +393,8 @@ sub onStreamLoaded(nodeEvent as object)
     end if
     sendDWAnalytics({method: "playerInit", params: [true, m.station.trackingContentID] })
     sendDWAnalytics({method: "playerLiveStart", params: [m.station, getPlayerPosition()] })
+
+    trackVideoLoad(m.station, m.heartbeatContext)
     
     if m.global.comscore <> invalid then
         m.global.comscore.reset = true
@@ -350,7 +416,9 @@ sub onStreamLoaded(nodeEvent as object)
     m.convivaTask.control = "run"
 
     m.video.control = "play"
-    
+
+    trackVideoStart()
+        
     m.global.showSpinner = false
     if not m.firstLoad then
         showNowPlaying()
@@ -395,6 +463,7 @@ sub onVideoStateChanged(nodeEvent as object)
         if m.global.comscore <> invalid then
             m.global.comscore.videoStart = true
         end if
+        trackVideoPlay()
     else if state = "finished" then
         sendDWAnalytics({method: "playerLiveEnd", params: [m.station, getPlayerPosition(), getPlayerPosition()] })
         if m.global.comscore <> invalid then
@@ -403,6 +472,8 @@ sub onVideoStateChanged(nodeEvent as object)
         if m.convivaTask <> invalid then
             m.convivaTask.control = "stop"
         end if
+        trackVideoComplete()
+        trackVideoUnload()
     else if state = "stopped" then
         if m.station <> invalid then
             if m.timedOut then
@@ -416,6 +487,8 @@ sub onVideoStateChanged(nodeEvent as object)
             if m.convivaTask <> invalid then
                 m.convivaTask.control = "stop"
             end if
+            trackVideoComplete()
+            trackVideoUnload()
         end if
     else if state = "error" then
         sendDWAnalytics({method: "playerLiveError", params: [m.video.errorMsg, m.station, getPlayerPosition(), getPlayerPosition()] })
@@ -425,6 +498,8 @@ sub onVideoStateChanged(nodeEvent as object)
         if m.convivaTask <> invalid then
             m.convivaTask.control = "stop"
         end if
+        trackVideoComplete()
+        trackVideoUnload()
 
         error = "Unfortunately, an error occurred during playback."
         ' Check for a network connection error
@@ -460,8 +535,9 @@ sub onPositionChanged()
             sendDWAnalytics({method: "playerLivePlayPosition", params: [m.station, getPlayerPosition()] })
         end if
         if m.position mod 60 = 0 then
-            trackScreenAction("trackVideo", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event57=60"])
+'            trackScreenAction("trackVideo", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event57=60"])
         end if
+        trackVideoPlayhead(m.position)
     end if
     
     idleTime = createObject("roDeviceInfo").timeSinceLastKeyPress()
@@ -560,7 +636,7 @@ end sub
 sub hideOverlay()
     if m.overlay.isInFocusChain() or m.nowPlayingOverlay.visible then
         m.overlay.visible = false
-        m.menu.visible = false
+        hideMenu()
         m.video.setFocus(true)
     end if
 end sub
@@ -573,7 +649,6 @@ sub showOverlay(showChannels = false as boolean, resetIndex = true as boolean)
     m.channelOverlay.visible = showChannels
     m.nowPlayingOverlay.visible = false
     m.overlay.visible = true
-    m.menu.visible = true
 
     if showChannels then
         m.channelGrid.setFocus(true)
@@ -583,6 +658,19 @@ sub showOverlay(showChannels = false as boolean, resetIndex = true as boolean)
         end if
         m.scheduleGrid.setFocus(true)
     end if
+end sub
+
+sub showMenu(focus = false as boolean)
+    m.darkenTop.visible = true
+    m.menu.visible = true
+    if focus then
+        m.menu.setFocus(true)
+    end if
+end sub
+
+sub hideMenu()
+    m.darkenTop.visible = false
+    m.menu.visible = false
 end sub
 
 sub showChannelSelection()
@@ -596,7 +684,6 @@ sub showNowPlaying()
     m.channelOverlay.visible = false
     m.nowPlayingOverlay.visible = true
     m.overlay.visible = true
-    m.menu.visible = true
 end sub
 
 sub showScheduleDetails()

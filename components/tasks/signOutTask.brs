@@ -12,9 +12,11 @@ sub doWork()
     deleteRegistryValue("Username", api.registrySection)
     deleteRegistryValue("Password", api.registrySection)
     deleteRegistryValue("liveTV", api.registrySection)
+    deleteRegistryValue("liveTVChannel", api.registrySection)
     m.global.cookies = ""
     m.global.stations = []
     m.global.station = ""
+    m.global.liveTVChannel = ""
     api.signOut()
 
     shows = api.getGroupShows(config.allShowsGroupID)

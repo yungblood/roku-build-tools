@@ -22,8 +22,10 @@
                 translation="[42,48]"
                 width="315"
                 color="0xffffffff"
-                wrap="false"
-                text="">
+                wrap="true"
+                text=""
+                maxLines="2"
+                lineSpacing="-10">
                 <Font
                     role="font"
                     size="42"

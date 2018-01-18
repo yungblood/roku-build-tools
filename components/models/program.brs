@@ -11,10 +11,23 @@ sub onJsonChanged()
             m.top.episodeTitle = json.headlineShort
             m.top.description = json.headline
             
+            if isNullOrEmpty(m.top.title) then
+                m.top.title = m.top.episodeTitle
+                m.top.episodeTitle = ""
+            end if
+            
             date = createObject("roDateTime")
-            date.fromIso8601String(asString(json.startDate))
+            if isString(json.startDate) or json.startDate = invalid then
+                date.fromIso8601String(asString(json.startDate))
+            else
+                date.fromSeconds(json.startDate)
+            end if
             m.top.startTime = date.asSeconds()
-            date.fromIso8601String(asString(json.endDate))
+            if isString(json.startDate) or json.endDate = invalid  then
+                date.fromIso8601String(asString(json.endDate))
+            else
+                date.fromSeconds(json.endDate)
+            end if
             m.top.endTime = date.asSeconds()
             m.top.length = m.top.endTime - m.top.startTime
         else

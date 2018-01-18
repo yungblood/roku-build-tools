@@ -81,6 +81,7 @@ sub doWork()
 
     m.global.stations = stations
     m.global.station = getRegistryValue("liveTV", "", api.registrySection)
+    m.global.liveTVChannel = getRegistryValue("liveTVChannel", "", api.registrySection)
 
     shows = api.getGroupShows(config.allShowsGroupID)
     showCache = {}

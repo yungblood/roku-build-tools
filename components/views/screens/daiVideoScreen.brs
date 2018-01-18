@@ -252,6 +252,8 @@ sub onVideoStateChanged()
             if m.global.comscore <> invalid then
                 m.global.comscore.videoEnd = true
             end if
+            trackVideoComplete()
+            trackVideoUnload()
         end if
     end if
 end sub
@@ -291,9 +293,9 @@ sub onPositionChanged()
                 end if
             end if
             if m.position mod 60 = 0 then
-                trackScreenAction("trackVideo", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event57=60"])
-                trackVideoPlayhead(m.position)
+                'trackScreenAction("trackVideo", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event57=60"])
             end if
+            trackVideoPlayhead(m.position)
         end if
     end if
     if m.episode.endCreditsChapterTime > 0 and (m.nextEpisode <> invalid or m.cpInfo <> invalid) then
@@ -506,8 +508,8 @@ sub onVideoStart()
     else
         m.omnitureParams.delete("v90")
     end if
-    trackScreenAction("trackVideoLoad", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event52"])
-    trackVideoLoad(m.episode)
+    'trackScreenAction("trackVideoLoad", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event52"])
+    trackVideoLoad(m.episode, m.heartbeatContext)
     trackVideoStart()
     m.watchNextType = ""
 end sub
@@ -553,8 +555,19 @@ sub onAdStart(nodeEvent as object)
         m.global.comscore.adStart = true
     end if
 
-    trackScreenAction("trackVideoLoad", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event60"])
-    trackAdStart()
+    position = eventData.position
+    if position <> m.lastAdPosition then
+        m.lastAdPosition = position
+        breakName = "mid-roll"
+        if position = 0 then
+            breakName = "pre-roll"
+        else if position = m.episode.length then
+            breakName = "post-roll"
+        end if
+        trackAdBreakStart(breakName, position, eventData.podIndex + 1)
+    end if
+'    trackScreenAction("trackVideoLoad", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event60"])
+    trackAdStart(eventData.ad, eventData.adIndex)
     
     if m.top.useDai then
         m.adCounter.visible = true
@@ -600,8 +613,11 @@ sub onAdComplete(nodeEvent as object)
         m.global.comscore.adEnd = true
     end if
 
-    trackScreenAction("trackVideoComplete", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event61"])
+'    trackScreenAction("trackVideoComplete", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event61"])
     trackAdComplete()
+    if eventData.adIndex = eventData.adCount then
+        trackAdBreakComplete()
+    end if
     
     if m.top.useDai then
         m.adCounter.visible = eventData.adIndex < eventData.adCount
@@ -722,20 +738,31 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                 m.global.comscore.content = m.episode
             end if
 
+            m.heartbeatContext = {}
+            m.heartbeatContext["screenName"] = m.top.omnitureName
+            m.heartbeatContext["showId"] = m.episode.showID
+    
             m.omnitureParams = {}
             m.omnitureParams["showEpisodeTitle"] = m.episode.title
+            m.heartbeatContext["showEpisodeTitle"] = m.episode.title
             if m.episode.showName <> "" then
                 m.omnitureParams["showEpisodeTitle"] = m.episode.showName + " - " + m.omnitureParams["showEpisodeTitle"]
+                m.heartbeatContext["showEpisodeTitle"] = m.episode.showName + " - " + m.omnitureParams["showEpisodeTitle"]
             end if
             m.omnitureParams["showEpisodeId"] = m.episode.id
+            m.heartbeatContext["showEpisodeId"] = m.episode.id
             if m.episode.subtype() = "Movie" then
                 m.omnitureParams.v38 = "vod:movies"
+                m.heartbeatContext["mediaContentType"] = "vod:movies"
             else if m.episode.isLive then
                 m.omnitureParams.v38 = "live"
+                m.heartbeatContext["mediaContentType"] = "live"
             else if m.episode.isFullEpisode then
                 m.omnitureParams.v38 = "vod:fullepisodes"
+                m.heartbeatContext["mediaContentType"] = "vod:fullepisodes"
             else
                 m.omnitureParams.v38 = "vod:clips"
+                m.heartbeatContext["mediaContentType"] = "vod:clips"
             end if
             m.omnitureParams.v36 = "false"
             m.omnitureParams.v46 = ""
@@ -745,7 +772,7 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
 
             m.omnitureParams.v24 = m.vguid
             m.omnitureParams.p24 = m.vguid
-    
+            
             m.episode.skipPreroll = skipPreroll
     
             onVideoStart()
@@ -841,13 +868,7 @@ function playNext(forced = false as boolean) as boolean
         sendDWAnalytics({method: "playerPlayPosition", params: [m.episode, getPlayerPosition()] })
     end if
 
-    trackScreenAction("trackVideoComplete", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event58"])
-    trackVideoComplete()
-    trackVideoUnload()
-
-    if m.convivaTask <> invalid then
-        m.convivaTask.control = "stop"
-    end if
+'    trackScreenAction("trackVideoComplete", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event58"])
 
     m.isContinuousPlay = true
     m.isForced = forced

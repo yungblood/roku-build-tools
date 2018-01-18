@@ -159,6 +159,9 @@ function parseDeepLink(link as string) as object
         else
             if parts.count() = 2 and parts[0] = "shows" then
                 params.mediaType = "series"
+            else if parts[0] = "live-tv" then
+                params.mediaType = "screen"
+                params.contentID = "live-tv/" + parts.peek()
             else
                 if parts[0] = "movies" then
                     params.mediaType = "movie"

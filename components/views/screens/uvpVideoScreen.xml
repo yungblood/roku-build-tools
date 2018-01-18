@@ -30,8 +30,7 @@
         <field id="section" type="node" />
     </interface>
     <children>
-        <!-- ComponentLibrary id="UVPVideoLib" uri="https://vidtech.cbsinteractive.com/uvproku/1.3.65/UVPPlayer.zip" / -->
-        <ComponentLibrary id="UVPVideoLib" uri="http://www.permanence.com/UVPPlayer.zip" />
+        <ComponentLibrary id="UVPVideoLib" uri="http://vidtech.cbsinteractive.com/uvproku/1.3.96/UVPPlayer.pkg" />
 
         <Font
             id="showTitleFont"

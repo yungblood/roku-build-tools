@@ -20,15 +20,8 @@
         <field id="close" type="boolean" alwaysNotify="true" />
     </interface>
     <children>
-<!--         <UvpVideoScreen -->
-<!--             id="uvpVideoScreen" -->
-<!--             visible="false" /> -->
-<!--         <VideoScreen -->
-<!--             id="videoScreen" -->
-<!--             visible="false" /> -->
-<!--         <LiveTVScreen -->
-<!--             id="liveTVScreen" -->
-<!--             visible="false" /> -->
+        <!--  ComponentLibrary id="UVPVideoLib" uri="http://vidtech.cbsinteractive.com/uvproku/1.3.96/UVPPlayer.pkg" / -->
+
         <Group
             id="screens" />
         <Group

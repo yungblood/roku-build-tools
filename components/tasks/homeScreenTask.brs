@@ -10,11 +10,14 @@ sub doWork()
     content.marquee = api.getMarquee()
 
     user = m.global.user
-    rows = [
-        user.favorites
-        user.recentlyWatched
-    ]
-    rows.append(api.getHomeRows(1))
+    rows = []
+    if user.favorites.getChildCount() > 0 then
+        rows.push(user.favorites)
+    end if
+    if user.recentlyWatched.getChildCount() > 0 then
+        rows.push(user.recentlyWatched)
+    end if
+    rows.append(api.getHomeRows(10))
 
     content.rows = rows
     

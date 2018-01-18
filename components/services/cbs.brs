@@ -687,11 +687,11 @@ function cbs_getHomeRows(itemsPerRow = 50 as integer) as object
     url = addQueryString(url, "excludeShow", true)
     
     response = m.makeRequest(url, "GET", invalid, "json", true)
-    if isAssociativeArray(response) and response.success = true and response.videoSectionMetadata <> invalid then
-        for each item in response.videoSectionMetadata
+    if isAssociativeArray(response) and response.success = true and response.results <> invalid then ' and response.videoSectionMetadata <> invalid then
+        for each item in response.results 'response.videoSectionMetadata
             section = createObject("roSGNode", "Section")
             section.json = item
-            sections.Push(section)
+            sections.push(section)
         next
     end if
 '    response = m.makeRequest(url, "GET")
@@ -1122,6 +1122,12 @@ function cbs_getVideoStreamUrl(id as string, baseUrl = m.streamUrl as string) as
     if not isNullOrEmpty(id) then
         url = baseUrl.replace("[PID]", id)
         url = url.replace("[SIGNATURE]", m.getVideoStreamToken(id))
+        
+        ' Retrieve the redirect url from the Location header, if present
+        headers = getUrlHeaders(url)
+        if headers <> invalid and not isNullOrEmpty(headers.location) then
+            url = headers.location
+        end if
     end if
     return url
 end function

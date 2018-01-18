@@ -8,6 +8,10 @@
         <field id="content" type="assocarray" onChange="onContentChanged" />
     </interface>
     <children>
+       <Font
+           id="rowTitleFont"
+           size="40"
+           uri="pkg:/fonts/Lato-Regular.ttf" />
         <MarqueeRow
             id="marquee"
             visible="false" />
@@ -20,11 +24,27 @@
 <!--             translation="[0,0]" -->
 <!--             itemComponentName="ContentAwareRow" /> -->
         
-        <FocusGroup
+        <RowList
             id="list"
-            translation="[0,772]"
-            advanceKey="down"
-            reverseKey="up" />
+            translation="[0,762]"
+            focusXOffset="[100]"
+            rowLabelOffset="[[100,20]]"
+            itemComponentName="GridTile"
+            itemSize="[1920,298]"
+            itemSpacing="[0,40]"
+            showRowLabel="[true]"
+            rowItemSpacing="[[10,0]]"
+            numRows="3"
+            rowLabelFont="dictionary:rowTitleFont"
+            rowLabelColor="0x999999ff"
+            focusBitmapUri="pkg:/images/frame_grid.9.png"
+            vertFocusAnimationStyle="fixedFocus" />
+
+<!--         <FocusGroup -->
+<!--             id="list" -->
+<!--             translation="[0,772]" -->
+<!--             advanceKey="down" -->
+<!--             reverseKey="up" /> -->
 
         <TopMenu
             id="menu"

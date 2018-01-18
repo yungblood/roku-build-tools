@@ -17,11 +17,8 @@ sub init()
     
     m.list = m.top.findNode("list")
     m.list.observeField("itemFocused", "onRowFocused")
-'    m.list.observeField("listItemSelected", "onListItemSelected")
-'    m.list.initialPositions             = [ -390,  0,  774, 1356, 1938]
-'    m.list.forwardIntermediatePositions = [ -774, -774,  188,  770, 1352]
-'    m.list.finalPositions               = [-1300, -718, -136,  446, 1028]
-'    m.list.content = createObject("roSGNode", "ContentNode")
+    m.list.observeField("rowItemFocused", "onRowItemFocused")
+    m.list.observeField("rowItemSelected", "onRowItemSelected")
 
     m.global.showSpinner = true
 
@@ -68,7 +65,8 @@ function onKeyEvent(key as string, press as boolean) as boolean
             else if m.marquee.isInFocusChain() then
                 m.list.setFocus(true)
                 m.lastFocus = m.list
-                scrollToRow(true)
+                scrollList()
+                'scrollToRow(true)
                 return true
             end if
         else if key = "up" then
@@ -79,7 +77,8 @@ function onKeyEvent(key as string, press as boolean) as boolean
             else if m.list.isInFocusChain() then
                 m.marquee.setFocus(true)
                 m.lastFocus = m.marquee
-                scrollToRow()
+                scrollList()
+                'scrollToRow()
                 return true
             end if
         end if
@@ -93,43 +92,68 @@ sub loadContent(content as object)
     m.marqueeTimer.control = "start"
 
     rows = content.rows
-
-timer = createObject("roTimespan")    
+    content = createObject("roSGNode", "ContentNode")
+    
+    rowHeights = []
+    rowItemSizes = []
     for i = 0 to rows.count() - 1
-        row = invalid
-        content = rows[i]
-        contentType = content.subtype()
-        if contentType = "Section" then
-            if content.title.inStr("Movies") >= 0 then
-                row = m.list.createChild("PostersRow")
+        row = rows[i]
+        if row.subtype() = "Section" then
+            row.loadIndex = 0
+            if row.title.inStr("Movies") >= 0 then
+                rowItemSizes.push([409, 614])
+                rowHeights.push(682)
             else
-                if content.excludeShow then
-                    row = m.list.createChild("FeaturedRow")
-                else
-                    row = m.list.createChild("EpisodesRow")
-                end if
+                rowItemSizes.push([409, 230])
+                rowHeights.push(298)
             end if
-        else if contentType = "Favorites" then
-            row = m.list.createChild("FavoritesRow")
-        else if contentType = "RecentlyWatched" then
-            row = m.list.createChild("RecentlyWatchedRow")
-        else if contentType = "Show" then
-            row = m.list.createChild("ShowInfoRow")
         else
-            ?"Unrecognized content type: ";contentType
+            rowItemSizes.push([409, 230])
+            rowHeights.push(298)
         end if
-        if row <> invalid then
-            if content.subtype() = "Section" and i <= m.concurrentRowLoads then
-                content.loadIndex = 0
-            end if
-            row.content = content
-            row.observeField("itemSelected", "onItemSelected")
-            row.observeField("visible", "updateRowLayout")
-        end if
+        content.appendChild(row)
     next
-?"Rows created:";timer.totalMilliseconds():timer.mark()
-    updateRowLayout()
-?"Rows updated:";timer.totalMilliseconds():timer.mark()    
+    m.list.rowItemSize = rowItemSizes
+    m.list.rowHeights = rowHeights
+    m.list.content = content
+
+'
+'timer = createObject("roTimespan")    
+'    for i = 0 to rows.count() - 1
+'        row = invalid
+'        content = rows[i]
+'        contentType = content.subtype()
+'        if contentType = "Section" then
+'            if content.title.inStr("Movies") >= 0 then
+'                row = m.list.createChild("PostersRow")
+'            else
+'                if content.excludeShow then
+'                    row = m.list.createChild("FeaturedRow")
+'                else
+'                    row = m.list.createChild("EpisodesRow")
+'                end if
+'            end if
+'        else if contentType = "Favorites" then
+'            row = m.list.createChild("FavoritesRow")
+'        else if contentType = "RecentlyWatched" then
+'            row = m.list.createChild("RecentlyWatchedRow")
+'        else if contentType = "Show" then
+'            row = m.list.createChild("ShowInfoRow")
+'        else
+'            ?"Unrecognized content type: ";contentType
+'        end if
+'        if row <> invalid then
+'            if content.subtype() = "Section" and i <= m.concurrentRowLoads then
+'                content.loadIndex = 0
+'            end if
+'            row.content = content
+'            row.observeField("itemSelected", "onItemSelected")
+'            row.observeField("visible", "updateRowLayout")
+'        end if
+'    next
+'?"Rows created:";timer.totalMilliseconds():timer.mark()
+'    updateRowLayout()
+'?"Rows updated:";timer.totalMilliseconds():timer.mark()    
     m.global.showSpinner = false
 end sub
 
@@ -143,45 +167,37 @@ sub onContentLoaded()
     m.contentTask = invalid
 end sub
 
-sub updateRowLayout()
-    offset = 0
-    for i = 0 to m.list.getChildCount() - 1
-        row = m.list.getChild(i)
-        if row.visible then
-            row.translation = [0, offset]
-            offset = offset + row.rowHeight + 50
-        end if
-    next
-end sub
-
-sub onRowFocused()
-    scrollToRow()
-end sub
-
-sub scrollToRow(fade = false as boolean)
-    for i = 0 to m.concurrentRowLoads - 1
-        row = m.list.getChild(m.list.itemFocused + i)
-        if row <> invalid and row.content <> invalid and row.content.subtype() = "Section" then
-            row.content.loadIndex = 0
-        end if
-    next
-
+sub scrollList()
     if m.list.isInFocusChain() then
-        row = m.list.getChild(m.list.itemFocused)
-        if row <> invalid then
-            rect = row.boundingRect()
-            m.scrollInterp.keyValue = [m.list.translation, [0, 188 - rect.y]]
-            if m.marquee.visible and fade then
-                m.fadeOutAnimation.appendChild(m.scrollAnimation)
-                m.fadeOutAnimation.control = "start"
-            else
-                m.scrollAnimation.control = "start"
-            end if
+        m.scrollInterp.keyValue = [m.list.translation, [0, 46]]
+        if m.marquee.visible then
+            m.fadeOutAnimation.appendChild(m.scrollAnimation)
+            m.fadeOutAnimation.control = "start"
+        else
+            m.scrollAnimation.control = "start"
         end if
     else if m.marquee.isInFocusChain() then
-        m.scrollInterp.keyValue = [m.list.translation, [0, 772]]
+        m.scrollInterp.keyValue = [m.list.translation, [0, 762]]
         m.fadeInAnimation.appendChild(m.scrollAnimation)
         m.fadeInAnimation.control = "start"
+    end if
+end sub
+
+sub onRowItemSelected(nodeEvent as object)
+    indices = nodeEvent.getData()
+    row = m.list.content.getChild(indices[0])
+    if row <> invalid then
+        index = indices[1]
+        item = row.getChild(index)
+        if item <> invalid then
+            trackScreenAction("trackPodSelect", getOmnitureData(row, index, iif(isSubscriber(m.global), "pay", "free")))
+            if item.subtype() = "Episode" or item.subtype() = "Movie" then
+                omnitureData = getOmnitureData(row, index, "more info", "overlay")
+                m.top.omnitureData = omnitureData
+                trackScreenAction("trackPodSelect", omnitureData)
+            end if
+            m.top.itemSelected = item
+        end if
     end if
 end sub
 

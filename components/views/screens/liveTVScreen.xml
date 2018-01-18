@@ -63,7 +63,8 @@
                     id="darkenTop"
                     width="1920"
                     height="398"
-                    uri="pkg:/images/overlay_livetv_top.png" />
+                    uri="pkg:/images/overlay_livetv_top.png"
+                    visible="false" />
                 <Group
                     id="channelOverlay"
                     translation="[0,645]"

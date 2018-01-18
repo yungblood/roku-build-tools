@@ -21,7 +21,7 @@
             id="subtitleFont"
             size="24"
             uri="pkg:/fonts/Lato-Regular.ttf" />
-        <CrossfadePoster
+        <Poster
             id="poster"
             loadDisplayMode="scaleToZoom" />
         <Poster

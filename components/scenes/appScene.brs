@@ -249,6 +249,7 @@ sub onUpsellButtonSelected(nodeEvent as object)
             end if
         end if
     else if button = constants().tourText then
+        'showDaiVideoScreen(source.tourVideoID, invalid, source)
         showDaiVideoScreen(source.tourVideoID, invalid, source)
         'showVideoScreen(source.tourVideoID, invalid, source)
     end if
@@ -656,17 +657,19 @@ sub showMovieScreen(movie as object, movieID = "" as string, autoPlay = false as
 end sub
 
 sub showUvpVideoScreen(episodeID as string, section = invalid as object, source = invalid as object)
-    m.uvpVideoScreen.episodeID = episodeID
-    m.uvpVideoScreen.section = section
+    screen = createObject("roSGNode", "UvpVideoScreen")
+    screen.episodeID = episodeID
+    screen.section = section
     if source <> invalid then
-        m.uvpVideoScreen.omnitureData = source.omnitureData
+        screen.omnitureData = source.omnitureData
     end if
-    addToNavigationStack(m.uvpVideoScreen)
+    addToNavigationStack(screen)
 end sub
 
 sub showDaiVideoScreen(episodeID as string, section = invalid as object, source = invalid as object)
     'showUvpVideoScreen(episodeID, section, source)
     'return
+
     screen = createObject("roSGNode", "DaiVideoScreen")
     screen.useDai = true
     screen.episodeID = episodeID
@@ -706,7 +709,8 @@ function openDeepLink(params as object, item = invalid as object) as boolean
             else if params.contentID = "movies" then
                 showMoviesScreen()
                 return true
-            else if params.contentID = "live-tv" then
+            else if params.contentID.inStr("live-tv") = 0 then
+                m.global.liveTVChannel = params.contentID.mid(8)
                 showLiveTVScreen()
                 return true
             else if params.contentID = "all-access" then

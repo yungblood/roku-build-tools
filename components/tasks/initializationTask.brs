@@ -7,6 +7,7 @@ sub doWork()
     m.global.addField("shows", "nodearray", false)
     m.global.addField("showCache", "assocarray", false)
     m.global.addField("liveTVChannels", "node", false)
+    m.global.addField("liveTVChannel", "string", false)
     m.global.addField("stations", "nodearray", false)
     m.global.addField("station", "string", false)
 

@@ -14,7 +14,7 @@
             uri="pkg:/fonts/Lato-Black.ttf" />
         <Poster
             id="poster"
-            loadDisplayMode="scaleToZoom" />
+            loadDisplayMode="scaleToZoom"/>
         <Poster
             id="marqueeDarken"
             width="1920"
