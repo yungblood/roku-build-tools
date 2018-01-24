@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<component name="Trailer" extends="Episode">
+<component name="Trailer" extends="Movie">
     <script type="text/brightscript" uri="pkg:/components/models/trailer.brs" />
     <interface>
     </interface>

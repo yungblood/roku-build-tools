@@ -1,11 +1,13 @@
 sub init()
     m.top.functionName = "doWork"
     m.debug = false
+    m.id = rnd(1000000).toStr()
 end sub
 
 sub doWork()
     port = createObject("roMessagePort")
     m.top.observeField("control", port)
+    m.top.observeField("cancel", port)
     m.top.observeField("adStart", port)
     m.top.observeField("adEnd", port)
     
@@ -19,28 +21,30 @@ sub doWork()
     convivaTags = {}
     contentInfo = {}
     if content.subtype() = "Station" or content.isLive then
-        convivaTags["category"]     = content.topLevelCategory
         convivaTags["contentId"]    = content.mediaID
         convivaTags["contentType"]  = "Live"
         convivaTags["isEpisode"]    = "false"
-        convivaTags["site"]         = "false"
-        convivaTags["episodeName"]  = content.trackingTitle
-    
+        convivaTags["episodeTitle"] = content.trackingTitle
+        convivaTags["app"]          = "Roku"
+        convivaTags["appVersion"]   = config.appVersion
+        convivaTags["winDimension"] = config.screenDims
+
         contentInfo = convivaContentInfo(content.convivaTrackingTitle, convivaTags)
         contentInfo["isLive"]       = true
         contentInfo["contentLength"] = 0
         contentInfo["streamUrl"]    = video.content.url
         contentInfo["streamFormat"] = video.content.streamFormat
     else
-        convivaTags["category"]     = content.topLevelCategory
         convivaTags["contentId"]    = content.id
         convivaTags["contentType"]  = "VOD"
         convivaTags["isEpisode"]    = iif(content.isFullEpisode , "true", "false")
-        convivaTags["site"]         = asString(content.skipPreroll)
         convivaTags["seriesTitle"]  = content.showName
-        convivaTags["episodeName"]  = content.trackingTitle
+        convivaTags["episodeTitle"] = content.trackingTitle
         convivaTags["drm"]          = iif(content.isProtected , "true", "false")
         convivaTags["drmType"]      = iif(content.isProtected , "PlayReady", "")
+        convivaTags["app"]          = "Roku"
+        convivaTags["appVersion"]   = config.appVersion
+        convivaTags["winDimension"] = config.screenDims
     
         contentInfo = convivaContentInfo(content.convivaTrackingTitle, convivaTags)
         contentInfo["isLive"]       = false
@@ -76,6 +80,11 @@ sub doWork()
                 if msg.getData() = "stop" then
                     exit while
                 end if
+            else if msg.getField() = "cancel" then
+                if m.debug
+                    print "convivaTask cancelled", m.id
+                end if
+                exit while
             else if msg.getField() = "adStart" then
                 if not m.inAd then
                     m.inAd = true
@@ -122,6 +131,6 @@ sub doWork()
     end if
     livePass.cleanup()
     if m.debug then
-        print "raftask - exiting client-stitched loop"
+        print "raftask - exiting client-stitched loop",m.id
     end if
 end sub

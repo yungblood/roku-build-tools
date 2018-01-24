@@ -151,6 +151,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
                 if m.menu.isInFocusChain() then
                     if m.liveTV.visible then
                         if m.channelOverlay.visible then
+                            hideMenu()
                             m.channelGrid.setFocus(true)
                         else if m.scheduleOverlay.visible then
                             m.scheduleGrid.setFocus(true)
@@ -229,6 +230,10 @@ end sub
 
 sub selectChannel(channel as object)
     if m.channel = invalid or m.channel.id <> channel.id then
+        if m.video.state <> "stopped" then
+            m.video.control = "stop"
+        end if
+
         if m.channel <> invalid then
             m.channel.isTuned = false
         end if
@@ -332,24 +337,23 @@ sub playChannel(channel as object)
     '
         m.heartbeatContext = {}
         m.omnitureParams = {}
+        m.heartbeatContext["screenName"] = m.top.omnitureName
         if channel.subtype() = "LiveFeed" then
-            m.heartbeatContext = {}
-            m.heartbeatContext["screenName"] = m.top.omnitureName
             m.heartbeatContext["showId"] = channel.showID
-            m.omnitureParams = {}
             m.omnitureParams["showEpisodeTitle"] = channel.title
             m.heartbeatContext["showEpisodeTitle"] = channel.title
             if channel.showName <> "" then
                 m.omnitureParams["showEpisodeTitle"] = channel.showName + " - " + m.omnitureParams["showEpisodeTitle"]
                 m.heartbeatContext["showEpisodeTitle"] = channel.showName + " - " + m.omnitureParams["showEpisodeTitle"]
             end if
-            m.omnitureParams["showEpisodeId"] = channel.id
-            m.heartbeatContext["showEpisodeId"] = channel.id
+            m.omnitureParams["showEpisodeId"] = channel.trackingContentId
+            m.heartbeatContext["showEpisodeId"] = channel.trackingContentId
             m.omnitureParams.v38 = "live"
             m.heartbeatContext["mediaContentType"] = "live"
             m.omnitureParams.v36 = "false"
             m.omnitureParams.v46 = ""
             m.omnitureParams.v59 = iif(channel.subscriptionLevel = "FREE", "non-svod", "svod")
+            m.heartbeatContext["mediaSvodContentType"] = iif(channel.subscriptionLevel = "FREE", "free", "pay")
             m.omnitureParams.pev2 = "video"
             m.omnitureParams.pev3 = "video"
         else
@@ -383,6 +387,13 @@ sub onLogoLoaded(nodeEvent as object)
 end sub
 
 sub onStreamLoaded(nodeEvent as object)
+?"====== ON STREAM LOADED ======"
+    if m.streamTask <> invalid then
+        m.streamTask.unobserveField("schedule")
+        m.streamTask.unobserveField("stream")
+        m.streamTask = invalid
+    end if
+
     stream = nodeEvent.getData()
     stream.station = m.station
     m.video.content = stream
@@ -410,11 +421,7 @@ sub onStreamLoaded(nodeEvent as object)
         m.global.comscore.content = m.station
     end if
 
-    m.convivaTask = createObject("roSGNode", "ConvivaTask")
-    m.convivaTask.video = m.video
-    m.convivaTask.content = m.station
-    m.convivaTask.control = "run"
-
+    startConviva()
     m.video.control = "play"
 
     trackVideoStart()
@@ -469,9 +476,7 @@ sub onVideoStateChanged(nodeEvent as object)
         if m.global.comscore <> invalid then
             m.global.comscore.videoEnd = true
         end if
-        if m.convivaTask <> invalid then
-            m.convivaTask.control = "stop"
-        end if
+        stopConviva()
         trackVideoComplete()
         trackVideoUnload()
     else if state = "stopped" then
@@ -484,9 +489,7 @@ sub onVideoStateChanged(nodeEvent as object)
             if m.global.comscore <> invalid then
                 m.global.comscore.videoEnd = true
             end if
-            if m.convivaTask <> invalid then
-                m.convivaTask.control = "stop"
-            end if
+            stopConviva()
             trackVideoComplete()
             trackVideoUnload()
         end if
@@ -495,9 +498,7 @@ sub onVideoStateChanged(nodeEvent as object)
         if m.global.comscore <> invalid then
             m.global.comscore.videoEnd = true
         end if
-        if m.convivaTask <> invalid then
-            m.convivaTask.control = "stop"
-        end if
+        stopConviva()
         trackVideoComplete()
         trackVideoUnload()
 
@@ -751,5 +752,20 @@ sub updateNowPlaying()
             m.showTitle.text = "Schedule is unavailable at this time."
             m.episodeTitle.text = ""
         end if
+    end if
+end sub
+
+sub startConviva()
+    stopConviva()
+    m.convivaTask = createObject("roSGNode", "ConvivaTask")
+    m.convivaTask.video = m.video
+    m.convivaTask.content = m.station
+    m.convivaTask.control = "run"
+end sub
+
+sub stopConviva()
+    if m.convivaTask <> invalid then
+        m.convivaTask.cancel = true
+        m.convivaTask = invalid
     end if
 end sub

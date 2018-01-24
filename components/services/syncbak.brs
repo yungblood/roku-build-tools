@@ -94,8 +94,9 @@ function syncbak_getDeviceData() as object
     if m.deviceData = invalid then
         deviceData = {}
         deviceData["deviceId"] = getDeviceID()
+        deviceData["deviceType"] = 8
         'deviceData["ip"] = Cbs().GetIPAddress() ' 
-        'deviceData["ip"] = "67.221.255.55" '"65.111.124.2" '"67.221.255.55" ' 
+        'deviceData["ip"] = "65.111.124.2" '"67.221.255.55" '""67.221.255.55" ' 
         deviceData["locationAccuracy"] = 5
         deviceData["locationAge"] = 0
         deviceData["MVPDId"] = "AllAccess"
@@ -106,7 +107,7 @@ function syncbak_getDeviceData() as object
 end function
 
 function syncbak_makeRequest(path as string, params = invalid as object, retryCount = 0 as integer) as object
-    setLogLevel(2)
+    setLogLevel(0)
     if isAssociativeArray(params) then
         for each param in params
             path = addQueryString(path, param, params[param])

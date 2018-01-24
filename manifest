@@ -4,7 +4,7 @@ dial_title=CBS All Access
 
 major_version=2
 minor_version=5
-build_version=20180115
+build_version=20180124
 
 mm_icon_focus_fhd=pkg:/storeassets/channelstore_fhd.png
 mm_icon_side_fhd=pkg:/storeassets/channelstore_fhd.png

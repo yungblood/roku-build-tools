@@ -15,7 +15,7 @@ sub onMovieJsonChanged()
                 end if
             next
         end if
-        m.top.comscoreTrackingTitle = "Movies"
+        m.top.comscoreTrackingTitle = m.top.title
         m.top.convivaTrackingTitle = m.top.title
     end if
 end sub

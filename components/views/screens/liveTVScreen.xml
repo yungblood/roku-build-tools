@@ -126,7 +126,6 @@
                             id="scheduleChannelName"
                             color="0xffffffff"
                             horizAlign="right"
-                            width="250"
                             wrap="false" >
                             <Font
                                 role="font"
@@ -212,11 +211,11 @@
                     translation="[0,906]"
                     visible="false">
                     <Rectangle
-                        color="0x000000aa"
+                        color="0x000000ee"
                         width="1920"
                         height="400" />
                     <Rectangle
-                        color="0x000000ff"
+                        color="0x00000000"
                         width="1920"
                         height="60">
                         <LayoutGroup

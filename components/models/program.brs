@@ -11,6 +11,10 @@ sub onJsonChanged()
             m.top.episodeTitle = json.headlineShort
             m.top.description = json.headline
             
+            if json.storyType = "commercial" then
+                m.top.episodeTitle = json.headline
+            end if
+            
             if isNullOrEmpty(m.top.title) then
                 m.top.title = m.top.episodeTitle
                 m.top.episodeTitle = ""

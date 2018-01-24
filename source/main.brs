@@ -17,6 +17,9 @@ sub runUserInterface(ecp as object)
         m.config = {}
     end if
     m.config.appVersion = appInfo.getVersion()
+    
+    displaySize = createObject("roDeviceInfo").getDisplaySize()
+    m.config.screenDims = displaySize.w.toStr() + "x" + displaySize.h.toStr()
 
     globalNode = m.screen.getGlobalNode()
     globalNode.addField("config", "assocarray", false)

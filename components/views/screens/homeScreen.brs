@@ -42,12 +42,7 @@ sub onVisibleChanged()
     if m.top.visible then
         m.marqueeTimer.control = "start"
         m.marquee.visible = true
-        if m.top.content = invalid then
-            m.global.showSpinner = true
-            m.contentTask = createObject("roSGNode", "HomeScreenTask")
-            m.contentTask.observeField("content", "onContentLoaded")
-            m.contentTask.control = "run"
-        end if
+        updateContent()
     else
         m.marqueeTimer.control = "stop"
         m.marquee.visible = false
@@ -157,14 +152,67 @@ sub loadContent(content as object)
     m.global.showSpinner = false
 end sub
 
-sub onContentChanged()
-    m.global.showSpinner = true
-    loadContent(m.top.content)
+sub updateContent()
+    if m.top.content = invalid then
+        m.global.showSpinner = true
+        m.contentTask = createObject("roSGNode", "HomeScreenTask")
+        m.contentTask.observeField("content", "onContentLoaded")
+        m.contentTask.control = "run"
+    else
+        content = {}
+        content.append(m.top.content)
+        rows = []
+        rows.append(content.rows)
+        content.rows = rows
+        user = m.global.user
+        update = false
+        if user.recentlyWatched.getChildCount() = 0 then
+            if user.recentlyWatched.isSameNode(rows[0]) then
+                rows.delete(0)
+                update = true
+            else if user.recentlyWatched.isSameNode(rows[1]) then
+                rows.delete(1)
+                update = true
+            end if
+        else
+            if not user.recentlyWatched.isSameNode(rows[1]) then
+                if not user.recentlyWatched.isSameNode(rows[0]) then
+                    if user.favorites.isSameNode(rows[0]) then
+                        rows.shift()
+                    end if
+                    rows.unshift(user.recentlyWatched)
+                    update = true
+                end if
+            end if
+        end if
+    
+        if user.favorites.getChildCount() = 0 then
+            if user.favorites.isSameNode(rows[0]) then
+                rows.delete(0)
+                update = true
+            end if
+        else
+            if not user.favorites.isSameNode(rows[0]) then
+                rows.unshift(user.favorites)
+                update = true
+            end if
+        end if
+        if update then
+            m.top.content = content
+        end if
+    end if
 end sub
 
-sub onContentLoaded()
-    m.top.content = m.contentTask.content
-    m.contentTask = invalid
+sub onContentChanged(nodeEvent as object)
+    m.global.showSpinner = true
+    loadContent(nodeEvent.getData())
+end sub
+
+sub onContentLoaded(nodeEvent as object)
+    if m.contentTask <> invalid then
+        m.top.content = m.contentTask.content
+        m.contentTask = invalid
+    end if
 end sub
 
 sub scrollList()

@@ -71,7 +71,7 @@ sub doWork()
             channel.trackingContentID = item.trackingContentID
             channel.trackingTitle = item.trackingTitle
             channel.omnitureTrackingTitle = item.trackingTitle
-            channel.convivaTrackingTitle = item.title
+            channel.convivaTrackingTitle = item.convivaTrackingTitle
             channel.comscoreC2 = item.comscoreC2
             channel.comscoreC3 = item.comscoreC3
             channel.comscoreC4 = item.comscoreC4
@@ -90,7 +90,7 @@ sub doWork()
     next
     m.global.shows = shows
     m.global.showCache = showCache
-    m.global.user = api.getUser()
+    m.global.user = api.getUser(true)
 
     m.top.signedIn = (m.global.user.status <> "ANONYMOUS")
 end sub

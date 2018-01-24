@@ -135,8 +135,6 @@ function dw_getPlayerLiveData(event as string, channel as object, playerTime as 
     ' append the user data
     data.append(m.getUserData())
 
-?data
-    
     return data
 end function
 
@@ -411,6 +409,7 @@ sub dw_processRequests(timeout = 5000 as integer, blockUntilComplete = false as 
 end sub
 
 sub dw_sendRequest(data = {} as object, isBeacon = false as boolean)
+setLogLevel(0)
     url = m.baseUrl
     if isBeacon then
         url = m.baseBeaconUrl

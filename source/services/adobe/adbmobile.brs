@@ -5030,7 +5030,7 @@ Function _adb_timer() As Object
     _init: Function() As Void
         m["_ts"] = CreateObject ("roTimespan")
         m["_interval"] = invalid
-        m["_name"] = invalid
+        m["_name"] = "" 'invalid
         m["_enabled"] = false
         m["_nextTick"] = invalid
       End Function

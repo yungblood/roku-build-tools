@@ -7,10 +7,10 @@ sub init()
 end sub
 
 sub onContentChanged()
-    content = m.top.itemContent
-    if content <> invalid then
-        m.title.text = uCase(content.title)
-        m.poster.uri = getImageUrl(content.browseImageUrl, m.poster.width)
+    m.content = m.top.itemContent
+    if m.content <> invalid then
+        m.title.text = uCase(m.content.title)
+        updatePoster()
     end if
 end sub
 
@@ -27,5 +27,12 @@ sub updateLayout()
             m.blackRect.width = m.top.width - 6
             m.blackRect.height = m.top.height - 6
         end if
+        updatePoster()
+    end if
+end sub
+
+sub updatePoster()
+    if m.poster.width > 0 and m.content <> invalid then
+        m.poster.uri = getImageUrl(m.content.browseImageUrl, m.poster.width)
     end if
 end sub

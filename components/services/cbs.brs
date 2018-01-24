@@ -601,7 +601,7 @@ function cbs_isAuthenticated() as boolean
     return false
 end function
 
-function cbs_getUser() as object
+function cbs_getUser(loadFavorites = false as boolean) as object
     url = m.apiBaseUrl + "v3.0/roku/login/status.json"
 
     user = createObject("roSGNode", "User")
@@ -609,6 +609,11 @@ function cbs_getUser() as object
     if isAssociativeArray(result) and result.isLoggedIn = true then
         user.json = result
         user.eligibleProducts = m.getEligibility()
+    end if
+    m.setUser(user)
+    if loadFavorites then
+        user.favorites.content = m.getFavoriteShows()
+        user.recentlyWatched.content = m.getRecentlyWatched(1, 50)
     end if
     return user
 end function

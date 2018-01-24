@@ -6,6 +6,7 @@
         <field id="video" type="node" />
         <field id="content" type="node" />
 
+        <field id="cancel" type="boolean" alwaysNotify="true" />
         <field id="adStart" type="boolean" alwaysNotify="true" />
         <field id="adEnd" type="boolean" alwaysNotify="true" />
     </interface>

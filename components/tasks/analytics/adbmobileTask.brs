@@ -27,6 +27,7 @@ end sub
 sub initializeRunLoop()
 
     m.adbmobile = ADBMobile()
+    m.adbmobile.setDebugLogging(true)
     
     while true
         msg = wait(250, m.port)

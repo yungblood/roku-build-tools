@@ -710,7 +710,12 @@ function openDeepLink(params as object, item = invalid as object) as boolean
                 showMoviesScreen()
                 return true
             else if params.contentID.inStr("live-tv") = 0 then
-                m.global.liveTVChannel = params.contentID.mid(8)
+                liveTVChannel = params.contentID.mid(8)
+                ' "stream" is used to indicate the last played stream
+                ' versus an empty string which indicates local
+                if liveTVChannel <> "stream" then
+                    m.global.liveTVChannel = liveTVChannel
+                end if
                 showLiveTVScreen()
                 return true
             else if params.contentID = "all-access" then

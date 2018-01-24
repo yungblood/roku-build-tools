@@ -9,6 +9,10 @@ sub update()
 end sub
 
 sub onEpisodesLoaded(nodeEvent as object)
+    m.top.content = nodeEvent.getData()
+end sub
+
+sub onContentChanged(nodeEvent as object)
     m.updateTask = invalid
 
     episodes = []

@@ -4,5 +4,7 @@
     <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
     <interface>
         <field id="update" type="boolean" onChange="update" alwaysNotify="true" />
+
+        <field id="content" type="nodearray" onChange="onContentChanged" />
     </interface>
 </component>

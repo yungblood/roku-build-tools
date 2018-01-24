@@ -29,8 +29,8 @@ sub onJsonChanged()
         
         m.top.packageName = getPackageName(json.cbsPackageInfo)
         
-        m.top.favorites.update = true
-        m.top.recentlyWatched.update = true
+        'm.top.favorites.update = true
+        'm.top.recentlyWatched.update = true
     end if
 end sub
 

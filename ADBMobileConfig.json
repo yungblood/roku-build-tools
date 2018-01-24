@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "analytics": {
-    "rsids": "cbsicbsott-dev,cbsicbsiall-dev",
+    "rsids": "cnetcbscomsite,cbsicbsiall",
     "server": "om.cbsi.com",
     "charset": "UTF-8",
     "ssl": false,

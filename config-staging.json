@@ -8,7 +8,7 @@
     "syncbakBaseUrl":  "https://stage-cbsservice.aws.syncbak.com",
     
     "omnitureSuiteID": "cbsicbsott-dev,cbsicbsiall-dev",
-    "omnitureEvar5":   "cbsicbsott-dev",
+    "omnitureEvar5":   "cnetcbscomsite-dev",
     
     "comScoreC2":      "3005086",
     "comScoreSecret":  "2cb08ca4d095dd734a374dff8422c2e5",
@@ -70,6 +70,21 @@
     		"comscoreC2": "3005086",
     		"comscoreC3": "CBSNewsRoku",
     		"comscoreC4": "CBSNews.com"
+    	},
+    	{
+			"id": "cbssports",
+			"title": "News, Scores and Highlights",
+			"icon": "pkg:/images/CBSSportsHQ_FinalLogo_2.png",
+			"streamUrl": "https://dai.google.com/ssai/event/lKh5_XooSbam79G4T7KvYQ/master.m3u8?iu=/8264/vaw-can/ott/cbs_roku_app",
+			"scheduleUrl": "https://fusion.cbssports.com/feeds/index.php",
+			"trackingID": "1130505795504",
+			"trackingContentID": "vn4vERdyJhcFf688ZEsPEWc6b943_FW8",
+			"trackingAstID": "595",
+			"trackingTitle": "Sports HQ",
+			"convivaTrackingTitle": "CBSHQ-LiveTV",
+			"comscoreC2": "3005086",
+			"comscoreC3": "247SportsRoku",
+			"comscoreC4": "247Sports.com"
     	}
    	]
 }

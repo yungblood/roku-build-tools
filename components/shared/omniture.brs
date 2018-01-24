@@ -11,6 +11,7 @@ sub initializeAdobe()
         m.persistentParams["siteCode"] = "CBS"
         m.persistentParams["siteEdition"] = "us"
         m.persistentParams["siteType"] = "roku tv ott|" + lCase(getModel())
+        m.persistentParams["brandPlatformId"] = "cbscom_ott_roku"
         m.persistentParams["sitePrimaryRsid"] = config.omnitureEvar5
         m.persistentParams["userStatus"] = user.trackingStatus
         m.persistentParams["mediaPartnerId"] = "cbs_roku_app|can"
@@ -71,7 +72,7 @@ function getOmnitureData(row as object, index as integer, podText = "" as string
         else
             item = row.dynamicPlayEpisode
         end if
-    else if row.content <> invalid then
+    else if row.content <> invalid and isSGNode(row.content) then
         data["podSection"] = row.content.title
         item = row.content.getChild(index)
     else
@@ -129,6 +130,7 @@ end sub
 sub trackVideoStart()
     initializeAdobe()
     m.adobe.mediaTrackStart()
+    m.videoStarted = true
 end sub
 
 sub trackVideoPlay()
@@ -142,8 +144,11 @@ sub trackVideoPause()
 end sub
 
 sub trackVideoComplete()
-    initializeAdobe()
-    m.adobe.mediaTrackComplete()
+    if m.videoStarted = true then
+        initializeAdobe()
+        m.adobe.mediaTrackComplete()
+        m.videoStarted = false
+    end if
 end sub
 
 sub trackAdBreakStart(name as string, startTime as integer, position as integer)
