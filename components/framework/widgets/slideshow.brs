@@ -43,7 +43,6 @@ sub updateCurrent()
         
         if content.hasField("streamFormat") and content.streamFormat <> invalid and content.streamFormat <> "" and content.streamFormat <> "(null)" then
             if m.video = invalid then
-                ?"creating video"
                 m.video = CreateObject("roSGNode", "Video")
                 m.video.observeField("state", "onVideoStateChanged")
                 m.video.mute = true
@@ -58,7 +57,6 @@ sub updateCurrent()
                 m.current = m.video
                 m.video.control = "PLAY"
             else
-                ?"NOT NEW CONTENT"
                 if m.video.state <> "playing" then
                     m.video.content = content
                     m.video.control = "PLAY"
@@ -155,7 +153,6 @@ end sub
 
 sub onVideoStateChanged()
     if m.video <> invalid then
-        ?"SLIDESHOW VIDEO STATE: ";m.video.state
         m.top.videoState = m.video.state
         if m.video.state = "playing" then
             if m.previous <> invalid then
@@ -170,8 +167,7 @@ sub onVideoStateChanged()
 end sub
 
 sub onSwitchTimerFired()
-?"SwitchTimerFired"
-    if m.top.visible then
+    if componentIsVisible(m.top) then
         m.switchTimer.control = "stop"
 
         ' Advance to the next item
@@ -190,3 +186,17 @@ end sub
 sub onAdvanceTimeChanged()
     m.switchTimer.duration = m.top.advanceTime
 end sub
+
+function componentIsVisible(node as object) as boolean
+    visible = node.visible
+    if visible then
+        parent = node.getParent()
+        while parent <> invalid
+            if not parent.visible then
+                return false
+            end if
+            parent = parent.getParent()
+        end while
+    end if
+    return visible
+end function

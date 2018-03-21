@@ -63,7 +63,7 @@
                     id="darkenTop"
                     width="1920"
                     height="398"
-                    uri="pkg:/images/overlay_livetv_top.png"
+                    uri="pkg:/images/overlay_livetv_top_480.png"
                     visible="false" />
                 <Group
                     id="channelOverlay"
@@ -73,10 +73,10 @@
                         translation="[0,-200]"
                         width="1920"
                         height="810"
-                        uri="pkg:/images/overlay_livetv_bottom.png" />
+                        uri="pkg:/images/overlay_livetv_bottom_480.png" />
                     <Label
                         translation="[67,0]"
-                        text="Live Channels"
+                        text="Channels"
                         color="0xffffffff"
                         vertAlign="top">
                        <Font
@@ -105,7 +105,7 @@
                         translation="[0,-200]"
                         width="1920"
                         height="810"
-                        uri="pkg:/images/overlay_livetv_bottom.png" />
+                        uri="pkg:/images/overlay_livetv_bottom_480.png" />
                     <Label
                         translation="[67,0]"
                         text="Schedule"

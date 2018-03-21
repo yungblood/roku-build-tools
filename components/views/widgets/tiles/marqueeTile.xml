@@ -19,7 +19,7 @@
             id="marqueeDarken"
             width="1920"
             height="1080"
-            uri="pkg:/images/home-hero-darken.png" />
+            uri="pkg:/images/home-hero-darken_480.png" />
         <Label
             id="title"
             translation="[99,200]"

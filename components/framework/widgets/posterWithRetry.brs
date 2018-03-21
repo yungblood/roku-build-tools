@@ -4,7 +4,6 @@ sub init()
 end sub
 
 sub onLoadStatusChanged()
-    ?m.top.loadStatus,m.top.uri
     if m.top.loadStatus = "ready" then
         resetTimers()
     else if m.top.loadStatus = "failed" then

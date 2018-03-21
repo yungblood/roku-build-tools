@@ -4,6 +4,10 @@ end sub
 sub onJsonChanged()
     json = m.top.json
     if json <> invalid then
+        ' HACK: This should ultimately be fixed in the CMS, but as that's not currently
+        '       an option, we replace occurrences of CBS All Access Movies with just Movies
+        json.seriesTitle = json.seriesTitle.replace("CBS All Access Movies", "Movies")
+
         m.top.id                = asString(json.contentId)
         m.top.pid               = asString(json.pid)
         m.top.mediaID           = asString(json["__FOR_TRACKING_ONLY_MEDIA_ID"])

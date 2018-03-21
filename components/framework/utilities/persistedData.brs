@@ -2,7 +2,7 @@ function getPersistedData() as object
     context = getGlobalAA().global
     if context <> invalid then
         if not context.hasField("persistedData") then
-            setPersistedData({})
+            refreshPersistedData()
         end if
         return context.persistedData
     end if

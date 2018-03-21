@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<component name="HomeScreen" extends="BaseScreen">
-    <script type="text/brightscript" uri="pkg:/components/views/screens/homeScreen.brs" />
+<component name="ShowScreenInt" extends="BaseScreen">
+    <script type="text/brightscript" uri="pkg:/components/views/screens/showScreenInt.brs" />
+    
     <interface>
+        <field id="showID" type="string" onChange="onShowIDChanged" alwaysNotify="true" />
+        <field id="show" type="node" onChange="onShowChanged" alwaysNotify="true" />
+
         <field id="itemSelected" type="node" alwaysNotify="true" />
-        <field id="menuItemSelected" type="string" alwaysNotify="true" />
-        
+        <field id="buttonSelected" type="string" alwaysNotify="true" />
+
         <field id="content" type="assocarray" onChange="onContentChanged" />
     </interface>
     <children>
@@ -13,21 +17,30 @@
            size="43"
            uri="pkg:/fonts/Lato-Light.ttf" />
 
-        <MarqueeRow
-            id="marquee"
-            visible="false" />
-        <Timer
-            id="marqueeTimer"
-            duration="5"
-            repeat="true" />
-<!--         <ScrollableList -->
-<!--             id="list" -->
-<!--             translation="[0,0]" -->
-<!--             itemComponentName="ContentAwareRow" /> -->
+        <Poster
+            id="hero"
+            width="1920"
+            height="1080"
+            loadDisplayMode="scaleToZoom" />
+        <Poster
+            id="heroDarken"
+            width="1920"
+            height="1080"
+            uri="pkg:/images/show-detail-hero-darken_int_480.png" />
+        <Rectangle
+            id="heroFadeRect"
+            width="1920"
+            height="1080"
+            color="0x000000ff"
+            opacity="0" />
         
+        <DynamicPlayMarqueeTile
+            id="dynamicPlay"
+            translation="[100,297]" />
+
         <RowList
             id="list"
-            translation="[0,762]"
+            translation="[0,867]"
             focusXOffset="[100]"
             rowLabelOffset="[[98,13]]"
             itemComponentName="GridTile"
@@ -40,17 +53,13 @@
             rowLabelColor="0xffffffff"
             focusBitmapUri="pkg:/images/frame_grid.9.png"
             vertFocusAnimationStyle="fixedFocus" />
-
+        
 <!--         <FocusGroup -->
 <!--             id="list" -->
-<!--             translation="[0,772]" -->
+<!--             translation="[0,482]" -->
 <!--             advanceKey="down" -->
 <!--             reverseKey="up" /> -->
 
-        <TopMenu
-            id="menu"
-            focusedID="home" />
-            
         <Animation
             id="scrollAnimation"
             duration="0.3"
@@ -66,47 +75,47 @@
         <ParallelAnimation
             id="fadeOutAnimation">
             <Animation
-                id="marqueeFadeOutAnimation"
+                id="heroFadeOutAnimation"
                 duration=".3"
                 delay="0"
                 repeat="false">
                 <FloatFieldInterpolator
                     key="[0,1]"
                     keyValue="[1,0]"
-                    fieldToInterp="marquee.opacity" />
+                    fieldToInterp="hero.opacity" />
             </Animation>
             <Animation
-                id="menuFadeOutAnimation"
+                id="dynamicPlayFadeOutAnimation"
                 duration=".3"
                 delay="0"
                 repeat="false">
                 <FloatFieldInterpolator
                     key="[0,1]"
                     keyValue="[1,0]"
-                    fieldToInterp="menu.opacity" />
+                    fieldToInterp="dynamicPlay.opacity" />
             </Animation>
         </ParallelAnimation>
         <ParallelAnimation
             id="fadeInAnimation">
             <Animation
-                id="marqueeFadeInAnimation"
+                id="heroFadeInAnimation"
                 duration=".3"
                 delay="0"
                 repeat="false">
                 <FloatFieldInterpolator
                     key="[0,1]"
                     keyValue="[0,1]"
-                    fieldToInterp="marquee.opacity" />
+                    fieldToInterp="hero.opacity" />
             </Animation>
             <Animation
-                id="menuFadeInAnimation"
+                id="dynamicPlayFadeInAnimation"
                 duration=".3"
                 delay="0"
                 repeat="false">
                 <FloatFieldInterpolator
                     key="[0,1]"
                     keyValue="[0,1]"
-                    fieldToInterp="menu.opacity" />
+                    fieldToInterp="dynamicPlay.opacity" />
             </Animation>
         </ParallelAnimation>
     </children>

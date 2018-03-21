@@ -49,7 +49,7 @@ Function GetPublisherID() As String
             Return GetHashedDeviceID()
         Else
             deviceInfo = CreateObject("roDeviceInfo")
-            m.PublisherID = deviceInfo.GetPublisherID()
+            m.PublisherID = deviceInfo.getClientTrackingID()
         End If
     End If
     Return m.PublisherID

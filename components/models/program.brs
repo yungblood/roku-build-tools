@@ -4,10 +4,14 @@ end sub
 sub onJsonChanged()
     json = m.top.json
     if json <> invalid then
-        if json.slug_label <> invalid then
+        if json.slug_label <> invalid or json.slugLabel <> invalid then
             ' This is a schedule item from a source other than syncbak
             m.top.id = json.mpxId
             m.top.title = json.slug_label
+            if isNullOrEmpty(m.top.title) then
+                m.top.title = json.slugLabel
+            end if
+            
             m.top.episodeTitle = json.headlineShort
             m.top.description = json.headline
             

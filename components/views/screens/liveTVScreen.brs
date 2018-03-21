@@ -28,6 +28,7 @@ sub init()
                             channelItem.title = station.station
                             channelItem.affiliate = station.affiliate
                             channelItem.scheduleUrl = station.scheduleUrl
+                            channelItem.isTuned = false
                             exit for
                         end if
                     next
@@ -39,6 +40,7 @@ sub init()
                     channelItem.title = station.title
                     channelItem.affiliate = station.affiliate
                     channelItem.scheduleUrl = station.scheduleUrl
+                    channelItem.isTuned = false
                 end if
             end if
             exit for
@@ -326,7 +328,6 @@ sub playChannel(channel as object)
         end if
     
         m.streamTask = createObject("roSGNode", "LoadLiveStreamTask")
-        m.streamTask.observeField("schedule", "onScheduleLoaded")
         m.streamTask.observeField("stream", "onStreamLoaded")
         m.streamTask.station = channel
         m.streamTask.control = "run"
@@ -346,8 +347,9 @@ sub playChannel(channel as object)
                 m.omnitureParams["showEpisodeTitle"] = channel.showName + " - " + m.omnitureParams["showEpisodeTitle"]
                 m.heartbeatContext["showEpisodeTitle"] = channel.showName + " - " + m.omnitureParams["showEpisodeTitle"]
             end if
-            m.omnitureParams["showEpisodeId"] = channel.trackingContentId
-            m.heartbeatContext["showEpisodeId"] = channel.trackingContentId
+            m.omnitureParams["showEpisodeId"] = channel.trackingContentID
+            m.heartbeatContext["showEpisodeId"] = channel.trackingContentID
+            m.omnitureParams.v31 = channel.trackingContentID
             m.omnitureParams.v38 = "live"
             m.heartbeatContext["mediaContentType"] = "live"
             m.omnitureParams.v36 = "false"
@@ -361,6 +363,7 @@ sub playChannel(channel as object)
             m.omnitureParams["showEpisodeTitle"] = channel.trackingTitle
             m.heartbeatContext["showEpisodeId"] = channel.trackingContentID
             m.omnitureParams.v24 = channel.trackingContentID
+            m.omnitureParams.v31 = channel.trackingContentID
             m.heartbeatContext["showTitle"] = channel.omnitureTrackingTitle
             m.omnitureParams.v25 = channel.omnitureTrackingTitle
             m.heartbeatContext["mediaContentType"] = "live"
@@ -389,7 +392,6 @@ end sub
 sub onStreamLoaded(nodeEvent as object)
 ?"====== ON STREAM LOADED ======"
     if m.streamTask <> invalid then
-        m.streamTask.unobserveField("schedule")
         m.streamTask.unobserveField("stream")
         m.streamTask = invalid
     end if
@@ -403,6 +405,7 @@ sub onStreamLoaded(nodeEvent as object)
         m.station = m.channel
     end if
     sendDWAnalytics({method: "playerInit", params: [true, m.station.trackingContentID] })
+    sendSparrowAnalytics({method: "playerInit", params: [true] })
     sendDWAnalytics({method: "playerLiveStart", params: [m.station, getPlayerPosition()] })
 
     trackVideoLoad(m.station, m.heartbeatContext)
@@ -534,6 +537,7 @@ sub onPositionChanged()
     if m.position > 0 then
         if m.position mod 10 = 0 then
             sendDWAnalytics({method: "playerLivePlayPosition", params: [m.station, getPlayerPosition()] })
+            sendSparrowAnalytics({method: "playerLivePlayPosition", params: [m.station, getPlayerPosition()] })
         end if
         if m.position mod 60 = 0 then
 '            trackScreenAction("trackVideo", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event57=60"])
@@ -650,6 +654,7 @@ sub showOverlay(showChannels = false as boolean, resetIndex = true as boolean)
     m.channelOverlay.visible = showChannels
     m.nowPlayingOverlay.visible = false
     m.overlay.visible = true
+    m.overlayTimer.duration = 3.5
 
     if showChannels then
         m.channelGrid.setFocus(true)
@@ -693,6 +698,7 @@ sub showScheduleDetails()
     m.scheduleOverlay.translation = [0, 485]
     m.scheduleDetails.visible = true
     m.scheduleDismiss.visible = false
+    m.overlayTimer.duration = 10
 end sub
 
 sub resetOverlayTimer(force = false as boolean)

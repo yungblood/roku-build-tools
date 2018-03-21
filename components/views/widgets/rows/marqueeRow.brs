@@ -63,8 +63,8 @@ function advance()
     if m.top.content <> invalid then
         m.list.advancing = true
         m.itemIndex = m.list.itemFocused + 1
-        if m.itemIndex >= m.top.content.getChildCount() - 1
-            m.itemIndex = m.itemIndex - (m.top.content.getChildCount() - 1)
+        if m.itemIndex >= m.top.content.getChildCount()
+            m.itemIndex = m.itemIndex - m.top.content.getChildCount()
         end if      
         print "right key itemIndex is "; m.itemIndex
         if m.targetSetIndex < m.top.focusedTargetSet.count() - 1
@@ -83,7 +83,7 @@ function reverse()
         m.list.reversing = true
         m.itemIndex = m.list.itemFocused - 1
         if m.itemIndex < 0 then
-            m.itemIndex = m.itemIndex + (m.top.content.getChildCount() - 1)
+            m.itemIndex = m.itemIndex + m.top.content.getChildCount()
         end if      
         print "left key itemIndex is "; m.itemIndex
         if m.targetSetIndex > 0 then
@@ -171,11 +171,11 @@ sub onContentChanged()
             dot.height = 12
             dot.uri = "pkg:/images/marquee_dot.png"
         next
-        ' HACK: In 7.5 the last item isn't selectable, so we add a fake final item and skip it
-        '       when scrolling through the content
-        if content.getChild(content.getChildCount() - 1).subtype() <> "ContentNode" then
-            content.createChild("ContentNode")
-        end if
+'        ' HACK: In 7.5 the last item isn't selectable, so we add a fake final item and skip it
+'        '       when scrolling through the content
+'        if content.getChild(content.getChildCount() - 1).subtype() <> "ContentNode" then
+'            content.createChild("ContentNode")
+'        end if
         m.list.content = content
         
         onItemFocused()

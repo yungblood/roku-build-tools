@@ -96,14 +96,14 @@ sub loadContent(content as object)
         if row.subtype() = "Section" then
             row.loadIndex = 0
             if row.title.inStr("Movies") >= 0 then
-                rowItemSizes.push([409, 614])
+                rowItemSizes.push([420, 630])
                 rowHeights.push(682)
             else
-                rowItemSizes.push([409, 230])
+                rowItemSizes.push([420, 230])
                 rowHeights.push(298)
             end if
         else
-            rowItemSizes.push([409, 230])
+            rowItemSizes.push([420, 230])
             rowHeights.push(298)
         end if
         content.appendChild(row)
@@ -112,43 +112,6 @@ sub loadContent(content as object)
     m.list.rowHeights = rowHeights
     m.list.content = content
 
-'
-'timer = createObject("roTimespan")    
-'    for i = 0 to rows.count() - 1
-'        row = invalid
-'        content = rows[i]
-'        contentType = content.subtype()
-'        if contentType = "Section" then
-'            if content.title.inStr("Movies") >= 0 then
-'                row = m.list.createChild("PostersRow")
-'            else
-'                if content.excludeShow then
-'                    row = m.list.createChild("FeaturedRow")
-'                else
-'                    row = m.list.createChild("EpisodesRow")
-'                end if
-'            end if
-'        else if contentType = "Favorites" then
-'            row = m.list.createChild("FavoritesRow")
-'        else if contentType = "RecentlyWatched" then
-'            row = m.list.createChild("RecentlyWatchedRow")
-'        else if contentType = "Show" then
-'            row = m.list.createChild("ShowInfoRow")
-'        else
-'            ?"Unrecognized content type: ";contentType
-'        end if
-'        if row <> invalid then
-'            if content.subtype() = "Section" and i <= m.concurrentRowLoads then
-'                content.loadIndex = 0
-'            end if
-'            row.content = content
-'            row.observeField("itemSelected", "onItemSelected")
-'            row.observeField("visible", "updateRowLayout")
-'        end if
-'    next
-'?"Rows created:";timer.totalMilliseconds():timer.mark()
-'    updateRowLayout()
-'?"Rows updated:";timer.totalMilliseconds():timer.mark()    
     m.global.showSpinner = false
 end sub
 

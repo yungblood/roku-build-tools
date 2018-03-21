@@ -24,8 +24,10 @@ function newCbs() as object
     
     this.appID                      = "TF7564CEF-EE7C-5EFD-E040-070AAC3132A7"
     this.accountPid                 = "dJ5BDC"
-    this.dashStreamUrl              = "http://link.theplatform.com/s/dJ5BDC/[PID]?sig=[SIGNATURE]&switch=roku" '&format=SMIL&tracking=true&mbr=true"
-    this.streamUrl                  = "http://link.theplatform.com/s/dJ5BDC/[PID]?sig=[SIGNATURE]&mbr=true&manifest=m3u&format=redirect&assetTypes=StreamPack%7COTT"
+    
+    ' Overidden by config.json
+    this.dashSelectorUrl            = "http://link.theplatform.com/s/dJ5BDC/[PID]?sig=[SIGNATURE]&switch=roku" '&format=SMIL&tracking=true&mbr=true"
+    this.selectorUrl                = "http://link.theplatform.com/s/dJ5BDC/[PID]?sig=[SIGNATURE]&mbr=true&manifest=m3u&format=redirect&assetTypes=StreamPack%7COTT"
 
     this.initialize                 = cbs_initialize
     this.setUser                    = cbs_setUser
@@ -101,6 +103,8 @@ function newCbs() as object
     
     this.generateAccessToken        = cbs_generateAccessToken
     this.makeRequest                = cbs_makeRequest
+    
+    setLogLevel(0)
 
     return this
 end function
@@ -130,8 +134,14 @@ end sub
 
 function cbs_getConfiguration() as object
     url = m.apiBaseUrl + "v2.0/roku/configuration.json"
-    response = m.makeRequest(url, "GET")
+    headers = {}
+    response = m.makeRequest(url, "GET", invalid, "json", false, headers)
     if isAssociativeArray(response) and response.configs <> invalid then
+        config = response.configs
+        
+        ' Capture the current country code from the response headers
+        config.currentCountryCode = lCase(asString(headers["x-request-ip-origin-country"]))
+
         return response.configs
     end if
     return {}
@@ -339,16 +349,11 @@ sub cbs_populateStream(episode as object)
         stream.titleSeason = episode.titleSeason
         if episode.isProtected then
             playReady = m.getPlayReadyInfo(episode.id)
-            'episode.url = m.getVideoStreamUrl(episode.pid, m.dashStreamUrl)
+            'episode.url = m.getVideoStreamUrl(episode.pid, m.dashSelectorUrl)
             stream.streamFormat = "dash"
             stream.encodingType = "PlayReadyLicenseAcquisitionUrl"
             stream.encodingKey = playReady.url
-            url = m.getVideoStreamUrl(episode.pid, m.dashStreamUrl)
-            headers = getUrlHeaders(url)
-            if not isNullOrEmpty(headers.location) then
-                url = headers.location
-            end if
-            stream.url = url
+            stream.url = m.getVideoStreamUrl(episode.pid, m.dashSelectorUrl)
         else
             stream.url = m.getVideoStreamUrl(episode.pid)
             stream.streamFormat = "hls"
@@ -1122,7 +1127,7 @@ function cbs_isOverStreamLimit() as boolean
     return false
 end function
 
-function cbs_getVideoStreamUrl(id as string, baseUrl = m.streamUrl as string) as string
+function cbs_getVideoStreamUrl(id as string, baseUrl = m.selectorUrl as string) as string
     url = ""
     if not isNullOrEmpty(id) then
         url = baseUrl.replace("[PID]", id)
@@ -1204,9 +1209,7 @@ function cbs_generateAccessToken(secret as string) as string
     return hexToBase64(output)
 end function
 
-function cbs_makeRequest(url as string, method = "POST" as string, postData = invalid as object, format = "json" as string, useCache = false as boolean) As dynamic
-    setLogLevel(2)
-    
+function cbs_makeRequest(url as string, method = "POST" as string, postData = invalid as object, format = "json" as string, useCache = false as boolean, responseHeaders = {} as object) As dynamic
     requestID = invalid
     query = ""
     ' Build the post data querystring
@@ -1244,6 +1247,8 @@ function cbs_makeRequest(url as string, method = "POST" as string, postData = in
             response = getUrlToStringEx(url, 60, headers)
         end if
         if response <> invalid and response.responseCode = 200 then
+            responseHeaders.append(response.responseHeaders)
+
             response = response.response
             if format = "json" then
                 ' Convert the tracking IDs and dates from longs to strings to avoid json parsing errors

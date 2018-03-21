@@ -72,6 +72,7 @@ sub doWork()
             channel.trackingTitle = item.trackingTitle
             channel.omnitureTrackingTitle = item.trackingTitle
             channel.convivaTrackingTitle = item.convivaTrackingTitle
+            channel.comscoreTrackingTitle = item.comscoreTrackingTitle
             channel.comscoreC2 = item.comscoreC2
             channel.comscoreC3 = item.comscoreC3
             channel.comscoreC4 = item.comscoreC4

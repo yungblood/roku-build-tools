@@ -44,6 +44,8 @@ sub onContentChanged()
                 m.tile = m.top.createChild("FavoriteTile")
             else if contentType = "RecentlyWatched" then
                 m.tile = m.top.createChild("FeaturedEpisodeTile")
+            else if m.content.subtype() = "RelatedShow" then
+                m.tile = m.top.createChild("PosterTile")
             else
                 m.tile = m.top.createChild("FeaturedEpisodeTile")
             end if

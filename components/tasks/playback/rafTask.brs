@@ -46,7 +46,7 @@ sub doWork()
 
     'Returns available ad pod(s) scheduled for rendering or invalid, if none are available.
     adPods = raf.getAds()
-    if adPods <> invalid and adPods.count() > 0 then
+    if not m.top.skipPreroll and adPods <> invalid and adPods.count() > 0 then
         m.top.adPodReady = true
         playContent = raf.showAds(adPods, invalid, view)
     end if
@@ -64,13 +64,6 @@ sub doWork()
                     position = msg.getData()
                     adPods = raf.getAds(msg)
                     if adPods <> invalid and adPods.count() > 0 then
-?"******************************************"
-?"******************************************"
-?"position"
-?position
-?adPods
-?"******************************************"
-?"******************************************"
                         m.top.adPodReady = true
                     end if
                 else if msg.getField() = "state" then
@@ -79,13 +72,6 @@ sub doWork()
                         if adPods = invalid or adPods.count() = 0 then
                             exit while
                         end if
-?"******************************************"
-?"******************************************"
-?"stopped"
-?position
-?adPods
-?"******************************************"
-?"******************************************"
                         if not raf.showAds(adPods, invalid, view) then
                             m.top.adPodComplete = true
                             exit while
@@ -97,14 +83,7 @@ sub doWork()
                         end if
                     else if state = "finished" then
                         adPods = raf.getAds(msg)
-?"******************************************"
-?"******************************************"
-?"finished"
-?position
-?adPods
-?"******************************************"
-?"******************************************"
-                        if adPods = invalid or adPods.count() = 0 then
+                        if m.top.skipPostroll or adPods = invalid or adPods.count() = 0 then
                             exit while
                         end if
                         postroll = true

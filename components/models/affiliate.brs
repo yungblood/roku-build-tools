@@ -9,6 +9,6 @@ sub onJsonChanged()
         m.top.url = json.affiliateUrl
         m.top.station = json.affiliateStation
         
-        m.top.hdPosterUrl = getImageUrl(json.logo, 266)
+        m.top.hdPosterUrl = getImageUrl(json.logoSelected, 266)
     end if
 end sub

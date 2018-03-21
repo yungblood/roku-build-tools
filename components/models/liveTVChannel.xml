@@ -13,6 +13,7 @@
         <field id="trackingTitle" type="string" />
         <field id="convivaTrackingTitle" type="string" />
         <field id="omnitureTrackingTitle" type="string" />
+        <field id="comscoreTrackingTitle" type="string" />
         <field id="comscoreC2" type="string" />
         <field id="comscoreC3" type="string" />
         <field id="comscoreC4" type="string" />

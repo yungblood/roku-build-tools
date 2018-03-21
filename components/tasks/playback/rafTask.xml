@@ -14,6 +14,9 @@
         <field id="adComplete" type="assocarray" />
         <field id="adClose" type="assocarray" />
 
+        <field id="skipPreroll" type="boolean" />
+        <field id="skipPostroll" type="boolean" />
+
         <field id="content" type="node" />
         <field id="video" type="node" />
     </interface>

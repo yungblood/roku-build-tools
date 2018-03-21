@@ -12,5 +12,7 @@ sub init()
 end sub
 
 sub onStationChanged()
-    m.logo.uri = m.top.station.affiliate.hdPosterUrl
+    if m.top.station.affiliate <> invalid then
+        m.logo.uri = m.top.station.affiliate.hdPosterUrl
+    end if
 end sub

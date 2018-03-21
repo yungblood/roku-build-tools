@@ -7,6 +7,5 @@ sub doWork()
     api.initialize(m.global.config, m.global.user, m.global.cookies)
 
     episode = api.getDynamicPlayEpisode(m.top.show, m.global.user.recentlyWatched)
-    m.top.show.dynamicPlayEpisode = episode
     m.top.episode = episode
 end sub

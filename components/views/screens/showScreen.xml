@@ -21,7 +21,7 @@
             id="heroDarken"
             width="1920"
             height="1080"
-            uri="pkg:/images/show-detail-hero-darken.png" />
+            uri="pkg:/images/show-detail-hero-darken_480.png" />
         <Rectangle
             id="heroFadeRect"
             width="1920"

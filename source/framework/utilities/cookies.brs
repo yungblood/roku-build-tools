@@ -188,7 +188,9 @@ Sub ParseCookieHeaders(url As String, headerArray As Object)
                 }
                 For i = 0 To data.Count() - 1
                     prop = data[i]
-                    propData = prop.Tokenize("=")
+                    propData = []
+                    propData[0] = prop.mid(0, prop.inStr("="))
+                    propData[1] = prop.mid(prop.inStr("=") + 1)
                     If propData.Count() = 2 Then
                         propName = propData[0].Trim()
                         lCasePropName = LCase(propName)

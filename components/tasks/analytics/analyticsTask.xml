@@ -3,11 +3,13 @@
     <script type="text/brightscript" uri="pkg:/components/tasks/analytics/analyticsTask.brs" />
     
     <script type="text/brightscript" uri="pkg:/components/services/dw.brs" />
+    <script type="text/brightscript" uri="pkg:/components/services/sparrow.brs" />
     <script type="text/brightscript" uri="pkg:/source/services/omniture/omniture.brs" />
     <script type="text/brightscript" uri="pkg:/source/services/omniture/NWM_Omniture.brs" />
 
     <interface>
         <field id="dwParams" type="assocarray" />
+        <field id="sparrowParams" type="assocarray" />
         <field id="omnitureParams" type="assocarray" />
         <field id="debugParams" type="assocarray" />
     </interface>

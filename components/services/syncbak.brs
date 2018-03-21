@@ -43,26 +43,8 @@ end function
 
 function syncbak_getSchedule(scheduleUrl as string) as object
     setLogLevel(1)
-    schedule = []
     response = getUrlToJson(scheduleUrl)
-    if response <> invalid then
-        now = createObject("roDateTime").asSeconds()
-        if response.schedule <> invalid then
-            items = response.schedule
-        else if response.navigation <> invalid then
-            items = response.navigation.data
-        end if
-        if items <> invalid then
-            for each item in items
-                program = createObject("roSGNode", "Program")
-                program.json = item
-                if program.endTime > now or program.endTime = 0 or program.startTime = 0 then
-                    schedule.push(program)
-                end if
-            next
-        end if
-    end if
-    return schedule
+    return parseScheduleJson(response)
 end function
 
 function syncbak_getStream(stationID as string, mediaID as string, typeID = -1 as integer) as object

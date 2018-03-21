@@ -4,14 +4,6 @@ sub init()
     m.top.setFocus(true)
     m.top.observeField("focusedChild", "onFocusChanged")
 
-'    m.uvpVideoScreen = m.top.findNode("uvpVideoScreen")
-'    m.videoScreen = m.top.findNode("videoScreen")
-
-'    m.liveTVScreen = m.top.findNode("liveTVScreen")
-'    m.liveTVScreen.observeField("itemSelected", "onItemSelected")
-'    m.liveTVScreen.observeField("buttonSelected", "onButtonSelected")
-'    m.liveTVScreen.observeField("menuItemSelected", "onMenuItemSelected")
-
     m.screens = m.top.findNode("screens")
     m.dialogs = m.top.findNode("dialogs")
     m.waitRect = m.top.findNode("waitRect")
@@ -97,26 +89,30 @@ sub signIn(username = "" as string, password = "" as string)
 end sub
 
 sub onSignedIn(nodeEvent as object)
+    ' Capture and reset the upsellItem here, in case one of the subsequent calls
+    ' needs to set it
+    upsellItem = m.upsellItem
+    m.upsellItem = invalid
+    
     clearNavigationStack()
     if m.global.dialog <> invalid then
         m.global.dialog.close = true
     end if
     m.global.showWaitScreen = false
-    if m.upsellItem <> invalid then
-        if isString(m.upsellItem) then
-            if m.upsellItem = "liveTV" then
+    if upsellItem <> invalid then
+        if isString(upsellItem) then
+            if upsellItem = "liveTV" then
                 showLiveTVScreen()
             end if
         else
-            if canWatch(m.upsellItem, m.global, true) then
-                if m.upsellItem.subtype() = "Episode" then
-                    showDaiVideoScreen(m.upsellItem.id, m.upsellItem.getParent(), m.upsellSource)
-                    'showVideoScreen(m.upsellItem.id, m.upsellItem.getParent(), m.upsellSource)
+            if canWatch(upsellItem, m.global, true) then
+                if upsellItem.subtype() = "Episode" then
+                    showVideoScreen(upsellItem.id, upsellItem.getParent(), m.upsellSource)
                 else
-                    showVideoScreen(m.upsellItem.id, invalid, m.upsellSource)
+                    showVideoScreen(upsellItem.id, invalid, m.upsellSource, false)
                 end if
             else
-                showUpsellScreen(m.upsellItem)
+                showUpsellScreen(upsellItem)
             end if
         end if
     else
@@ -132,7 +128,6 @@ sub onSignedIn(nodeEvent as object)
         openDeepLink(m.top.ecp)
     end if
     m.top.ecp = invalid
-    m.upsellItem = invalid
     m.signInTask = invalid
 end sub
 
@@ -249,9 +244,7 @@ sub onUpsellButtonSelected(nodeEvent as object)
             end if
         end if
     else if button = constants().tourText then
-        'showDaiVideoScreen(source.tourVideoID, invalid, source)
-        showDaiVideoScreen(source.tourVideoID, invalid, source)
-        'showVideoScreen(source.tourVideoID, invalid, source)
+        showVideoScreen(source.tourVideoID, invalid, source)
     end if
 end sub
 
@@ -666,35 +659,17 @@ sub showUvpVideoScreen(episodeID as string, section = invalid as object, source 
     addToNavigationStack(screen)
 end sub
 
-sub showDaiVideoScreen(episodeID as string, section = invalid as object, source = invalid as object)
-    'showUvpVideoScreen(episodeID, section, source)
-    'return
+sub showVideoScreen(episodeID as string, section = invalid as object, source = invalid as object, useDai = true as boolean)
+    config = m.global.config
 
-    screen = createObject("roSGNode", "DaiVideoScreen")
-    screen.useDai = true
+    screen = createObject("roSGNode", "VideoScreen")
+    screen.useDai = useDai and config.useDai
     screen.episodeID = episodeID
     screen.section = section
     if source <> invalid then
         screen.omnitureData = source.omnitureData
     end if
     addToNavigationStack(screen)
-end sub
-
-sub showVideoScreen(episodeID as string, section = invalid as object, source = invalid as object)
-    screen = createObject("roSGNode", "DaiVideoScreen")
-    screen.useDai = false
-    screen.episodeID = episodeID
-    screen.section = section
-    if source <> invalid then
-        screen.omnitureData = source.omnitureData
-    end if
-    addToNavigationStack(screen)
-'    m.videoScreen.episodeID = episodeID
-'    m.videoScreen.section = section
-'    if source <> invalid then
-'        m.videoScreen.omnitureData = source.omnitureData
-'    end if
-'    addToNavigationStack(m.videoScreen)
 end sub
 
 function openDeepLink(params as object, item = invalid as object) as boolean
@@ -963,8 +938,7 @@ sub onButtonSelected(nodeEvent as object)
         if source.hasField("episode") and source.episode <> invalid then
             episode = source.episode
             if canWatch(episode, m.global) then
-                showDaiVideoScreen(episode.ID, episode.getParent(), source)
-                'showVideoScreen(episode.ID, episode.getParent(), source)
+                showVideoScreen(episode.ID, episode.getParent(), source)
             else
                 showUpsellScreen(episode)
             end if
@@ -988,8 +962,7 @@ sub onButtonSelected(nodeEvent as object)
             movie = source.movie
             if movie.trailer <> invalid then
                 if canWatch(movie.trailer, m.global) then
-                    showDaiVideoScreen(movie.trailer.id, invalid, source)
-                    'showVideoScreen(movie.trailer.id, invalid, source)
+                    showVideoScreen(movie.trailer.id, invalid, source)
                 else
                     showUpsellScreen(movie.trailer)
                 end if

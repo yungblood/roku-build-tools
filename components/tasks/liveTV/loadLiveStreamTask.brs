@@ -5,14 +5,6 @@ end sub
 sub doWork()
     config = m.global.config
     
-    stream = invalid
-
-    schedule = []
-    if not isNullOrEmpty(m.top.station.scheduleUrl) then
-        schedule = syncbak().getSchedule(m.top.station.scheduleUrl)
-    end if
-    m.top.schedule = schedule
-
     if m.top.station.subtype() = "LiveTVChannel" then
         stream = createObject("roSGNode", "LiveTVStream")
         stream.streamFormat = "hls"

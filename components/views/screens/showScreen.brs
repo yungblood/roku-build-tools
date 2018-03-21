@@ -169,7 +169,7 @@ sub onItemSelected(nodeEvent as object)
                 omnitureData = getOmnitureData(row, 0, lCase(content.dynamicPlayEpisode.title))
                 m.top.omnitureData = omnitureData
                 trackScreenAction("trackPodSelect", omnitureData)
-                m.top.itemSelected = content.dynamicPlayEpisode.episode
+                m.top.itemSelected = content.dynamicPlayEpisode
             end if
         else
             item = content.getChild(index)

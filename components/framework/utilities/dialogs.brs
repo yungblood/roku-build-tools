@@ -41,14 +41,17 @@ function createWaitDialog(title as string, spinnerImage = "" as string) as objec
 end function
 
 function setSceneDialog(node as object, dialog as object) as boolean
-    scene = node.getParent()
-    while scene <> invalid
-        if scene.getParent() <> invalid then
-            scene = scene.getParent()
-        else
-            exit while
-        end if
-    end while
+    scene = node.getScene()
+    if scene = invalid then
+        scene = node.getParent()
+        while scene <> invalid
+            if scene.getParent() <> invalid then
+                scene = scene.getParent()
+            else
+                exit while
+            end if
+        end while
+    end if
     if scene <> invalid and scene.hasField("dialog") then
         scene.dialog = dialog
         return true

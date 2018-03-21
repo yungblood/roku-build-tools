@@ -23,10 +23,13 @@ sub doWork()
     if content.subtype() = "Station" or content.isLive then
         convivaTags["contentId"]    = content.mediaID
         convivaTags["contentType"]  = "Live"
-        convivaTags["isEpisode"]    = "false"
-        convivaTags["episodeTitle"] = content.trackingTitle
+        convivaTags["isAd"]         = "false"
+        convivaTags["episodeTitle"] = content.convivaTrackingTitle
+        convivaTags["drm"]          = "false"
+        convivaTags["drmType"]      = "none"
         convivaTags["app"]          = "Roku"
         convivaTags["appVersion"]   = config.appVersion
+        convivaTags["appRegion"]    = config.appRegion
         convivaTags["winDimension"] = config.screenDims
 
         contentInfo = convivaContentInfo(content.convivaTrackingTitle, convivaTags)
@@ -37,13 +40,15 @@ sub doWork()
     else
         convivaTags["contentId"]    = content.id
         convivaTags["contentType"]  = "VOD"
+        convivaTags["isAd"]         = "false"
         convivaTags["isEpisode"]    = iif(content.isFullEpisode , "true", "false")
         convivaTags["seriesTitle"]  = content.showName
-        convivaTags["episodeTitle"] = content.trackingTitle
+        convivaTags["episodeTitle"] = content.title
         convivaTags["drm"]          = iif(content.isProtected , "true", "false")
-        convivaTags["drmType"]      = iif(content.isProtected , "PlayReady", "")
-        convivaTags["app"]          = "Roku"
-        convivaTags["appVersion"]   = config.appVersion
+        convivaTags["drmType"]      = iif(content.isProtected , "PlayReady", "none")
+        convivaTags["app"]          = config.appName
+        convivaTags["appVersion"]   = config.appName + " " + config.appVersion
+        convivaTags["appRegion"]    = config.appRegion
         convivaTags["winDimension"] = config.screenDims
     
         contentInfo = convivaContentInfo(content.convivaTrackingTitle, convivaTags)
@@ -53,7 +58,8 @@ sub doWork()
         contentInfo["streamFormat"] = content.videoStream.streamFormat
     end if
     convivaTags["accessType"]       = user.trackingStatus
-    convivaTags["connectionType"]   = iif(getEthernetInterface() = "eth0", "Ethernet", "WiFi")
+    convivaTags["connectionType"]   = iif(getEthernetInterface() = "eth0", "ethernet", "wifi")
+    convivaTags["Partner_ID"]       = "cbs_roku_app"
     convivaTags["Player_Version"]   = getAppVersion()
 
     contentInfo["playerName"]       = "ROKU"

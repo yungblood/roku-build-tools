@@ -3,19 +3,22 @@ sub init()
     m.top.omnitureName = "/video"
     m.top.omniturePageType = "video"
     
+    m.top.observeField("close", "onClosed")
+
     m.overlay = m.top.findNode("overlay")
     m.overlay.visible = false
     
-    ' HACK: Observing these as aliased fields to work around an issue with
-    '       Conviva unobserving the fields out from under us
-    m.top.observeField("position", "onPositionChanged")
-    m.top.observeField("state", "onVideoStateChanged")
-
     m.video = m.top.findNode("video")
-    m.video.observeField("trickPlayBarVisibilityHint", "onOverlayVisibilityHint")
+    m.video.enableCookies()
+    m.video.timedMetaDataSelectionKeys = ["*"]
+
+    m.video.observeFieldScoped("content", "onContentReady")
+    m.video.observeFieldScoped("position", "onPositionChanged")
+    m.video.observeFieldScoped("state", "onVideoStateChanged")
+    m.video.observeFieldScoped("trickPlayBarVisibilityHint", "onOverlayVisibilityHint")
     
-    if createObject("roDeviceInfo").getModel().mid(0, 1) = "3" then
-        ' limit the video resolution on "giga" devices
+    if m.global.extremeMemoryManagement then
+        ' limit the video resolution on low-end devices
         m.video.maxVideoDecodeResolution = [1280, 720]
     end if
 
@@ -33,25 +36,22 @@ sub init()
 
     m.video.trickPlayBar.reparent(m.overlay, true)
     m.video.trickPlayBar.visible = false
+    
+    m.adCounter = m.top.findNode("adCounter")
+    m.adCounterShadow = m.top.findNode("adCounterShadow")
 
     m.showTitle = m.top.findNode("showTitle")
     m.episodeTitle = m.top.findNode("episodeTitle")
     m.episodeNumber = m.top.findNode("episodeNumber")
     m.description = m.top.findNode("description")
     
+    m.debugInfo = m.top.findNode("debugInfo")
+    m.debugInfo.visible = m.global.config.useStaging
+    
     m.endCard = m.top.findNode("endCard")
-    m.endCardBackground = m.top.findNode("endCardBackground")
-    m.endCardButtons = m.top.findNode("endCardButtons")
-    m.endCardButtons.observeField("buttonSelected", "onEndCardButtonSelected")
+    m.endCard.observeField("buttonSelected", "onEndCardButtonSelected")
     m.endCard.visible = false
 
-    m.zoom = m.top.findNode("zoom")
-    m.upNext = m.top.findNode("upNext")
-    m.countdown = m.top.findNode("countdown")
-    m.upNextShowName = m.top.findNode("upNextShowName")
-    m.upNextEpisodeNumber = m.top.findNode("upNextEpisodeNumber")
-    m.upNextEpisodeName = m.top.findNode("upNextEpisodeName")
-    
     m.continuousPlayTimer = m.top.findNode("continuousPlayTimer")
     m.continuousPlayTimer.observeField("fire", "onContinuousPlayTimerFired")
     
@@ -65,12 +65,14 @@ sub init()
     m.paused = false
     m.pausedPosition = 0
 
+    m.inAd = false
     m.adCount = 0
-    m.adPodIndex = 1
     m.adPositionOffset = 0
 
     m.position = 0
     m.overrideEndCard = false
+    m.isContinuousPlay = false
+    m.isForced = false
     
     m.timedOut = false
     
@@ -79,15 +81,20 @@ end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
     if press then
-        if not m.video.enableTrickPlay then
+        if not m.inAd then
             if key = "OK" or key = "play" then
-                m.overlay.visible = true
-                m.overlayTimer.control = "start"
-                return true
+                if not m.endCard.visible then
+                    m.overlay.visible = true
+                    m.overlayTimer.control = "start"
+                    return true
+                end if
             else if key = "back" then
                 if m.overlay.visible then
                     m.overlay.visible = false
                     m.overlayTimer.control = "stop"
+                    return true
+                else
+                    m.top.close = true
                     return true
                 end if
             end if
@@ -96,10 +103,51 @@ function onKeyEvent(key as string, press as boolean) as boolean
     return false
 end function
 
+sub onClosed()
+    if m.loadTask <> invalid then
+        m.loadTask.unobserveField("episode")
+        m.loadTask = invalid
+    end if
+    m.video.unobserveFieldScoped("close")
+    if m.top.useDai then
+        m.global.dai.unobserveField("error")
+        m.global.dai.unobserveField("videoComplete")
+        m.global.dai.unobserveField("adPosition")
+        m.global.dai.unobserveField("adStart")
+        m.global.dai.unobserveField("adFirstQuartile")
+        m.global.dai.unobserveField("adMidpoint")
+        m.global.dai.unobserveField("adThirdQuartile")
+        m.global.dai.unobserveField("adComplete")
+        m.global.dai.video = invalid
+        m.global.dai.reset = true
+    end if
+end sub
+
 sub onFocusChanged()
     if m.top.hasFocus() then
         if m.video <> invalid then
             m.video.setFocus(true)
+        end if
+    end if
+end sub
+
+sub onContentReady()
+    if m.top.useDai and m.video.content <> invalid then
+        if m.video.content.streamDetails <> invalid then
+            m.debugInfo.text = "DAI Stream ID: " + m.video.content.streamDetails.streamID
+        end if
+        m.video.control = "play"
+    end if
+end sub
+
+sub onVideoComplete()
+    if m.top.useDai and m.global.dai.videoComplete then
+        if m.errorDialog = invalid then
+            if not playNext() then
+                m.top.close = true
+            end if
+        else
+            m.errorDialog.setFocus(true)
         end if
     end if
 end sub
@@ -141,70 +189,72 @@ sub onVideoStateChanged()
     if m.video <> invalid then
         state = LCase(m.video.state)
         ?"VIDEO STATE: ";state
-        if state = "finished" then ' and not m.playingAd then
+        if state = "finished" and not m.inAd then
             if m.errorDialog = invalid then
-                ' HACK: this is needed so the main.brs thread can respond to the content update
-                m.continuousPlayTimer.control = "start"
+                onContinuousPlayTimerFired()
             else
                 m.errorDialog.setFocus(true)
             end if
         else if state = "error" then
-            if m.episode.isLive then
-                m.global.analytics.dwParams = { method: "playerLiveError", params: [m.video.errorMsg, m.episode, getPlayerPosition(true), getPlayerPosition()]}
-            else
-                m.global.analytics.dwParams = { method: "playerError", params: [m.video.errorMsg, m.episode, getPlayerPosition(true), getPlayerPosition()]}
-            end if
-            
-            error = "Unfortunately, an error occurred during playback."
-            ' Check for a network connection error
-            if not createObject("roDeviceInfo").getLinkStatus() then
-                error = error + " Please check your network connection and try again."
-            else
-                error = error + " Please try again."
-            end if
-            m.errorDialog = createCbsDialog("Error", error, ["OK"])
-            m.errorDialog.observeField("buttonSelected", "onErrorDialogClose")
-            m.global.dialog = m.errorDialog
+            showErrorDialog(m.video.errorMsg)
         else if state = "buffering" then
             m.overlay.visible = false
         else if state = "paused" then
             m.paused = true
             m.pausedPosition = m.video.position
-            m.global.analytics.dwParams = { method: "playerPause", params: [m.episode, getPlayerPosition(true), getPlayerPosition()]}
-            m.global.analytics.dwParams = { method: "playerPlayPosition", params: [m.episode, getPlayerPosition()]}
+            sendDWAnalytics({method: "playerPause", params: [m.episode, getPlayerPosition(true), getPlayerPosition()]})
+            sendDWAnalytics({method: "playerPlayPosition", params: [m.episode, getPlayerPosition()]})
+            trackVideoPause()
             m.pauseTimer.mark()
+
+            if m.global.comscore <> invalid then
+                m.global.comscore.videoEnd = true
+            end if
         else if state = "playing" then
             if m.paused then
                 if m.video.position < m.pausedPosition or m.video.position > m.pausedPosition + 1 then
                     if m.video.position > m.pausedPosition then
-                        m.global.analytics.dwParams = { method: "playerForward", params: [m.video.position - m.pausedPosition, m.episode, getPlayerPosition(true), getPlayerPosition()]}
+                        sendDWAnalytics({method: "playerForward", params: [m.video.position - m.pausedPosition, m.episode, getPlayerPosition(true), getPlayerPosition()]})
                     else
-                        m.global.analytics.dwParams = { method: "playerRewind", params: [m.pausedPosition - m.video.position, m.episode, getPlayerPosition(true), getPlayerPosition()]}
+                        sendDWAnalytics({method: "playerRewind", params: [m.pausedPosition - m.video.position, m.episode, getPlayerPosition(true), getPlayerPosition()]})
+                        
+                        ' The user activated trick play, so reset the end card override, so the end card
+                        ' shows again.
+                        m.overrideEndCard = false
                     end if
                 else
-                    m.global.analytics.dwParams = { method: "playerUnpause", params: [m.pauseTimer.totalSeconds(), m.episode, getPlayerPosition(true), getPlayerPosition()]}
+                    sendDWAnalytics({method: "playerUnpause", params: [m.pauseTimer.totalSeconds(), m.episode, getPlayerPosition(true), getPlayerPosition()]})
                 end if
+            end if
+            trackVideoPlay()
+            if m.global.comscore <> invalid then
+                m.global.comscore.videoStart = true
             end if
             m.paused = false
         else if state = "stopped" then
             if m.episode <> invalid then
                 if m.episode.isLive then
-                    m.global.analytics.dwParams = { method: "playerLivePlayPosition", params: [m.episode, getPlayerPosition()]}
+                    sendDWAnalytics({method: "playerLivePlayPosition", params: [m.episode, getPlayerPosition()]})
                 else
-                    m.global.analytics.dwParams = { method: "playerPlayPosition", params: [m.episode, getPlayerPosition()]}
+                    sendDWAnalytics({method: "playerPlayPosition", params: [m.episode, getPlayerPosition()]})
                 end if
-                if not m.top.playingAd then
+                if not m.inAd then
                     if m.episode.isLive then
                         if m.timedOut then
-                            m.global.analytics.dwParams = { method: "playerLiveForcedEnd", params: ["forcedend", m.episode, getPlayerPosition(), getPlayerPosition()] }
+                            sendDWAnalytics({method: "playerLiveForcedEnd", params: ["forcedend", m.episode, getPlayerPosition(), getPlayerPosition()] })
                         else
-                            m.global.analytics.dwParams = { method: "playerLiveStop", params: [m.episode, getPlayerPosition(), getPlayerPosition()] }
+                            sendDWAnalytics({method: "playerLiveStop", params: [m.episode, getPlayerPosition(), getPlayerPosition()] })
                         end if
                     else
-                        m.global.analytics.dwParams = { method: "playerStop", params: [m.episode, getPlayerPosition(true), getPlayerPosition()]}
+                        sendDWAnalytics({method: "playerStop", params: [m.episode, getPlayerPosition(true), getPlayerPosition()]})
                     end if
                 end if
             end if
+            if m.global.comscore <> invalid then
+                m.global.comscore.videoEnd = true
+            end if
+            trackVideoComplete()
+            trackVideoUnload()
         end if
     end if
 end sub
@@ -227,25 +277,31 @@ sub onContinuousPlayTimerFired()
 end sub
 
 sub onPositionChanged()
-    m.position = m.video.position
-    if m.episode.isLive then
-        m.global.analytics.dwParams = { method: "playerLivePlay", params: [m.episode, getPlayerPosition(true), getPlayerPosition()]}
-    else
-        m.global.analytics.dwParams = { method: "playerPlay", params: [m.episode, getPlayerPosition(true), getPlayerPosition()]}
-    end if
-    if m.position > 0 then
-        if m.position mod 10 = 0 then
-            if m.episode.isLive then
-                m.global.analytics.dwParams = { method: "playerLivePlayPosition", params: [m.episode, getPlayerPosition()]}
-            else
-                m.global.analytics.dwParams = { method: "playerPlayPosition", params: [m.episode, getPlayerPosition()]}
+    m.position = getPlayerPosition(false)
+    ?"CONTENT POSITION:";m.position,"STREAM POSITION:";m.video.position
+    if m.lastPosition = invalid or m.position <> m.lastPosition then
+        if m.episode.isLive then
+            sendDWAnalytics({method: "playerLivePlay", params: [m.episode, getPlayerPosition(true), getPlayerPosition()]})
+        else
+            sendDWAnalytics({method: "playerPlay", params: [m.episode, getPlayerPosition(true), getPlayerPosition()]})
+        end if
+        if m.position > 0 then
+            if m.position mod 10 = 0 then
+                if m.episode.isLive then
+                    sendDWAnalytics({method: "playerLivePlayPosition", params: [m.episode, getPlayerPosition()]})
+                    sendSparrowAnalytics({method: "playerLivePlayPosition", params: [m.episode, getPlayerPosition()]})
+                else
+                    sendDWAnalytics({method: "playerPlayPosition", params: [m.episode, getPlayerPosition()]})
+                    sendSparrowAnalytics({method: "playerPlayPosition", params: [m.episode, getPlayerPosition()]})
+                end if
             end if
-        end if
-        if m.position mod 60 = 0 then
-            trackScreenAction("trackVideo", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event57=60"])
+            if m.position mod 60 = 0 then
+                'trackScreenAction("trackVideo", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event57=60"])
+            end if
+            trackVideoPlayhead(m.position)
         end if
     end if
-    if m.episode.endCreditsChapterTime > 0 and m.nextEpisode <> invalid then
+    if m.episode.endCreditsChapterTime > 0 and (m.nextEpisode <> invalid or m.cpInfo <> invalid) then
         updateEndCard()
     end if
     
@@ -259,6 +315,7 @@ sub onPositionChanged()
             m.timeoutTimer.control = "start"
         end if
     end if
+    m.lastPosition = m.position
 end sub
 
 sub onTimeoutDialogClosed(nodeEvent as object)
@@ -267,7 +324,7 @@ sub onTimeoutDialogClosed(nodeEvent as object)
     dialog.close = true
     m.stillWatchingDialog = invalid
 
-    m.global.analytics.dwParams = { method: "playerLiveForcedEnd", params: ["resume", m.episode, getPlayerPosition(), getPlayerPosition()] }
+    sendDWAnalytics({method: "playerLiveForcedEnd", params: ["resume", m.episode, getPlayerPosition(), getPlayerPosition()] })
     m.video.control = "resume"
 end sub
 
@@ -283,10 +340,12 @@ sub onEpisodeIDChanged()
     m.global.showSpinner = true
 
     m.nextEpisode = invalid
+    m.cpInfo = invalid
     m.overlay.visible = false
     m.endCard.visible = false
     m.video.bifDisplay.visible = false
     m.video.trickPlayBar.visible = false
+    m.video.content = invalid
 
     m.loadTask = createObject("roSGNode", "LoadEpisodeTask")
     m.loadTask.observeField("episode", "onEpisodeLoaded")
@@ -298,10 +357,36 @@ end sub
 sub onEpisodeLoaded(nodeEvent as object)
     m.global.showSpinner = false
     
+    if m.top.useDai then
+        m.global.dai.unobserveField("error")
+        m.global.dai.unobserveField("videoComplete")
+        m.global.dai.unobserveField("adPosition")
+        m.global.dai.unobserveField("adStart")
+        m.global.dai.unobserveField("adFirstQuartile")
+        m.global.dai.unobserveField("adMidpoint")
+        m.global.dai.unobserveField("adThirdQuartile")
+        m.global.dai.unobserveField("adComplete")
+    end if
+
     m.loadTask = invalid
     task = nodeEvent.getRoSGNode()
     m.episode = nodeEvent.getData()
     
+    if m.episode.isLive or m.episode.isProtected then
+        m.top.useDai = false
+    end if
+    
+    if m.top.useDai then
+        m.global.dai.observeField("error", "onDaiError")
+        m.global.dai.observeField("videoComplete", "onVideoComplete")
+        m.global.dai.observeField("adPosition", "onAdPosition")
+        m.global.dai.observeField("adStart", "onAdStart")
+        m.global.dai.observeField("adFirstQuartile", "onAdFirstQuartile")
+        m.global.dai.observeField("adMidpoint", "onAdMidpoint")
+        m.global.dai.observeField("adThirdQuartile", "onAdThirdQuartile")
+        m.global.dai.observeField("adComplete", "onAdComplete")
+    end if
+
     m.top.content = m.episode
     if m.episode = invalid then
         if task.error = "CONCURRENT_STREAM_LIMIT" then
@@ -330,7 +415,7 @@ sub onEpisodeLoaded(nodeEvent as object)
             omnitureData["podText"] = "resume watching"
             trackScreenAction("trackPodSelect", omnitureData)
         else
-            startPlayback(false)
+            startPlayback(m.isContinuousPlay, 0, m.isContinuousPlay, m.isForced)
         end if
     end if
 end sub
@@ -349,7 +434,7 @@ sub onResumeDialogButtonSelected(nodeEvent as object)
         omnitureData["podText"] = "play from where i left off"
         trackScreenAction("trackPodSelect", omnitureData)
 
-        startPlayback(false, m.episode.resumePoint)
+        startPlayback(m.isContinuousPlay, m.episode.resumePoint, m.isContinuousPlay, m.isForced)
     else
         omnitureData = m.top.omnitureData
         if omnitureData = invalid then
@@ -359,9 +444,17 @@ sub onResumeDialogButtonSelected(nodeEvent as object)
         omnitureData["podText"] = "restart from beginning"
         trackScreenAction("trackPodSelect", omnitureData)
 
-        startPlayback(false)
+        startPlayback(m.isContinuousPlay, 0, m.isContinuousPlay, m.isForced)
     end if
     dialog.close = true
+end sub
+
+sub onContinuousPlayInfoLoaded(nodeEvent as object)
+    m.nextTask = invalid
+    m.cpInfo = nodeEvent.getData()
+    if m.cpInfo <> invalid then
+        m.endCard.continuousPlayInfo = m.cpInfo
+    end if
 end sub
 
 sub onNextEpisodeLoaded(nodeEvent as object)
@@ -370,170 +463,335 @@ sub onNextEpisodeLoaded(nodeEvent as object)
     m.nextEpisode = nextEpisode
     if m.nextEpisode <> invalid then
         m.episode.skipPostroll = true
-        show = m.global.showCache[m.nextEpisode.showID]
-        if show <> invalid then
-            m.endCardBackground.uri = getImageUrl(show.heroImageUrl, m.endCardBackground.width)
-        else
-            m.endCardBackground.uri = ""
-        end if
-        m.upNext.backgroundUri = getImageUrl(m.nextEpisode.thumbnailUrl, m.upNext.width)
-        m.upNext.focusedBackgroundUri = getImageUrl(m.nextEpisode.thumbnailUrl, m.upNext.width)
-        m.upNextShowName.text = m.nextEpisode.showName
+        m.endCard.episode = m.nextEpisode
         
-        upNextEpisodeNumber = (m.nextEpisode.seasonString + " " + m.nextEpisode.episodeString).trim()
-        if not isNullOrEmpty(upNextEpisodeNumber) then
-            upNextEpisodeNumber = upNextEpisodeNumber + " | "
+        ' We have continuous play info, so make sure we skip the postroll
+        if m.rafTask <> invalid then
+            m.rafTask.skipPostroll = true
         end if
-        m.upNextEpisodeNumber.text = upNextEpisodeNumber + m.nextEpisode.durationString
-        m.upNextEpisodeName.text = m.nextEpisode.title
     end if
 end sub
 
 sub onEndCardButtonSelected(nodeEvent as object)
-    button = m.endCardButtons.getChild(nodeEvent.getData())
+    omnitureParams = {}
+    omnitureParams.append(m.omnitureParams)
+    omnitureParams["podType"] = "end card ui"
+    omnitureParams["podSection"] = "video"
+
+    button = nodeEvent.getData()
     if button <> invalid then
-        if button.id = "zoom" then
+        if button.id.inStr("Zoom") > 0 then
             setVideoToFullScreen(true)
+            
+            omnitureParams["podText"] = "credits"
+            trackScreenAction("trackPodSelect", omnitureParams, m.top.omnitureName, m.top.omniturePageType)
         else
+            if m.cpInfo <> invalid then
+                if m.cpInfo.episode <> invalid then
+                    m.nextEpisode = m.cpInfo.episode
+                    omnitureParams["mediaWatchNextType"] = "single_next-ep"
+                else
+                    m.nextEpisode = button.itemContent.video
+                    omnitureParams["mediaWatchNextType"] = button.itemContent.watchNextType
+                end if
+                omnitureParams["podText"] = "upnext|play"
+                omnitureParams["podTitle"] = m.nextEpisode.title
+                omnitureParams["showId"] = m.nextEpisode.showID
+                omnitureParams["showName"] = m.nextEpisode.showName
+                omnitureParams["showEpisodeId"] = m.nextEpisode.id
+                omnitureParams["showEpisodeTitle"] = m.nextEpisode.showName + " - " + m.nextEpisode.title
+                trackScreenAction("trackPodSelect", omnitureParams, m.top.omnitureName, m.top.omniturePageType)
+                
+                m.watchNextType = omnitureParams["mediaWatchNextType"]
+            end if
             playNext(true)
         end if
+        m.endCard.buttonSelected = invalid
     end if
 end sub
 
-sub onVideoStart(nodeEvent as object)
-    trackScreenAction("trackVideoLoad", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event52"])
+sub onVideoStart()
+    if not isNullOrEmpty(m.watchNextType) then
+        m.omnitureParams["v90"] = m.watchNextType
+    else
+        m.omnitureParams.delete("v90")
+    end if
+    'trackScreenAction("trackVideoLoad", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event52"])
+    trackVideoLoad(m.episode, m.heartbeatContext)
+    trackVideoStart()
+    m.watchNextType = ""
+end sub
+
+sub onAdPodReady()
+?"==== onAdPodReady ===="
+    m.inAd = true
+    if m.video.state = "playing" or m.video.state = "finished" then
+        m.resumePoint = m.video.position
+        if m.video.state = "finished" then
+            m.videoComplete = true
+        end if
+        m.video.control = "stop"
+    end if
+end sub
+
+sub onAdPodComplete()
+?"==== onAdPodComplete ===="
+    m.inAd = false
+    if m.videoComplete then
+        m.top.close = true
+    else
+        m.video.seek = m.resumePoint
+        m.video.control = "play"
+        m.video.setFocus(true)
+    end if
 end sub
 
 sub onAdStart(nodeEvent as object)
+?"==== onAdStart ===="
+    ' check to make sure we're not in a post-roll during continuous play
+    if m.episode.endCreditsChapterTime > 0 and (m.nextEpisode <> invalid or m.cpInfo <> invalid) then
+        remaining = int(m.episode.endCreditsChapterEnd - m.position)
+        if remaining <= 5 and playNext() then
+            return
+        end if
+    end if
+
     eventData = nodeEvent.getData()
     m.adCount = m.adCount + 1
-    m.global.analytics.dwParams = { method: "playerAdStart", params: [eventData.ad, eventData.podIndex + 1, eventData.adIndex, m.adCount, m.episode, getPlayerPosition(true), getPlayerPosition()]}
+    sendDWAnalytics({method: "playerAdStart", params: [eventData.ad, eventData.podIndex + 1, eventData.adIndex, m.adCount, m.episode, getPlayerPosition(true), getPlayerPosition()]})
+    if m.global.comscore <> invalid then
+        m.global.comscore.adStart = true
+    end if
 
-    trackScreenAction("trackVideoLoad", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event60"])
+    position = eventData.position
+    if position <> m.lastAdPosition then
+        m.lastAdPosition = position
+        breakName = "mid-roll"
+        if position = 0 then
+            breakName = "pre-roll"
+        else if position = m.episode.length then
+            breakName = "post-roll"
+        end if
+        trackAdBreakStart(breakName, position, eventData.podIndex + 1)
+    end if
+'    trackScreenAction("trackVideoLoad", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event60"])
+    trackAdStart(eventData.ad, eventData.adIndex)
     
-'    adPods = m.AdPods
-'    if isArray(adPods) then
-'        adPods = adPods[0]
-'    end if
-'    ad = eventData.ad
-'    ' TODO: Currently Akamai only supports pre-rolls
-'    if m.position = 0 and ad <> invalid then
-'        m.Akamai.handleAdLoaded(GetAkamaiAdParams(ad, getPlayerPosition() - m.AdPositionOffset))
-'        m.Akamai.handleAdStarted(GetAkamaiAdParams(ad, getPlayerPosition() - m.AdPositionOffset))
-'    end if
+    if m.top.useDai then
+        m.adCounter.visible = true
+        m.adCounterShadow.visible = true
+        m.adCounter.text = "Ad " + eventData.adIndex.toStr() + " of " + eventData.adCount.toStr()
+        m.adCounterShadow.text = m.adCounter.text
+        
+        setVideoToFullScreen()
+    end if
+    
+    m.inAd = true
+    if m.convivaTask <> invalid then
+        m.convivaTask.adStart = true
+    end if
 end sub
 
 sub onAdFirstQuartile(nodeEvent as object)
+?"==== onAdFirstQuartile ===="
     eventData = nodeEvent.getData()
-'    ad = eventData.ad
-'    ' TODO: Currently Akamai only supports pre-rolls
-'    if m.position = 0 and ad <> invalid then
-'        m.Akamai.handleAdFirstQuartile(GetAkamaiAdParams(ad, getPlayerPosition() - m.AdPositionOffset))
-'    end if
 end sub
 
 sub onAdMidpoint(nodeEvent as object)
+?"==== onAdMidpoint ===="
     eventData = nodeEvent.getData()
-'    ad = eventData.ad
-'    ' TODO: Currently Akamai only supports pre-rolls
-'    if m.position = 0 and ad <> invalid then
-'        m.Akamai.handleAdMidpoint(GetAkamaiAdParams(ad, getPlayerPosition() - m.AdPositionOffset))
-'    end if
 end sub
 
 sub onAdThirdQuartile(nodeEvent as object)
+?"==== onAdThirdQuartile ===="
     eventData = nodeEvent.getData()
-'    ad = eventData.ad
-'    ' TODO: Currently Akamai only supports pre-rolls
-'    if m.position = 0 and ad <> invalid then
-'        m.Akamai.handleAdThirdQuartile(GetAkamaiAdParams(ad, getPlayerPosition() - m.AdPositionOffset))
-'    end if
 end sub
 
 sub onAdPosition(nodeEvent as object)
+?"==== onAdPosition ===="
     eventData = nodeEvent.getData()
-    m.global.analytics.dwParams = { method: "playerAdPlay", params: [eventData.ad, eventData.position, eventData.podIndex + 1, eventData.adIndex, m.adCount, m.episode, getPlayerPosition(true), getPlayerPosition()] }
+    sendDWAnalytics({method: "playerAdPlay", params: [eventData.ad, eventData.position, eventData.podIndex + 1, eventData.adIndex, m.adCount, m.episode, getPlayerPosition(true), getPlayerPosition()] })
 end sub
 
 sub onAdComplete(nodeEvent as object)
+?"==== onAdComplete ===="
     eventData = nodeEvent.getData()
-    m.global.analytics.dwParams = { method: "playerAdEnd", params: [eventData.ad, asInteger(eventData.ad.duration) - 1, eventData.podIndex + 1, eventData.adIndex, m.adCount, m.episode, getPlayerPosition(true), getPlayerPosition()] }
+    sendDWAnalytics({method: "playerAdEnd", params: [eventData.ad, asInteger(eventData.ad.duration) - 1, eventData.podIndex + 1, eventData.adIndex, m.adCount, m.episode, getPlayerPosition(true), getPlayerPosition()] })
+    if m.global.comscore <> invalid then
+        m.global.comscore.adEnd = true
+    end if
 
-    trackScreenAction("trackVideoComplete", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event61"])
-
-'    adPods = m.AdPods
-'    if isArray(adPods) then
-'        adPods = adPods[0]
-'    end if
-'    
-'    ' TODO: Currently Akamai only supports pre-rolls
-'    if m.position = 0 and ad <> invalid then
-'        m.Akamai.handleAdComplete(GetAkamaiAdParams(ad, getPlayerPosition() - m.AdPositionOffset))
-'        m.Akamai.handleAdEnd(GetAkamaiAdParams(ad, getPlayerPosition() - m.AdPositionOffset), getPlayerPosition())
-'    end if
+'    trackScreenAction("trackVideoComplete", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event61"])
+    trackAdComplete()
+    if eventData.adIndex = eventData.adCount then
+        trackAdBreakComplete()
+    end if
+    
+    if m.top.useDai then
+        m.adCounter.visible = eventData.adIndex < eventData.adCount
+        m.adCounterShadow.visible = m.adCounter.visible
+    end if
+    
+    m.inAd = false
+    if m.convivaTask <> invalid then
+        m.convivaTask.adEnd = true
+    end if
 end sub
 
 sub onAdClose(nodeEvent as object)
+?"==== onAdClose ===="
     eventData = nodeEvent.getData()
-'    ad = eventData.ad
-'    ' TODO: Currently Akamai only supports pre-rolls
-'    if m.position = 0 and ad <> invalid then
-'        m.Akamai.handleAdStopped(GetAkamaiAdParams(ad, getPlayerPosition() - m.AdPositionOffset), getPlayerPosition())
-'    end if
+    
+    m.inAd = false
+    if m.convivaTask <> invalid then
+        m.convivaTask.adEnd = true
+    end if
+
+    m.top.close = true
+end sub
+
+sub onDaiError()
+    showErrorDialog(m.global.dai.error)
+end sub
+
+sub showErrorDialog(errorMessage as string)
+    if m.episode.isLive then
+        sendDWAnalytics({method: "playerLiveError", params: [errorMessage, m.episode, getPlayerPosition(true), getPlayerPosition()]})
+    else
+        sendDWAnalytics({method: "playerError", params: [errorMessage, m.episode, getPlayerPosition(true), getPlayerPosition()]})
+    end if
+    if m.global.comscore <> invalid then
+        m.global.comscore.videoEnd = true
+    end if
+    
+    error = "Unfortunately, an error occurred during playback."
+    ' Check for a network connection error
+    if not createObject("roDeviceInfo").getLinkStatus() then
+        error = error + " Please check your network connection and try again."
+    else
+        error = error + " Please try again."
+    end if
+    m.errorDialog = createCbsDialog("Error", error, ["OK"])
+    m.errorDialog.observeField("buttonSelected", "onErrorDialogClose")
+    m.global.dialog = m.errorDialog
 end sub
 
 function getPlayerPosition(includeAds = false as boolean) as integer
-    if includeAds then
-        return m.position + m.top.adPlaybackTime
+    if m.top.useDai then
+        if includeAds then
+            return m.video.position
+        end if
+        return m.global.dai.contentTime
     end if
-    return m.position
+    if includeAds then
+        if m.rafTask <> invalid then
+            return m.video.position + m.rafTask.adPlaybackTime
+        end if
+    end if
+    return m.video.position
 end function
 
-sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer, isAutoPlay = false as boolean, forced = false as boolean)
+sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer, isContinuousPlay = false as boolean, forced = false as boolean)
+?"---- START PLAYBACK ----"
+    ?runGarbageCollector()
     if m.episode <> invalid then
         if m.episode.videoStream <> invalid and m.episode.videoStream.url <> "" then
+            streamData = m.episode.videoStream
+            m.vguid = createObject("roDeviceInfo").getRandomUuid()
+            
+            config = m.global.config
+            streamData.apiKey = config.daiKey
+            streamData.contentSourceID = m.global.config.daiSourceID
+            streamData.videoID = m.episode.id
+
+            ' Add encoded video specific custom parameters
+            custParams = m.episode.adParams["cust_params_encoded"]
+            if skipPreroll then
+                custParams = custParams + "%26cpPre%3D1"
+            else
+                custParams = custParams + "%26cpPre%3D0"
+            end if
+            if isContinuousPlay then
+                custParams = custParams + "%26cpSession%3D1"
+            else
+                custParams = custParams + "%26cpSession%3D0"
+            end if
+
+            adParams = m.global.config.fixedAdParams
+            adParams = adParams + "&vguid=" + m.vguid
+            adParams = adParams + "&ppid=" + m.episode.adParams["ppid_encoded"]
+            adParams = adParams + "&vid=" + m.episode.id
+            adParams = adParams + "&cust_params=" + custParams
+
+            streamData.adTagParameters = adParams
+            if m.global.user <> invalid then
+                streamData.ppid = m.global.user.ppid
+            end if
+
             m.episode.resume = resumePosition > 0
             m.episode.resumePoint = resumePosition
             m.position = resumePosition
+            m.resumePoint = resumePosition
             m.adCount = 0
-            m.adPodIndex = 1
-            m.top.adPlaybackTime = 0
+            m.isContinuousPlay = false
+            m.isForced = false
     
-            m.global.analytics.dwParams = { method: "playerInit", params: [not isAutoPlay] }
+            sendDWAnalytics({method: "playerInit", params: [not isContinuousPlay, m.vguid] })
+            sendSparrowAnalytics({method: "playerInit", params: [not isContinuousPlay] })
             if m.episode.isLive then
-                m.global.analytics.dwParams = { method: "playerLiveStart", params: [m.episode, getPlayerPosition()] }
+                sendDWAnalytics({method: "playerLiveStart", params: [m.episode, getPlayerPosition()] })
             else
-                m.global.analytics.dwParams = { method: "playerStart", params: [m.episode, getPlayerPosition(), 1, iif(isAutoPlay, iif(forced, "autoplay:endcard_click", "autoplay:endcard"), "")] }
+                sendDWAnalytics({method: "playerStart", params: [m.episode, getPlayerPosition(), 1, iif(isContinuousPlay, iif(forced, "autoplay:endcard_click", "autoplay:endcard"), "")] })
+            end if
+            if m.global.comscore <> invalid then
+                m.global.comscore.reset = true
+                m.global.comscore.content = m.episode
             end if
 
+            m.heartbeatContext = {}
+            m.heartbeatContext["screenName"] = m.top.omnitureName
+            m.heartbeatContext["showId"] = m.episode.showID
+    
             m.omnitureParams = {}
             m.omnitureParams["showEpisodeTitle"] = m.episode.title
+            m.heartbeatContext["showEpisodeTitle"] = m.episode.title
             if m.episode.showName <> "" then
                 m.omnitureParams["showEpisodeTitle"] = m.episode.showName + " - " + m.omnitureParams["showEpisodeTitle"]
+                m.heartbeatContext["showEpisodeTitle"] = m.episode.showName + " - " + m.omnitureParams["showEpisodeTitle"]
             end if
             m.omnitureParams["showEpisodeId"] = m.episode.id
+            m.heartbeatContext["showEpisodeId"] = m.episode.id
             if m.episode.subtype() = "Movie" then
                 m.omnitureParams.v38 = "vod:movies"
+                m.heartbeatContext["mediaContentType"] = "vod:movies"
             else if m.episode.isLive then
                 m.omnitureParams.v38 = "live"
+                m.heartbeatContext["mediaContentType"] = "live"
             else if m.episode.isFullEpisode then
                 m.omnitureParams.v38 = "vod:fullepisodes"
+                m.heartbeatContext["mediaContentType"] = "vod:fullepisodes"
             else
                 m.omnitureParams.v38 = "vod:clips"
+                m.heartbeatContext["mediaContentType"] = "vod:clips"
             end if
             m.omnitureParams.v36 = "false"
             m.omnitureParams.v46 = ""
+            m.omnitureParams.v59 = iif(m.episode.subscriptionLevel = "FREE", "non-svod", "svod")
             m.omnitureParams.pev2 = "video"
             m.omnitureParams.pev3 = "video"
-    
+
+            m.omnitureParams.v24 = m.vguid
+            m.omnitureParams.p24 = m.vguid
+            
             m.episode.skipPreroll = skipPreroll
     
+            onVideoStart()
             setVideoToFullScreen()
-
-            ' the main.brs event loop is observing this change and will
-            ' start the playback
-            m.video.content = m.episode.videoStream
             
+            if m.episode.resume then
+                streamData.bookmarkPosition = m.episode.resumePoint
+            end if
+
             m.episodeTitle.text = m.episode.title
             if m.episode.isLive then
                 m.episodeNumber.text = ""
@@ -556,13 +814,43 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
             end if
             m.description.text = m.episode.description
     
-            'if m.episode.isFullEpisode then
-                m.nextTask = createObject("roSGNode", "LoadNextEpisodeTask")
-                m.nextTask.observeField("nextEpisode", "onNextEpisodeLoaded")
-                m.nextTask.episode = m.episode
-                m.nextTask.section = m.top.section
-                m.nextTask.control = "run"
-            'end if
+'            m.nextTask = createObject("roSGNode", "LoadNextEpisodeTask")
+'            m.nextTask.observeField("nextEpisode", "onNextEpisodeLoaded")
+'            m.nextTask.episode = m.episode
+'            m.nextTask.section = m.top.section
+'            m.nextTask.control = "run"
+            m.nextTask = createObject("roSGNode", "LoadContinuousPlayInfoTask")
+            m.nextTask.observeField("continuousPlayInfo", "onContinuousPlayInfoLoaded")
+            m.nextTask.episode = m.episode
+            m.nextTask.section = m.top.section
+            m.nextTask.control = "run"
+
+            m.convivaTask = createObject("roSGNode", "ConvivaTask")
+            m.convivaTask.video = m.video
+            m.convivaTask.content = m.episode
+            m.convivaTask.control = "run"
+
+            if m.top.useDai then
+                m.video.content = invalid
+                m.global.dai.reset = true
+                m.global.dai.video = m.video
+                m.global.dai.streamData = streamData
+            else
+                m.video.content = m.episode.videoStream
+                m.rafTask = createObject("roSGNode", "RafTask")
+                m.rafTask.observeField("adPodReady", "onAdPodReady")
+                m.rafTask.observeField("adPodComplete", "onAdPodComplete")
+                m.rafTask.observeField("adStart", "onAdStart")
+                m.rafTask.observeField("adFirstQuartile", "onAdFirstQuartile")
+                m.rafTask.observeField("adMidpoint", "onAdMidpoint")
+                m.rafTask.observeField("adThirdQuartile", "onAdThirdQuartile")
+                m.rafTask.observeField("adComplete", "onAdComplete")
+                m.rafTask.observeField("adClose", "onAdClose")
+                m.rafTask.skipPreroll = skipPreroll
+                m.rafTask.content = m.episode
+                m.rafTask.video = m.video
+                m.rafTask.control = "run"
+            end if
         else
             if m.global.user.state = "SUSPENDED" then
                 dialog = createCbsDialog("Error", "An error occurred when attempting to play this video. Please contact customer support for assistance at " + m.global.config.supportPhone + ".", ["OK"])
@@ -584,22 +872,42 @@ function playNext(forced = false as boolean) as boolean
     ' Update the position to reflect the full video played
     m.position = m.episode.length
     if m.episode.isLive then
-        m.global.analytics.dwParams = { method: "playerLiveEnd", params: [m.episode, getPlayerPosition(true), getPlayerPosition()] }
-        m.global.analytics.dwParams = { method: "playerLivePlayPosition", params: [m.episode, getPlayerPosition()] }
+        sendDWAnalytics({method: "playerLiveEnd", params: [m.episode, getPlayerPosition(true), getPlayerPosition()] })
+        sendDWAnalytics({method: "playerLivePlayPosition", params: [m.episode, getPlayerPosition()] })
     else
-        m.global.analytics.dwParams = { method: "playerEnd", params: [m.episode, getPlayerPosition(true), getPlayerPosition()] }
-        m.global.analytics.dwParams = { method: "playerPlayPosition", params: [m.episode, getPlayerPosition()] }
+        sendDWAnalytics({method: "playerEnd", params: [m.episode, getPlayerPosition(true), getPlayerPosition()] })
+        sendDWAnalytics({method: "playerPlayPosition", params: [m.episode, getPlayerPosition()] })
     end if
 
-    trackScreenAction("trackVideoComplete", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event58"])
+'    trackScreenAction("trackVideoComplete", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event58"])
+
+    m.isContinuousPlay = true
+    m.isForced = forced
+    if m.nextEpisode = invalid and m.cpInfo <> invalid then
+        if m.cpInfo.episode <> invalid then
+            m.nextEpisode = m.cpInfo.episode
+            m.watchNextType = "single_next-ep"
+        else
+            button = m.endCard.buttonFocused
+            if button <> invalid then
+                m.nextEpisode = button.itemContent.video
+                m.watchNextType = button.itemContent.watchNextType
+            end if
+        end if
+    end if
 
     if m.nextEpisode <> invalid then
         m.video.control = "stop"
-
-        m.episode = m.nextEpisode
-        m.top.content = m.episode
-        m.nextEpisode = invalid
-        startPlayback(true, 0, true, forced)
+        if m.nextEpisode.videoStream <> invalid then
+            m.episode = m.nextEpisode
+            m.top.content = m.episode
+            m.nextEpisode = invalid
+            startPlayback(true, 0, true, forced)
+        else
+            ' We don't have the stream info, yet, so populate it now
+            m.top.episodeID = m.nextEpisode.id
+            setVideoToFullscreen(m.overrideEndCard)
+        end if
 
         return true
     end if
@@ -608,22 +916,17 @@ end function
 
 sub updateEndCard()
     if not m.overrideEndCard then
-        remaining = int(m.episode.endCreditsChapterEnd - m.video.position)
-        if m.position >= m.episode.endCreditsChapterTime then
+        remaining = int(m.episode.endCreditsChapterEnd - m.position)
+        if m.video.state = "playing" and m.position >= m.episode.endCreditsChapterTime then
             if not m.endCard.visible then
                 m.endCard.visible = true
-                m.video.translation = [m.endCardButtons.translation[0] + 4, m.endCardButtons.translation[1] + 4]
-                m.video.width = m.zoom.width - 8
-                m.video.height = m.zoom.height - 8
-                m.endCardButtons.setFocus(true)
-                m.endCardButtons.jumpToIndex = 1
+                m.video.translation = [m.endCard.viewport.x, m.endCard.viewport.y]
+                m.video.width = m.endCard.viewport.width
+                m.video.height = m.endCard.viewport.height
+                m.endCard.setFocus(true)
             end if
             if remaining > 0 then
-                countdown = remaining.toStr() + " SECOND"
-                if remaining <> 1 then
-                    countdown = countdown + "S"
-                end if
-                m.countdown.text = countdown
+                m.endCard.countdown = remaining
             else
                 if not playNext() then
                     m.top.close = true
@@ -641,6 +944,7 @@ sub setVideoToFullScreen(overrideEndCard = false as boolean)
     m.video.height = 1080
     m.video.setFocus(true)
     
+    m.videoComplete = false
     m.overrideEndCard = overrideEndCard
     m.endCard.visible = false
 end sub

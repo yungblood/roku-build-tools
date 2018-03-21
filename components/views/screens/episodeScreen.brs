@@ -101,10 +101,6 @@ sub onEpisodeChanged()
                 m.background.uri = getImageUrl(show.heroImageUrl, m.background.width)
             end if
             
-            if m.top.autoPlay then
-                m.top.buttonSelected = m.watch.id
-            end if
-            
             ' NOTE: We're checking the refreshed version of the episode here
             if canWatch(m.episode, m.global) then
                 m.watch.text = "WATCH"
@@ -113,6 +109,11 @@ sub onEpisodeChanged()
             end if
             
             m.buttons.visible = true
+            
+            if m.top.autoPlay then
+                m.top.buttonSelected = m.watch.id
+                m.top.autoPlay = false
+            end if
         end if
     else
         dialog = createCbsDialog("Content Unavailable", "The content you are trying to play is currently unavailable. Please try again later.", ["OK"])
