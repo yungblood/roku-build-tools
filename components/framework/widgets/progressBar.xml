@@ -9,6 +9,7 @@
 
         <field id="backgroundColor" type="color" alias="backgroundRect.color" />
         <field id="backgroundUri" type="string" alias="background.uri" />
+        <field id="backgroundOpacity" type="float" alias="background.opacity" />
         <field id="barColor" type="color" alias="barRect.color" />
         <field id="barUri" type="string" alias="bar.uri" />
         
@@ -21,19 +22,19 @@
     </interface>
 
     <children>
-    	<Rectangle
-    		id="backgroundRect"
-    		color="0x00000000" />
+        <Rectangle
+            id="backgroundRect"
+            color="0x00000000" />
         <Poster
             id="background"
             loadDisplayMode="scaleToFill" />
-    	<Rectangle
-    		id="barRect"
-    		color="0x00000000" />
+        <Rectangle
+            id="barRect"
+            color="0x00000000" />
         <Poster
             id="bar"
             loadDisplayMode="scaleToFill" />
         <Group
-        	id="ticks" />
+            id="ticks" />
     </children>
 </component>

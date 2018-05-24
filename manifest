@@ -3,8 +3,8 @@ subtitle=Watch Full Seasons of Your Shows. Anytime, Anywhere.
 dial_title=CBS All Access
 
 major_version=2
-minor_version=6
-build_version=20180320
+minor_version=8
+build_version=20180515
 
 mm_icon_focus_fhd=pkg:/storeassets/channelstore_fhd.png
 mm_icon_side_fhd=pkg:/storeassets/channelstore_fhd.png
@@ -24,4 +24,4 @@ bs_libs_required=roku_ads_lib
 ui_resolutions=fhd
 uri_resolution_autosub=$$RES$$,fhd,hd,fhd
 
-use_staging=false
+config_file=pkg:/config.json

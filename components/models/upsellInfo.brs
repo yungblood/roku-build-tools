@@ -17,7 +17,7 @@ sub onJsonChanged()
         if m.top.hdPosterUrl = invalid or m.top.hdPosterUrl = "" then
             m.top.hdPosterUrl = getImageUrl(json.upsellImagePath, 1920)
         end if
-        m.top.logoUrl = getImageUrl(json.upsellImage2Path, 0)
+        m.top.logoUrl = getImageUrl(json.upsellImage2Path, -1)
 
         m.top.message1 = json.upsellMessage
         m.top.message2 = json.upsellMessage2

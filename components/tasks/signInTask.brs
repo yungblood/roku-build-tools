@@ -62,7 +62,9 @@ sub doWork()
         for each item in config.liveTVChannels
             channel = channels.createChild("LiveTVChannel")
             channel.id = item.id
+            channel.contentID = item.contentID
             channel.hdPosterUrl = item.icon
+            channel.sdPosterUrl = item.iconSmall
             channel.scheduleUrl = item.scheduleUrl
             channel.streamUrl = item.streamUrl
             channel.title = item.title

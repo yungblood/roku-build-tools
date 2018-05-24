@@ -3,6 +3,6 @@
     <script type="text/brightscript" uri="pkg:/components/tasks/showScreenTask.brs" />
     <interface>
         <field id="showID" type="string" />
-        <field id="content" type="assocarray" />
+        <field id="content" type="assocarray" alwaysNotify="true" />
     </interface>
 </component>

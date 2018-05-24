@@ -8,7 +8,7 @@ sub init()
     m.top.focusedBackgroundUri = "pkg:/images/menu_focus_$$RES$$.9.png"
     m.top.font = m.buttonFont
     m.top.focusedFont = m.buttonFont
-    m.top.height = 60
+    m.top.height = 50
 end sub
 
 sub onGroupChanged()

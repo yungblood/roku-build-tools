@@ -7,31 +7,39 @@ sub init()
     m.fadeInInterp = m.top.findNode("fadeInInterp")
 end sub
 
-sub onItemContentChanged()
-    if m.top.uri <> m.top.itemContent.hdPosterUrl then
-        m.top.uri = m.top.itemContent.hdPosterUrl
-        if m.top.itemContent.hdPosterUrl <> "" then
-            m.top.uri = m.top.itemContent.hdPosterUrl
-        else
-            m.top.uri = m.top.failedBitmapUri
+sub onItemContentChanged(nodeEvent as object)
+    content = nodeEvent.getData()
+    if content <> invalid then
+        if m.top.uri <> content.hdPosterUrl then
+            m.top.uri = content.hdPosterUrl
+            if content.hdPosterUrl <> "" then
+                m.top.uri = content.hdPosterUrl
+            else
+                m.top.uri = m.top.failedBitmapUri
+            end if
         end if
+    else
+        m.top.uri = m.top.failedBitmapUri
     end if
 end sub
 
-sub onUriChanged()
+sub onUriChanged(nodeEvent as object)
+    uri = nodeEvent.getData()
     m.poster.opacity = m.top.startingOpacity
-    m.poster.uri = m.top.uri
+    m.poster.uri = uri
     m.retries = 0
     m.loading.visible = true
 end sub
 
-sub onLoadDisplayModeChanged()
-    m.poster.loadDisplayMode = m.top.loadDisplayMode
-    m.loading.loadDisplayMode = m.top.loadDisplayMode
+sub onLoadDisplayModeChanged(nodeEvent as object)
+    mode = nodeEvent.getData()
+    m.poster.loadDisplayMode = mode
+    m.loading.loadDisplayMode = mode
 end sub
 
-sub onLoadStatusChanged()
-    if m.poster.loadStatus = "ready" then
+sub onLoadStatusChanged(nodeEvent as object)
+    status = nodeEvent.getData()
+    if status = "ready" then
         m.loading.visible = false
         m.fadeInInterp.keyValue = [m.top.startingOpacity, 1]
         m.fadeIn.control = "start"
@@ -39,7 +47,7 @@ sub onLoadStatusChanged()
             m.retryTimer.unobserveField("fire")
             m.retryTimer = invalid
         end if
-    else if m.poster.loadStatus = "failed" then
+    else if status = "failed" then
         if m.retries < m.top.retries then
             m.retries++
             ?"Retrying (";m.retries.toStr();")... ";m.top.uri
@@ -74,8 +82,8 @@ sub updateLayout()
     end if
 end sub
 
-sub onCurrRectChanged()
-    rect = m.top.currRect
+sub onCurrRectChanged(nodeEvent as object)
+    rect = nodeEvent.getData()
     m.top.width = rect.width
     m.top.height = rect.height
 end sub

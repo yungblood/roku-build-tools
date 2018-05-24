@@ -18,7 +18,11 @@
     
     "comScoreC2":      "3005086",
     "comScoreSecret":  "2cb08ca4d095dd734a374dff8422c2e5",
-    
+
+    "brightLineUrl":   "http://services.brightline.tv/api/v2/config/",
+    "brightLineID":    "1020",
+    "brightLinePkg":   "http://cdn-media.brightline.tv/sdk/gen2/roku/direct/cbs/BrightLineDirect.pkg",
+
     "akamaiUrl":       "http://ma61-r.analytics.edgesuite.net/config/beacon-5508.xml",
 
     "convivaID":       "c3.CBSCom-Test",
@@ -39,11 +43,12 @@
     "allShowsGroupID": "24",
     
     "registrySection": "CBSAllAccess",
+    "showDebug":       true,
 
     "liveTimeout":     600,
     
     "useDai":          true,
-    "daiSourceID":     "20289",
+    "daiSourceID":     "2475217",
     "daiKey":          "7j3n273bfj7jcnvf22d713a51f",
     "uvpConfigUrl":    "http://can.cbs.com/thunder/player/chromeless/uvp/cbs_roku_app/cbs_roku_app_stage.xml",
 

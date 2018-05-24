@@ -22,7 +22,10 @@ sub init()
     m.global.observeField("showWaitScreen", "onShowWaitScreen")
     
     m.navigationStack = []
+    reinit()
+end sub
 
+sub reinit()
     m.initTask = createObject("roSGNode", "InitializationTask")
     m.initTask.observeField("initialized", "onInitialized")
     m.initTask.control = "RUN"
@@ -74,7 +77,7 @@ sub onExitDialogButtonSelected(nodeEvent as object)
     dialog.close = true
 end sub
 
-sub onInitialized()
+sub onInitialized(nodeEvent as object)
     m.initTask = invalid
     signIn()
 end sub
@@ -311,6 +314,7 @@ sub onCreateAccountSuccess(nodeEvent as object)
         if product = invalid then
             product = {
                 price: "$0.00"
+                cost: "$0.00"
             }
         end if
         if task.success then
@@ -318,27 +322,36 @@ sub onCreateAccountSuccess(nodeEvent as object)
             dialog.observeField("buttonSelected", "onCreateAccountSuccessDialogClose")
             m.global.dialog = dialog
 
-'            params = {}
-'            screenName = "/all access/upsell"
-'            pageType = "billing|payment complete"
-'            params["purchaseProduct"] = "new"
-'            params["purchaseOrderID"] = task.transactionID
-'            params["purchasePrice"] = product.price.replace("$", "")
-'            params["purchaseCategory"] = iif(params["purchasePrice"] = "5.99", "limited commercials", "commercial free")
-'            params["purchaseProductName"] = iif(params["purchasePrice"] = "5.99", "limited commercials", "commercial free")
-'            params["purchaseQuantity"] = "1"
-'            params["&&products"] = join([params["purchaseCategory"], params["purchaseProduct"], params["purchaseQuantity"], params["purchasePrice"]], ";")
-'            trackScreenAction("trackPaymentComplete", params, screenName, pageType, ["event76"])
+            params = {}
+            screenName = "all-access/subscription/payment/confirmation/"
+            pageType = "svod_complete"
+            params["siteHier"] = "billing|payment complete"
+            params["purchaseProduct"] = "new"
+            params["purchaseOrderID"] = asString(task.transactionID)
+            params["purchasePrice"] = asString(product.price).replace("$", "")
+            ' It seems at some point "price" changed to "cost", so support both
+            if isNullOrEmpty(params["purchasePrice"]) then
+                params["purchasePrice"] = asString(product.cost).replace("$", "")
+            end if
+            params["purchaseCategory"] = iif(params["purchasePrice"] = "5.99", "limited commercials", "commercial free")
+            params["purchaseProductName"] = iif(params["purchasePrice"] = "5.99", "limited commercials", "commercial free")
+            params["purchaseQuantity"] = "1"
+            params["productPricingPlan"] = "monthly"
+            'params["productOfferperiod"] = "1-"
+            params["purchasePaymentMethod"] = "roku"
+            params["purchaseEventOrderComplete"] = "1"
+            params["&&products"] = join([params["purchaseCategory"], params["purchaseProduct"], params["purchaseQuantity"], params["purchasePrice"]], ";")
+            trackScreenAction("trackPaymentComplete", params, screenName, pageType, ["event76"])
         else
             if task.error <> "NO_TRANSACTION_ID" then
                 dialog = createCbsDialog("Error", "An error occurred when creating your CBS All Access account. Please contact customer support for assistance at " + m.global.config.supportPhone + ".", ["OK"])
                 dialog.observeField("buttonSelected", "onCreateAccountFailDialogClose")
                 m.global.dialog = dialog
 
-'                params = {}
-'                screenName = "/all access/upsell"
-'                pageType = iif(product.price.replace("$", "") = "5.99", "billing_failure_Limited Commercial", "billing_failure_Commercial Free")
-'                trackScreenAction("trackAppLog", params, screenName, pageType, ["event20"])
+                params = {}
+                screenName = "/all access/upsell"
+                pageType = "billing_failure" 'iif(product.price.replace("$", "") = "5.99", "billing_failure_Limited Commercial", "billing_failure_Commercial Free")
+                trackScreenAction("trackAppLog", params, screenName, pageType, ["event20"])
             end if
         end if
     else
@@ -351,13 +364,11 @@ end sub
 sub onCreateAccountSuccessDialogClose(nodeEvent as object)
     m.global.showWaitScreen = true
 
-    clearNavigationStack("UpsellScreen")
-    goBackInNavigationStack()
     dialog = nodeEvent.getRoSGNode()
     if dialog <> invalid then
         dialog.close = true
     end if
-    signIn()
+    reinit()
 end sub
 
 sub onCreateAccountFailDialogClose(nodeEvent as object)
@@ -413,32 +424,41 @@ sub onSubscriptionSuccess(nodeEvent as object)
             if product = invalid then
                 product = {
                     price: "$0.00"
+                    cost: "$0.00"
                 }
             end if
             if task.type = "upgrade" then
-'                params = {}
-'                screenName = "/all access/upsell"
-'                pageType = "billing|upgrade complete"
-'                params["purchaseOrderID"] = task.transactionID
-'                params["purchaseCategory"] = "commercial free"
-'                params["purchaseProduct"] = "upgrade"
-'                params["purchaseProductName"] = "commercial free"
-'                params["purchaseQuantity"] = "1"
-'                params["purchasePrice"] = product.price.replace("$", "")
-'                params["&&products"] = join([params["purchaseCategory"], params["purchaseProduct"], params["purchaseQuantity"], params["purchasePrice"]], ";")
-'                trackScreenAction("trackUpgrade", params, screenName, pageType, ["event107"])
+                params = {}
+                screenName = "all-access/subscription/payment/confirmation/"
+                pageType = "svod_complete"
+                params["purchaseOrderID"] = task.transactionID
+                params["purchaseCategory"] = "commercial free"
+                params["purchaseProduct"] = "upgrade"
+                params["purchaseProductName"] = "commercial free"
+                params["purchaseQuantity"] = "1"
+                params["purchasePrice"] = asString(product.price).replace("$", "")
+                ' It seems at some point "price" changed to "cost", so support both
+                if isNullOrEmpty(params["purchasePrice"]) then
+                    params["purchasePrice"] = asString(product.cost).replace("$", "")
+                end if
+                params["&&products"] = join([params["purchaseCategory"], params["purchaseProduct"], params["purchaseQuantity"], params["purchasePrice"]], ";")
+                trackScreenAction("trackUpgrade", params, screenName, pageType, ["event107"])
             else if task.type = "downgrade" then
-'                params = {}
-'                screenName = "/all access/upsell"
-'                pageType = "billing|downgrade complete"
-'                params["purchaseOrderID"] = task.transactionID
-'                params["purchaseCategory"] = "limited commercials"
-'                params["purchaseProduct"] = "downgrade"
-'                params["purchaseProductName"] = "limited commercials"
-'                params["purchaseQuantity"] = "1"
-'                params["purchasePrice"] = product.price.replace("$", "")
-'                params["&&products"] = join([params["purchaseCategory"], params["purchaseProduct"], params["purchaseQuantity"], params["purchasePrice"]], ";")
-'                trackScreenAction("trackDowngrade", params, screenName, pageType, ["event108"])
+                params = {}
+                screenName = "all-access/subscription/payment/confirmation/"
+                pageType = "billing|downgrade complete"
+                params["purchaseOrderID"] = task.transactionID
+                params["purchaseCategory"] = "limited commercials"
+                params["purchaseProduct"] = "downgrade"
+                params["purchaseProductName"] = "limited commercials"
+                params["purchaseQuantity"] = "1"
+                params["purchasePrice"] = asString(product.price).replace("$", "")
+                ' It seems at some point "price" changed to "cost", so support both
+                if isNullOrEmpty(params["purchasePrice"]) then
+                    params["purchasePrice"] = asString(product.cost).replace("$", "")
+                end if
+                params["&&products"] = join([params["purchaseCategory"], params["purchaseProduct"], params["purchaseQuantity"], params["purchasePrice"]], ";")
+                trackScreenAction("trackDowngrade", params, screenName, pageType, ["event108"])
             else if task.type = "exsub" then
                 dialog = createCbsDialog("Congratulations!", "Your account has been re-activated!", ["OK"])
                 dialog.observeField("buttonSelected", "onSubscriptionSuccessDialogClose")
@@ -453,15 +473,15 @@ sub onSubscriptionSuccess(nodeEvent as object)
         else
             if isNullOrEmpty(task.error) then
                 if task.type = "upgrade" then
-'                    params = {}
-'                    screenName = "/all access/upsell"
-'                    pageType = "billing_failure_Commercial Free"
-'                    trackScreenAction("trackUpgrade", params, screenName, pageType)
+                    params = {}
+                    screenName = "/all access/upsell"
+                    pageType = "billing_failure"
+                    trackScreenAction("trackUpgrade", params, screenName, pageType)
                 else if task.type = "downgrade" then
-'                    params = {}
-'                    screenName = "/all access/upsell"
-'                    pageType = "billing_failure_Limited Commercial"
-'                    trackScreenAction("trackDowngrade", params, screenName, pageType)
+                    params = {}
+                    screenName = "/all access/upsell"
+                    pageType = "billing_failure"
+                    trackScreenAction("trackDowngrade", params, screenName, pageType)
                 else if task.type = "sub" then
                 end if
 
@@ -600,9 +620,15 @@ sub showSettingsScreen()
     addToNavigationStack(screen, true, true)
 end sub
 
-sub showShowScreen(showID = "" as string, replaceCurrent = false as boolean)
+sub showShowScreen(showID = "" as string, episodeID = "" as string, source = invalid as object, replaceCurrent = false as boolean)
     screen = createObject("roSGNode", "ShowScreen")
     screen.showID = showID
+    screen.episodeID = episodeID
+    if source <> invalid then
+        if source.hasField("additionalContext") then
+            screen.additionalContext = source.additionalContext
+        end if
+    end if
     screen.observeField("itemSelected", "onItemSelected")
     screen.observeField("buttonSelected", "onButtonSelected")
     addToNavigationStack(screen, true, replaceCurrent)
@@ -621,6 +647,9 @@ sub showEpisodeScreen(episode as object, episodeID = "" as string, autoPlay = fa
         screen.omnitureName = source.omnitureName
         screen.omniturePageType = source.omniturePageType
         screen.omnitureData = source.omnitureData
+        if source.hasField("additionalContext") then
+            screen.additionalContext = source.additionalContext
+        end if
     end if
     screen.autoPlay = autoPlay
     if episode <> invalid then
@@ -668,6 +697,9 @@ sub showVideoScreen(episodeID as string, section = invalid as object, source = i
     screen.section = section
     if source <> invalid then
         screen.omnitureData = source.omnitureData
+        if source.hasField("additionalContext") then
+            screen.additionalContext = source.additionalContext
+        end if
     end if
     addToNavigationStack(screen)
 end sub
@@ -709,12 +741,17 @@ function openDeepLink(params as object, item = invalid as object) as boolean
         else if params.mediaType = "moviedetails" then
             showMovieScreen(invalid, params.contentID, false)
             return true
-        else if params.mediaType = "series" or params.mediaType = "season" or params.mediaType = "special" then
+        else if params.mediaType = "series" or params.mediaType = "special" then
             if not isNullOrEmpty(params.contentID) then
                 showShowScreen(params.contentID)
                 return true
             else if item <> invalid then
                 showShowScreen(item.showID)
+                return true
+            end if
+        else if params.mediaType = "season" then
+            if not isNullOrEmpty(params.contentID) then
+                showShowScreen("", params.contentID)
                 return true
             end if
         end if
@@ -813,15 +850,20 @@ end sub
 
 function goBackInNavigationStack(setFocus = true as boolean) as boolean
     if m.navigationStack.count() > 1 then
+        episodeID = ""
         screen = m.navigationStack.pop()
         if isSGNode(screen) then
             screen.visible = false
             screen.unobserveField("close")
             if screen.subtype().inStr("VideoScreen") >= 0 then
                 screen.control = "stop"
-                
+                ' Capture the episode ID, so we can update the episode screen, if appropriate
+                episodeID = screen.episodeID
+
                 ' update the recently watched
-                m.global.user.recentlyWatched.update = true
+                m.global.user.videoHistory.update = true
+                m.global.user.continueWatching.update = true
+                m.global.user.showHistory.update = true
             else if screen.subtype() = "LiveTVScreen" then
                 screen.control = "stop"
             else
@@ -831,6 +873,12 @@ function goBackInNavigationStack(setFocus = true as boolean) as boolean
         if setFocus then
             screen = m.navigationStack.peek()
             if isSGNode(screen) then
+                if screen.subtype() = "EpisodeScreen" then
+                    if not isNullOrEmpty(episodeID) then
+                        ' update the episode screen to the last viewed video
+                        screen.episodeID = episodeID
+                    end if
+                end if
                 screen.visible = true
                 screen.setFocus(true)
             else
@@ -926,11 +974,11 @@ sub onButtonSelected(nodeEvent as object)
         end if
     else if buttonID = "show" then
         if source.subtype() = "EpisodeScreen" then
-            showShowScreen(source.episode.showID)
+            showShowScreen(source.episode.showID, "", source)
         else if source.subtype() = "LiveFeedScreen" then
-            showShowScreen(source.liveFeed.showID)
+            showShowScreen(source.liveFeed.showID, "", source)
         else if source.hasField("showID") then
-            showShowScreen(source.showID)
+            showShowScreen(source.showID, "", source)
         end if
     else if buttonID = "favorite" then
         toggleFavorite(source.showID, m.global)
@@ -990,14 +1038,20 @@ end sub
 sub onItemSelected(nodeEvent as object)
     source = nodeEvent.getRoSGNode()
     item = nodeEvent.getData()
+    
     ?"onItemSelected()", item.title
     if item <> invalid then
+        if source <> invalid then
+            ' set the source field to invalid, so we don't get further updates
+            source.setField(nodeEvent.getField(), invalid)
+        end if
+
         if item.subtype() = "Episode" then
-            showEpisodeScreen(item, "", false, source)
+            showEpisodeScreen(item, "", false, source, false)
         else if item.subtype() = "LiveFeed" then
             showLiveFeedScreen(item, source)
         else if item.subtype() = "Show" or item.subtype() = "RelatedShow" or item.subtype() = "ShowGroupItem" then
-            showShowScreen(item.id)
+            showShowScreen(item.id, "", source)
         else if item.subtype() = "Favorite" then
             showShowScreen(item.showID)
         else if item.subtype() = "SearchResult" then

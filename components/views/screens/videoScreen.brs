@@ -46,7 +46,7 @@ sub init()
     m.description = m.top.findNode("description")
     
     m.debugInfo = m.top.findNode("debugInfo")
-    m.debugInfo.visible = m.global.config.useStaging
+    m.debugInfo.visible = m.global.config.showDebug
     
     m.endCard = m.top.findNode("endCard")
     m.endCard.observeField("buttonSelected", "onEndCardButtonSelected")
@@ -80,6 +80,7 @@ sub init()
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
+    ?"videoScreen.onKeyEvent", key, press, m.inAd
     if press then
         if not m.inAd then
             if key = "OK" or key = "play" then
@@ -98,6 +99,9 @@ function onKeyEvent(key as string, press as boolean) as boolean
                     return true
                 end if
             end if
+        else
+            'm.inAd - send key to brightline
+            m.global.brightline.BLKeyPress = key
         end if
     end if
     return false
@@ -578,8 +582,8 @@ sub onAdStart(nodeEvent as object)
     trackAdStart(eventData.ad, eventData.adIndex)
     
     if m.top.useDai then
-        m.adCounter.visible = true
-        m.adCounterShadow.visible = true
+        m.adCounter.visible = (not m.global.user.isAdFree)
+        m.adCounterShadow.visible = m.adCounter.visible
         m.adCounter.text = "Ad " + eventData.adIndex.toStr() + " of " + eventData.adCount.toStr()
         m.adCounterShadow.text = m.adCounter.text
         
@@ -628,7 +632,7 @@ sub onAdComplete(nodeEvent as object)
     end if
     
     if m.top.useDai then
-        m.adCounter.visible = eventData.adIndex < eventData.adCount
+        m.adCounter.visible = ((not m.global.user.isAdFree) and (eventData.adIndex < eventData.adCount))
         m.adCounterShadow.visible = m.adCounter.visible
     end if
     
@@ -774,6 +778,12 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                 m.omnitureParams.v38 = "vod:clips"
                 m.heartbeatContext["mediaContentType"] = "vod:clips"
             end if
+            if not isNullOrEmpty(m.episode.seasonNumber) then
+                m.heartbeatContext["showSeasoNumber"] = m.episode.seasonNumber
+            end if
+            if not isNullOrEmpty(m.episode.episodeNumber) then
+                m.heartbeatContext["showEpisodeNumber"] = m.episode.episodeNumber
+            end if
             m.omnitureParams.v36 = "false"
             m.omnitureParams.v46 = ""
             m.omnitureParams.v59 = iif(m.episode.subscriptionLevel = "FREE", "non-svod", "svod")
@@ -783,8 +793,14 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
             m.omnitureParams.v24 = m.vguid
             m.omnitureParams.p24 = m.vguid
             
+            if m.top.additionalContext <> invalid then
+                m.omnitureParams.append(m.top.additionalContext)
+                m.heartbeatContext.append(m.top.additionalContext)
+                m.top.additionalContext = {}
+            end if
+            
             m.episode.skipPreroll = skipPreroll
-    
+
             onVideoStart()
             setVideoToFullScreen()
             
@@ -834,6 +850,7 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                 m.video.content = invalid
                 m.global.dai.reset = true
                 m.global.dai.video = m.video
+                m.global.dai.content = m.episode
                 m.global.dai.streamData = streamData
             else
                 m.video.content = m.episode.videoStream

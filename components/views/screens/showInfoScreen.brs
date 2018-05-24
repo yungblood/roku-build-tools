@@ -6,6 +6,8 @@ sub init()
     m.title = m.top.findNode("title")
     m.description = m.top.findNode("description")
 
+    m.airTime = m.top.findNode("airTime")
+
     m.top.setFocus(true)
 end sub
 
@@ -18,6 +20,10 @@ end sub
 function onKeyEvent(key as string, press as boolean) as boolean
     ?"ShowInfoScreen.onKeyEvent: ";key,press
     if press then
+        if key = "options" then
+            m.top.close = true
+            return true
+        end if
     end if
     return false
 end function
@@ -40,5 +46,7 @@ sub onShowChanged()
         m.poster.uri = getImageUrl(show.descriptionImageUrl, m.poster.width)
         m.title.text = uCase(show.title)
         m.description.text = show.description.replace(chr(13), "")
+        
+        m.airtime.text = uCase(show.tuneInTime)
     end if
 end sub

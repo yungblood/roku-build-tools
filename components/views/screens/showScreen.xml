@@ -5,13 +5,20 @@
     <interface>
         <field id="showID" type="string" onChange="onShowIDChanged" alwaysNotify="true" />
         <field id="show" type="node" onChange="onShowChanged" alwaysNotify="true" />
+        <field id="episodeID" type="string" onChange="onEpisodeIDChanged" alwaysNotify="true" />
 
         <field id="itemSelected" type="node" alwaysNotify="true" />
         <field id="buttonSelected" type="string" alwaysNotify="true" />
 
-        <field id="content" type="assocarray" onChange="onContentChanged" />
+        <field id="content" type="assocarray" onChange="onContentChanged" alwaysNotify="true" />
+        <field id="additionalContext" type="assocarray" />
     </interface>
     <children>
+       <Font
+           id="rowTitleFont"
+           size="43"
+           uri="pkg:/fonts/Lato-Light.ttf" />
+
         <Poster
             id="hero"
             width="1920"
@@ -21,7 +28,7 @@
             id="heroDarken"
             width="1920"
             height="1080"
-            uri="pkg:/images/show-detail-hero-darken_480.png" />
+            uri="pkg:/images/show-detail-hero-darken_int_480.png" />
         <Rectangle
             id="heroFadeRect"
             width="1920"
@@ -29,11 +36,31 @@
             color="0x000000ff"
             opacity="0" />
         
-        <FocusGroup
+        <DynamicPlayMarqueeTile
+            id="dynamicPlay"
+            translation="[100,297]" />
+
+        <RowList
             id="list"
-            translation="[0,482]"
-            advanceKey="down"
-            reverseKey="up" />
+            translation="[0,867]"
+            focusXOffset="[100]"
+            rowLabelOffset="[[98,13]]"
+            itemComponentName="GridTile"
+            itemSize="[1920,298]"
+            itemSpacing="[0,40]"
+            showRowLabel="[true]"
+            rowItemSpacing="[[30,0]]"
+            numRows="3"
+            rowLabelFont="dictionary:rowTitleFont"
+            rowLabelColor="0xffffffff"
+            focusBitmapUri="pkg:/images/frame_grid.9.png"
+            vertFocusAnimationStyle="fixedFocus" />
+        
+<!--         <FocusGroup -->
+<!--             id="list" -->
+<!--             translation="[0,482]" -->
+<!--             advanceKey="down" -->
+<!--             reverseKey="up" /> -->
 
         <Animation
             id="scrollAnimation"
@@ -50,27 +77,47 @@
         <ParallelAnimation
             id="fadeOutAnimation">
             <Animation
-                id="marqueeFadeOutAnimation"
-                duration=".3"
-                delay="0"
-                repeat="false">
-                <FloatFieldInterpolator
-                    key="[0,1]"
-                    keyValue="[0,1]"
-                    fieldToInterp="heroFadeRect.opacity" />
-            </Animation>
-        </ParallelAnimation>
-        <ParallelAnimation
-            id="fadeInAnimation">
-            <Animation
-                id="marqueeFadeInAnimation"
+                id="heroFadeOutAnimation"
                 duration=".3"
                 delay="0"
                 repeat="false">
                 <FloatFieldInterpolator
                     key="[0,1]"
                     keyValue="[1,0]"
-                    fieldToInterp="heroFadeRect.opacity" />
+                    fieldToInterp="hero.opacity" />
+            </Animation>
+            <Animation
+                id="dynamicPlayFadeOutAnimation"
+                duration=".3"
+                delay="0"
+                repeat="false">
+                <FloatFieldInterpolator
+                    key="[0,1]"
+                    keyValue="[1,0]"
+                    fieldToInterp="dynamicPlay.opacity" />
+            </Animation>
+        </ParallelAnimation>
+        <ParallelAnimation
+            id="fadeInAnimation">
+            <Animation
+                id="heroFadeInAnimation"
+                duration=".3"
+                delay="0"
+                repeat="false">
+                <FloatFieldInterpolator
+                    key="[0,1]"
+                    keyValue="[0,1]"
+                    fieldToInterp="hero.opacity" />
+            </Animation>
+            <Animation
+                id="dynamicPlayFadeInAnimation"
+                duration=".3"
+                delay="0"
+                repeat="false">
+                <FloatFieldInterpolator
+                    key="[0,1]"
+                    keyValue="[0,1]"
+                    fieldToInterp="dynamicPlay.opacity" />
             </Animation>
         </ParallelAnimation>
     </children>

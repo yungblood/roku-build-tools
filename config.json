@@ -19,6 +19,10 @@
     "comScoreC2":      "3005086",
     "comScoreSecret":  "2cb08ca4d095dd734a374dff8422c2e5",
     
+    "brightLineUrl":   "http://services.brightline.tv/api/v2/config/",
+    "brightLineID":    "1020",
+    "brightLinePkg":   "http://cdn-media.brightline.tv/sdk/gen2/roku/direct/cbs/BrightLineDirect.pkg",
+
     "akamaiUrl":       "http://ma61-r.analytics.edgesuite.net/config/beacon-5508.xml",
 
     "convivaID":       "c3.CBSCom",
@@ -39,6 +43,7 @@
     "allShowsGroupID": "24",
     
     "registrySection": "CBSAllAccess",
+    "showDebug":       false,
 
     "liveTimeout":     7200,
     
@@ -55,6 +60,7 @@
             "id": "local",
             "title": "Local",
             "icon": "pkg:/images/icon_livetv_local.png",
+            "iconSmall": "pkg:/images/icon_livetv_local.png",
             "streamUrl": "",
             "scheduleUrl": "",
             "trackingID": "",
@@ -71,30 +77,32 @@
             "id": "cbsn",
             "title": "",
             "icon": "pkg:/images/icon_livetv_cbsn.png",
+            "iconSmall": "pkg:/images/icon_livetv_cbsn_small.png",
             "streamUrl": "https://dai.google.com/ssai/event/Sid4xiTQTkCT1SLu6rjUSQ/master.m3u8?iu=/8264/vaw-can/ott/cbs_roku_app",
             "scheduleUrl": "v3.0/roku/cbsn/schedule/feed.json",
             "trackingID": "1004533827514",
             "trackingContentID": "C4552942-B263-B8ED-C2AD-612113A59478",
             "trackingAstID": "595",
-            "trackingTitle": "CBSN Live Video",
-            "convivaTrackingTitle": "CBSN-LiveTV",
-            "comscoreTrackingTitle": "CBSN-LiveTV",
+            "trackingTitle": "CBSN Live Stream",
+            "convivaTrackingTitle": "CBSN Live Stream",
+            "comscoreTrackingTitle": "CBSN Live Stream",
             "comscoreC2": "3005086",
             "comscoreC3": "CBSNewsRoku",
             "comscoreC4": "CBSNews.com"
         },
         {
             "id": "cbssports",
-            "title": "News, Scores and Highlights",
+            "title": "",
             "icon": "pkg:/images/icon_livetv_cbssports.png",
+            "iconSmall": "pkg:/images/icon_livetv_cbssports_small.png",
             "streamUrl": "https://dai.google.com/ssai/event/lKh5_XooSbam79G4T7KvYQ/master.m3u8?iu=/8264/vaw-can/ott/cbs_roku_app",
             "scheduleUrl": "v3.0/roku/cbssports/events/proxy.json?as=json&transform=cbsnews-fusion&device=roku&iu=/8264/vaw-can/ott/cbs_roku_app",
             "trackingID": "1130505795504",
             "trackingContentID": "vn4vERdyJhcFf688ZEsPEWc6b943_FW8",
             "trackingAstID": "595",
             "trackingTitle": "Sports HQ",
-            "convivaTrackingTitle": "CBSHQ-LiveTV",
-            "comscoreTrackingTitle": "CBSHQ-LiveTV",
+            "convivaTrackingTitle": "Sports HQ",
+            "comscoreTrackingTitle": "Sports HQ",
             "comscoreC2": "3005086",
             "comscoreC3": "CBSSportsRoku",
             "comscoreC4": "CBSSports.com"

@@ -13,6 +13,7 @@
 
         <field id="episodeID" type="string" onChange="onEpisodeIDChanged" alwaysNotify="true" />
         <field id="section" type="node" />
+        <field id="additionalContext" type="assocarray" />
     </interface>
     <children>
         <Font

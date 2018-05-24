@@ -8,7 +8,6 @@ end function
 function newCbs() as object
     this                            = {}
     this.className                  = "CBS"
-    this.useStaging                 = false
     
     this.user                       = createObject("roSGNode", "User")
 
@@ -91,8 +90,10 @@ function newCbs() as object
     this.getFavoriteShows           = cbs_getFavoriteShows
     this.addShowToFavorites         = cbs_addShowToFavorites
     this.removeShowFromFavorites    = cbs_removeShowFromFavorites
+    this.getShowHistory             = cbs_getShowHistory
 
-    this.getRecentlyWatched         = cbs_getRecentlyWatched
+    this.getVideoHistory            = cbs_getVideoHistory
+    this.getContinueWatching        = cbs_getContinueWatching
     
     this.getResumePoint             = cbs_getResumePoint
     
@@ -104,7 +105,7 @@ function newCbs() as object
     this.generateAccessToken        = cbs_generateAccessToken
     this.makeRequest                = cbs_makeRequest
     
-    setLogLevel(0)
+    setLogLevel(2)
 
     return this
 end function
@@ -400,11 +401,13 @@ function cbs_getCampaignAvailability(pageUrl = "CBS_ALL_ACCESS_PACKAGE" as strin
     result = m.makeRequest(url, "GET")
     if isAssociativeArray(result) and result.upsellCampaignAvailability <> invalid then
         creationTime = getDeviceCreationTime()
-        for each campaign in asArray(result.upsellCampaignAvailability)
-            if campaign.liveDate / 1000 <= creationTime.AsSeconds() and campaign.expiresOn / 1000 > creationTime.AsSeconds() then
-                return campaign.campaign
-            end if
-        next
+        if creationTime <> invalid then
+            for each campaign in asArray(result.upsellCampaignAvailability)
+                if campaign.liveDate / 1000 <= creationTime.AsSeconds() and campaign.expiresOn / 1000 > creationTime.AsSeconds() then
+                    return campaign.campaign
+                end if
+            next
+        end if
     end if
     return ""
 end function
@@ -618,7 +621,9 @@ function cbs_getUser(loadFavorites = false as boolean) as object
     m.setUser(user)
     if loadFavorites then
         user.favorites.content = m.getFavoriteShows()
-        user.recentlyWatched.content = m.getRecentlyWatched(1, 50)
+        user.videoHistory.content = m.getVideoHistory(1, 50)
+        user.continueWatching.content = m.getContinueWatching()
+        user.showHistory.content = m.getShowHistory()
     end if
     return user
 end function
@@ -691,27 +696,20 @@ end function
 function cbs_getHomeRows(itemsPerRow = 50 as integer) as object
     sections = []
     
+'    url = m.apiBaseUrl + "v3.0/roku/homeshowgroup.json"
     url = m.apiBaseUrl + "v2.0/roku/shows/199951/videos/config/SHOW_HOME_ROKU_SVOD.json"
     url = addQueryString(url, "platformType", "roku")
     url = addQueryString(url, "rows", itemsPerRow)
     url = addQueryString(url, "excludeShow", true)
     
     response = m.makeRequest(url, "GET", invalid, "json", true)
-    if isAssociativeArray(response) and response.success = true and response.results <> invalid then ' and response.videoSectionMetadata <> invalid then
-        for each item in response.results 'response.videoSectionMetadata
+    if isAssociativeArray(response) and response.success = true and response.results <> invalid then
+        for each item in response.results
             section = createObject("roSGNode", "Section")
             section.json = item
             sections.push(section)
         next
     end if
-'    response = m.makeRequest(url, "GET")
-'    if isAssociativeArray(response) and response.success = true then
-'        for each section in response.results
-'            row = createObject("roSGNode", "Section")
-'            row.json = section
-'            rows.push(row)
-'        next
-'    end if
     return sections
 end function
 
@@ -817,50 +815,52 @@ function cbs_getShow(showID as string, loadRows = false as boolean) as object
     url = m.apiBaseUrl + "v2.0/roku/shows/" + showID + ".json"
     response = m.makeRequest(url, "GET", invalid, "json", true)
     if response <> invalid and response.show <> invalid then
-        show = createObject("roSGNode", "Show")
-        show.json = response
-        if loadRows then
-            showSections = m.getShowSections(showID)
-            seasons = m.getShowAvailableSeasons(showID)
-            if seasons <> invalid then
-                ' Add the show for the show info row
-                sections = []
-                for each parentSection in showSections
-                    if parentSection.displaySeasons = true then
-                        sortedSeasons = []
-                        sortedSeasons.append(seasons)
-                        if parentSection.seasonSortOrder = "DESC" then
-                            sortArray(sortedSeasons, function(item1, item2) as boolean : return item1.number < item2.number : end function)
-                        else if parentSection.seasonSortOrder = "ASC" then
-                            sortArray(sortedSeasons, function(item1, item2) as boolean : return item1.number > item2.number : end function)
-                        end if
-                        for each availableSeason in sortedSeasons
+        if response.show.results = invalid or response.show.results.count() > 0 then
+            show = createObject("roSGNode", "Show")
+            show.json = response
+            if loadRows then
+                showSections = m.getShowSections(showID)
+                seasons = m.getShowAvailableSeasons(showID)
+                if seasons <> invalid then
+                    ' Add the show for the show info row
+                    sections = []
+                    for each parentSection in showSections
+                        if parentSection.displaySeasons = true then
+                            sortedSeasons = []
+                            sortedSeasons.append(seasons)
+                            if parentSection.seasonSortOrder = "DESC" then
+                                sortArray(sortedSeasons, function(item1, item2) as boolean : return item1.number < item2.number : end function)
+                            else if parentSection.seasonSortOrder = "ASC" then
+                                sortArray(sortedSeasons, function(item1, item2) as boolean : return item1.number > item2.number : end function)
+                            end if
+                            for each availableSeason in sortedSeasons
+                                section = createObject("roSGNode", "Section")
+                                section.json = parentSection.json
+                                section.showID = showID
+                                section.title = availableSeason.title
+                                section.excludeShow = false
+                                section.totalCount = availableSeason.totalCount
+                                params = {}
+                                params["params"] = "seasonNum=" + availableSeason.number.toStr()
+                                params["seasonNum"] = availableSeason.number
+                                section.params = params
+                                sections.push(section)
+                            next
+                        else
                             section = createObject("roSGNode", "Section")
                             section.json = parentSection.json
                             section.showID = showID
-                            section.title = availableSeason.title
                             section.excludeShow = false
-                            section.totalCount = availableSeason.totalCount
-                            params = {}
-                            params["params"] = "seasonNum=" + availableSeason.number.toStr()
-                            params["seasonNum"] = availableSeason.number
-                            section.params = params
                             sections.push(section)
-                        next
-                    else
-                        section = createObject("roSGNode", "Section")
-                        section.json = parentSection.json
-                        section.showID = showID
-                        section.excludeShow = false
-                        sections.push(section)
-                    end if
-                next
-                show.sections = sections
-            else
-                return invalid
+                        end if
+                    next
+                    show.sections = sections
+                else
+                    return invalid
+                end if
             end if
+            return show
         end if
-        return show
     end if
     return invalid
 end function
@@ -870,15 +870,19 @@ function cbs_getShowSections(showID as string) as object
     url = m.apiBaseUrl + "v2.0/roku/shows/" + showID + "/videos/config/DEFAULT_ROKU_SVOD.json"
     url = addQueryString(url, "platformType", "roku")
     url = addQueryString(url, "begin", 0)
-    url = addQueryString(url, "rows", 0)
+    url = addQueryString(url, "rows", 1)
     
     response = m.makeRequest(url, "GET", invalid, "json", true)
-    if isAssociativeArray(response) and response.success = true and response.videoSectionMetadata <> invalid then
-        for each item in response.videoSectionMetadata
-            section = createObject("roSGNode", "Section")
-            section.json = item
-            section.showID = showID
-            sections.Push(section)
+    if isAssociativeArray(response) and response.success = true and response.results <> invalid then
+        for each item in response.results
+            if item.sectionItems <> invalid and item.sectionItems.itemCount > 0 then
+                ' Remove the sectionItems, so we can populate the rows properly on the show screen
+                item.sectionItems = invalid
+
+                section = createObject("roSGNode", "Section")
+                section.json = item
+                sections.push(section)
+            end if
         next
     end if
     return sections
@@ -903,7 +907,26 @@ end function
 function cbs_getDynamicPlayEpisode(show as object, history = invalid as object) as object
     episode = invalid
     dynamicPlay = createObject("roSGNode", "DynamicPlayEpisode")
-    if history <> invalid then
+    url = m.apiBaseUrl + "v3.0/roku/dynamicplay/show/"+ show.id +".json"
+    response = m.makeRequest(url, "GET")
+    if response <> invalid and response.success = true then
+         if response.dynamicVideoModel <> invalid then
+            if response.dynamicVideoModel.model <> invalid then
+                episode = createObject("roSGNode", "Episode")
+                episode.json = response.dynamicVideoModel.model
+                if response.dynamicVideoModel.medTime <> invalid then
+                    episode.resumePoint = response.dynamicVideoModel.medTime
+                end if
+            end if 
+         end if
+         if episode <> invalid then
+            dynamicPlay.title =  response.dynamicVideoModel.playbackModeCTA
+            dynamicPlay.episode = episode
+            return dynamicPlay
+         end if 
+    end if
+    
+    if history <> invalid and episode = invalid then
         for i = 0 to history.getChildCount() - 1
             item = history.getChild(i)
             if item.showID = show.id then
@@ -1050,6 +1073,25 @@ function cbs_getFavoriteShows() as object
     return favorites
 end function
 
+function cbs_getShowHistory(relevanceOrder = "recency" as string) as object
+    shows = []
+    url = m.apiBaseUrl + "v2.0/roku/video/show/history.json"
+    url = addQueryString(url, "relevanceOrder", relevanceOrder)
+
+    response = m.makeRequest(url, "GET")
+    if isAssociativeArray(response) and response.success = true then
+        if response.showHistory <> invalid then
+            for each item in response.showHistory
+                show = createObject("roSGNode", "Show")
+                show.json = item
+                shows.push(show)
+            next
+        end if
+    end if
+    return shows
+end function
+
+
 function cbs_addShowToFavorites(showID as string) as boolean
     url = m.apiBaseUrl + "roku/lists/favoriteshows/unique/favorite-shows/item/add.json"
     postData = {}
@@ -1074,7 +1116,7 @@ function cbs_removeShowFromFavorites(showID as string) as boolean
     return false
 end function
 
-function cbs_getRecentlyWatched(page = 1 as integer, count = 50 as integer) as object
+function cbs_getVideoHistory(page = 1 as integer, count = 50 as integer) as object
     episodes = []
     url = m.apiBaseUrl + "v3.0/roku/video/streams/history.json"
     url = addQueryString(url, "page", page)
@@ -1104,6 +1146,42 @@ function cbs_getRecentlyWatched(page = 1 as integer, count = 50 as integer) as o
     end if
     return episodes
 end function
+
+function cbs_getContinueWatching(page = 1 as integer, count = 20 as integer) as object
+    episodes = []
+    url = m.apiBaseUrl + "v3.0/roku/video/continuewatching/watch-history.json"
+    url = addQueryString(url, "page", page)
+    url = addQueryString(url, "rows", count)
+    response = m.makeRequest(url, "GET")
+    if isAssociativeArray(response) and response.success = true then
+        if response.history <> invalid or response.continueWatching <> invalid then
+            if response.history <> invalid then
+                history = response.history
+            else
+                history = response.continueWatching
+            end if
+            for each item in history
+                if item.canModel <> invalid then
+                    episode = invalid
+                    if item.canModel.mediaType = "Movie" then
+                        episode = createObject("roSGNode", "Movie")
+                    else
+                        episode = createObject("roSGNode", "Episode")
+                    end if
+                    episode.json = item.canModel
+                    if item.medTime <> invalid then
+                        episode.resumePoint = item.medtime
+                    end if
+                    if isAvailable(episode) then
+                        episodes.push(episode)
+                    end if
+                end if
+            next
+        end if
+    end if
+    return episodes
+end function
+
 
 function cbs_getResumePoint(contentID as String) as integer
     if m.isAuthenticated() then
@@ -1225,6 +1303,9 @@ function cbs_makeRequest(url as string, method = "POST" as string, postData = in
 
     preTokenUrl = url
     url = addQueryString(url, "at", m.generateAccessToken(m.apiKey))
+    
+'   Uncomment this only for debug channels only 
+'    url = addQueryString(url,"LOCATEMEIN","CA")
 
     debugPrint(postData, "cbs.makeRequest (" + url + ")", 1)
     
@@ -1257,6 +1338,8 @@ function cbs_makeRequest(url as string, method = "POST" as string, postData = in
             if useCache then
                 writeAsciiFile(cacheFilename, response)
             end if
+        else if response <> invalid then
+            response = response.response
         end if
     end if
 

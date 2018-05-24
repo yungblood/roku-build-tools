@@ -1,7 +1,6 @@
 sub initializeAdobe()
     if m.adobe = invalid then
         m.adobe = ADBMobile().getADBMobileConnectorInstance(m.global.adobe)
-        m.adobe.setDebugLogging(false)
         m.adobeConstants = m.adobe.sceneGraphConstants()
         m.global.adobe.observeField(m.adobeConstants.API_RESPONSE, "onAdobeApiResponse")
 
@@ -14,7 +13,8 @@ sub initializeAdobe()
         m.persistentParams["brandPlatformId"] = "cbscom_ott_roku"
         m.persistentParams["sitePrimaryRsid"] = config.omnitureEvar5
         m.persistentParams["userStatus"] = user.trackingStatus
-        m.persistentParams["mediaPartnerId"] = "cbs_roku_app|can"
+        m.persistentParams["mediaPartnerId"] = "cbs_roku_app"
+        m.persistentParams["mediaDistNetwork"] = "can"
         m.persistentParams["mediaDeviceId"] = getDeviceID()
         m.persistentParams["userRegId"] = user.id
         m.persistentParams["&&products"] = user.trackingProduct
@@ -44,11 +44,14 @@ end sub
 
 sub trackScreenAction(actionName as string, params = {} as object, screenName = m.top.omnitureName as string, pageType = m.top.omniturePageType as string, events = [] as object)
     initializeAdobe()
-    params["screenName"] = screenName
-    params["pageType"] = pageType
-    params.append(m.persistentParams)
 
-    trackAction(actionName, params, events)
+    allParams = {}
+    allParams["screenName"] = screenName
+    allParams["pageType"] = pageType
+    allParams.append(m.persistentParams)
+    allParams.append(params)
+
+    trackAction(actionName, allParams, events)
 end sub
 
 function getOmnitureData(row as object, index as integer, podText = "" as string, podType = "" as string) as object
@@ -112,13 +115,18 @@ sub trackVideoLoad(video as object, context as object)
         videoType = "vod:clips"
     end if
     m.mediaInfo = adb_media_init_mediainfo(video.trackingTitle, video.trackingContentID, video.length, videoType)
-    m.mediaInfo.id = video.id
+    m.mediaInfo.id = video.trackingContentID
     m.mediaInfo.length = video.length
     
     m.mediaContext = {}
     m.mediaContext.append(m.persistentParams)
     m.mediaContext.append(context)
-    
+
+    ?"***************************"
+    ?"***************************"
+    ?m.mediaContext
+    ?"***************************"
+    ?"***************************"
     m.adobe.mediaTrackLoad(m.mediaInfo, m.mediaContext)
 end sub
 
@@ -201,7 +209,6 @@ end sub
 
 sub trackAction(actionName as string, params as object, events = [] as object)
     initializeAdobe()
-    
     ' Remove any legacy omniture params
     for each param in params.keys()
         if param.mid(0, 1) = "v" or param.mid(0, 2) = "pe" then

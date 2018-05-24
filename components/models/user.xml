@@ -17,6 +17,7 @@
         
         <field id="isSubscriber" type="boolean" />
         <field id="isRokuSubscriber" type="boolean" />
+        <field id="isAdFree" type="boolean" />
         <field id="packageName" type="string" />
         <field id="eligibleProducts" type="assocarray" onChange="onEligibleProductsChanged" />
         <field id="canUpgrade" type="boolean" />
@@ -27,6 +28,9 @@
         <field id="adStatus" type="string" />
 
         <field id="favorites" type="node" />
-        <field id="recentlyWatched" type="node" />
+        <field id="videoHistory" type="node" />
+        <field id="showHistory" type="node" />
+        <field id="continueWatching" type="node" />
+        
     </interface>
 </component>

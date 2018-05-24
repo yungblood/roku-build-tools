@@ -42,10 +42,16 @@ sub doWork()
     comscoreTask.control = "run"
     m.global.comscore = comscoreTask
     
+    ' Add BrightlineTask here 
+    m.global.addField("brightline", "node", false)
+    brightlineTask = createObject("roSGNode", "BrightlineTask")
+    brightlineTask.control = "run"
+    m.global.brightline = brightlineTask    
+    
     m.global.addField("dai", "node", false)
     daiTask = createObject("roSGNode", "DaiTask")
     daiTask.control = "run"
     m.global.dai = daiTask
-
+    
     m.top.initialized = true
 end sub

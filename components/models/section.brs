@@ -1,6 +1,11 @@
 sub init()
     m.loadedPages = []
     m.loadTasks = []
+    
+    user = m.global.user
+    if user <> invalid and user.videoHistory <> invalid then
+        user.videoHistory.observeField("cache", "onVideoHistoryChanged")
+    end if
 end sub
 
 sub onJsonChanged()
@@ -31,6 +36,7 @@ sub onJsonChanged()
                 end if
             next
             m.loadedPages[0] = true
+            updateResumePoints()
         end if
     end if
 end sub
@@ -62,6 +68,28 @@ sub onTotalCountChanged()
     'm.top.createChildren(m.top.totalCount - m.top.getchildCount(), "ContentNode")
 end sub
 
+sub onVideoHistoryChanged(nodeEvent as object)
+    updateResumePoints(nodeEvent.getData())
+end sub
+
+sub updateResumePoints(history = invalid as object)
+    if history = invalid then
+        user = m.global.user
+        if user <> invalid and user.videoHistory <> invalid then
+            history = user.videoHistory.cache
+        end if
+    end if
+    if history <> invalid then
+        for i = 0 to m.top.getChildCount() - 1
+            child = m.top.getChild(i)
+            resumePoint = history[child.id]
+            if resumePoint <> invalid then
+                child.resumePoint = resumePoint
+            end if
+        next
+    end if
+end sub
+
 sub onVideosLoaded(nodeEvent as object)
     task = nodeEvent.getRoSGNode()
     startIndex = task.page * task.pageSize
@@ -77,4 +105,5 @@ sub onVideosLoaded(nodeEvent as object)
         end if
     end if
     m.loadTasks[task.page] = invalid
+    updateResumePoints()
 end sub

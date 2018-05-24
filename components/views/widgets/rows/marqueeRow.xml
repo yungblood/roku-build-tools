@@ -2,44 +2,25 @@
 <component name="MarqueeRow" extends="Group">
     <script type="text/brightscript" uri="pkg:/components/views/widgets/rows/marqueeRow.brs" />
     <interface>
-        <field id="itemComponentName" type="string" alias="list.itemComponentName" />
-
         <field id="content" type="node" onChange="onContentChanged" />
-        <field id="itemFocused" type="integer" alias="list.itemFocused" />
-        <field id="itemSelected" type="integer" alias="list.itemSelected" />
-        <field id="jumpToItem" type="integer" alias="list.jumpToItem" />
-        <field id="animateToItem" type="integer" alias="list.animateToItem" />
-        <field id="animateToTargetSet" type="integer" alias="list.animateToTargetSet" />
-        
-        <field id="itemSize" type="vector2d" />
-        <field id="focusedItemSize" type="vector2d" />
-        <field id="itemSpacing" type="float" />
-        <field id="margin" type="float" />
-
-        <field id="focusedTargetSet" type="nodearray" />
-        <field id="unfocusedTargetSet" type="node" />
-        <field id="targetSet" type="node" alias="list.targetSet" />
-
-        <field id="advanceKey" type="string" value="right" />
-        <field id="reverseKey" type="string" value="left" />
-        <field id="wrap" type="boolean" />
-        
-        <field id="rowHeight" type="float" alias="boundingRect.height" />
+        <field id="itemFocused" type="integer" value="-1" />
+        <field id="itemSelected" type="integer" alwaysNotify="true" />
+        <field id="jumpToItem" type="integer" alwaysNotify="true" />
+        <field id="animateToItem" type="integer" alwaysNotify="true" />
     </interface>
     <children>
         <Font
             id="buttonFont"
             size="24"
             uri="pkg:/fonts/Lato-Regular.ttf" />
-
-          <!--  Rectangle is used to enforce size for dynamic layout -->
-        <Rectangle
-              id="boundingRect"
-              width="1"
-              color="0x00000000" />
-        <TargetGroup
-            id="list"
-            duration=".5" />
+        <MarkupGrid
+            id="marquee"
+            numRows="1"
+            itemSize="[1920,1080]"
+            itemSpacing="[0,0]"
+            itemComponentName="MarqueeTile"
+            horizFocusAnimationStyle="fixedFocusWrap"
+            drawFocusFeedback="false" />
         <LabelButton
             id="actionButton"
             translation="[100,521]"
@@ -49,7 +30,8 @@
             backgroundUri="pkg:/images/frame_generic.9.png"
             focusedBackgroundUri="pkg:/images/frame_generic.9.png"
             font="dictionary:buttonFont"
-            opacity=".4" />
+            opacity=".4"
+            visible="false" />
         <LayoutGroup
             id="dots"
             translation="[100,642]"

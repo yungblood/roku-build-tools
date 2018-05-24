@@ -22,6 +22,7 @@ end sub
 sub onUriChanged()
     ' Rotate the back poster to the front
     poster = m.top.getChild(0)
+    poster.uri = "invalid"
     poster.uri = m.top.uri
     m.top.appendChild(poster)
 end sub

@@ -27,6 +27,7 @@ end sub
 sub onVisibleChanged()
     if m.top.visible then
         m.background.uri = m.heroImageUrl
+        refreshEpisodeState()
     else
         m.heroImageUrl = m.background.uri
         m.background.uri = ""

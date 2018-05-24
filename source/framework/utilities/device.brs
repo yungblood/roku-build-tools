@@ -310,22 +310,8 @@ Function GetDeviceCreationTime() As Object
         print "Creation time is empty"
         Return invalid
     End If
-    regex = CreateObject("roRegex", "^\d{1,2}/\d{1,2}/\d{4} \d{1,2}:\d{1,2}:\d{1,2}.*[A|P]M$", "i")
-    If Not regex.IsMatch(creationTime) Then
-        print "Creation time " ; creationTime ; " not in expected format"
-        Return invalid
-    End If
-    regex = CreateObject("roRegex", "/+", "")
-    subStrings = regex.split(creationTime)
-    month = subStrings[0]
-    day = subStrings[1]
-    remainder = subStrings[2]
-    regex = CreateObject("roRegex", " ", "")
-    subStrings = regex.split(remainder)
-    year = subStrings[0]
-    dateString = year + "-" + month + "-" + day + " 00:00:00.000"
     dt = CreateObject("roDateTime")
-    dt.FromISO8601String(dateString)
+    dt.FromISO8601String(creationTime)
     If dt.AsSeconds() <= 0 Then
         Return invalid
     End If

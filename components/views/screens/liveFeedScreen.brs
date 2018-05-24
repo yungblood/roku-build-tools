@@ -52,6 +52,7 @@ sub onLiveFeedChanged()
         
         if m.top.autoPlay then
             m.top.buttonSelected = m.watch.id
+            m.top.autoPlay = false
         end if
         
         if canWatch(liveFeed, m.global) then

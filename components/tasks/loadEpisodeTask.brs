@@ -15,7 +15,7 @@ sub doWork()
     end if
     episode = api.getEpisode(m.top.episodeID, m.top.populateStream)
     
-    if episode.isLive and m.top.populateStream then
+    if episode <> invalid and episode.isLive and m.top.populateStream then
         hls = parseHls(episode.videoStream.url)
         if hls <> invalid and hls.playlists <> invalid and hls.playlists.count() > 0 then
             hls = parseHls(hls.playlists[0].url)

@@ -6,6 +6,7 @@
         <field id="menuItemSelected" type="string" alwaysNotify="true" />
         
         <field id="content" type="assocarray" onChange="onContentChanged" />
+        <field id="additionalContext" type="assocarray" />
     </interface>
     <children>
        <Font
@@ -27,7 +28,7 @@
         
         <RowList
             id="list"
-            translation="[0,762]"
+            translation="[0,862]"
             focusXOffset="[100]"
             rowLabelOffset="[[98,13]]"
             itemComponentName="GridTile"

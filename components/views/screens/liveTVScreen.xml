@@ -67,7 +67,7 @@
                     visible="false" />
                 <Group
                     id="channelOverlay"
-                    translation="[0,645]"
+                    translation="[0,692]"
                     visible="true">
                     <Poster
                         translation="[0,-200]"
@@ -75,31 +75,29 @@
                         height="810"
                         uri="pkg:/images/overlay_livetv_bottom_480.png" />
                     <Label
-                        translation="[67,0]"
+                        translation="[100,23]"
                         text="Channels"
                         color="0xffffffff"
                         vertAlign="top">
                        <Font
                            role="font"
-                           size="40"
+                           size="32"
                            uri="pkg:/fonts/Lato-Regular.ttf" />
                     </Label>
                     <MarkupGrid
                         id="channelGrid"
-                        translation="[67,60]"
+                        translation="[100,60]"
                         numRows="1"
                         numColumns="4"
                         itemComponentName="ChannelTile"
-                        itemSize="[399,238]"
-                        itemSpacing="[62,0]"
+                        itemSize="[436,261]"
+                        itemSpacing="[34,0]"
                         horizFocusAnimationStyle="floatingFocus"
                         drawFocusFeedback="false" />
                 </Group>
-<!--  485  -->
-<!--  645  -->
                 <Group
                     id="scheduleOverlay"
-                    translation="[0,645]"
+                    translation="[0,676]"
                     visible="false">
                     <Poster
                         translation="[0,-200]"
@@ -107,17 +105,17 @@
                         height="810"
                         uri="pkg:/images/overlay_livetv_bottom_480.png" />
                     <Label
-                        translation="[67,0]"
+                        translation="[100,23]"
                         text="Schedule"
                         color="0xffffffff"
                         vertAlign="top">
                        <Font
                            role="font"
-                           size="40"
+                           size="32"
                            uri="pkg:/fonts/Lato-Regular.ttf" />
                     </Label>
                     <LayoutGroup
-                        translation="[1855,25]"
+                        translation="[1855,23]"
                         layoutDirection="horiz"
                         itemSpacings="[18]"
                         horizAlignment="right"
@@ -139,12 +137,12 @@
                     </LayoutGroup>
                     <MarkupGrid
                         id="scheduleGrid"
-                        translation="[67,60]"
+                        translation="[100,60]"
                         numRows="1"
                         numColumns="4"
                         itemComponentName="ScheduleTile"
-                        itemSize="[399,238]"
-                        itemSpacing="[62,0]"
+                        itemSize="[436,261]"
+                        itemSpacing="[34,0]"
                         horizFocusAnimationStyle="floatingFocus"
                         drawFocusFeedback="false" />
                     <Poster

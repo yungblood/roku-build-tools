@@ -49,11 +49,6 @@
                 vertAlign="bottom"
                 wrap="false"
                 font="dictionary:subtitleFont" />
-            <ProgressBar
-                id="progressBar"
-                backgroundColor="0xffffff33"
-                barColor="0x0092f3ff"
-                height="4" />
         </LayoutGroup>
     </children>
 </component>

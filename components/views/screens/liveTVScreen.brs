@@ -209,11 +209,11 @@ sub onScheduleItemFocused(nodeEvent as object)
 end sub
 
 sub onScheduleItemSelected(nodeEvent as object)
-    if m.scheduleDetails.visible then
+    'if m.scheduleDetails.visible then
         showOverlay(false, false)
-    else
-        showScheduleDetails()
-    end if
+    'else
+        'showScheduleDetails()
+    'end if
 end sub
 
 sub onOverlayTimerFired()
@@ -291,14 +291,16 @@ sub playChannel(channel as object)
         m.nowPlaying = invalid
         m.schedule = invalid
     
-        m.scheduleChannelName.text = channel.title
-        m.channelName.text = channel.title
+        'm.scheduleChannelName.text = channel.title
+        'm.channelName.text = channel.title
         if channel.affiliate <> invalid then
-            m.scheduleChannelLogo.uri = channel.affiliate.hdPosterUrl
-            m.channelLogo.uri = channel.affiliate.hdPosterUrl
+            m.scheduleChannelLogo.visible = true
+            m.scheduleChannelLogo.uri = channel.affiliate.sdPosterUrl
+            m.channelLogo.uri = channel.affiliate.sdPosterUrl
         else if channel.hdPosterUrl <> invalid then
-            m.scheduleChannelLogo.uri = channel.hdPosterUrl
-            m.channelLogo.uri = channel.hdPosterUrl
+            m.scheduleChannelLogo.visible = false
+            'm.scheduleChannelLogo.uri = channel.sdPosterUrl
+            m.channelLogo.uri = channel.sdPosterUrl
         end if
         
         if channel.subtype() <> "Station" and channel.id = "local" then
@@ -648,7 +650,7 @@ end sub
 
 sub showOverlay(showChannels = false as boolean, resetIndex = true as boolean)
     m.scheduleOverlay.visible = not showChannels
-    m.scheduleOverlay.translation = [0, 645]
+    'm.scheduleOverlay.translation = [0, 645]
     m.scheduleDetails.visible = false
     m.scheduleDismiss.visible = true
     m.channelOverlay.visible = showChannels
@@ -695,7 +697,7 @@ end sub
 sub showScheduleDetails()
     resetOverlayTimer()
     m.scheduleOverlay.visible = true
-    m.scheduleOverlay.translation = [0, 485]
+    'm.scheduleOverlay.translation = [0, 485]
     m.scheduleDetails.visible = true
     m.scheduleDismiss.visible = false
     m.overlayTimer.duration = 10

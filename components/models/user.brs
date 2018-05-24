@@ -1,6 +1,8 @@
 sub init()
     m.top.favorites = createObject("roSGNode", "Favorites")
-    m.top.recentlyWatched = createObject("roSGNode", "RecentlyWatched")
+    m.top.videoHistory = createObject("roSGNode", "VideoHistory")
+    m.top.showHistory = createObject("roSGNode", "ShowHistory")
+    m.top.continueWatching = createObject("roSGNode", "ContinueWatching")
 end sub
 
 sub onJsonChanged()
@@ -23,6 +25,7 @@ sub onJsonChanged()
         end if
         m.top.isSubscriber = (m.top.status = "SUBSCRIBER")
         m.top.isRokuSubscriber = isRokuSubscriber(json.cbsPackageInfo)
+        m.top.isAdFree = isAdFree(json.cbsPackageInfo)
         m.top.trackingProduct = getProductForTracking(json.cbsPackageInfo)
         m.top.trackingStatus = getStatusForTracking(json.packageStatus)
         m.top.adStatus = getStatusForAds(json.packageStatus)
@@ -30,7 +33,7 @@ sub onJsonChanged()
         m.top.packageName = getPackageName(json.cbsPackageInfo)
         
         'm.top.favorites.update = true
-        'm.top.recentlyWatched.update = true
+        'm.top.videoHistory.update = true
     end if
 end sub
 
@@ -63,6 +66,18 @@ function getPackageName(packageInfo as object) as string
     else
         return "Free Account"
     end if
+end function
+
+function isAdFree(packageInfo as object) as boolean
+    if m.top.isSubscriber then
+        if packageInfo.count() > 0 then
+            package = packageInfo[0]
+            if package.isAdFree then
+                return true
+            end if
+        end if
+    end if
+    return false
 end function
 
 function getProductForTracking(packageInfo as object) as string

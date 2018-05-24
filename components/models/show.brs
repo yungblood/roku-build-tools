@@ -10,6 +10,9 @@ sub onJsonChanged()
         end if
         if show <> invalid then
             m.top.title = show.title
+            if show.showTitle <> invalid then
+                m.top.title = show.showTitle
+            end if
             m.top.id = show.id
             if show.showId <> invalid then
                 m.top.id = show.showId
@@ -34,18 +37,31 @@ sub onJsonChanged()
         end if
 
         showAssets = json.showAssets
-        if json.showAssets <> invalid and json.showAssets.results <> invalid then
-            showAssets = json.showAssets.results
+        if json.showAssets <> invalid then
+            if isArray(json.showAssets) then
+                showAssets =  {}
+                for each showAsset in json.showAssets
+                    showAssets.append(showAsset)
+                next
+            else
+                if showAssets.results <> invalid then
+                    showAssets = json.showAssets.results
+                end if
+            end if 
         end if
         if showAssets <> invalid then
             m.top.heroImageUrl = showAssets.filepath_show_page_header
             m.top.myCbsImageUrl = showAssets.filepath_mycbs_show_image
-            m.top.browseImageUrl = showAssets.filepath_show_browse_poster
+            
+            ' we're not using the gradient version anymore, so commenting
+            ' this out should force it to use the description poster
+            'm.top.browseImageUrl = showAssets.filepath_show_browse_poster
+            
             m.top.descriptionImageUrl = showAssets.filepath_show_description_poster
-            if m.top.browseImageUrl = "" then
+            if isNullOrEmpty(m.top.browseImageUrl) then
                 m.top.browseImageUrl = m.top.descriptionImageUrl
             end if
-            if m.top.descriptionImageUrl = "" then
+            if isNullOrEmpty(m.top.descriptionImageUrl) then
                 m.top.descriptionImageUrl = m.top.browseImageUrl
             end if
         end if

@@ -3,34 +3,37 @@ sub init()
 end sub
 
 sub onAddFavorite(nodeEvent as object)
-    m.addTask = createObject("roSGNode", "AddToFavoritesTask")
-    m.addTask.observeField("favorites", "onFavoritesLoaded")
-    m.addTask.showID = nodeEvent.getData()
-    m.addTask.control = "run"
+    if m.updateTask = invalid then
+        m.updateTask = createObject("roSGNode", "AddToFavoritesTask")
+        m.updateTask.observeField("favorites", "onFavoritesLoaded")
+        m.updateTask.showID = nodeEvent.getData()
+        m.updateTask.control = "run"
+    end if
 end sub
 
 sub onRemoveFavorite()
-    m.removeTask = createObject("roSGNode", "RemoveFromFavoritesTask")
-    m.removeTask.observeField("favorites", "onFavoritesLoaded")
-    m.removeTask.showID = nodeEvent.getData()
-    m.removeTask.control = "run"
+    if m.updateTask = invalid then
+        m.updateTask = createObject("roSGNode", "RemoveFromFavoritesTask")
+        m.updateTask.observeField("favorites", "onFavoritesLoaded")
+        m.updateTask.showID = nodeEvent.getData()
+        m.updateTask.control = "run"
+    end if
 end sub
 
 sub update()
-    m.updateTask = createObject("roSGNode", "LoadFavoritesTask")
-    m.updateTask.observeField("favorites", "onFavoritesLoaded")
-    m.updateTask.control = "run"
+    if m.updateTask = invalid then
+        m.updateTask = createObject("roSGNode", "LoadFavoritesTask")
+        m.updateTask.observeField("favorites", "onFavoritesLoaded")
+        m.updateTask.control = "run"
+    end if
 end sub
 
 sub onFavoritesLoaded(nodeEvent as object)
+    m.updateTask = invalid
     m.top.content = nodeEvent.getData()
 end sub
 
 sub onContentChanged(nodeEvent as object)
-    m.updateTask = invalid
-    m.removeTask = invalid
-    m.addTask = invalid
-
     favorites = []
     favorites.append(nodeEvent.getData())
     if favorites.count() > 0 then

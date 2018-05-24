@@ -46,9 +46,20 @@
             color="0xffffffff"
             wrap="false"
             font="dictionary:titleFont" />
+            
+        <Label
+            id="airtime"
+            translation="[947,330]"
+            color="0xffffffff">
+            <Font
+                role="font"
+                size="26"
+                uri="pkg:/fonts/Lato-Regular.ttf" />
+        </Label>
+            
         <ScrollableText
             id="description"
-            translation="[947,351]"
+            translation="[947,383]"
             width="655"
             height="528"
             color="0xe5e6e7ff"
@@ -56,6 +67,5 @@
             font="dictionary:descriptionFont"
             scrollbarTrackBitmapUri="invalid"
             scrollbarThumbBitmapUri="invalid" />
-
     </children>
 </component>

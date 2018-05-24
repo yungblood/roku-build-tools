@@ -28,7 +28,7 @@ sub doWork()
         convivaTags["drm"]          = "false"
         convivaTags["drmType"]      = "none"
         convivaTags["app"]          = "Roku"
-        convivaTags["appVersion"]   = config.appVersion
+        convivaTags["appVersion"]   = config.appName + " " + config.appVersion
         convivaTags["appRegion"]    = config.appRegion
         convivaTags["winDimension"] = config.screenDims
 

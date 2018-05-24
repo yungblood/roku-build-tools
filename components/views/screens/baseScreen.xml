@@ -3,7 +3,7 @@
     <script type="text/brightscript" uri="pkg:/components/views/screens/baseScreen.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/omniture.brs" />
-    <script type="text/brightscript" uri="pkg:/source/services/adobe/adbmobile.brs" />
+    <script type="text/brightscript" uri="pkg:/components/services/adobe/adbmobile.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/device.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />

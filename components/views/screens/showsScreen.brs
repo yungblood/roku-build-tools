@@ -49,12 +49,21 @@ function onKeyEvent(key as string, press as boolean) as boolean
             end if
         else if key = "up" then
             if m.grid.isInFocusChain() then
-                m.groups.setFocus(true)
+                m.menu.setFocus(true)
                 return true
             else if m.groups.isInFocusChain() then
                 m.menu.setFocus(true)
                 return true
             end if
+        else if key = "right" then
+            if m.groups.isInFocusChain() then
+                 m.grid.setFocus(true)
+                return true
+            end if
+        else if key = "left" then
+            if m.grid.isInFocusChain() then
+                m.groups.setFocus(true)
+            end if    
         end if
     end if
     return false

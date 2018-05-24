@@ -10,18 +10,18 @@
     <children>
         <LabelButtonGroup
             id="groups"
-            translation="[95,150]"
-            layoutDirection="horiz"
-            itemSpacings="[53]">
+            translation="[100,135]"
+            layoutDirection="vert"
+            itemSpacings="[35]">
         </LabelButtonGroup>
         
         <MarkupGrid
             id="grid"
-            translation="[95,256]"
+            translation="[350,142]"
             itemComponentName="ShowTile"
-            itemSize="[417,626]"
-            itemSpacing="[18,20]"
-            numColumns="4"
+            itemSize="[266,400]"
+            itemSpacing="[30,30]"
+            numColumns="5"
             numRows="2"
             vertFocusAnimationStyle="fixedFocus"
             focusBitmapUri="pkg:/images/frame_grid.9.png" />

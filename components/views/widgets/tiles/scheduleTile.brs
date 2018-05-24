@@ -20,19 +20,27 @@ sub onContentChanged()
             time = createObject("roDateTime")
             time.fromSeconds(m.content.startTime)
             time.toLocalTime()
-            m.time.text = getTimeString(time)
-            
+            m.time.text = uCase(getTimeString(time))
+
+            m.showTitle.translation = [m.showTitle.translation[0], 96]
             m.showTitle.text = m.content.title
 
             now = createObject("roDateTime").asSeconds()
             m.liveNow.visible = asBoolean(m.content.isLive) or (m.content.startTime <= now and m.content.endTime > now) 
             'm.comingUp.visible = asBoolean(m.content.isNext)
         else
-            m.time.text = m.content.title
+            m.time.text = ""
+
+            m.showTitle.translation = [m.showTitle.translation[0], 76]
+            m.showTitle.text = m.content.episodeTitle
             
-            m.showTitle.text = ""
+            if m.content.startTime > 0 then
+                m.liveNow.visible = asBoolean(m.content.isLive) or (m.content.startTime <= now and (m.content.endTime > now or m.content.endTime = 0 ))
+            else
+                m.liveNow.visible = false 
+            end if
         end if
-        m.episodeTitle.text = m.content.episodeTitle
+        'm.episodeTitle.text = m.content.episodeTitle
     end if
 end sub
 

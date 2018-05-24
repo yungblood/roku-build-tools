@@ -5,19 +5,11 @@ sub runUserInterface(ecp as object)
     scene = m.screen.CreateScene("AppScene")
     
     appInfo = createObject("roAppInfo")
-    useStaging = (appInfo.GetValue("use_staging") = "true")
-
-    m.config = invalid
-    if useStaging then
-        m.config = parseJson(readAsciiFile("pkg:/config-staging.json"))
-    else
-        m.config = parseJson(readAsciiFile("pkg:/config.json"))
-    end if
+    m.config = parseJson(readAsciiFile(appInfo.getValue("config_file")))
     if m.config = invalid then
         m.config = {}
     end if
     m.config.appVersion = appInfo.getVersion()
-    m.config.useStaging = useStaging
     
     displaySize = createObject("roDeviceInfo").getDisplaySize()
     m.config.screenDims = displaySize.w.toStr() + "x" + displaySize.h.toStr()

@@ -6,6 +6,6 @@ sub doWork()
     api = cbs()
     api.initialize(m.global.config, m.global.user, m.global.cookies)
 
-    episode = api.getDynamicPlayEpisode(m.top.show, m.global.user.recentlyWatched)
+    episode = api.getDynamicPlayEpisode(m.top.show, m.global.user.videoHistory)
     m.top.episode = episode
 end sub

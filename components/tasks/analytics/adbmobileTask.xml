@@ -28,6 +28,6 @@
   <!-- Replace with correct location if needed -->
   <script type="text/brightscript" uri="pkg:/components/tasks/analytics/adbmobileTask.brs"/>
   <!-- Replace with correct location if needed -->
-  <script type="text/brightscript" uri="pkg:/source/services/adobe/adbmobile.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/services/adobe/adbmobile.brs"/>
 
 </component>

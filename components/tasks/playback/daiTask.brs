@@ -2,11 +2,14 @@ Library "Roku_Ads.brs"
 
 sub init()
     m.top.functionName = "doWork"
+    
+    m.debug = false
 end sub
 
 sub doWork()
     m.lastLoopTime = 0
     m.seekThreshold = 2
+    
     m.cuepoints = []
     m.skippingPod = false
 
@@ -28,6 +31,7 @@ sub doWork()
                         currentTime = m.top.video.position
                         contentTime = m.streamManager.getContentTime(currentTime * 1000) / 1000
                         m.top.contentTime = contentTime
+                        
                         if m.lastLoopTime > 0 and abs(currentTime - m.lastLoopTime) > m.seekThreshold then
                             print "Seek detected from "; m.lastLoopTime;" to ";currentTime
                             if m.top.inSnapback or m.skippingPod then
@@ -99,7 +103,8 @@ sub loadSdk()
             end if
             ' This is the AA created in the remote IMA file. Here we store it while it
             ' is still in scope for this function context.
-            m.sdk = imasdk
+            m.sdk = imasdk                        
+            
             m.top.sdkLoaded = true
         else
             print("Error downloading SDK: " + stri(code))
@@ -132,6 +137,24 @@ sub loadStreamManager()
         
         ?"Stream Data: ";streamData
         ?"DAI Request: ";request
+        
+        content = m.top.content
+        if content <> invalid then
+            config = m.global.config
+            raf = Roku_Ads()
+            raf.setDebugOutput(m.debug)
+    
+            'RAF content params
+            raf.setContentID(content.id)
+            raf.setContentGenre("General Variety")
+            
+            'Nielsen content params
+            raf.enableNielsenDAR(true)
+            raf.setContentLength(content.length)
+            raf.setNielsenGenre(content.nielsenGenre)
+            raf.setNielsenAppID(config.nielsenAppID)
+            raf.setNielsenProgramID(asString(content.showName))
+        end if
 
         m.cuepoints = []
         requestResult = m.sdk.requestStream(request)
@@ -273,9 +296,30 @@ sub onUserSeek(seekStartTime as integer, seekEndTime as integer)
 end sub
 
 sub onAdStart(ad as object)
+            
     print "Callback from SDK -- Start called - "; ad
-    print "breakInfo: "; ad.adBreakInfo
-    m.top.adStart = getAdEventData(ad)
+    'print "ad.breakInfo: "; ad.adBreakInfo
+    'print "ad.companions: "; ad.companions
+    
+    m.top.adStart = getAdEventData(ad)        
+   
+    'Check for brightline_direct companion nodes
+    for i = 0 to ad.companions.count()
+       if ad.companions[i] <> invalid and ad.companions[i].apiframework = "brightline_direct" then               
+            ad.adURL = ad.companions[i].url
+            ad.contentId = m.top.streamData.contentSourceID
+            ad.adName = ad.adtitle
+            ad.streamFormat = m.top.streamData.STREAMFORMAT
+            ad.startAt = m.top.video.position
+            ad.rendered = false            
+                        
+            view = m.top.video.getParent()
+            
+            m.global.brightline.ad = {adPods: [ad], videoNode : m.top.video, rsgNode : view}
+            m.global.brightline.loadAd = "true"
+        end if
+    end for             
+    
 end sub
 
 sub onAdFirstQuartile(ad as object)
@@ -295,7 +339,9 @@ end sub
 
 sub onAdComplete(ad as object)
     print "Callback from SDK -- Complete called - "
+
     m.top.adComplete = getAdEventData(ad)
+    
 end sub
 
 sub onError(error as object)

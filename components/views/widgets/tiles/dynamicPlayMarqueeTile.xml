@@ -3,8 +3,11 @@
     <script type="text/brightscript" uri="pkg:/components/views/widgets/tiles/dynamicPlayMarqueeTile.brs" />
     <interface>
         <field id="show" type="node" onChange="onShowChanged" />
+        <field id="update" type="boolean" onChange="updateContent" alwaysNotify="true" />
         <field id="episode" type="node" />
         <field id="contentLoaded" type="boolean" alwaysNotify="true" />
+
+        <field id="buttonSelected" type="string" alwaysNotify="true" />
     </interface>
     <children>
         <Font
@@ -14,11 +17,16 @@
         <Font
             id="episodeFont"
             size="42"
-            uri="pkg:/fonts/Lato-Light.ttf" />
+            uri="pkg:/fonts/Lato-Regular.ttf" />
         <Font
             id="descriptionFont"
             size="28"
-            uri="pkg:/fonts/Lato-Light.ttf" />
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="timeIndicatorFont"
+            size="20"
+            uri="pkg:/fonts/Lato-Bold.ttf" />
+            
         <Font
             id="buttonFont"
             size="26"
@@ -30,7 +38,7 @@
             itemSpacings="[0]">
             <Label
                 id="showTitle"
-                width="450"
+                width="500"
                 font="dictionary:titleFont"
                 maxLines="2"
                 wrap="true"
@@ -38,7 +46,7 @@
                 color="0xffffffff" />
             <Rectangle
                 width="1"
-                height="28"
+                height="26"
                 color="0x00000000" />
             <Label
                 id="episodeTitle"
@@ -53,21 +61,29 @@
                 wrap="false"
                 color="0xffffffff" />
             <Rectangle
+                id="progressSpacer"
                 width="1"
-                height="11"
+                height="10"
                 color="0x00000000" />
             <Group
                 id="progress">
+                <Label
+                    id="timeIndicator"
+                    translation = "[755,-11]"
+                    width="140"
+                    font="dictionary:timeIndicatorFont"
+                    color="0xffffffff"
+                    opacity = "0.50" />
                 <ProgressBar
                     id="progressBar"
-                    width="896"
+                    width="735"
                     height="4"
                     backgroundColor="0xffffff80"
                     barColor="0x0092f3ff"
                     visible="false" />
                 <Rectangle
                     width="1"
-                    height="13"
+                    height="26"
                     color="0x00000000" />
             </Group>
             <Label
@@ -78,20 +94,45 @@
                 lineSpacing="2"
                 wrap="true"
                 color="0xffffffff" />
-            <Rectangle
-                width="1"
-                height="46"
-                color="0x00000000" />
-            <LabelButton
-                id="button"
-                width="600"
-                height="88"
-                text=""
-                backgroundUri="pkg:/images/frame_generic.9.png"
-                focusedBackgroundUri="pkg:/images/button_focus.9.png"
-                font="dictionary:buttonFont"
-                processKeyEvents="false"
-                visible="false" />
         </LayoutGroup>
+        <LabelButton
+            id="ctaButton"
+            translation="[0,423]"
+            width="600"
+            height="88"
+            text=""
+            backgroundUri="pkg:/images/frame_generic.9.png"
+            focusedBackgroundUri="pkg:/images/button_focus.9.png"
+            font="dictionary:buttonFont"
+            processKeyEvents="false"
+            visible="false" />
+<!--         <LayoutGroup -->
+<!--             translation="[1720,467]" -->
+<!--             layoutDirection="horiz" -->
+<!--             itemSpacings="[10]" -->
+<!--             horizAlignment="right" -->
+<!--             vertAlignment="center"> -->
+<!--             <LabelButton -->
+<!--                 id="showInfo" -->
+<!--                 width="60" -->
+<!--                 height="70" -->
+<!--                 foregroundUri="pkg:/images/icon-info-unselected-unfocused.png" -->
+<!--                 foregroundImageWidth="45" -->
+<!--                 foregroundImageHeight="45" -->
+<!--                 focusedForegroundUri="pkg:/images/icon-info-unselected-focused.png" -->
+<!--                 focusedForegroundImageWidth="45" -->
+<!--                 focusedForegroundImageHeight="45" -->
+<!--                 focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png" -->
+<!--                 processKeyEvents="false" /> -->
+<!--             <Label -->
+<!--                 id="airtime" -->
+<!--                 vertAlign="center" -->
+<!--                 color="0xffffffff"> -->
+<!--                 <Font -->
+<!--                     role="font" -->
+<!--                     size="26" -->
+<!--                     uri="pkg:/fonts/Lato-Regular.ttf" /> -->
+<!--             </Label> -->
+<!--         </LayoutGroup> -->
     </children>
 </component>

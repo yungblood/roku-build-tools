@@ -4,6 +4,7 @@
     <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/constants.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/omniture.brs" />
+    <script type="text/brightscript" uri="pkg:/components/services/adobe/adbmobile.brs" />
     <script type="text/brightscript" uri="pkg:/components/framework/utilities/dialogs.brs" />
 
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/debug.brs" />

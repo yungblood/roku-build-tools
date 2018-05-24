@@ -14,13 +14,23 @@
     <children>
         <Rectangle
             translation="[0,13]"
-            width="399"
-            height="225"
+            width="435"
+            height="261"
             color="0x2b2b2bff">
             <Label
                 id="time"
-                translation="[42,48]"
-                width="315"
+                translation="[44,54]"
+                width="282"
+                color="0xffffffff">
+                <Font
+                    role="font"
+                    size="25"
+                    uri="pkg:/fonts/Lato-Bold.ttf" />
+            </Label>
+            <Label
+                id="showTitle"
+                translation="[44,96]"
+                width="348"
                 color="0xffffffff"
                 wrap="true"
                 text=""
@@ -29,24 +39,12 @@
                 <Font
                     role="font"
                     size="42"
-                    uri="pkg:/fonts/Lato-Light.ttf" />
-            </Label>
-            <Label
-                id="showTitle"
-                translation="[42,122]"
-                width="315"
-                color="0xffffffff"
-                wrap="false"
-                text="">
-                <Font
-                    role="font"
-                    size="25"
-                    uri="pkg:/fonts/Lato-Bold.ttf" />
+                    uri="pkg:/fonts/Lato-Regular.ttf" />
             </Label>
             <Label
                 id="episodeTitle"
-                translation="[42,160]"
-                width="315"
+                translation="[44,160]"
+                width="348"
                 color="0xffffffff"
                 wrap="false"
                 text="">
@@ -58,38 +56,17 @@
         </Rectangle>
         <Rectangle
             id="liveNow"
-            translation="[0,13]"
-            width="223"
-            height="37"
+            translation="[354,13]"
+            width="81"
+            height="32"
             color="0x0092f3ff"
             visible="false">
             <Label
-                width="223"
-                height="37"
+                width="80"
+                height="32"
                 color="0xffffffff"
                 wrap="false"
-                text="Live Now"
-                horizAlign="center"
-                vertAlign="center">
-                <Font
-                    role="font"
-                    size="27"
-                    uri="pkg:/fonts/Lato-Bold.ttf" />
-            </Label>
-        </Rectangle>
-        <Rectangle
-            id="comingUp"
-            translation="[0,13]"
-            width="223"
-            height="37"
-            color="0x024069ff"
-            visible="false">
-            <Label
-                width="223"
-                height="37"
-                color="0xffffffff"
-                wrap="false"
-                text="Up Next"
+                text="LIVE"
                 horizAlign="center"
                 vertAlign="center">
                 <Font
@@ -101,8 +78,8 @@
         <Poster
             id="focusFrame"
             translation="[0,13]"
-            width="399"
-            height="225"
+            width="436"
+            height="248"
             uri="pkg:/images/frame_grid.9.png"
             visible="false" />
     </children>

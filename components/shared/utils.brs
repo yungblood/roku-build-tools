@@ -13,10 +13,16 @@ sub sendDWAnalytics(params as object)
     end if
 end sub
 
-function getImageUrl(baseUrl as string, width as integer) as string
+sub sendSparrowAnalytics(params as object)
+    if m.global.analytics <> invalid then
+        m.global.analytics.sparrowParams = params
+    end if
+end sub
+
+function getImageUrl(baseUrl as string, width = 0 as integer, height = 0 as integer) as string
     width = int(width / (1920 / createObject("roDeviceInfo").getUIResolution().width))
-    photoImageEndpoint = "http://wwwimage.cbsstatic.com/thumbnails/photos/w[WIDTH]/"
-    videoImageEndpoint = "http://wwwimage.cbsstatic.com/thumbnails/videos/w[WIDTH]/"
+    photoImageEndpoint = "http://wwwimage.cbsstatic.com/thumbnails/photos/[WIDTH]/[HEIGHT]"
+    videoImageEndpoint = "http://wwwimage.cbsstatic.com/thumbnails/videos/[WIDTH]/[HEIGHT]"
     url = baseUrl
     if baseUrl <> invalid and baseUrl <> "" then
         if baseUrl.inStr("http://thumbnails.cbsig.net") > -1 then
@@ -29,7 +35,12 @@ function getImageUrl(baseUrl as string, width as integer) as string
         if width = 0 then
             url = url.replace("[WIDTH]", "")
         else
-            url = url.replace("[WIDTH]", width.toStr())
+            url = url.replace("[WIDTH]", "w" + width.toStr())
+        end if
+        if height = 0 then
+            url = url.replace("[HEIGHT]", "")
+        else
+            url = url.replace("[HEIGHT]", "h" + height.toStr())
         end if
     end if
     return url
@@ -120,19 +131,15 @@ function canWatch(episode as object, context as object, postSignIn = false as bo
 end function
 
 function parseDeepLink(link as string) as object 
-    link = link.replace("http://www.cbs.com", "")
-    link = link.replace("https://www.cbs.com", "")
-    link = link.replace("cbs://www.cbs.com", "")
-    ' HACK: some deep links have a / before the #, some don't, so
-    '       we ensure all do.  Empty entries will be removed later
-    link = link.replace("#", "/#")
+    link = link.replace("http://www.cbs.com/", "")
+    link = link.replace("https://www.cbs.com/", "")
+    link = link.replace("cbs://www.cbs.com/", "")
+    
+    if link.inStr("/") = 0 then
+        link = link.mid(1)
+    end if
     
     parts = link.split("/")
-    for i = parts.count() - 1 to 0 step -1
-        if isNullOrEmpty(parts[i]) then
-            parts.delete(i)
-        end if
-    next
     params = {}
     if parts.count() = 0 then
         params.mediaType = "screen"
@@ -141,38 +148,104 @@ function parseDeepLink(link as string) as object
         params.mediaType = "screen"
         params.contentID = parts[0]
     else
-        if parts.peek().mid(0, 1) = "#" then
-            if parts.peek() = "#open" then
-                if parts[0] = "movies" then
-                    params.mediaType = "moviedetails"
-                else
+        if parts[0] = "all-access" then
+            params.mediaType = "screen"
+            params.contentID = "all-access"
+        else if parts[0] = "shows" then
+            if parts.count() = 2 then
+                ' /shows/#featured
+                params.mediaType = "screen"
+                params.contentID = "shows"
+                if parts[1].inStr("#") = 0 then
+                    params.category = parts[1].mid(1)
+                end if
+            else if parts.count() = 3 then
+                ' /shows/the-good-fight/
+                params.mediaType = "series"
+            else if parts[2] = "video" then
+                ' /shows/macgyver/video/jfKgYcYhkZ80Yz_q0fIuw48TqQAMu0B5/#open
+                params.mediaType = "episode"
+                params.contentID = parts[3]
+                if parts.peek() = "#open" then
                     params.mediaType = "episodedetails"
                 end if
-                params.contentID = parts[parts.count() - 2]
-            else
-                if parts[0] = "shows" then
-                    params.mediaType = "screen"
-                    params.contentID = "shows"
-                    params.category = parts.peek().mid(1)
+            end if
+        else if parts[0] = "movies" then
+            if parts.count() = 2 then
+                ' /movies/
+                params.mediaType = "screen"
+                params.contentID = "movies"
+            else if parts.count() > 2 then
+                params.mediaType = "movie"
+                if parts[2] = "trailer" then
+                    ' /movies/star-trek-first-contact/trailer/uam4uMDVsHcD6T9FCQCuUekB5vwwGB0a
+                    params.contentID = parts[3]
+                    params.playTrailer = true
+                else
+                    ' /movies/star-trek-first-contact/uam4uMDVsHcD6T9FCQCuUekB5vwwGB0a/#open
+                    params.contentID = parts[2]
+                    if parts.peek() = "#open" then
+                        params.mediaType = "moviedetails"
+                    end if
                 end if
             end if
-        else
-            if parts.count() = 2 and parts[0] = "shows" then
-                params.mediaType = "series"
-            else if parts[0] = "live-tv" then
-                params.mediaType = "screen"
-                params.contentID = "live-tv/" + parts.peek()
-            else
-                if parts[0] = "movies" then
-                    params.mediaType = "movie"
-                else
-                    params.mediaType = "episode"
+        else if parts[0] = "live-tv" then
+            if parts.count() = 2 then
+                if isNullOrEmpty(parts[1]) then
+                    ' /live-tv/
+                    params.mediaType = "screen"
+                    params.contentID = "live-tv"
+                else if parts[1] = "stream" then
+                    ' /live-tv/stream
+                    params.mediaType = "screen"
+                    params.contentID = "live-tv/local"
                 end if
-                params.contentID = parts.peek()
+            else if parts.count() >= 3 then
+                if isNullOrEmpty(parts[2]) then
+                    ' /live-tv/stream/
+                    params.mediaType = "screen"
+                    params.contentID = "live-tv/local"
+                else
+                    ' /live-tv/stream/cbsn/
+                    params.mediaType = "screen"
+                    params.contentID = "live-tv/" + parts[2]
+                end if
             end if
         end if
     end if
     return params
 end function
 
-
+function parseScheduleJson(json as object) as object
+    schedule = []
+    if json <> invalid then
+        now = createObject("roDateTime").asSeconds()
+        items = invalid
+        if isArray(json) then
+            for each item in json
+                if item.navigation <> invalid and not item.navigation.data.isEmpty() then
+                    items = item.navigation.data
+                    exit for
+                end if
+            next
+        else if json.schedule <> invalid then
+            if isArray(json.schedule) then
+                items = json.schedule
+            else if json.schedule.navigation <> invalid then
+                items = json.schedule.navigation.data
+            end if
+        else if json.navigation <> invalid then
+            items = json.navigation.data
+        end if
+        if items <> invalid then
+            for each item in items
+                program = createObject("roSGNode", "Program")
+                program.json = item
+                if program.endTime > now or program.endTime = 0 or program.startTime = 0 then
+                    schedule.push(program)
+                end if
+            next
+        end if
+    end if
+    return schedule
+end function

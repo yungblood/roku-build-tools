@@ -7,9 +7,9 @@
         <field id="highlight" type="boolean" onChange="onHighlightChanged" />
     </interface>
     <children>
-           <Font
-               id="buttonFont"
-               size="30"
-               uri="pkg:/fonts/Lato-Regular.ttf" />
+    <Font
+        id="buttonFont"
+        size="28"
+        uri="pkg:/fonts/Lato-Regular.ttf" />
     </children>
 </component>

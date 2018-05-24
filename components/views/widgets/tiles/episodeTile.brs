@@ -2,7 +2,6 @@ sub init()
     m.poster = m.top.findNode("poster")
     m.title = m.top.findNode("title")
     m.subtitle = m.top.findNode("subtitle")
-    m.progressBar = m.top.findNode("progressBar")
     
     m.largeDarken = m.top.findNode("largeDarken")
     m.smallDarken = m.top.findNode("smallDarken")
@@ -12,6 +11,9 @@ end sub
 
 sub onContentChanged()
     if m.episode = invalid or not m.episode.isSameNode(m.top.itemContent) then
+        if m.episode <> invalid then
+            m.episode.unobserveField("resumePoint")
+        end if
         if m.updateTimer <> invalid then
             m.updateTimer.control = "stop"
             m.updateTimer.unobserveField("fire")
@@ -19,13 +21,31 @@ sub onContentChanged()
         end if
         m.episode = m.top.itemContent
         if m.episode <> invalid then
+            m.episode.observeField("resumePoint", "updateResumePoint")
             updateMetadata()
             updatePoster()
-            if m.episode.resumePoint <> invalid and m.episode.resumePoint > 0 then
-                m.metadata.appendChild(m.progressBar)
-                m.progressBar.maxValue = m.episode.length
-                m.progressBar.value = m.episode.resumePoint
-            else
+            updateResumePoint()
+        end if
+    end if
+end sub
+
+sub updateResumePoint()
+    if m.episode <> invalid then
+        if m.episode.resumePoint <> invalid and m.episode.resumePoint > 0 then
+            if m.progressBar = invalid then
+                m.progressBar = createObject("roSGNode", "ProgressBar")
+                m.progressBar.id = "progressBar"
+                m.progressBar.width = m.top.width - 36
+                m.progressBar.height = 4
+                m.progressBar.backgroundColor = "0xffffff33"
+                m.progressBar.barColor = "0x0092f3ff"
+            end if
+
+            m.metadata.appendChild(m.progressBar)
+            m.progressBar.maxValue = m.episode.length
+            m.progressBar.value = m.episode.resumePoint
+        else
+            if m.progressBar <> invalid then
                 m.metadata.removeChild(m.progressBar)
             end if
         end if
@@ -64,7 +84,10 @@ sub updateLayout()
             
             m.title.width = m.top.width - 36
             m.subtitle.width = m.top.width - 36
-            m.progressBar.width = m.top.width - 36
+            
+            if m.progressBar <> invalid then
+                m.progressBar.width = m.top.width - 36
+            end if
             
             m.largeDarken.width = m.top.width
             m.largeDarken.height = m.top.height

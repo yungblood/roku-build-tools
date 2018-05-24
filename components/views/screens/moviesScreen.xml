@@ -18,10 +18,10 @@
             id="grid"
             translation="[95,150]"
             itemComponentName="PosterTile"
-            itemSize="[417,626]"
-            itemSpacing="[18,20]"
-            numColumns="4"
-            numRows="2"
+            itemSize="[266,400]"
+            itemSpacing="[27,30]"
+            numColumns="6"
+            numRows="3"
             vertFocusAnimationStyle="fixedFocus"
             focusBitmapUri="pkg:/images/frame_grid.9.png" />
         

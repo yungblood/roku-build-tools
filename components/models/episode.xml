@@ -44,6 +44,8 @@
         <field id="thumbnailUrl" type="string" />
         <field id="browseImageUrl" type="string" />
 
+        <field id="liveStreamingUrl" type="string" />
+
         <field id="trackingTitle" type="string" />
         <field id="trackingContentID" type="string" />
         <field id="convivaTrackingTitle" type="string" />

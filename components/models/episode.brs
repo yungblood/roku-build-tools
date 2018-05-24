@@ -4,9 +4,11 @@ end sub
 sub onJsonChanged()
     json = m.top.json
     if json <> invalid then
-        ' HACK: This should ultimately be fixed in the CMS, but as that's not currently
-        '       an option, we replace occurrences of CBS All Access Movies with just Movies
-        json.seriesTitle = json.seriesTitle.replace("CBS All Access Movies", "Movies")
+
+'       After discussing further with the comscore and conviva folks, this should no longer be necessary
+'        ' HACK: This should ultimately be fixed in the CMS, but as that's not currently
+'        '       an option, we replace occurrences of CBS All Access Movies with just Movies
+'        json.seriesTitle = json.seriesTitle.replace("CBS All Access Movies", "Movies")
 
         m.top.id                = asString(json.contentId)
         m.top.pid               = asString(json.pid)
@@ -89,5 +91,7 @@ sub onJsonChanged()
 '                end if
 '            next
 '        end if
+
+        m.top.liveStreamingUrl = json.liveStreamingUrl
     end if
 end sub

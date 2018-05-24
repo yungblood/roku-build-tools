@@ -23,7 +23,7 @@
             translation="[0,100]"
             width="1920"
             horizAlign="center"
-            text="Terms of Service"
+            text="Terms of Use"
             color="0xe5e5e5ff">
               <Font
                   role="font"

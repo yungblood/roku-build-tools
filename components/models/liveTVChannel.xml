@@ -7,6 +7,8 @@
         <field id="streamUrl" type="string" />
         <field id="schedule" type="nodearray" />
 
+        <field id="contentID" type="string" />
+
         <field id="trackingID" type="string" />
         <field id="trackingAstID" type="string" />
         <field id="trackingContentID" type="string" />

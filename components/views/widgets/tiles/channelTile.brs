@@ -96,6 +96,9 @@ end sub
 sub updateNowPlaying()
     nowPlaying = m.nowPlaying
     if nowPlaying <> invalid then
-        m.showTitle.text = nowPlaying.title
+        m.showTitle.text = nowPlaying.episodeTitle
+        if nowPlaying.subtype() = "Program" or isNullOrEmpty(m.showTitle.text) then
+            m.showTitle.text = nowPlaying.title
+        end if
     end if
 end sub

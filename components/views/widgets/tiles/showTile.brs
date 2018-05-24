@@ -18,17 +18,17 @@ sub onContentChanged()
         m.title.text = uCase(show.title)
         m.poster.uri = getImageUrl(show.browseImageUrl, m.poster.width)
         m.count.text = ""
-        if show.episodeCount <> invalid and show.episodeCount > 0 then
-            m.count.text = show.episodeCount.toStr() + " Episode"
-            if show.episodeCount > 1 then
-                m.count.text = m.count.text + "s"
-            end if
-        else if show.clipCount <> invalid and show.clipCount > 0 then
-            m.count.text = show.clipCount.toStr() + " Clip"
-            if show.clipCount > 1 then
-                m.count.text = m.count.text + "s"
-            end if
-        end if
+'        if show.episodeCount <> invalid and show.episodeCount > 0 then
+'            m.count.text = show.episodeCount.toStr() + " Episode"
+'            if show.episodeCount > 1 then
+'                m.count.text = m.count.text + "s"
+'            end if
+'        else if show.clipCount <> invalid and show.clipCount > 0 then
+'            m.count.text = show.clipCount.toStr() + " Clip"
+'            if show.clipCount > 1 then
+'                m.count.text = m.count.text + "s"
+'            end if
+'        end if
     end if
 end sub
 

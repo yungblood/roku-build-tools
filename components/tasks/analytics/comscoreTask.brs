@@ -1,3 +1,5 @@
+Library "Roku_Ads.brs"
+
 sub init()
     m.top.functionName = "doWork"
 end sub

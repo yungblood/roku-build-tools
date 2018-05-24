@@ -24,6 +24,7 @@
 
         <field id="reset" type="boolean" alwaysNotify="true" onChange="onReset" />
         <field id="streamData" type="node" />
+        <field id="content" type="node" />
         <field id="video" type="node" />
     </interface>
 </component>

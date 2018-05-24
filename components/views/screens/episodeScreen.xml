@@ -9,6 +9,7 @@
         <field id="buttonSelected" type="string" alwaysNotify="true" />
         <field id="trackingRow" type="node" />
         <field id="trackingIndex" type="integer" />
+        <field id="additionalContext" type="assocarray" />
     </interface>
     <children>
         <Font
