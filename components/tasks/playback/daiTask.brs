@@ -1,4 +1,5 @@
 Library "Roku_Ads.brs"
+Library "IMA3.brs"
 
 sub init()
     m.top.functionName = "doWork"
@@ -84,34 +85,50 @@ sub loadSdk()
     sdk = m.sdk
     ' Only do this once per channel execution
     if sdk = invalid then
-'        m.sdk = getImaSdk()
-        sdkUrl = "https://imasdk.googleapis.com/roku/sdkloader/ima3.brs"
-        sdkResponse = getUrlToStringEx(sdkUrl)
-        if sdkResponse.responseCode = 200 then
-            sdkCode = sdkResponse.response
-            error = eval(sdkCode)
-            if type(error) = "roList" then
-                for each e in error
-                    print e
-                    m.top.errors.push(e)
-                end for
-            else if error <> &hE2 and error <> &hFC and error <> &hFF then
-                ' hFC = error on normal end, hE2 = error on return value
-                ' hFF = unknown error
-                print("Error Evaluating SDK: " + stri(error))
-                m.top.errors.push("Error Evaluating SDK: " + stri(error))
-            end if
-            ' This is the AA created in the remote IMA file. Here we store it while it
-            ' is still in scope for this function context.
-            m.sdk = imasdk                        
-            
+        print "SDK IS INVALID LOAD IMASDK"
+        sdkcode = New_IMASDK()
+        m.sdk = sdkcode
+        if m.top <> invalid then 'if we are not in an RSG app
             m.top.sdkLoaded = true
         else
-            print("Error downloading SDK: " + stri(code))
-            m.top.errors.push("Error downloading SDK: " + stri(code))
+            m.top = {}
+            m.top.sdkloaded = true
         end if
     end if
 end sub
+
+'sub loadSdk()
+'    sdk = m.sdk
+'    ' Only do this once per channel execution
+'    if sdk = invalid then
+''        m.sdk = getImaSdk()
+'        sdkUrl = "https://imasdk.googleapis.com/roku/sdkloader/ima3.brs"
+'        sdkResponse = getUrlToStringEx(sdkUrl)
+'        if sdkResponse.responseCode = 200 then
+'            sdkCode = sdkResponse.response
+'            error = eval(sdkCode)
+'            if type(error) = "roList" then
+'                for each e in error
+'                    print e
+'                    m.top.errors.push(e)
+'                end for
+'            else if error <> &hE2 and error <> &hFC and error <> &hFF then
+'                ' hFC = error on normal end, hE2 = error on return value
+'                ' hFF = unknown error
+'                print("Error Evaluating SDK: " + stri(error))
+'                m.top.errors.push("Error Evaluating SDK: " + stri(error))
+'            end if
+'            ' This is the AA created in the remote IMA file. Here we store it while it
+'            ' is still in scope for this function context.
+'            m.sdk = imasdk                        
+'            
+'            m.top.sdkLoaded = true
+'        else
+'            print("Error downloading SDK: " + stri(code))
+'            m.top.errors.push("Error downloading SDK: " + stri(code))
+'        end if
+'    end if
+'end sub
 
 sub loadStreamManager()
     if m.sdk <> invalid and m.top.video <> invalid and m.top.streamData <> invalid then
@@ -121,69 +138,72 @@ sub loadStreamManager()
         request = m.sdk.createStreamRequest()
         
         streamData = m.top.streamData
-        if streamData.type = "live" then
-            request.assetKey = streamData.assetKey
-        else
-            request.contentSourceId = streamData.contentSourceId
-            request.videoId = streamData.videoId
-        end if
-        request.apiKey = streamData.apiKey
-        if streamData.attemptPreroll <> invalid then
-            request.attemptPreroll = streamData.attemptPreroll
-        end if
-        request.player = m.player
-        request.adTagParameters = streamData.adTagParameters
-        request.ppid = streamData.ppid
-        
-        ?"Stream Data: ";streamData
-        ?"DAI Request: ";request
-        
-        content = m.top.content
-        if content <> invalid then
-            config = m.global.config
-            raf = Roku_Ads()
-            raf.setDebugOutput(m.debug)
-    
-            'RAF content params
-            raf.setContentID(content.id)
-            raf.setContentGenre("General Variety")
-            
-            'Nielsen content params
-            raf.enableNielsenDAR(true)
-            raf.setContentLength(content.length)
-            raf.setNielsenGenre(content.nielsenGenre)
-            raf.setNielsenAppID(config.nielsenAppID)
-            raf.setNielsenProgramID(asString(content.showName))
-        end if
-
-        m.cuepoints = []
-        requestResult = m.sdk.requestStream(request)
-        if requestResult <> invalid then
-            print "Error requesting stream ";requestResult
-        else
-            m.streamManager = invalid
-            while m.streamManager = invalid
-                sleep(50)
-                m.streamManager = m.sdk.getStreamManager()
-            end while
-            if m.streamManager.type = "error" then
-                print "DAI Error: ";m.streamManager.info
-                m.top.error = m.streamManager.info
-                m.streamManager = invalid
-                m.top.reset = true
+        if streamData <> invalid then
+            if streamData.type = "live" then
+                request.assetKey = streamData.assetKey
             else
-                m.top.streamManagerReady = true
-                addCallbacks()
-                m.player.streamManager = m.streamManager
-                m.streamManager.start()
-
-                m.cuepoints = m.streamManager.getCuePoints()
+                request.contentSourceId = streamData.contentSourceId
+                request.videoId = streamData.videoId
+            end if
+            request.apiKey = streamData.apiKey
+            if streamData.attemptPreroll <> invalid then
+                request.attemptPreroll = streamData.attemptPreroll
+            end if
+            request.player = m.player
+            request.adTagParameters = streamData.adTagParameters
+            request.ppid = streamData.ppid
+            request.campaign = streamData.campaign
+            
+    '        ?"Stream Data: ";streamData
+    '        ?"DAI Request: ";request
+            
+            content = m.top.content
+            if content <> invalid then
+                config = getGlobalField("config")
+                raf = Roku_Ads()
+                raf.setDebugOutput(m.debug)
+        
+                'RAF content params
+                raf.setContentID(content.id)
+                raf.setContentGenre("General Variety")
                 
-                if streamData.bookmarkPosition <> invalid and streamData.bookmarkPosition > 0 then
-                    ' Adjust bookmark position for stitched ads
-                    streamData.bookmarkPosition = m.streamManager.getStreamTime(streamData.bookmarkPosition * 1000) / 1000
+                'Nielsen content params
+                raf.enableNielsenDAR(true)
+                raf.setContentLength(asInteger(content.length))
+                raf.setNielsenGenre(content.nielsenGenre)
+                raf.setNielsenAppID(config.nielsenAppID)
+                raf.setNielsenProgramID(asString(content.showName))
+            end if
+    
+            m.cuepoints = []
+            requestResult = m.sdk.requestStream(request)
+            if requestResult <> invalid then
+                print "Error requesting stream ";requestResult
+            else
+                m.streamManager = invalid
+                while m.streamManager = invalid
+                    sleep(50)
+                    m.streamManager = m.sdk.getStreamManager()
+                end while
+                if m.streamManager.type = "error" then
+                    print "DAI Error: ";m.streamManager.info
+                    m.top.error = m.streamManager.info
+                    m.streamManager = invalid
+                    reset()
+                else
+                    m.top.streamManagerReady = true
+                    addCallbacks()
+                    m.player.streamManager = m.streamManager
+                    m.streamManager.start()
+    
+                    m.cuepoints = m.streamManager.getCuePoints()
+                    
+                    if streamData.bookmarkPosition <> invalid and streamData.bookmarkPosition > 0 then
+                        ' Adjust bookmark position for stitched ads
+                        streamData.bookmarkPosition = m.streamManager.getStreamTime(streamData.bookmarkPosition * 1000) / 1000
+                    end if
+                    m.lastLoopTime = 0
                 end if
-                m.lastLoopTime = 0
             end if
         end if
     end if
@@ -195,50 +215,53 @@ sub setupVideoPlayer()
     m.player.top = m.top
 
     m.player.loadUrl = function(streamInfo as object)
-        print "---- Load URL ---- "
-        print streamInfo
         streamData = m.top.streamData
-        streamData.url = streamInfo.manifest
-        streamData.streamDetails = streamInfo
-
-        if streamInfo.subtitles <> invalid then
-            ?formatjson(streamInfo.subtitles)
-            for each subtitle in streamInfo.subtitles
-                if lCase(subtitle.language) = "en" and subtitle.ttml <> invalid then
-                    streamData.subtitleConfig = { trackName: subtitle.ttml.toStr() }
-                    exit for    
-                else if lCase(subtitle.language) = "en" and subtitle.webvtt <> invalid then
-                    streamData.subtitleConfig = { trackName: subtitle.webvtt.toStr() }
-                    exit for
-                end if
-            end for
+        if streamData <> invalid then
+            streamData.url = streamInfo.manifest
+            streamData.streamDetails = streamInfo
+    
+            if streamInfo.subtitles <> invalid then
+                for each subtitle in streamInfo.subtitles
+                    if lCase(subtitle.language) = "en" and subtitle.ttml <> invalid then
+                        streamData.subtitleConfig = { trackName: subtitle.ttml.toStr() }
+                        exit for    
+                    else if lCase(subtitle.language) = "en" and subtitle.webvtt <> invalid then
+                        streamData.subtitleConfig = { trackName: subtitle.webvtt.toStr() }
+                        exit for
+                    end if
+                end for
+            end if
+    
+            if m.top.video <> invalid then
+                m.top.video.content = streamData
+            end if
+            m.top.videoComplete = false
         end if
-
-        if m.top.video <> invalid then
-            m.top.video.content = streamData
-        end if
-        m.top.videoComplete = false
     end function
 
     m.player.adBreakStarted = function(adBreakInfo as object)
         print "---- Ad Break Started ---- ";adBreakInfo
-        m.top.adPlaying = true
-        m.top.video.enableTrickPlay = false
+        if m.top.video <> invalid then
+            m.top.adPlaying = true
+            m.top.video.enableTrickPlay = false
+        end if
     end function
 
     m.player.adBreakEnded = function(adBreakInfo as object)
         print "---- Ad Break Ended ---- ";adBreakInfo
-        m.top.adPlaying = false
-        if m.top.snapbackTime > -1 and m.top.snapbackTime > m.top.video.position then
-            m.top.video.seek = m.top.snapbackTime
-            m.top.snapbackTime = -1
+        if m.top.video <> invalid then
+            m.top.adPlaying = false
+            if m.top.snapbackTime > -1 and m.top.snapbackTime > m.top.video.position then
+                m.top.video.seek = m.top.snapbackTime
+                m.top.snapbackTime = -1
+            end if
+            m.top.video.enableTrickPlay = true
         end if
-        m.top.video.enableTrickPlay = true
     end function
 
     m.player.allVideoComplete = function()
         print "---- All Video Complete ---- "
-        onReset()
+        reset()
         m.top.videoComplete = true
     end function
 end sub
@@ -252,7 +275,7 @@ sub addCallbacks()
     m.streamManager.addEventListener(m.sdk.AdEvent.COMPLETE, onAdComplete)
 end sub
 
-sub onReset()
+function reset()
     m.top.snapbackTime = -1
     m.top.streamData = invalid
     m.top.adPlaying = false
@@ -260,7 +283,7 @@ sub onReset()
         m.top.video.enableTrickPlay = true
     end if
     m.top.streamManagerReady = false
-end sub
+end function
 
 sub onVideoChanged()
     if m.video = invalid or not m.video.isSameNode(m.top.video) then
@@ -275,8 +298,6 @@ sub onVideoChanged()
             m.video.observeFieldScoped("timedMetadata", m.port)
             m.video.observeFieldScoped("state", m.port)
         end if
-        m.top.snapbackTime = -1
-        m.top.streamManagerReady = false
     end if
 end sub
 
@@ -296,30 +317,31 @@ sub onUserSeek(seekStartTime as integer, seekEndTime as integer)
 end sub
 
 sub onAdStart(ad as object)
-            
-    print "Callback from SDK -- Start called - "; ad
-    'print "ad.breakInfo: "; ad.adBreakInfo
-    'print "ad.companions: "; ad.companions
-    
-    m.top.adStart = getAdEventData(ad)        
-   
-    'Check for brightline_direct companion nodes
-    for i = 0 to ad.companions.count()
-       if ad.companions[i] <> invalid and ad.companions[i].apiframework = "brightline_direct" then               
-            ad.adURL = ad.companions[i].url
-            ad.contentId = m.top.streamData.contentSourceID
-            ad.adName = ad.adtitle
-            ad.streamFormat = m.top.streamData.STREAMFORMAT
-            ad.startAt = m.top.video.position
-            ad.rendered = false            
-                        
-            view = m.top.video.getParent()
-            
-            m.global.brightline.ad = {adPods: [ad], videoNode : m.top.video, rsgNode : view}
-            m.global.brightline.loadAd = "true"
-        end if
-    end for             
-    
+    if m.top.video <> invalid then
+        print "Callback from SDK -- Start called - "; ad
+        'print "ad.breakInfo: "; ad.adBreakInfo
+        'print "ad.companions: "; ad.companions
+        
+        m.top.adStart = getAdEventData(ad)        
+       
+        'Check for brightline_direct companion nodes
+        for i = 0 to ad.companions.count()
+           if ad.companions[i] <> invalid and ad.companions[i].apiframework = "brightline_direct" then               
+                ad.adURL = ad.companions[i].url
+                ad.contentId = m.top.streamData.contentSourceID
+                ad.adName = ad.adtitle
+                ad.streamFormat = m.top.streamData.STREAMFORMAT
+                ad.startAt = m.top.video.position
+                ad.rendered = false            
+                            
+                view = m.top.video.getParent()
+                
+                brightline = getGlobalField("brightline")
+                brightline.ad = {adPods: [ad], videoNode : m.top.video, rsgNode : view}
+                brightline.loadAd = "true"
+            end if
+        next
+    end if
 end sub
 
 sub onAdFirstQuartile(ad as object)

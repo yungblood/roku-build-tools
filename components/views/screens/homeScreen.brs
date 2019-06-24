@@ -19,8 +19,11 @@ sub init()
     m.list.observeField("itemFocused", "onRowFocused")
     m.list.observeField("rowItemFocused", "onRowItemFocused")
     m.list.observeField("rowItemSelected", "onRowItemSelected")
+    
+    m.user = getGlobalField("user")
+    observeGlobalField("user", "onUserChanged")
 
-    m.global.showSpinner = true
+    showSpinner()
 
     m.fadeOutAnimation = m.top.findNode("fadeOutAnimation")
     m.fadeInAnimation = m.top.findNode("fadeInAnimation")
@@ -28,8 +31,6 @@ sub init()
     m.scrollInterp = m.top.findNode("scrollInterp")
     
     m.lastFocus = m.menu
-    
-    m.concurrentRowLoads = 3
 end sub
 
 sub onFocusChanged()
@@ -43,6 +44,8 @@ sub onVisibleChanged()
         m.marqueeTimer.control = "start"
         m.marquee.visible = true
         updateContent()
+
+        trackRMFEvent("CHS")
     else
         m.marqueeTimer.control = "stop"
         m.marquee.visible = false
@@ -81,8 +84,23 @@ function onKeyEvent(key as string, press as boolean) as boolean
     return false
 end function
 
+sub onUserChanged(nodeEvent as object)
+    user = nodeEvent.getData()
+    if m.user = invalid or not m.user.isSameNode(user) then
+        m.user = user
+        refreshContent()
+    end if
+end sub
+
+sub refreshContent()
+    showSpinner()
+    m.contentTask = createObject("roSGNode", "HomeScreenTask")
+    m.contentTask.observeField("content", "onContentLoaded")
+    m.contentTask.control = "run"
+end sub
+
 sub loadContent(content as object)
-    config = m.global.config
+    config = getGlobalField("config")
     m.marquee.content = content.marquee
     m.marquee.visible = true
     m.marqueeTimer.control = "start"
@@ -95,23 +113,40 @@ sub loadContent(content as object)
     for i = 0 to rows.count() - 1
         row = rows[i]
         if row.subtype() = "Section" then
-            row.loadIndex = 0
+            if i <= 2 then
+                row.loadIndex = 0
+            end if
             if row.title.inStr("Movies") >= 0 then
-                rowItemSizes.push([266, 400])
+                rowItemSizes.push([266, 399])
                 rowHeights.push(480)
             else
                 if row.getChild(0).subtype() = "Show" or row.getChild(0).subtype() = "RelatedShow" then
-                    rowItemSizes.push([266, 400])
+                    rowItemSizes.push([266, 399])
                     rowHeights.push(480)
                 else
                     rowItemSizes.push([420, 230])
                     rowHeights.push(298)
                 end if 
             end if
-        else if row.subtype() = "ShowHistory" then 
-            rowItemSizes.push([266, 400])
+        else if row.subtype() = "HomeShowGroup" then
+            rowItemSizes.push([266, 399])
+            rowHeights.push(480)   
+        else if row.subtype() = "ShowHistory" then
+            if m.showHistoryObserved <> true then
+                row.observeField("content", "updateContent")
+                m.showHistoryObserved = true
+            end if
+            row.update = true
+            rowItemSizes.push([266, 399])
             rowHeights.push(480)   
         else
+            if row.subtype() = "ContinueWatching" then
+                if m.continueWatchingObserved <> true then
+                    row.observeField("content", "updateContent")
+                    m.continueWatchingObserved = true
+                end if
+                row.update = true
+            end if
             rowItemSizes.push([420, 230])
             rowHeights.push(298)
         end if
@@ -121,16 +156,15 @@ sub loadContent(content as object)
     m.list.rowHeights = rowHeights
     m.list.content = content
 
-'    if config.currentCountryCode <> config.appCountryCode then
-'        if m.global.showContentBlock = invalid then
-'            m.global.addField("showContentBlock", "boolean", true)
-'            dialog = createCbsDialog("", "Due to licensing restrictions, video is not available outside your country.", ["CLOSE"])
-'            dialog.observeField("buttonSelected", "onLicensingDialogClosed")
-'            m.global.dialog = dialog
-'       end if
-'    end if
+    if config.enableGeoBlock and config.currentCountryCode <> config.appCountryCode and not config.geoBlocked then
+        dialog = createCbsDialog("", "Due to licensing restrictions, video is not available outside your country.", ["CLOSE"])
+        dialog.observeField("buttonSelected", "onLicensingDialogClosed")
+        setGlobalField("cbsDialog", dialog)
+        
+        config.geoBlocked = true
+    end if
 
-    m.global.showSpinner = false
+    hideSpinner()
 end sub
 
 sub onLicensingDialogClosed(nodeEvent as object)
@@ -143,19 +177,16 @@ end sub
 
 sub updateContent()
     if m.top.content = invalid then
-        m.global.showSpinner = true
-        m.contentTask = createObject("roSGNode", "HomeScreenTask")
-        m.contentTask.observeField("content", "onContentLoaded")
-        m.contentTask.control = "run"
+        refreshContent()
     else
         content = {}
         content.append(m.top.content)
         rows = []
         rows.append(content.rows)
         content.rows = rows
-        user = m.global.user
+        user = getGlobalField("user")
         update = false
-        if user.showHistory.getChildCount() = 0 then
+        if user.showHistory.getChildCount() = 0 and not user.showHistory.firstLoad then
             if user.showHistory.isSameNode(rows[0]) then
                 rows.delete(0)
                 update = true
@@ -175,7 +206,7 @@ sub updateContent()
             end if
         end if
     
-        if user.continueWatching.getChildCount() = 0 then
+        if user.continueWatching.getChildCount() = 0 and not user.continueWatching.firstLoad then
             if user.continueWatching.isSameNode(rows[0]) then
                 rows.delete(0)
                 update = true
@@ -193,15 +224,20 @@ sub updateContent()
 end sub
 
 sub onContentChanged(nodeEvent as object)
-    m.global.showSpinner = true
+    showSpinner()
     loadContent(nodeEvent.getData())
 end sub
 
 sub onContentLoaded(nodeEvent as object)
     m.contentTask = invalid
-    content = nodeEvent.getData()
-    if content <> invalid then
-        m.top.content = content
+    task = nodeEvent.getRoSGNode()
+    if task.errorCode = 0 then
+        content = nodeEvent.getData()
+        if content <> invalid then
+            m.top.content = content
+        end if
+    else
+        showApiError(true)
     end if
 end sub
 
@@ -223,10 +259,18 @@ end sub
 
 sub onRowItemFocused(nodeEvent as object)
     indices = nodeEvent.getData()
-    row = m.list.content.getChild(indices[0])
-    if row <> invalid then
-        row.loadIndex = indices[1]
-    end if
+    rowIndex = indices[0]
+    itemIndex = indices[1]
+    for i = 0 to 4
+        row = m.list.content.getChild(rowIndex + i)
+        if row <> invalid then
+            if i = 0 then
+                row.loadIndex = itemIndex
+            else
+                row.loadIndex = row.itemFocused
+            end if
+        end if
+    next
 end sub
 
 sub onRowItemSelected(nodeEvent as object)
@@ -236,7 +280,7 @@ sub onRowItemSelected(nodeEvent as object)
         index = indices[1]
         item = row.getChild(index)
         if item <> invalid then
-            trackScreenAction("trackPodSelect", getOmnitureData(row, index, iif(isSubscriber(m.global), "pay", "free")))
+            trackScreenAction("trackPodSelect", getOmnitureData(row, index, iif(isSubscriber(m.top), "pay", "free")))
             if item.subtype() = "Episode" or item.subtype() = "Movie" then
                 omnitureData = getOmnitureData(row, index, "more info", "overlay")
                 m.top.additionalContext = {}
@@ -247,6 +291,14 @@ sub onRowItemSelected(nodeEvent as object)
                 additionalContext = {}
                 event = "trackContinueWatching"
                 sectionName = "continue watching"
+                omnitureData = getOmnitureData(row, index, sectionName, "resume")
+                if item.hasNewEpisodes = true then
+                    omnitureData["episodeBadge"] = "true"
+                    omnitureData["episodeBadgeLabel"] = "new"
+                else
+                    omnitureData["episodeBadge"] = "false"
+                end if
+
                 additionalContext["mediaResume"] = "true"
                 additionalContext["mediaResumeSource"] = "continue watching"
                 if row.subtype() = "ShowHistory" then
@@ -254,13 +306,21 @@ sub onRowItemSelected(nodeEvent as object)
                     sectionName = "shows you watch"
                     additionalContext["mediaResumeSource"] = "shows you watch"
                     additionalContext["mediaResumeSourceShow"] = item.title
+                    
+                    config = getGlobalField("config")
+                    if config <> invalid and config.enableTaplytics = true then
+                        taplyticsApi = getGlobalComponent("taplytics")
+                        if taplyticsApi <> invalid then
+                            taplyticsApi.callFunc("logEvent", { eventName: event, eventValue: 1 })
+                        end if
+                    end if
                 else
                     additionalContext["mediaResumeSourceShow"] = item.showName + " - " + item.title
                 end if
-                omnitureData = getOmnitureData(row, index, sectionName, "resume")
                 
                 showList = ""
-                continueWatching = m.global.user.videoHistory
+                user = getGlobalField("user")
+                continueWatching = user.videoHistory
                 if continueWatching <> invalid then
                     for i = 0 to continueWatching.getChildCount() - 1
                         episode = continueWatching.getChild(i)
@@ -276,6 +336,7 @@ sub onRowItemSelected(nodeEvent as object)
                 omnitureData["continueWatchingShowsList"] = showList
                 m.top.additionalContext = additionalContext
                 m.top.omnitureData = omnitureData
+
                 trackScreenAction(event, omnitureData)
             end if
             m.top.itemSelected = item
@@ -289,7 +350,7 @@ sub onItemSelected(nodeEvent as object)
         index = nodeEvent.getData()
         item = row.content.getChild(index)
         if item <> invalid then
-            trackScreenAction("trackPodSelect", getOmnitureData(row, index, iif(isSubscriber(m.global), "pay", "free")))
+            trackScreenAction("trackPodSelect", getOmnitureData(row, index, iif(isSubscriber(m.top), "pay", "free")))
             if item.subtype() = "Episode" or item.subtype() = "Movie" then
                 omnitureData = getOmnitureData(row, index, "more info", "overlay")
                 m.top.omnitureData = omnitureData

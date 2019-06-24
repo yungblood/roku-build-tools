@@ -102,7 +102,7 @@
                 id="watch"
                 width="305"
                 height="62"
-                text="WATCH"
+                text=""
                 textColor="0xffffff99"
                 focusedTextColor="0xffffffff"
                 backgroundUri="pkg:/images/frame_generic.9.png"

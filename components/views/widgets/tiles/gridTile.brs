@@ -44,7 +44,7 @@ sub onContentChanged()
                 m.tile = m.top.createChild("FavoriteTile")
             else if contentType = "RecentlyWatched" or contentType = "ContinueWatching" then
                 m.tile = m.top.createChild("FeaturedEpisodeTile")
-            else if m.content.subtype() = "Show" or m.content.subtype() = "RelatedShow" then
+            else if m.content.subtype() = "Show" or m.content.subtype() = "RelatedShow" or m.content.subtype() = "ShowGroupItem" then
                 m.tile = m.top.createChild("PosterTile")
             else
                 if parent.displaySeasons = true then

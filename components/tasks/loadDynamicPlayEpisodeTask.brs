@@ -4,8 +4,9 @@ end sub
 
 sub doWork()
     api = cbs()
-    api.initialize(m.global.config, m.global.user, m.global.cookies)
+    api.initialize(m.top)
 
-    episode = api.getDynamicPlayEpisode(m.top.show, m.global.user.videoHistory)
+    user = getGlobalField("user")
+    episode = api.getDynamicPlayEpisode(m.top.show, user.videoHistory)
     m.top.episode = episode
 end sub

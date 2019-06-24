@@ -1,6 +1,8 @@
 sub init()
     m.top.omnitureName = "/movies/list/"
     m.top.omniturePageType = "category_door"
+    m.top.omnitureSiteHier = "movies|other|movies listings|"
+    
     m.top.observeField("focusedChild", "onFocusChanged")
     
     m.menu = m.top.findNode("menu")
@@ -9,13 +11,15 @@ sub init()
     m.buttonFont = m.top.findNode("buttonFont")
 '    m.groups = m.top.findNode("groups")
     m.grid = m.top.findNode("grid")
+    m.grid.observeField("itemFocused", "onItemFocused")
     m.grid.observeField("itemSelected", "onItemSelected")
 
-    m.global.showSpinner = true
-    
-    m.contentTask = createObject("roSGNode", "MoviesScreenTask")
-    m.contentTask.observeField("movies", "onMoviesLoaded")
-    m.contentTask.control = "run"
+    m.movies = createObject("roSGNode", "MovieGroup")
+    m.movies.observeField("change", "onMoviesLoaded")
+    m.movies.loadIndex = 0
+    m.grid.content = m.movies
+
+    showSpinner(m.top, true)
 end sub
 
 sub onFocusChanged()
@@ -41,22 +45,22 @@ function onKeyEvent(key as string, press as boolean) as boolean
     return false
 end function
 
-sub onMoviesLoaded()
-    movies = m.contentTask.movies
-    content = createObject("roSGNode", "ContentNode")
-    content.title = "movies"
-    content.appendChildren(movies)
-    m.grid.content = content
-    
-    m.global.showSpinner = false
+sub onMoviesLoaded(nodeEvent as object)
+    hideSpinner()
+    m.movies.unobserveField("change")
 end sub
 
 sub onMenuItemSelected(nodeEvent as object)
     m.top.menuItemSelected = nodeEvent.getData()
 end sub
 
-sub onItemSelected()
-    index = m.grid.itemSelected
+sub onItemFocused(nodeEvent as object)
+    index = nodeEvent.getData()
+    m.movies.loadIndex = index
+end sub
+
+sub onItemSelected(nodeEvent as object)
+    index = nodeEvent.getData()
     movie = m.grid.content.getChild(index)
     if movie <> invalid then
         omnitureData = getOmnitureData(m.grid, index)

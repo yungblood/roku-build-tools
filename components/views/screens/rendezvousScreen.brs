@@ -1,6 +1,7 @@
 sub init()
     m.top.omnitureName = "/rendezvous/activation/enter code"
     m.top.omniturePageType = "activation"
+    m.top.omnitureSiteHier = "activation|enter code"
 
     m.background = m.top.findNode("background")
     m.logo = m.top.findNode("logo")
@@ -12,6 +13,8 @@ sub init()
     m.loadTask.observeField("upsellInfo", "onUpsellInfoLoaded")
     m.loadTask.upsellType = "rendezvous"
     m.loadTask.control = "run"
+
+    m.tts = createObject("roTextToSpeech")
 
     m.top.setFocus(true)
 end sub
@@ -51,13 +54,28 @@ sub onCodeChanged()
     m.activationCode.text = m.top.code
 end sub
 
-sub onActivationCodeLoaded()
-    m.top.code = m.codeTask.code
+sub onActivationCodeLoaded(nodeEvent as object)
+    code = nodeEvent.getData()
+    m.top.code = code
+    if createObject("roDeviceInfo").isAudioGuideEnabled() then
+        ttsCode = ""
+        for i = 0 to code.len() - 1 step 1
+            ttsCode = ttsCode + " " + code.mid(i, 1)
+        next
+
+        text = m.message1.text + " "
+        text = text + "Step 1. Visit " + m.activationUrl.text + " on your computer or mobile device "
+        text = text + "Step 2. Enter the following code "
+        text = text + ttsCode + " "
+        text = text + "Step 3. When complete this screen will refresh"
+
+        m.tts.say(text)
+    end if
 end sub
 
 sub onActivationSuccessChanged()
     if m.codeTask.success = true then
-        m.global.cookies = m.codeTask.cookies
+        setGlobalField("cookies", m.codeTask.cookies)
         
         trackScreenView(m.top.omnitureName + "/activation success")
     end if

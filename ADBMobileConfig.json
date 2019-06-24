@@ -2,9 +2,9 @@
   "version": "1.0",
   "analytics": {
     "rsids": "cnetcbscomsite",
-    "server": "om.cbsi.com",
+    "server": "saa.cbsi.com",
     "charset": "UTF-8",
-    "ssl": false,
+    "ssl": true,
     "offlineEnabled": false,
     "lifecycleTimeout": 300,
     "referrerTimeout": 0,
@@ -20,7 +20,8 @@
     "timeout": 5
   },
   "audienceManager": {
-    "server": "cbsi.demdex.net"
+    "server": "",
+    "analyticsForwardingEnabled": true
   },
   "acquisition": {
     "server": "",

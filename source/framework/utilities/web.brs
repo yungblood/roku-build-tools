@@ -53,7 +53,7 @@ Function SortQueryString(qs As String) As String
     Return outQS
 End Function
 
-Function ParseQueryString(qs As String) As Object
+Function ParseQueryString(qs As String, useUrlTransfer = false as boolean) As Object
     querystring = {}
     If qs.InStr("?") > -1 Then
         qs = qs.Mid(qs.InStr("?") + 1)
@@ -62,27 +62,41 @@ Function ParseQueryString(qs As String) As Object
     For each query in queryParts
         qsValueParts = query.Tokenize("=")
         If qsValueParts.Count() >= 2 Then
-            querystring[UrlDecode(qsValueParts[0])] = UrlDecode(qsValueParts[1])
+            querystring[UrlDecode(qsValueParts[0], useUrlTransfer)] = UrlDecode(qsValueParts[1], useUrlTransfer)
         Else
-            querystring[UrlDecode(qsValueParts[0])] = ""
+            querystring[UrlDecode(qsValueParts[0], useUrlTransfer)] = ""
         End If
     Next
     Return querystring
 End Function
 
-Function UrlEncode(str As String, formal = True As Boolean) As String
-    urlEncodeDecode = CreateObject("roUrlTransfer")
-    If formal Then
-        Return urlEncodeDecode.UrlEncode(str)
-    Else
-        Return urlEncodeDecode.Escape(str)
-    End If
+Function UrlEncode(str As String, formal = True As Boolean, useUrlTransfer = false as boolean) As String
+    urlEncodeDecode = invalid
+    if useUrlTransfer then
+        urlEncodeDecode = CreateObject("roUrlTransfer")
+    end if
+    if urlEncodeDecode = invalid then
+        Return str.encodeUriComponent()
+    else
+        If formal Then
+            Return urlEncodeDecode.UrlEncode(str)
+        Else
+            Return urlEncodeDecode.Escape(str)
+        End If
+    end if
 End Function
 
-Function UrlDecode(str As String) As String
-    urlEncodeDecode = CreateObject("roUrlTransfer")
+Function UrlDecode(str As String, useUrlTransfer = false as boolean) As String
+    urlEncodeDecode = invalid
+    if useUrlTransfer then
+        urlEncodeDecode = CreateObject("roUrlTransfer")
+    end if
     str = Replace(str, "+", " ")
-    Return urlEncodeDecode.Unescape(str)
+    if urlEncodeDecode = invalid then
+        Return str.decodeUriComponent()
+    else
+        Return urlEncodeDecode.Unescape(str)
+    end if
 End Function
 
 Function GetExtensionFromUrl(url As String) As String
@@ -128,10 +142,8 @@ Function GetUrlHeadersEx(url As String, timeout = 30 As Integer, headers = inval
     http.SetUrl(url)
     http.EnableFreshConnection(True)
     http.EnableCookies()
-    If Not IsRokuOne() Then
-        http.RetainBodyOnError(True)
-        http.EnableEncodings(True)
-    End If
+    http.RetainBodyOnError(True)
+    http.EnableEncodings(True)
     
     If Not IsNullOrEmpty(certificates) Then
         http.SetCertificatesFile(certificates)
@@ -197,10 +209,8 @@ Function GetUrlToStringEx(url As String, timeout = 30 As Integer, headers = inva
         http.SetRequest(method)
         http.EnableFreshConnection(True)
         http.EnableCookies()
-        If Not IsRokuOne() Then
-            http.RetainBodyOnError(True)
-            http.EnableEncodings(True)
-        End If
+        http.RetainBodyOnError(True)
+        http.EnableEncodings(True)
         
         If Not IsNullOrEmpty(certificates) Then
             http.SetCertificatesFile(certificates)
@@ -246,6 +256,7 @@ Function GetUrlToStringEx(url As String, timeout = 30 As Integer, headers = inva
         response.Response = ReadAsciiFile(url)
         response.ResponseCode = 200
     End If
+    response.Raw = response.Response
     Return response
 End Function
 
@@ -262,10 +273,8 @@ Function GetUrlToStringAsync(url As String, headers = invalid As Object, certifi
     http.SetRequest(method)
     http.EnableFreshConnection(True)
     http.EnableCookies()
-    If Not IsRokuOne() Then
-        http.RetainBodyOnError(True)
-        http.EnableEncodings(True)
-    End If   
+    http.RetainBodyOnError(True)
+    http.EnableEncodings(True)
          
     If Not IsNullOrEmpty(certificates) Then
         http.SetCertificatesFile(certificates)
@@ -312,10 +321,8 @@ Function GetUrlToFileEx(url As String, path As String, timeout = 30 As Integer, 
     http.SetRequest(method)
     http.EnableFreshConnection(True)
     http.EnableCookies()
-    If Not IsRokuOne() Then
-        http.RetainBodyOnError(True)
-        http.EnableEncodings(True)
-    End If
+    http.RetainBodyOnError(True)
+    http.EnableEncodings(True)
 
     If Not IsNullOrEmpty(certificates) Then
         http.SetCertificatesFile(certificates)
@@ -374,10 +381,8 @@ Function GetUrlToFileAsync(url As String, path As String, headers = invalid As O
     http.SetRequest(method)
     http.EnableFreshConnection(True)
     http.EnableCookies()
-    If Not IsRokuOne() Then
-        http.RetainBodyOnError(True)
-        http.EnableEncodings(True)
-    End If   
+    http.RetainBodyOnError(True)
+    http.EnableEncodings(True)
          
     If Not IsNullOrEmpty(certificates) Then
         http.SetCertificatesFile(certificates)
@@ -423,10 +428,8 @@ Function PostUrlToStringEx(url As String, postData = "" As String, timeout = 30 
     http.SetRequest(method)
     http.EnableFreshConnection(True)
     http.EnableCookies()
-    If Not IsRokuOne() Then
-        http.RetainBodyOnError(True)
-        http.EnableEncodings(True)
-    End If
+    http.RetainBodyOnError(True)
+    http.EnableEncodings(True)
 
     If Not IsNullOrEmpty(certificates) Then
         http.SetCertificatesFile(certificates)
@@ -468,6 +471,7 @@ Function PostUrlToStringEx(url As String, postData = "" As String, timeout = 30 
             DebugPrint(msg, "AsyncPostFromString unknown event", 0)
         End If
     End If
+    response.Raw = response.Response
     Return response
 End Function
 
@@ -484,10 +488,8 @@ Function PostUrlToStringAsync(url As String, postData = "" As String, headers = 
     http.SetRequest(method)
     http.EnableFreshConnection(True)
     http.EnableCookies()
-    If Not IsRokuOne() Then
-        http.RetainBodyOnError(True)
-        http.EnableEncodings(True)
-    End If
+    http.RetainBodyOnError(True)
+    http.EnableEncodings(True)
 
     If Not IsNullOrEmpty(certificates) Then
         http.SetCertificatesFile(certificates)
@@ -638,8 +640,8 @@ Function GetBitmapFromUrlAsync(url As String, extension = "" As String) As Strin
     Return imageUrl
 End Function
 
-Function GetUrlToJsonEx(url As String, timeout = 30 As Integer, headers = invalid As Object, certificates = "common:/certs/ca-bundle.crt" As String, certificatesDepth = -1 As Integer, method = "GET" As String) As Dynamic
-    response = GetUrlToStringEx(url, timeout, headers, certificates, certificatesDepth, method)
+Function GetUrlToJsonEx(url As String, timeout = 30 As Integer, headers = invalid As Object, certificates = "common:/certs/ca-bundle.crt" As String, certificatesDepth = -1 As Integer, method = "GET" As String, requireCertVerification = True As Boolean) As Dynamic
+    response = GetUrlToStringEx(url, timeout, headers, certificates, certificatesDepth, method, requireCertVerification)
     If response <> invalid Then
         response.Json = invalid
         If Not IsNullOrEmpty(response.Response) Then

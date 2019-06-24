@@ -159,7 +159,7 @@ End Function
 
 Function Deserialize(serializedItem As String) As Dynamic
     deserialized = invalid
-    Eval("deserialized=" + serializedItem)
+    'Eval("deserialized=" + serializedItem)
     Return deserialized
 End Function
 

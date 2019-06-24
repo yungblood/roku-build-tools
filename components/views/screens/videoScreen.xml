@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="VideoScreen" extends="BaseScreen">
     <script type="text/brightscript" uri="pkg:/components/views/screens/VideoScreen.brs" />
-    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
-
-    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
-    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
-    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
     <interface>
         <field id="control" type="string" alias="video.control" />
 
         <field id="useDai" type="boolean" value="false" />
 
         <field id="episodeID" type="string" onChange="onEpisodeIDChanged" alwaysNotify="true" />
+        <field id="episode" type="node" />
         <field id="section" type="node" />
+        <field id="buttonSelected" type="string" alwaysNotify="true" />
         <field id="additionalContext" type="assocarray" />
     </interface>
     <children>

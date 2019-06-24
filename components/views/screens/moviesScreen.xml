@@ -18,7 +18,7 @@
             id="grid"
             translation="[95,150]"
             itemComponentName="PosterTile"
-            itemSize="[266,400]"
+            itemSize="[266,399]"
             itemSpacing="[27,30]"
             numColumns="6"
             numRows="3"

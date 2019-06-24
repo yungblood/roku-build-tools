@@ -5,6 +5,7 @@
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
     <interface>
         <field id="json" type="assocarray" onChange="onJsonChanged" />
 

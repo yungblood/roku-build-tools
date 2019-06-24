@@ -20,4 +20,6 @@ sub onContentChanged(nodeEvent as object)
     shows.append(nodeEvent.getData())
     m.top.removeChildrenIndex(m.top.getChildCount(), 0)
     m.top.appendChildren(shows)
+    
+    m.top.firstLoad = false
 end sub

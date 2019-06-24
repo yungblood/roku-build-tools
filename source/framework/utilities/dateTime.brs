@@ -88,13 +88,13 @@ Function GetShortDateString(dateTime As Object) As String
     Return dateString
 End Function
 
-Function GetTimeString(dateTime As Object, format12 = True As Boolean, padDigits = False As Boolean, includeAmPm = True As Boolean) As String
+Function GetTimeString(dateTime As Object, format12 = True As Boolean, padDigits = False As Boolean, includeAmPm = True As Boolean, am = " am" as string, pm = " pm" as string) As String
     time = ""
     hours = dateTime.GetHours()
-    ampm = IIf(includeAmPm, " am", "")
+    ampm = IIf(includeAmPm, am, "")
     If hours >= 12 And format12 Then
         hours = hours - 12
-        ampm = IIf(includeAmPm, " pm", "")
+        ampm = IIf(includeAmPm, pm, "")
     End If
     If hours = 0 And format12 Then
         hours = 12

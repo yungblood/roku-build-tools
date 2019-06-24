@@ -3,14 +3,9 @@ sub init()
 
     m.top.observeField("focusedChild", "onFocusChanged")
     m.top.observeField("visible", "onVisibleChanged")
-    
-    m.heroImageUrl = ""
-    m.heroDarkenImageUrl = ""
-    m.hero = m.top.findNode("hero")
-    m.hero.observeField("opacity", "onHeroOpacityChanged")
 
-    m.heroDarken = m.top.findNode("heroDarken")
     m.heroFadeRect = m.top.findNode("heroFadeRect")
+    m.heroFadeRect.observeField("opacity", "onHeroOpacityChanged")
     m.menu = m.top.findNode("menu")
     
     m.dynamicPlay = m.top.findNode("dynamicPlay")
@@ -27,6 +22,7 @@ sub init()
     m.scrollAnimation = m.top.findNode("scrollAnimation")
     m.scrollInterp = m.top.findNode("scrollInterp")
     
+    m.firstShow = true
     m.focusSeason = ""
     m.lastFocus = m.dynamicPlay
 end sub
@@ -52,6 +48,8 @@ function onKeyEvent(key as string, press as boolean) as boolean
                 m.lastFocus = m.dynamicPlay
                 scrollList()
             end if
+        else if key = "OK" then
+            m.dynamicPlay.vilynxControl = "stop" 
         end if
     end if
     return false
@@ -62,6 +60,13 @@ sub onVisibleChanged()
         if m.show <> invalid then
             m.dynamicPlay.update = true
         end if
+        if m.firstShow then
+            m.dynamicPlay.setFocus(true)
+            scrollList()
+            m.firstShow = false
+        end if
+    else
+        m.dynamicPlay.vilynxControl = "stop"
     end if
 end sub
 
@@ -71,30 +76,34 @@ sub onShowChanged()
         if m.show <> invalid then
             pageName = "/shows/" + lCase(m.show.title)
             m.top.omnitureName = pageName
+            m.top.omnitureSiteHier = "shows|"+ lCase(m.show.categories.join(",")) + "|" + lCase(m.show.title) + "|"
             trackScreenView()
     
-            m.hero.uri = getImageUrl(m.show.heroImageUrl, m.hero.width)
             m.dynamicPlay.show = m.show
 
             rows = m.show.sections
             content = createObject("roSGNode", "ContentNode")
             
-            focusRow = -1
+            m.focusRow = -1
             rowHeights = []
             rowItemSizes = []
             for i = 0 to rows.count() - 1
                 row = rows[i]
+                
+                ' HACK: Find the row for the deep-linked episode
+                if not isNullOrEmpty(m.focusSeason) and row.title = ("Season " + m.focusSeason) then
+                    m.focusRow = i
+                    row.observeField("change", "onEpisodesLoaded")
+                end if
+
                 if row.subtype() = "Section" then
-                    row.loadIndex = 0
+                    if i <= 2 then
+                        row.loadIndex = 0
+                    end if
                     rowItemSizes.push([420, 230])
                     rowHeights.push(298)
                 end if
                 content.appendChild(row)
-                
-                ' HACK: Find the row for the deep-linked episode
-                if row.title = "Season " + m.focusSeason then
-                    focusRow = i
-                end if
             next
             ' Append the related shows row info to the end
             rowItemSizes.push([266, 400])
@@ -104,8 +113,8 @@ sub onShowChanged()
             m.list.rowHeights = rowHeights
             m.list.content = content
             
-            if focusRow > -1 then
-                m.list.jumpToItem = focusRow
+            if m.focusRow > -1 then
+                m.list.jumpToItem = m.focusRow
                 m.lastFocus = m.list
                 m.list.setFocus(true)
                 scrollList(true)
@@ -120,7 +129,7 @@ end sub
 sub onShowIDChanged(nodeEvent as object)
     showID = nodeEvent.getData()
     if not isNullOrEmpty(showID) then
-        m.global.showSpinner = true
+        showSpinner()
         m.loadTask = createObject("roSGNode", "ShowScreenTask")
         m.loadTask.observeField("content", "onContentLoaded")
         m.loadTask.showID = showID
@@ -131,7 +140,7 @@ end sub
 sub onEpisodeIDChanged(nodeEvent as object)
     episodeID = nodeEvent.getData()
     if not isNullOrEmpty(episodeID) then
-        m.global.showSpinner = true
+        showSpinner()
         m.loadTask = createObject("roSGNode", "LoadEpisodeTask")
         m.loadTask.observeField("episode", "onEpisodeLoaded")
         m.loadTask.episodeID = episodeID
@@ -143,20 +152,63 @@ sub onEpisodeLoaded(nodeEvent as object)
     episode = nodeEvent.getData()
     if episode <> invalid then
         m.focusSeason = episode.seasonNumber
+        m.focusEpisode = episode.id
         m.top.showID = episode.showID
     else
         m.top.close = true
     end if
 end sub
 
+sub onEpisodesLoaded(nodeEvent as object)
+    if m.focusRow <> invalid and m.focusRow > -1 and not isNullOrEmpty(m.focusEpisode) then
+        row = nodeEvent.getRoSGNode()
+        for i = 0 to row.getChildCount() - 1
+            episode = row.getChild(i)
+            if episode <> invalid and episode.id = m.focusEpisode then
+                row.unobserveField("change")
+                m.focusEpisode = ""
+                m.focusItem = i
+                
+                ' Delay the focus, so the row list has time to update
+                m.focusTimer = createObject("roSGNode", "Timer")
+                m.focusTimer.observeField("fire", "onFocusTimerFired")
+                m.focusTimer.duration = .5
+                m.focusTimer.control = "start"
+                exit for
+            end if
+        next
+    end if
+end sub
+
+sub onFocusTimerFired()
+    m.focusTimer = invalid
+    if m.focusRow <> invalid and m.focusItem <> invalid then
+        ?"JUMPING TO: ", [m.focusRow, m.focusItem]
+        m.list.jumpToRowItem = [m.focusRow, m.focusItem]
+        if m.top.autoplay then
+            row = m.list.content.getChild(m.focusRow)
+            if row <> invalid then
+                selectItem(row, m.focusItem)
+            end if
+        end if
+    end if
+end sub
+
 sub onContentChanged()
-    m.global.showSpinner = true
+    showSpinner()
     loadContent(m.top.content)
 end sub
 
 sub onContentLoaded(nodeEvent as object)
     content = nodeEvent.getData()
-    m.top.content = nodeEvent.getData()
+    task = nodeEvent.getRoSGNode()
+    if not content.isEmpty() then
+        m.top.content = nodeEvent.getData()
+    else if task.errorCode > 0 then
+        showApiError(true)
+    else
+        m.top.close = true
+    end if
 end sub
 
 sub loadContent(content as object)
@@ -173,13 +225,13 @@ sub loadContent(content as object)
 end sub
 
 sub onDynamicPlayLoaded()
-    m.global.showSpinner = false
+    hideSpinner()
 end sub
 
 sub scrollList(forceScroll = false as boolean)
     if forceScroll or m.list.isInFocusChain() then
         m.scrollInterp.keyValue = [m.list.translation, [0, 46]]
-        if m.hero.visible then
+        if m.heroFadeRect.opacity = 0 then
             m.fadeOutAnimation.appendChild(m.scrollAnimation)
             m.fadeOutAnimation.control = "start"
         else
@@ -192,23 +244,33 @@ sub scrollList(forceScroll = false as boolean)
     end if
 end sub
 
-sub onHeroOpacityChanged()
-    m.hero.visible = (m.hero.opacity > 0)
+sub onHeroOpacityChanged(nodeEvent as object)
+    opacity = nodeEvent.getData()
+    if opacity = 1 then
+        m.dynamicPlay.vilynxControl = "pause"
+    else if opacity = 0 then
+        m.dynamicPlay.vilynxControl = "resume"
+    end if
 end sub
 
 sub onRowItemFocused(nodeEvent as object)
     indices = nodeEvent.getData()
-    row = m.list.content.getChild(indices[0])
-    if row <> invalid then
-        row.loadIndex = indices[1]
-    end if
+    rowIndex = indices[0]
+    itemIndex = indices[1]
+    for i = 0 to 4
+        row = m.list.content.getChild(rowIndex + i)
+        if row <> invalid then
+            if i = 0 then
+                row.loadIndex = itemIndex
+            else
+                row.loadIndex = row.itemFocused
+            end if
+        end if
+    next
 end sub
 
-sub onRowItemSelected(nodeEvent as object)
-    indices = nodeEvent.getData()
-    row = m.list.content.getChild(indices[0])
+sub selectItem(row as object, index = 0 as integer)
     if row <> invalid then
-        index = indices[1]
         item = row.getChild(index)
         if item <> invalid then
             if item.subtype() = "RelatedShow" then
@@ -220,8 +282,18 @@ sub onRowItemSelected(nodeEvent as object)
                 m.top.omnitureData = omnitureData
                 trackScreenAction("trackPodSelect", omnitureData)
             end if
+            m.dynamicPlay.vilynxControl = "stop"
             m.top.itemSelected = item
         end if
+    end if
+end sub
+
+sub onRowItemSelected(nodeEvent as object)
+    indices = nodeEvent.getData()
+    row = m.list.content.getChild(indices[0])
+    if row <> invalid then
+        index = indices[1]
+        selectItem(row, index)
     end if
 end sub
 
@@ -246,7 +318,8 @@ sub onButtonSelected(nodeEvent as object)
         end if
     else
         if button = "favorite" then
-            favorites = m.global.user.favorites
+            user = getGlobalField("user")
+            favorites = user.favorites
             if isFavorite(m.top.showID, favorites) then
                 trackScreenAction("trackMyCBSRemove", getOmnitureData(row, -1, "remove from mycbs"))
             else

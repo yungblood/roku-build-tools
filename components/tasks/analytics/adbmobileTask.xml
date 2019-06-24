@@ -23,6 +23,7 @@
   <interface>
   	<field id="adbmobileApiCall" type="assocarray"/>
     <field id="adbmobileApiResponse" type="assocarray"/>
+    <field id="syncIdentifier" type="string"/>
   </interface>
 
   <!-- Replace with correct location if needed -->

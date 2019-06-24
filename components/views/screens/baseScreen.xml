@@ -3,10 +3,12 @@
     <script type="text/brightscript" uri="pkg:/components/views/screens/baseScreen.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/omniture.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/constants.brs" />
     <script type="text/brightscript" uri="pkg:/components/services/adobe/adbmobile.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/device.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/encryption.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/debug.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
@@ -14,6 +16,7 @@
     <interface>
         <field id="omnitureName" type="string" />
         <field id="omniturePageType" type="string" />
+        <field id="omnitureSiteHier" type="string" />
         <field id="omnitureData" type="assocarray" />
 
         <field id="close" type="boolean" alwaysNotify="true" />

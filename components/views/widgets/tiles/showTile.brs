@@ -13,7 +13,8 @@ sub onContentChanged()
     show = m.top.itemContent
     if show <> invalid then
         if show.subtype() = "Favorite" then
-            show = m.global.showCache[show.showID]
+            showCache = getGlobalField("showCache")
+            show = showCache[show.showID]
         end if
         m.title.text = uCase(show.title)
         m.poster.uri = getImageUrl(show.browseImageUrl, m.poster.width)

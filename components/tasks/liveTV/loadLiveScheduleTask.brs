@@ -5,12 +5,12 @@ end sub
 sub doWork()
     schedule = []
     if not isNullOrEmpty(m.top.scheduleUrl) then
-        config = m.global.config
+        config = getGlobalField("config")
         scheduleUrl = m.top.scheduleUrl
         if scheduleUrl.mid(0, 4) <> "http" then
             ' This is a proxied url, get the schedule json from the cbs api
             api = cbs()
-            api.initialize(config, m.global.user, m.global.cookies)
+            api.initialize(m.top)
             scheduleJson = api.makeRequest(api.apiBaseUrl + scheduleUrl, "GET")
             schedule = parseScheduleJson(scheduleJson)
         else

@@ -6,7 +6,10 @@
         <field id="width" type="float" onChange="updateLayout" />
         <field id="height" type="float" onChange="updateLayout" />
         <field id="padding" type="float" value="10" onChange="updateLayout" />
-        
+
+        <field id="tts" type="string" />
+        <field id="ttsComponentType" type="string" value="textbox" />
+
         <field id="horizAlign" type="string" onChange="onHorizAlignChanged" />
         <field id="vertAlign" type="string" onChange="onVertAlignChanged" />
         <field id="hintHorizAlign" type="string" onChange="onHintHorizAlignChanged" />

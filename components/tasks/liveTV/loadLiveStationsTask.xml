@@ -3,6 +3,9 @@
     <script type="text/brightscript" uri="pkg:/components/tasks/liveTV/loadLiveStationsTask.brs" />
     <script type="text/brightscript" uri="pkg:/components/services/syncbak.brs" />
     <interface>
-        <field id="stations" type="nodearray" />
+        <field id="loadChannels" type="boolean" value="true" />
+        <field id="canOverride" type="boolean" />
+        <field id="liveTVChannels" type="node" />
+        <field id="stations" type="nodearray" alwaysNotify="true" />
     </interface>
 </component>

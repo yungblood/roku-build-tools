@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name = "VilynxPreview" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/views/widgets/vilynx/vilynxPreview.brs" />
+
+    <interface>
+        <field id="width" type="float" onChange="updateLayout" />
+        <field id="height" type="float" onChange="updateLayout" />
+
+        <field id="thumbnailUri" type="string" onChange="onThumbnailUriChanged" />
+        <field id="heroUri" type="string" />
+        <field id="videoUri" type="string" onChange="onVideoUriChanged" />
+        <field id="videoState" type="string" alwaysNotify="true" />
+        <field id="control" type="string" onChange="onControlChanged" alwaysNotify="true" />
+
+        <field id="shadeOpacity" type="float" alias="shade.opacity" />
+    </interface>
+
+    <children>
+        <Video
+            id="videoPreview"
+            enableUI="false"
+            enableTrickPlay="false"
+            notificationInterval=".5" />
+        <FadeInPoster
+            id="hero"
+            width="1920"
+            height="1080"
+            loadDisplayMode="scaleToZoom" />
+        <Poster
+            id="heroDarken"
+            uri="pkg:/images/show-hero-darken_480.png" 
+            width="1920"
+            height="1080"/>
+
+        <Rectangle
+            id="shade"
+            color="0x000000ff"
+            opacity="0.0"/>
+
+        <Animation
+            id="fadeInAnimation"
+            repeat="false">
+            <FloatFieldInterpolator
+                key="[0.0,1.0]"
+                keyValue="[0.0,1.0]"
+                fieldToInterp="hero.opacity"/>
+        </Animation>
+        <Animation
+            id="fadeOutAnimation"
+            repeat="false">
+            <FloatFieldInterpolator
+                key="[0.0,1.0]"
+                keyValue="[1.0,0.0]"
+                fieldToInterp="hero.opacity"/>
+        </Animation>
+    </children>
+</component>

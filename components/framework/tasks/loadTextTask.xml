@@ -10,6 +10,7 @@
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/device.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/application.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/cookies.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
 
     <interface>
         <field id="uri" type="string" />

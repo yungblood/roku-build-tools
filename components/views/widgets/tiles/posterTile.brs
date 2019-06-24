@@ -4,12 +4,16 @@ sub init()
 
     m.whiteRect = m.top.findNode("whiteRect")
     m.blackRect = m.top.findNode("blackRect")
+    
+    m.badge = m.top.findNode("badge")
+    m.badgeText = m.top.findNode("badgeText")
 end sub
 
 sub onContentChanged()
     m.content = m.top.itemContent
     if m.content <> invalid then
         m.title.text = uCase(m.content.title)
+        m.badge.visible = (m.content.hasNewEpisodes = true)
         updatePoster()
     end if
 end sub
@@ -21,6 +25,9 @@ sub updateLayout()
             m.poster.height = m.top.height
             m.title.width = m.top.width - 40
             m.title.height = m.top.height - 40
+            
+            m.badge.width = m.top.width
+            m.badgeText.width = m.top.width
             
             m.whiteRect.width = m.top.width - 2
             m.whiteRect.height = m.top.height - 2

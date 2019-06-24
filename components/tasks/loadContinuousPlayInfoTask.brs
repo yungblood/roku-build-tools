@@ -4,11 +4,12 @@ end sub
 
 sub doWork()
     api = cbs()
-    api.initialize(m.global.config, m.global.user, m.global.cookies)
+    api.initialize(m.top)
     episode = m.top.episode
     
     segmentID = "default_free_all_platforms"
-    if m.global.user.isSubscriber then
+    user = getGlobalField("user")
+    if user.isSubscriber then
         segmentID = "default_paid_all_platforms"
     end if
     cpInfo = api.getContinuousPlayInfo(episode.id, episode.showID, segmentID)

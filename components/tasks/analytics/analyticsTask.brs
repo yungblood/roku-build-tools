@@ -3,8 +3,7 @@ sub init()
 end sub
 
 sub doWork()
-    'setLogLevel(6)
-    config = m.global.config
+    config = getGlobalField("config")
 
     m.port = createObject("roMessagePort")
     if config.enableDW then
@@ -16,12 +15,20 @@ sub doWork()
     m.top.observeField("omnitureParams", m.port)
     m.top.observeField("debugParams", m.port)
     m.top.observeField("control", m.port)
-    m.global.observeField("user", m.port)
+    observeGlobalField("user", m.port)
 
-    user = m.global.user
+    user = getGlobalField("user")
     dw().setUserInfo(user.id, user.trackingStatus)
+
+    sparrow().initialize(config.sparrowUrl)
     sparrow().setUserID(user.id)
+
     omniture().initialize(config.omnitureSuiteID, user.id, user.trackingStatus, user.trackingProduct, config.omnitureEvar5)
+    
+    spotX().initialize(getPersistedDeviceID(), config.spotXBaseUrl, config.spotXPageUrl)
+    campaignValue = spotX().getCampaign()
+    setGlobalField("spotXCampaign", campaignValue)
+    
     while true
         msg = wait(0, m.port)
         if msg <> invalid then

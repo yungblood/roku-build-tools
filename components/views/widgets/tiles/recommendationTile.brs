@@ -15,22 +15,45 @@ sub onFocusChanged()
     if m.top.hasFocus() then
         m.ctaButton.setFocus(true)
     end if
-    m.countdown.visible = m.top.isInFocusChain()
 end sub
 
 sub onContentChanged()
     if m.content = invalid or not m.content.isSameNode(m.top.itemContent) then
         m.content = m.top.itemContent
         if m.content <> invalid then
-            m.title.text = m.content.title
-            m.subtitle.text = m.content.subtitle
-            m.poster.uri = getImageUrl(m.content.thumbnailUrl, m.poster.width)
-            m.ctaButton.text = m.content.callToAction
+            if m.content.subtype() = "Episode" then
+                m.title.text = m.content.title
+                m.subtitle.text = (m.content.seasonString + " " + m.content.episodeString).trim()
+
+                showCache = getGlobalField("showCache")
+                show = showCache[m.content.showID]
+                if show <> invalid then
+                    m.poster.uri = getImageUrl(show.myCbsImageUrl, m.poster.width)
+                else
+                    m.poster.uri = getImageUrl(m.content.thumbnailUrl, m.poster.width)
+                end if
+
+                if canWatch(m.content, m.top) then
+                    m.ctaButton.text = "WATCH NOW"
+                else
+                    m.ctaButton.text = "SUBSCRIBE TO WATCH"
+                end if
+            else
+                m.title.text = m.content.title
+                m.subtitle.text = m.content.subtitle
+                m.poster.uri = getImageUrl(m.content.thumbnailUrl, m.poster.width)
+                m.ctaButton.text = m.content.callToAction
+            end if
         end if
     end if
 end sub
 
 sub onCountdownChanged()
-    m.countdownLabel.text = m.top.countdown.toStr()
+    'if m.content.subtype() <> "Episode" or canWatch(m.content, m.top) then
+        m.countdownLabel.text = m.top.countdown.toStr()
+        m.countdown.visible = m.top.isInFocusChain()
+    'else
+    '    m.countdown.visible = false
+    'end if
 end sub
 

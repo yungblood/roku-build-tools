@@ -36,6 +36,7 @@
         <field id="adParams" type="assocarray" />
         <field id="vmapUrl" type="string" />
         <field id="videoStream" type="node" />
+        <field id="premiumAudioAvailable" type="boolean" />
 
         <field id="seasonString" type="string" />
         <field id="episodeString" type="string" />

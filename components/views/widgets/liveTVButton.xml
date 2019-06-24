@@ -3,6 +3,7 @@
     <script type="text/brightscript" uri="pkg:/components/views/widgets/liveTVButton.brs" />
     <interface>
         <field id="station" type="node" onChange="onStationChanged" />
+        <field id="selected" type="boolean" onChange="onSelectedChanged" />
     </interface>
     <children>
         <LayoutGroup
@@ -12,5 +13,9 @@
             <Poster
                 id="logo" />
         </LayoutGroup>
+        <Poster
+            id="frame"
+            uri="pkg:/images/frame_generic.9.png"
+            opacity=".5" />
     </children>
 </component>

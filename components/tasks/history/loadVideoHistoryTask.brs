@@ -4,7 +4,7 @@ end sub
 
 sub doWork()
     api = cbs()
-    api.initialize(m.global.config, m.global.user, m.global.cookies)
+    api.initialize(m.top)
     
     m.top.history = api.getVideoHistory(1, 50)
 end sub

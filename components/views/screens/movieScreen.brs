@@ -25,7 +25,7 @@ sub onFocusChanged()
 end sub
 
 sub onMovieIDChanged()
-    m.global.showSpinner = true
+    showSpinner()
 
     m.loadTask = createObject("roSGNode", "LoadMovieTask")
     m.loadTask.observeField("movie", "onMovieLoaded")
@@ -34,16 +34,25 @@ sub onMovieIDChanged()
 end sub
 
 sub onMovieLoaded(nodeEvent as object)
-    m.top.movie = nodeEvent.getData()
+    movie = nodeEvent.getData()
+    task = nodeEvent.getRoSGNode()
+    if movie <> invalid then
+        m.top.movie = movie
+    else if task.errorCode > 0 then
+        showApiError(true)
+    else
+        m.top.close = true
+    end if
     m.loadTask = invalid
 end sub
 
 sub onMovieChanged()
-    m.global.showSpinner = false
+    hideSpinner()
     movie = m.top.movie
     if movie <> invalid then
         pageName = "/movies/" + lCase(movie.title)
         m.top.omnitureName = pageName
+        m.top.omnitureSiteHier = "movies|" + lCase(movie.title)
         trackScreenView()
 
         m.movieTitle.text = movie.title
@@ -61,7 +70,7 @@ sub onMovieChanged()
             m.top.buttonSelected = m.watch.id
         end if
         
-        if canWatch(movie, m.global) then
+        if canWatch(movie, m.top) then
             m.watch.text = "WATCH"
         else
             m.watch.text = "SUBSCRIBE TO WATCH"
@@ -71,7 +80,7 @@ sub onMovieChanged()
     else        
         dialog = createCbsDialog("Content Unavailable", "The content you are trying to play is currently unavailable. Please try again later.", ["OK"])
         dialog.observeField("buttonSelected", "onUnavailableDialogClosed")
-        m.global.dialog = dialog
+        setGlobalField("cbsDialog", dialog)
     end if
 end sub
 

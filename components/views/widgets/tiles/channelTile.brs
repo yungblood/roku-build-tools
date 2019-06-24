@@ -1,4 +1,5 @@
 sub init()
+    m.background = m.top.findNode("background")
     m.logo = m.top.findNode("logo")
     m.showTitle = m.top.findNode("showTitle")
     m.focusFrame = m.top.findNode("focusFrame")
@@ -100,5 +101,24 @@ sub updateNowPlaying()
         if nowPlaying.subtype() = "Program" or isNullOrEmpty(m.showTitle.text) then
             m.showTitle.text = nowPlaying.title
         end if
+    end if
+end sub
+
+sub updateLayout()
+    if m.top.width > 0 and m.top.height > 0 then
+        m.background.width = m.top.width
+        m.background.height = m.top.height
+        
+        m.focusFrame.width = m.top.width
+        m.focusFrame.height = m.top.height
+        
+        m.logo.width = m.top.width
+        
+        m.error.width = m.top.width - (m.error.translation[0] * 2)
+        
+        m.showTitle.translation = [m.showTitle.translation[0], m.top.height - 75]
+        m.showTitle.width = m.top.width - (m.showTitle.translation[0] * 2)
+        
+        m.liveNow.translation = [m.top.width - m.liveNow.width, m.liveNow.translation[1]]
     end if
 end sub

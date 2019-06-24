@@ -40,7 +40,8 @@ sub onContentUpdated(change as object)
         index = change.index1
         item = m.content.getChild(index)
         if item <> invalid then
-            history = m.global.user.videoHistory
+            user = getGlobalField("user")
+            history = user.videoHistory
             historyItem = getChildByID(item.id, history)
             if historyItem <> invalid then
                 item.resumePoint = historyItem.resumePoint

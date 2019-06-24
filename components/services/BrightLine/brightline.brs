@@ -3,13 +3,13 @@ function BrightLine_APILoad() as Boolean
 
     ' Retrieve local storage segments; make Manifest call; and load BrightLineDirect.pkg
     print "Brightline_APILoad"
-    config = m.global.config
+    config = getGlobalField("config")
         
     REM This is where the component library is loaded. 
     m.adlib = createObject("roSGNode", "ComponentLibrary")
     m.brightlineLoaded = false
     m.adlib.observeField("loadStatus", "BrightLineAPI_LoadStatus")
-    m.adlib.setField("uri", m.global.config.brightLinePkg)
+    m.adlib.setField("uri", config.brightLinePkg)
         
     return true
     
@@ -18,24 +18,27 @@ end function
 function BrightLine_ManifestLoad() as Object
     ' Get the configuration service object.    
     data = {}
-    configurationServiceURL = m.global.config.brightLineUrl + m.global.config.brightLineID
+    config = getGlobalField("config")
+    configurationServiceURL = config.brightLineUrl + config.brightLineID
     
     di = CreateObject("roDeviceInfo")
     displaySize = di.GetDisplaySize()
     
     deviceInfo = {
-        "configId": m.global.config.brightLineID
+        "configId": config.brightLineID
         "os":"roku"
         "osVersion":di.GetVersion()
         "appSessionID":di.GetRandomUUID()
         "adSessionID":di.GetRandomUUID()
         "applicationName":"CBS" 
-        "deviceUUID":di.GetDeviceUniqueId()
+' SMK: Patched for future compatability
+'        "deviceUUID":di.GetDeviceUniqueId()
+        "deviceUUID":di.getChannelClientID()
         "platformName":"roku"
         "mobileCarrier":"NA" 
         "manufacturer":"roku", 
         "advertisingIdentifier":di.GetAdvertisingId()
-        "applicationIdentifier": m.global.config.registrySection
+        "applicationIdentifier": config.registrySection
         "applicationVersion":"1" 
         "sdkVersion":"2.0.0" 
         "deviceModel":di.GetModel()
@@ -81,8 +84,9 @@ function BrightLineAPI_LoadStatus(msg) as void
             m.BrightLineDirect.observeField("state", "onBrightLineDirectStateChange")
             
             ' Observe the "event" listener.
+            brightline = getGlobalField("brightline")
             m.BrightLineDirect.observeField("event", "onBrightLineAPI_event")
-            m.BrightLineDirect.configJSON =  m.global.brightline.manifest
+            m.BrightLineDirect.configJSON =  brightline.manifest
 
             m.brightlineLoaded = true
             'Add BrightLineDirect to a view (the view in scope, in this case)
@@ -110,8 +114,10 @@ function onBrightLineDirectStateChange(msg)
     if m.BrightLineDirect.state = "exited" then
         m.BrightLineDirect.visible = false
         m.BrightLineDirect.setFocus(false)
-        m.global.brightline.inAd = false
-        m.global.brightline.adExited = true
+
+        brightline = getGlobalField("brightline")
+        brightline.inAd = false
+        brightline.adExited = true
     endif
 endfunction
 

@@ -4,6 +4,7 @@
     <interface>
         <field id="itemContent" type="node" onChange="onItemContentChanged" />
         <field id="uri" type="string" onChange="onUriChanged" />
+        <field id="failedBitmapUri" type="string" onChange="onFailedBitmapUriChanged" />
         <field id="width" type="float" />
         <field id="height" type="float" />
         <field id="loadWidth" type="float" />

@@ -8,6 +8,9 @@ sub onJsonChanged()
         m.top.parentStationID = json.parentStationID
         m.top.mediaID = json.mediaID
         m.top.title = json.name
+        if isNullOrEmpty(m.top.title) then
+            m.top.title = json.callSign
+        end if
         m.top.description = json.description
         m.top.closedCaptions = json.supportsClosedCaptions
         m.top.scheduleUrl = json.scheduleUrl
@@ -21,10 +24,26 @@ sub onJsonChanged()
         m.top.token = json.token
         
         m.top.trackingID = json.stationId
-        m.top.trackingTitle = json.name + "-liveTV"
-        m.top.convivaTrackingTitle = json.name + "-LiveTV"
-        m.top.omnitureTrackingTitle = json.name + "-LiveTV"
+        m.top.trackingTitle = m.top.title + "-LiveTV"
+        m.top.convivaTrackingTitle = m.top.title + "-LiveTV"
+        m.top.omnitureTrackingTitle = m.top.title + "-LiveTV"
         m.top.comscoreTrackingTitle = m.top.trackingTitle
-        m.top.trackingContentID = ""
+        m.top.trackingContentID = "_55cL7EscO2mdFcpsZVcQ3VtXNA5bcA_"
+        
+        location = json.city
+        if not isNullOrEmpty(json.state) then
+            if not isNullOrEmpty(location) then
+                location = location + ", "
+            end if
+            location = location + json.state
+        end if
+        if isNullOrEmpty(location) then
+            location = json.market
+        end if
+        m.top.location = location
+        
+        if isNullOrEmpty(m.top.description) then
+            m.top.description = m.top.location
+        end if
     end if
 end sub

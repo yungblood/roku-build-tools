@@ -1,3 +1,23 @@
+sub showSpinner(context = m.top as object, ignoreContextVisibility = false as boolean)
+    if ignoreContextVisibility or context.visible then
+        debugPrint(context.subtype(), "showSpinner()", 0)
+        scene = context.getScene()
+        if scene <> invalid then
+            scene.callFunc("showLoading")
+        end if
+    end if
+end sub
+
+sub hideSpinner(context = m.top as object, ignoreContextVisibility = false as boolean)
+    if ignoreContextVisibility or context.visible then
+        debugPrint(context.subtype(), "hideSpinner()", 0)
+        scene = context.getScene()
+        if scene <> invalid then
+            scene.callFunc("hideLoading")
+        end if
+    end if
+end sub
+
 function createCbsDialog(title as string, message as string, buttons = [] as object, autoClose = false as boolean) as object
     dialog = createObject("roSGNode", "CbsDialog")
     dialog.title = title
@@ -8,50 +28,65 @@ function createCbsDialog(title as string, message as string, buttons = [] as obj
 end function
 
 sub sendDWAnalytics(params as object)
-    if m.global.analytics <> invalid then
-        m.global.analytics.dwParams = params
+    analytics = getGlobalField("analytics")
+    if analytics <> invalid then
+        analytics.dwParams = params
     end if
 end sub
 
 sub sendSparrowAnalytics(params as object)
-    if m.global.analytics <> invalid then
-        m.global.analytics.sparrowParams = params
+    analytics = getGlobalField("analytics")
+    if analytics <> invalid then
+        analytics.sparrowParams = params
     end if
 end sub
 
 function getImageUrl(baseUrl as string, width = 0 as integer, height = 0 as integer) as string
     width = int(width / (1920 / createObject("roDeviceInfo").getUIResolution().width))
-    photoImageEndpoint = "http://wwwimage.cbsstatic.com/thumbnails/photos/[WIDTH]/[HEIGHT]"
-    videoImageEndpoint = "http://wwwimage.cbsstatic.com/thumbnails/videos/[WIDTH]/[HEIGHT]"
+    photoImageEndpoint = "http://wwwimage.cbsstatic.com/thumbnails/photos/[WIDTHxHEIGHT]"
+    videoImageEndpoint = "https://thumbnails.cbsig.net/_x/[WIDTH]/[HEIGHT]"
     url = baseUrl
     if baseUrl <> invalid and baseUrl <> "" then
-        if baseUrl.inStr("http://thumbnails.cbsig.net") > -1 then
-            url = baseUrl.replace("http://thumbnails.cbsig.net", videoImageEndpoint)
-        else if baseUrl.inStr("files/") > -1 then
+'        if baseUrl.inStr("http://thumbnails.cbsig.net") > -1 then
+'            url = baseUrl.replace("http://thumbnails.cbsig.net", videoImageEndpoint)
+'        else 
+        if baseUrl.inStr("files/") > -1 then
             url = photoImageEndpoint + url.mid(url.inStr(8, "files/") + 6)
+            resize = ""
+            if width > 0 then
+                resize = "w" + width.toStr()
+            end if
+            if height > 0 then
+                if not isNullOrEmpty(resize) then
+                    resize = resize + "-"
+                end if
+                resize = resize + "h" + height.toStr()
+            end if
+            url = url.replace("[WIDTHxHEIGHT]", resize)
         else
             url = videoImageEndpoint + url.mid(url.inStr(8, "/") + 1)
-        end if
-        if width = 0 then
-            url = url.replace("[WIDTH]", "")
-        else
-            url = url.replace("[WIDTH]", "w" + width.toStr())
-        end if
-        if height = 0 then
-            url = url.replace("[HEIGHT]", "")
-        else
-            url = url.replace("[HEIGHT]", "h" + height.toStr())
+            if width = 0 then
+                url = url.replace("[WIDTH]", "")
+            else
+                url = url.replace("[WIDTH]", "w" + width.toStr())
+            end if
+            if height = 0 then
+                url = url.replace("[HEIGHT]", "")
+            else
+                url = url.replace("[HEIGHT]", "h" + height.toStr())
+            end if
         end if
     end if
     return url
 end function
 
 function isSubscriber(context as object) as boolean
-    return isAuthenticated(context) and m.global.user.isSubscriber
+    user = getGlobalField("user", context)
+    return isAuthenticated(context) and user.isSubscriber
 end function
 
 function isAuthenticated(context as object) as boolean
-    cookies = context.cookies
+    cookies = getGlobalField("cookies", context)
     if not isNullOrEmpty(cookies) then
         return cookies.inStr("CBS_COM=") > -1
     end if
@@ -98,7 +133,7 @@ function addFavorite(showID as string, favorites as object) as boolean
 end function
 
 sub toggleFavorite(showID as string, context as object)
-    user = context.user
+    user = getGlobalField("user", context)
     if user <> invalid then
         favorites = user.favorites
         if isFavorite(showID, favorites) then
@@ -236,6 +271,8 @@ function parseScheduleJson(json as object) as object
             end if
         else if json.navigation <> invalid then
             items = json.navigation.data
+        else if json.playlists <> invalid and asArray(json.playlists).count() > 0 then
+            items = json.playlists[0].items
         end if
         if items <> invalid then
             for each item in items
@@ -248,4 +285,111 @@ function parseScheduleJson(json as object) as object
         end if
     end if
     return schedule
+end function
+
+function createKeyPadDialog(title as string, message as string, text = "" as string, buttons = ["OK"]) as object
+    dialog = createMessageDialog(title, message, buttons, "KeyPadDialog")
+    dialog.width = 900
+    dialog.text = text
+    return dialog
+end function
+
+sub addGlobalField(field as string, fieldType as string, alwaysNotify = false as boolean, context = m.top as object)
+    scene = context.getScene()
+    if scene <> invalid then
+        scene.addField(field, fieldType, alwaysNotify)
+        return
+    end if
+    globalNode = m.global
+    if globalNode <> invalid then
+        globalNode.addField(field, fieldType, alwaysNotify)
+    end if
+end sub
+
+function getGlobalField(field as string, context = m.top as object) as object
+    scene = context.getScene()
+    if scene <> invalid and scene.hasField(field) then
+        return scene.getField(field)
+    end if
+    globalNode = m.global
+    if globalNode <> invalid and globalNode.hasField(field) then
+        return globalNode.getField(field)
+    end if
+    return invalid
+end function
+
+sub setGlobalField(field as string, value as dynamic, context = m.top as object)
+    scene = context.getScene()
+    if scene <> invalid and scene.hasField(field) then
+        scene.setField(field, value)
+        return
+    end if
+    globalNode = m.global
+    if globalNode <> invalid and globalNode.hasField(field) then
+        globalNode.setField(field, value)
+    end if
+end sub
+
+function getGlobalComponent(id as string, context = m.top as object) as object
+    scene = context.getScene()
+    if scene <> invalid then
+        return scene.findNode(id)
+    end if
+    globalNode = m.global
+    if globalNode <> invalid then
+        return globalNode.findNode(id)
+    end if
+    return invalid
+end function
+
+sub observeGlobalField(field as string, callbackOrPort as object, context = m.top as object)
+    scene = context.getScene()
+    if scene <> invalid and scene.hasField(field) then
+        scene.observeField(field, callbackOrPort)
+        return
+    end if
+    globalNode = m.global
+    if globalNode <> invalid and globalNode.hasField(field) then
+        globalNode.observeField(field, callbackOrPort)
+    end if
+end sub
+
+sub showApiError(closeApp = true as boolean)
+    dialog = createCbsDialog("Error", "Uh-oh. An error has occurred, but we're working on fixing it. We'll be up and streaming again shortly!", ["OK"])
+    if closeApp then
+        dialog.observeField("buttonSelected", "onFatalError")
+    else
+        dialog.observeField("buttonSelected", "onApiErrorDialogClosed")
+    end if
+    setGlobalField("cbsDialog", dialog)
+    hideSpinner()
+end sub
+
+sub onApiErrorDialogClosed(nodeEvent as object)
+    dialog = nodeEvent.getRoSGNode()
+    dialog.close = true
+end sub
+
+sub onFatalError()
+    setGlobalField("close", true)
+end sub
+
+sub trackRMFEvent(eventName as string)
+    correlator = getGlobalField("correlator")
+    rac = getGlobalField("rac")
+    if rac = invalid then
+        rac = createObject("roSGNode", "Roku_Analytics:AnalyticsNode")
+        rac.debug = true
+        rac.init = { RED: {} }
+        setGlobalField("rac", rac)
+    end if
+    if not isNullOrEmpty(correlator) then
+        rac.trackEvent = { RED: { eventName: eventName, correlator: correlator } }
+    else
+        rac.trackEvent = { RED: { eventName: eventName } }
+    end if
+end sub
+
+function getPersistedDeviceID() as string
+    return getGlobalField("deviceID")
 end function

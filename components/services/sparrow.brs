@@ -12,16 +12,14 @@ function newSparrow() as object
     this.requests               = []
 
     this.debug                  = false
-    this.staging                = true 'false
+    this.staging                = false
     this.userID                 = ""
     this.siteID                 = 164
     this.playerID               = ""
     this.platform               = "roku"
     this.lastTimestamp          = 0
-    
-    this.baseBeaconUrl          = "http://sparrow.cbs.com/streamer/v1.0/ingest/beacon.json"
-    this.baseStagingBeaconUrl   = "http://stage-sparrow.cbs.com/streamer/v1.0/ingest/beacon.json"
-    
+
+    this.initialize             = sparrow_initialize
     this.setUserID              = sparrow_setUserID
     this.setSiteID              = sparrow_setSiteID
     
@@ -36,6 +34,10 @@ function newSparrow() as object
     return this
 end function
 
+sub sparrow_initialize(url as string)
+    m.baseUrl = url
+end sub
+
 sub sparrow_setUserID(userID as string)
     m.userID = userID
 end sub
@@ -46,7 +48,7 @@ end sub
 
 sub sparrow_playerInit(generateNewPlayerID = true as boolean)
     if isNullOrEmpty(m.playerID) or generateNewPlayerID then
-        m.playerID = md5Hash(getDeviceID() + nowDate().asSeconds().toStr())
+        m.playerID = md5Hash(getPersistedDeviceID() + nowDate().asSeconds().toStr())
     end if
 end sub
 
@@ -115,17 +117,7 @@ sub sparrow_processRequests(timeout = 5000 as integer, blockUntilComplete = fals
 end sub
 
 sub sparrow_sendRequest(data = {} as object, isBeacon = false as boolean)
-setLogLevel(3)
-    url = m.baseBeaconUrl
-    if isBeacon then
-        url = m.baseBeaconUrl
-    end if
-    if m.staging then
-        url = m.baseStagingBeaconUrl
-        if isBeacon then
-            url = m.baseStagingBeaconUrl
-        end if
-    end if
+    url = m.baseUrl
     
     for each key In data
         url = addQueryString(url, key, data[key])

@@ -37,7 +37,7 @@ sub onContentChanged(nodeEvent as object)
     favorites = []
     favorites.append(nodeEvent.getData())
     if favorites.count() > 0 then
-        shows = m.global.showCache
+        shows = getGlobalField("showCache")
         for i = favorites.count() - 1 to 0 step -1
             favorite = favorites[i]
             if favorite <> invalid then

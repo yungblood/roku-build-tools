@@ -6,6 +6,7 @@
     <script type="text/brightscript" uri="pkg:/components/services/sparrow.brs" />
     <script type="text/brightscript" uri="pkg:/components/services/omniture/omniture.brs" />
     <script type="text/brightscript" uri="pkg:/components/services/omniture/NWM_Omniture.brs" />
+    <script type="text/brightscript" uri="pkg:/components/services/spotX.brs" />
 
     <interface>
         <field id="dwParams" type="assocarray" />

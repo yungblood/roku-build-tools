@@ -18,6 +18,8 @@ function newSyncbak() as object
     this.getDeviceData      = syncbak_getDeviceData
     this.makeRequest        = syncbak_makeRequest
     
+    setLogLevel(1)
+    
     return this
 end function
 
@@ -62,9 +64,25 @@ function syncbak_getStream(stationID as string, mediaID as string, typeID = -1 a
                 stream.streamFormat = "hls"
                 stream.switchingStrategy = "full-adaptation"
                 stream.live = true
-                stream.playStart = createObject("roDateTime").asSeconds() + 999999
+
                 stream.subtitleConfig = { trackName: "eia608/1" }
                 stream.url = item.url
+                stream.forwardQueryStringParams = false
+
+
+                hackModels = ["24", "25", "27", "30", "31", "34", "35", "37", "39"]
+                model = getModel().mid(0, 2)
+                if arrayContains(hackModels, model) then
+                    ' HACK: increased segment count for devices affected by 8.1 playlist issue
+                    '       https -> http to reduce handshake delay
+                    '       bitrate cap to reduce decoding time
+                    stream.playStart = 0
+                    stream.url = stream.url.replace("https://", "http://")
+                    stream.maxBandwidth = 4000
+                else
+                    stream.playStart = createObject("roDateTime").asSeconds() + 999999
+                end if
+
                 return stream
             end if
         next
@@ -75,10 +93,10 @@ end function
 function syncbak_getDeviceData() as object
     if m.deviceData = invalid then
         deviceData = {}
-        deviceData["deviceId"] = getDeviceID()
+        deviceData["deviceId"] = getPersistedDeviceID()
         deviceData["deviceType"] = 8
         'deviceData["ip"] = Cbs().GetIPAddress() ' 
-        'deviceData["ip"] = "65.111.124.2" '"67.221.255.55" '""67.221.255.55" ' 
+        'deviceData["ip"] = "65.111.124.2" '"67.221.255.55" '""67.221.255.55" ' "170.20.96.14" '
         deviceData["locationAccuracy"] = 5
         deviceData["locationAge"] = 0
         deviceData["MVPDId"] = "AllAccess"
@@ -89,7 +107,6 @@ function syncbak_getDeviceData() as object
 end function
 
 function syncbak_makeRequest(path as string, params = invalid as object, retryCount = 0 as integer) as object
-    setLogLevel(0)
     if isAssociativeArray(params) then
         for each param in params
             path = addQueryString(path, param, params[param])

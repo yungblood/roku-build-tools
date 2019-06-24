@@ -1,8 +1,8 @@
 sub init()
     'Initialize BrightLine here
-    config = m.global.config
-    BrightLine_APILoad()
+    config = getGlobalField("config")
     m.top.manifest = BrightLine_ManifestLoad()
+    BrightLine_APILoad()
     m.top.observeField("loadAd", "loadAd")
     m.top.observeField("BLKeyPress", "keyEvent")
     m.top.inAd = false

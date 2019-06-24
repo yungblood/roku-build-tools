@@ -5,170 +5,174 @@ end if
 return m.cs_vb
 end function
 function cs_vc()as object
-cs_vxw=createobject("roAssociativeArray")
-cs_vxw.log_debug=false
-cs_vxw.cs_ve=30*60*1000
-cs_vxw.cs_viv=1000*60*60*24
-cs_vxw.cs_vg=1000*10
-cs_vxw.census_url="http://b.scorecardresearch.com/p2?"
-cs_vxw.census_url_secure="https://sb.scorecardresearch.com/p2?"
-cs_vxw.cs_vh="4.1.1.171010"
-cs_vxw.p_storage=invalid
-cs_vxw.cs_vi=createobject("roTimespan")
-cs_vxw.cs_vj=createobject("roTimespan")
-cs_vxw.cs_vk=createobject("roTimespan")
-cs_vxw.cs_vcs=0
-cs_vxw.cs_vct=0
-cs_vxw.cs_vgh=true
-cs_vxw.p_keepalive=invalid
-cs_vxw.cs_vge=false
-cs_vxw.cs_vqb=createobject("roAssociativeArray")
-cs_vxw.p_pixelurl=""
-cs_vxw.cs_vca=""
-cs_vxw.cs_vcu=""
-cs_vxw.cs_vcl=-1
-cs_vxw.cs_vcp=-1
-cs_vxw.p_genesis=-1
-cs_vxw.cs_vfs=0
-cs_vxw.cs_vcx=""
-cs_vxw.cs_vcz=""
-cs_vxw.start=function(labels=invalid as object)as void
+cs_vyf=createobject("roAssociativeArray")
+cs_vyf.log_debug=false
+cs_vyf.cs_ve=30*60*1000
+cs_vyf.cs_vkc=1000*60*60*24
+cs_vyf.cs_vg=1000*10
+cs_vyf.census_url="http://b.scorecardresearch.com/p2?"
+cs_vyf.census_url_secure="https://sb.scorecardresearch.com/p2?"
+cs_vyf.cs_vh="4.5.0.190328"
+cs_vyf.cs_vi="NO-RAF"
+cs_vyf.cs_vj="REGULAR"
+cs_vyf.cs_vk="REGULAR"
+cs_vyf.p_storage=invalid
+cs_vyf.cs_vl=createobject("roTimespan")
+cs_vyf.cs_vm=createobject("roTimespan")
+cs_vyf.cs_vn=createobject("roTimespan")
+cs_vyf.cs_vcx=0
+cs_vyf.cs_vcy=0
+cs_vyf.cs_vhy=true
+cs_vyf.p_keepalive=invalid
+cs_vyf.cs_vhv=true
+cs_vyf.cs_vri=createobject("roAssociativeArray")
+cs_vyf.p_pixelurl=""
+cs_vyf.cs_vce=""
+cs_vyf.cs_vcz=""
+cs_vyf.cs_vcp=-1
+cs_vyf.cs_vct=-1
+cs_vyf.p_genesis=-1
+cs_vyf.cs_vhj=0
+cs_vyf.cs_vdc=""
+cs_vyf.cs_vde=""
+cs_vyf.cs_vcw=invalid
+cs_vyf.start=function(labels=invalid as object)as void
 m.notify(cseventtype().start,"",labels)
 end function
-cs_vxw.hidden=function(labels=invalid as object)as void
+cs_vyf.hidden=function(labels=invalid as object)as void
 m.notify(cseventtype().hidden,"",labels)
 end function
-cs_vxw.view=function(labels=invalid as object)as void
+cs_vyf.view=function(labels=invalid as object)as void
 m.notify(cseventtype().view,"",labels)
 end function
-cs_vxw.close=function()as void
+cs_vyf.close=function()as void
 m.notify(cseventtype().close,"",invalid)
 end function
-cs_vxw.setpublishersecret=function(salt as string)as void
-m.cs_vca=salt
+cs_vyf.setpublishersecret=function(salt as string)as void
+m.cs_vce=salt
 end function
-cs_vxw.publishersecret=function()as string
-return m.cs_vca
+cs_vyf.publishersecret=function()as string
+return m.cs_vce
 end function
-cs_vxw.cs_vy=function(cs_vba as boolean)as void
-m.cs_vgh=cs_vba
+cs_vyf.cs_vbc=function(cs_vbe as boolean)as void
+m.cs_vhy=cs_vbe
 end function
-cs_vxw.cs_vba=function()as boolean
-return m.cs_vgh
+cs_vyf.cs_vbe=function()as boolean
+return m.cs_vhy
 end function
-cs_vxw.cs_vbb=function()as object
+cs_vyf.cs_vbf=function()as object
 return m.p_keepalive
 end function
-cs_vxw.tick=function()as void
+cs_vyf.tick=function()as void
 m.p_keepalive.tick()
-if m.cs_vi.totalmilliseconds()>m.cs_vg then
-m.p_storage.cs_vhi("accumulatedForegroundTime",comscore_tostr(m.cs_vj.totalmilliseconds()))
-m.p_storage.cs_vhi("totalForegroundTime",comscore_tostr(m.cs_vk.totalmilliseconds()))
-m.cs_vi.mark()
+if m.cs_vl.totalmilliseconds()>m.cs_vg then
+m.p_storage.cs_viz("accumulatedForegroundTime",comscore_tostr(m.cs_vm.totalmilliseconds()))
+m.p_storage.cs_viz("totalForegroundTime",comscore_tostr(m.cs_vn.totalmilliseconds()))
+m.cs_vl.mark()
 end if
 end function
-cs_vxw.cs_vbc=function()as void
+cs_vyf.cs_vbg=function()as void
 m.p_keepalive.reset()
 end function
-cs_vxw.cs_vbd=function()as void
-m.cs_vj.mark()
+cs_vyf.cs_vbh=function()as void
+m.cs_vm.mark()
 end function
-cs_vxw.setpixelurl=function(cs_vvw as string)as string
-if instr(1,cs_vvw,"?")>0 and right(cs_vvw,1)<>"?" then
-cs_vbe=createobject("roAssociativeArray")
-cs_vbi=""
-labels=right(cs_vvw,len(cs_vvw)-instr(1,cs_vvw,"?")).tokenize("&")
+cs_vyf.setpixelurl=function(cs_vxd as string)as string
+if instr(1,cs_vxd,"?")>0 and right(cs_vxd,1)<>"?" then
+cs_vbi=createobject("roAssociativeArray")
+cs_vbm=""
+labels=right(cs_vxd,len(cs_vxd)-instr(1,cs_vxd,"?")).tokenize("&")
 for each label in labels
-cs_vbg=label.tokenize("=")
-if cs_vbg.count()=2 then
-if cs_vbg[0]= "name" then
-cs_vbi=cs_vbg[1]
+cs_vbk=label.tokenize("=")
+if cs_vbk.count()=2 then
+if cs_vbk[0]= "name" then
+cs_vbm=cs_vbk[1]
 else
-cs_vbe[cs_vbg[0]]=cs_vbg[1]
+cs_vbi[cs_vbk[0]]=cs_vbk[1]
 end if
-else if cs_vbg.count()=1 then
-cs_vbi=comscore_url_encode(cs_vbg[0])
+else if cs_vbk.count()=1 then
+cs_vbm=comscore_url_encode(cs_vbk[0])
 end if
 end for
-for each label in cs_vbe
-m.cs_vqb[label]=cs_vbe[label]
+for each label in cs_vbi
+m.cs_vri[label]=cs_vbi[label]
 end for
-cs_vvw=left(cs_vvw,instr(1,cs_vvw,"?"))+cs_vbi
+cs_vxd=left(cs_vxd,instr(1,cs_vxd,"?"))+cs_vbm
 end if
-if instr(1,cs_vvw,"?")=0 and instr(1,cs_vvw,"//")=0 then
+if instr(1,cs_vxd,"?")=0 and instr(1,cs_vxd,"//")=0 then
 if len(m.p_pixelurl)>0 and instr(1,m.p_pixelurl,"?")>0 then
-cs_vvw=left(m.p_pixelurl,instr(1,m.p_pixelurl,"?"))+comscore_url_encode(cs_vvw)
+cs_vxd=left(m.p_pixelurl,instr(1,m.p_pixelurl,"?"))+comscore_url_encode(cs_vxd)
 else
-cs_vvw=cs_vvw+"?"
+cs_vxd=cs_vxd+"?"
 end if
 end if
-if right(cs_vvw,1)= "?" then
-cs_vvw=cs_vvw+"Application"
+if right(cs_vxd,1)= "?" then
+cs_vxd=cs_vxd+"Application"
 end if
-m.p_pixelurl=cs_vvw
+m.p_pixelurl=cs_vxd
 return m.p_pixelurl
 end function
-cs_vxw.pixelurl=function()as string
+cs_vyf.pixelurl=function()as string
 return m.p_pixelurl
 end function
-cs_vxw.setsecure=function(secure as boolean)as void
-m.cs_vge=secure
+cs_vyf.setsecure=function(secure as boolean)as void
+m.cs_vhv=secure
 end function
-cs_vxw.secure=function()as boolean
-return m.cs_vge
+cs_vyf.secure=function()as boolean
+return m.cs_vhv
 end function
-cs_vxw.setcustomerc2=function(c2 as string)as void
-m.cs_vqb["c2"]=comscore_url_encode(c2)
+cs_vyf.setcustomerc2=function(c2 as string)as void
+m.cs_vri["c2"]=comscore_url_encode(c2)
 if m.secure()then
 m.setpixelurl(m.census_url_secure)
 else
 m.setpixelurl(m.census_url)
 end if
 end function
-cs_vxw.customerc2=function()as string
-return m.cs_vqb["c2"]
+cs_vyf.customerc2=function()as string
+return m.cs_vri["c2"]
 end function
-cs_vxw.getlabels=function()as object
-return m.cs_vqb
+cs_vyf.getlabels=function()as object
+return m.cs_vri
 end function
-cs_vxw.setlabels=function(cs_vtw as object)as void
-if cs_vtw<>invalid then
-for each label in cs_vtw
-m.setlabel(label,cs_vtw[label])
+cs_vyf.setlabels=function(cs_vvd as object)as void
+if cs_vvd<>invalid then
+for each label in cs_vvd
+m.setlabel(label,cs_vvd[label])
 end for
 end if
 end function
-cs_vxw.getlabel=function(name as string)as string
-return m.cs_vqb[name]
+cs_vyf.getlabel=function(name as string)as string
+return m.cs_vri[name]
 end function
-cs_vxw.setlabel=function(key as string,cs_vvw as string)as void
-if cs_vvw=invalid then
-m.cs_vqb.delete(key)
+cs_vyf.setlabel=function(key as string,cs_vxd as string)as void
+if cs_vxd=invalid then
+m.cs_vri.delete(key)
 else
-m.cs_vqb[key]=cs_vvw
+m.cs_vri[key]=cs_vxd
 end if
 end function
-cs_vxw.setappname=function(name as string)as void
-m.cs_vdu=name
+cs_vyf.setappname=function(name as string)as void
+m.cs_vdz=name
 end function
-cs_vxw.appname=function()as string
-return m.cs_vdu
+cs_vyf.appname=function()as string
+return m.cs_vdz
 end function
-cs_vxw.setappversion=function(version as string)as void
-m.cs_vdv=version
+cs_vyf.setappversion=function(version as string)as void
+m.cs_vea=version
 end function
-cs_vxw.appversion=function()as string
-return m.cs_vdv
+cs_vyf.appversion=function()as string
+return m.cs_vea
 end function
-cs_vxw.adframeworkavailable=function()as boolean
-return m.cs_vdw
+cs_vyf.adframeworkavailable=function()as boolean
+return m.cs_veb
 end function
-cs_vxw.setuseraf=function(useraf as boolean)as boolean
-m.cs_vgk=useraf
+cs_vyf.setuseraf=function(useraf as boolean)as boolean
+m.cs_vib=useraf
 if useraf=true and m.adframeworkavailable()=true then
-m.cs_vbt=roku_ads()
-if m.cs_vbt<>invalid and findmemberfunction(m.cs_vbt,"enableAdMeasurements")<>invalid then
-m.cs_vbt.enableadmeasurements(true)
+m.cs_vbx=roku_ads()
+if m.cs_vbx<>invalid and m.cs_vbx.enableadmeasurements<>invalid then
+m.cs_vbx.enableadmeasurements(true)
 return true
 else
 print"Could not enable RAF Ad measurements. Make sure the installed RAF version is greater or equal to 2.1"
@@ -176,616 +180,658 @@ end if
 end if
 return false
 end function
-cs_vxw.useraf=function()as boolean
-return m.cs_vgk
+cs_vyf.useraf=function()as boolean
+return m.cs_vib
 end function
-cs_vxw.adinterface=function()as object
-return m.cs_vbt
+cs_vyf.adinterface=function()as object
+return m.cs_vbx
 end function
-cs_vxw.setuserafsettermethods=function(userafsettermethods as boolean)as void
-m.cs_vgn=userafsettermethods
+cs_vyf.setuserafsettermethods=function(userafsettermethods as boolean)as void
+m.cs_vie=userafsettermethods
 end function
-cs_vxw.userafsettermethods=function()as boolean
-return m.cs_vgn
+cs_vyf.userafsettermethods=function()as boolean
+return m.cs_vie
 end function
-cs_vxw.visitorid=function()as string
-if m.cs_vcu="" then
-di=createobject("roDeviceInfo")
-if findmemberfunction(di,"GetPublisherId")<>invalid then
-m.cs_vcu=m.cs_vce(di.getpublisherid())+ "-cs62"
+cs_vyf.visitorid=function()as string
+if m.cs_vcz="" then
+cs_vhq=createobject("roDeviceInfo")
+if findmemberfunction(cs_vhq,"GetChannelClientId")<>invalid then
+m.cs_vcz=m.cs_vci(cs_vhq.getchannelclientid())+ "-cs62"
 else
-m.cs_vcu=m.cs_vce(di.getdeviceuniqueid())
+m.cs_vcz=m.cs_vci(cs_vhq.getchannelclientid())
 end if
-m.p_storage.cs_vhi("visitorId",m.cs_vcu)
+m.p_storage.cs_viz("visitorId",m.cs_vcz)
 end if
-return m.cs_vcu
-end function
-cs_vxw.version=function()as string
-return m.cs_vcx
-end function
-cs_vxw.previousversion=function()as string
 return m.cs_vcz
 end function
-cs_vxw.notify=function(cs_vud as string,pixelurl="" as string,labels=invalid as object)as void
-if m.cs_vca="" or m.cs_vqb["c2"]=invalid then return
+cs_vyf.version=function()as string
+return m.cs_vdc
+end function
+cs_vyf.previousversion=function()as string
+return m.cs_vde
+end function
+cs_vyf.notify=function(cs_vvk as string,pixelurl="" as string,labels=invalid as object)as void
+if m.cs_vce="" or m.cs_vri["c2"]=invalid then return
 if pixelurl="" then
 pixelurl=m.pixelurl()
 else
 pixelurl=m.setpixelurl(pixelurl)
 end if
 if labels=invalid then labels=createobject("roAssociativeArray")
-if cs_vud<>"close" then
-cs_vmu=cs_ves(m,cs_vud,pixelurl,labels)
-m.dispatch(cs_vmu)
+if cs_vvk<>"close" then
+cs_vob=cs_vgj(m,cs_vvk,pixelurl,labels)
+m.dispatch(cs_vob)
 end if
-m.p_storage.cs_vhi("lastActivityTime",str(comscore_unix_time()))
+m.p_storage.cs_viz("lastActivityTime",str(comscore_unix_time()))
 end function
-cs_vxw.dispatch=function(cs_vmu as object)as void
-m.cs_vfs=m.cs_vfs+1
-cs_vmu.labels["ns_ap_ec"]=comscore_tostr(m.cs_vfs)
-cs_vcd=cs_vgs(cs_vmu)
-cs_vcd.cs_vgv()
+cs_vyf.dispatch=function(cs_vob as object)as void
+m.cs_vhj=m.cs_vhj+1
+cs_vob.labels["ns_ap_ec"]=comscore_tostr(m.cs_vhj)
+cs_vch=cs_vij(cs_vob)
+cs_vch.cs_vim()
 end function
-cs_vxw.cs_vce=function(cs_vfj as string)as string
-cs_vfj=cs_vfj+m.cs_vca
-cs_vfk=createobject("roByteArray")
-cs_vfk.fromasciistring(cs_vfj)
-cs_vfl=createobject("roEVPDigest")
-cs_vfl.setup("md5")
-cs_vfl.update(cs_vfk)
-return cs_vfl.final()
+cs_vyf.cs_vci=function(cs_vha as string)as string
+cs_vha=cs_vha+m.cs_vce
+cs_vhb=createobject("roByteArray")
+cs_vhb.fromasciistring(cs_vha)
+cs_vhc=createobject("roEVPDigest")
+cs_vhc.setup("md5")
+cs_vhc.update(cs_vhb)
+return cs_vhc.final()
 end function
-cs_vxw.cs_vci=function()as double
-if m.cs_vcl<0 then
-if m.p_storage.cs_vhh("installTime")then
-cs_vck=comscore_stod(m.p_storage.cs_vhg("installTime"))
-else
-cs_vck=m.p_genesis
-m.p_storage.cs_vhi("installTime",str(cs_vck))
-end if
-m.cs_vcl=cs_vck
-end if
-return m.cs_vcl
-end function
-cs_vxw.cs_vcm=function()as double
+cs_vyf.cs_vcm=function()as double
 if m.cs_vcp<0 then
-cs_vco=0
-if m.p_storage.cs_vhh("installTime")then
-cs_vco=comscore_stod(m.p_storage.cs_vhg("previousGenesis"))
+if m.p_storage.cs_viy("installTime")then
+cs_vco=comscore_stod(m.p_storage.cs_vix("installTime"))
+else
+cs_vco=m.p_genesis
+m.p_storage.cs_viz("installTime",str(cs_vco))
 end if
 m.cs_vcp=cs_vco
 end if
 return m.cs_vcp
 end function
-cs_vxw.cs_vcq=function()as void
-cs_vcr=comscore_unix_time()
-if cs_vcr-m.p_genesis>m.cs_ve then
-m.p_storage.cs_vhi("previousGenesis",str(m.p_genesis))
-m.p_genesis=cs_vcr
-m.p_storage.cs_vhi("genesis",str(m.p_genesis))
+cs_vyf.cs_vcq=function()as double
+if m.cs_vct<0 then
+cs_vcs=0
+if m.p_storage.cs_viy("installTime")then
+cs_vcs=comscore_stod(m.p_storage.cs_vix("previousGenesis"))
+end if
+m.cs_vct=cs_vcs
+end if
+return m.cs_vct
+end function
+cs_vyf.cs_vcu=function()as void
+cs_vcv=comscore_unix_time()
+if cs_vcv-m.p_genesis>m.cs_ve then
+m.p_storage.cs_viz("previousGenesis",str(m.p_genesis))
+m.p_genesis=cs_vcv
+m.p_storage.cs_viz("genesis",str(m.p_genesis))
 end if
 end function
-cs_vdh(cs_vxw)
-cs_vxw.p_storage=cs_vhd(cs_vxw)
-cs_vxw.p_genesis=comscore_unix_time()
-cs_vxw.p_keepalive=cs_vee(cs_vxw)
-cs_vxw.cs_vci()
-cs_vda(cs_vxw)
-cs_vdx(cs_vxw)
-if cs_vxw.p_storage.cs_vhh("accumulatedForegroundTime")then
-cs_vxw.cs_vcs=comscore_stoi(cs_vxw.p_storage.cs_vhg("accumulatedForegroundTime"))
+cs_vdm(cs_vyf)
+cs_vyf.p_storage=cs_viu(cs_vyf)
+cs_vyf.p_genesis=comscore_unix_time()
+cs_vyf.cs_vcw=cs_vef(cs_vyf)
+cs_vyf.p_keepalive=cs_vfv(cs_vyf)
+cs_vyf.cs_vcm()
+cs_vdf(cs_vyf)
+cs_vec(cs_vyf)
+if cs_vyf.p_storage.cs_viy("accumulatedForegroundTime")then
+cs_vyf.cs_vcx=comscore_stoi(cs_vyf.p_storage.cs_vix("accumulatedForegroundTime"))
 end if
-if cs_vxw.p_storage.cs_vhh("totalForegroundTime")then
-cs_vxw.cs_vct=comscore_stoi(cs_vxw.p_storage.cs_vhg("totalForegroundTime"))
+if cs_vyf.p_storage.cs_viy("totalForegroundTime")then
+cs_vyf.cs_vcy=comscore_stoi(cs_vyf.p_storage.cs_vix("totalForegroundTime"))
 end if
-if cs_vxw.p_storage.cs_vhh("visitorId")then
-cs_vxw.cs_vcu=cs_vxw.p_storage.cs_vhg("visitorId")
+if cs_vyf.p_storage.cs_viy("visitorId")then
+cs_vyf.cs_vcz=cs_vyf.p_storage.cs_vix("visitorId")
 end if
-if cs_vxw.p_storage.cs_vhh("currentVersion")then
-if cs_vxw.p_storage.cs_vhg("currentVersion")<>cs_vxw.cs_vh then
-cs_vxw.p_storage.cs_vhi("previousVersion",cs_vxw.p_storage.cs_vhg("currentVersion"))
-cs_vxw.p_storage.cs_vhi("currentVersion",cs_vxw.cs_vh)
-cs_vxw.cs_vcx=cs_vxw.cs_vh
+if cs_vyf.p_storage.cs_viy("currentVersion")then
+if cs_vyf.p_storage.cs_vix("currentVersion")<>cs_vyf.cs_vh then
+cs_vyf.p_storage.cs_viz("previousVersion",cs_vyf.p_storage.cs_vix("currentVersion"))
+cs_vyf.p_storage.cs_viz("currentVersion",cs_vyf.cs_vh)
+cs_vyf.cs_vdc=cs_vyf.cs_vh
 else
-cs_vxw.cs_vcx=cs_vxw.p_storage.cs_vhg("currentVersion")
+cs_vyf.cs_vdc=cs_vyf.p_storage.cs_vix("currentVersion")
 end if
 else
-cs_vxw.p_storage.cs_vhi("currentVersion",cs_vxw.cs_vh)
-cs_vxw.cs_vcx=cs_vxw.cs_vh
+cs_vyf.p_storage.cs_viz("currentVersion",cs_vyf.cs_vh)
+cs_vyf.cs_vdc=cs_vyf.cs_vh
 end if
-if cs_vxw.p_storage.cs_vhh("previousVersion")then
-cs_vxw.cs_vcz=cs_vxw.p_storage.cs_vhg("previousVersion")
+if cs_vyf.p_storage.cs_viy("previousVersion")then
+cs_vyf.cs_vde=cs_vyf.p_storage.cs_vix("previousVersion")
 else
-cs_vxw.p_storage.cs_vhi("previousVersion",cs_vxw.cs_vcx)
-cs_vxw.cs_vcz=cs_vxw.cs_vcx
+cs_vyf.p_storage.cs_viz("previousVersion",cs_vyf.cs_vdc)
+cs_vyf.cs_vde=cs_vyf.cs_vdc
 end if
-cs_vxw.cs_vj.mark()
-cs_vxw.cs_vk.mark()
-cs_vxw.cs_vi.mark()
-if cs_vxw.adframeworkavailable()=true then
-cs_vxw.setuseraf(true)
-cs_vxw.setuserafsettermethods(true)
+cs_vyf.cs_vm.mark()
+cs_vyf.cs_vn.mark()
+cs_vyf.cs_vl.mark()
+if cs_vyf.adframeworkavailable()=true and cs_vyf.cs_vk<>cs_vyf.cs_vi then
+cs_vyf.setuseraf(true)
+cs_vyf.setuserafsettermethods(true)
+else
+cs_vyf.setuseraf(false)
+cs_vyf.setuserafsettermethods(false)
 end if
-return cs_vxw
+return cs_vyf
 end function
-sub cs_vda(dax as object)
-cs_vdb=dax.p_storage
-cs_vdd=0
-if cs_vdb.cs_vhh("lastActivityTime")then cs_vdd=comscore_stod(cs_vdb.cs_vhg("lastActivityTime"))
-cs_vdf=0
-if cs_vdb.cs_vhh("genesis")then cs_vdf=comscore_stod(cs_vdb.cs_vhg("genesis"))
-if(cs_vdd>0)then
-cs_vdg=comscore_unix_time()-cs_vdd
-if cs_vdg<dax.cs_ve then
-if cs_vdf>0 and cs_vdf<comscore_unix_time()then
-dax.p_genesis=cs_vdf
+sub cs_vdf(dax as object)
+cs_vdg=dax.p_storage
+cs_vdi=0
+if cs_vdg.cs_viy("lastActivityTime")then cs_vdi=comscore_stod(cs_vdg.cs_vix("lastActivityTime"))
+cs_vdk=0
+if cs_vdg.cs_viy("genesis")then cs_vdk=comscore_stod(cs_vdg.cs_vix("genesis"))
+if(cs_vdi>0)then
+cs_vdl=comscore_unix_time()-cs_vdi
+if cs_vdl<dax.cs_ve then
+if cs_vdk>0 and cs_vdk<comscore_unix_time()then
+dax.p_genesis=cs_vdk
 end if
 else
-cs_vdb.cs_vhi("previousGenesis",str(cs_vdf))
+cs_vdg.cs_viz("previousGenesis",str(cs_vdk))
 end if
 end if
-cs_vdb.cs_vhi("genesis",str(dax.p_genesis))
-cs_vdb.cs_vhi("lastActivityTime",str(comscore_unix_time()))
+cs_vdg.cs_viz("genesis",str(dax.p_genesis))
+cs_vdg.cs_viz("lastActivityTime",str(comscore_unix_time()))
 end sub
-sub cs_vdh(dax as object)
-cs_vdi=readasciifile("pkg:/manifest")
-title="AppName"
-cs_vdr="1"
-cs_vds="0"
-cs_vdt="0"
+sub cs_vdm(dax as object)
+cs_vdn=readasciifile("pkg:/manifest")
+cs_vdv="AppName"
+cs_vdw="1"
+cs_vdx="0"
+cs_vdy="0"
 adframeworkavailable=false
-cs_vfj=cs_vdi.tokenize(chr(10))
-for each cs_vdo in cs_vfj
-cs_vdo=cs_vdo.trim()
-if len(cs_vdo)>0 then
-cs_vdp=cs_vdo.tokenize("=")
-if cs_vdp.count()=2 then
-if cs_vdp[0]= "title" then
-title=cs_vdp[1]
-else if cs_vdp[0]= "major_version" then
-cs_vdr=cs_vdp[1]
-else if cs_vdp[0]= "minor_version" then
-cs_vds=cs_vdp[1]
-else if cs_vdp[0]= "build_version" then
-cs_vdt=cs_vdp[1]
-else if cs_vdp[0]= "bs_libs_required" and cs_vdp[1]= "roku_ads_lib" then
+cs_vha=cs_vdn.tokenize(chr(10))
+for each cs_vdt in cs_vha
+cs_vdt=cs_vdt.trim()
+if len(cs_vdt)>0 then
+cs_vdu=cs_vdt.tokenize("=")
+if cs_vdu.count()=2 then
+if cs_vdu[0]= "title" then
+cs_vdv=cs_vdu[1]
+else if cs_vdu[0]= "major_version" then
+cs_vdw=cs_vdu[1]
+else if cs_vdu[0]= "minor_version" then
+cs_vdx=cs_vdu[1]
+else if cs_vdu[0]= "build_version" then
+cs_vdy=cs_vdu[1]
+else if cs_vdu[0]= "bs_libs_required" and cs_vdu[1]= "roku_ads_lib" then
 adframeworkavailable=true
 end if
 end if
 end if
 end for
-dax.cs_vdu=title
-dax.cs_vdv=cs_vdr+"." +cs_vds+"." +cs_vdt
-dax.cs_vdw=adframeworkavailable
+dax.cs_vdz=cs_vdv
+dax.cs_vea=cs_vdw+"." +cs_vdx+"." +cs_vdy
+dax.cs_veb=adframeworkavailable
 end sub
-sub cs_vdx(dax as object)
-cs_vdy=dax.p_storage
-if(cs_vdy.cs_vhh("runs"))then
-cs_vdz=comscore_tostr(comscore_stoi(cs_vdy.cs_vhg("runs"))+1)
-cs_vdy.cs_vhi("runs",cs_vdz)
+sub cs_vec(dax as object)
+cs_ved=dax.p_storage
+if(cs_ved.cs_viy("runs"))then
+cs_vee=comscore_tostr(comscore_stoi(cs_ved.cs_vix("runs"))+1)
+cs_ved.cs_viz("runs",cs_vee)
 else
-cs_vdy.cs_vhi("runs","0")
+cs_ved.cs_viz("runs","0")
 end if
 end sub
+function cs_vef(dax as object)as object
+cs_vyf=createobject("roAssociativeArray")
+cs_vyf.cs_vez=false
+cs_vyf.cs_vfg=true
+cs_vyf.cs_vfe=""
+cs_vyf.cs_vff=""
+cs_vyf.cs_vel="crossPublisherIdHash"
+cs_vyf.cs_vrh=dax
+cs_vyf.cs_ven=function()as void
+cs_vfb=m.cs_vfj()
+cs_vey=m.cs_vfn(cs_vfb)
+if m.cs_vfg
+m.cs_vfe=cs_vfb
+if m.cs_vrh.p_storage.cs_viy(m.cs_vel)then
+m.cs_vff=m.cs_vrh.p_storage.cs_vix(m.cs_vel)
+end if
+end if
+if m.cs_vrh.p_storage.cs_viy(m.cs_vel)=false then
+m.cs_vfe=cs_vfb
+m.cs_vrh.p_storage.cs_viz(m.cs_vel,cs_vey)
+m.cs_vff=cs_vey
+else if((cs_vfb="none" and m.cs_vff="none")or(m.cs_vfg=false and m.cs_vff="none")or(cs_vfb<>"none" and cs_vey=m.cs_vff))
+else
+m.cs_vez=true
+if(m.cs_vfg=false or cs_vfb="none" )
+m.cs_vfe="none"
+m.cs_vff="none"
+else
+m.cs_vfe=cs_vfb
+m.cs_vff=cs_vey
+end if
+m.cs_vrh.p_storage.cs_viz(m.cs_vel,m.cs_vff)
+end if
+m.cs_vfg=false
+end function
+cs_vyf.cs_vfh=function()as string
+return m.cs_vfe
+end function
+cs_vyf.cs_vfi=function()as boolean
+return m.cs_vez
+end function
+cs_vyf.cs_vfj=function()as string
+cs_vfm="none"
+cs_vfl=createobject("roDeviceInfo")
+if not cs_vfl.isridadisabled()
+cs_vfm=cs_vfl.getrida()
+end if
+return cs_vfm
+end function
+cs_vyf.cs_vfn=function(string as string)as string
+cs_vhb=createobject("roByteArray")
+cs_vhb.fromasciistring(string)
+cs_vhc=createobject("roEVPDigest")
+cs_vhc.setup("md5")
+cs_vmk=cs_vhc.process(cs_vhb)
+return cs_vmk
+end function
+return cs_vyf
+end function
 function cseventtype()
-if m.cs_veb=invalid then m.cs_veb=cs_vec()
-return m.cs_veb
+if m.cs_vfs=invalid then m.cs_vfs=cs_vft()
+return m.cs_vfs
 end function
-function cs_vec()as object
-cs_vsv=createobject("roAssociativeArray")
-cs_vsv.view="view"
-cs_vsv.hidden="hidden"
-cs_vsv.start="start"
-cs_vsv.aggregate="aggregate"
-cs_vsv.close="close"
-cs_vsv.keep_alive="keep-alive"
-return cs_vsv
+function cs_vft()as object
+cs_vuc=createobject("roAssociativeArray")
+cs_vuc.view="view"
+cs_vuc.hidden="hidden"
+cs_vuc.start="start"
+cs_vuc.aggregate="aggregate"
+cs_vuc.close="close"
+cs_vuc.keep_alive="keep-alive"
+return cs_vuc
 end function
-function cs_vee(dax as object)as object
-cs_vxw=createobject("roAssociativeArray")
-cs_vxw.cs_veg=createobject("roTimespan")
-cs_vxw.cs_veh=createobject("roDeviceInfo")
-cs_vxw.cs_vei=createobject("roArray",1,true)
-cs_vxw.cs_vqa=dax
-cs_vek=cs_vxw.cs_veh.getipaddrs()
-if cs_vek<>invalid then
-for each key in cs_vek
-cs_vxw.cs_vei.push(cs_vek[key])
+function cs_vfv(dax as object)as object
+cs_vyf=createobject("roAssociativeArray")
+cs_vyf.cs_vfx=createobject("roTimespan")
+cs_vyf.cs_vfy=createobject("roDeviceInfo")
+cs_vyf.cs_vfz=createobject("roArray",1,true)
+cs_vyf.cs_vrh=dax
+cs_vgb=cs_vyf.cs_vfy.getipaddrs()
+if cs_vgb<>invalid then
+for each key in cs_vgb
+cs_vyf.cs_vfz.push(cs_vgb[key])
 end for
 end if
-cs_vxw.reset=function()as void
-m.cs_veg.mark()
+cs_vyf.reset=function()as void
+m.cs_vfx.mark()
 end function
-cs_vxw.tick=function()as void
-if m.cs_vqa.cs_vba()then
-if m.cs_veg.totalmilliseconds()>m.cs_vqa.cs_viv then
-m.cs_vqa.notify(cseventtype().keep_alive)
-m.cs_veg.mark()
+cs_vyf.tick=function()as void
+if m.cs_vrh.cs_vbe()then
+if m.cs_vfx.totalmilliseconds()>m.cs_vrh.cs_vkc then
+m.cs_vrh.notify(cseventtype().keep_alive)
+m.cs_vfx.mark()
 else
-cs_ver=false
-cs_ven=m.cs_veh.getipaddrs()
-if cs_ven<>invalid then
-for each key in cs_ven
-cs_veq=false
-for cs_vyh=0 to m.cs_vei.count()step 1
-if m.cs_vei[cs_vyh]=cs_ven[key]then
-cs_veq=true
+cs_vgi=false
+cs_vge=m.cs_vfy.getipaddrs()
+if cs_vge<>invalid then
+for each key in cs_vge
+cs_vgh=false
+for cs_vyq=0 to m.cs_vfz.count()step 1
+if m.cs_vfz[cs_vyq]=cs_vge[key]then
+cs_vgh=true
 exit for
 end if
 end for
-if cs_veq then
+if cs_vgh then
 else
-m.cs_vei.push(cs_ven[key])
-cs_ver=true
+m.cs_vfz.push(cs_vge[key])
+cs_vgi=true
 end if
 end for
-if cs_ver then
-m.cs_vqa.notify(cseventtype().keep_alive)
-m.cs_veg.mark()
+if cs_vgi then
+m.cs_vrh.notify(cseventtype().keep_alive)
+m.cs_vfx.mark()
 end if
 end if
 end if
 end if
 end function
-if dax.cs_vba()then
-cs_vxw.cs_veg.mark()
+if dax.cs_vbe()then
+cs_vyf.cs_vfx.mark()
 else
 end if
-return cs_vxw
+return cs_vyf
 end function
-function cs_ves(dax as object,cs_vud as string,pixelurl as string,labels as object)as object
-dax.cs_vcq()
-if cs_vud=cseventtype().start then return cs_vgb(dax,cs_vud,pixelurl,labels)
-if cs_vud=cseventtype().aggregate then return cs_vgq(dax,cs_vud,pixelurl,labels)
-return csapplicationmeasurement(dax,cs_vud,pixelurl,labels)
+function cs_vgj(dax as object,cs_vvk as string,pixelurl as string,labels as object)as object
+dax.cs_vcu()
+if cs_vvk=cseventtype().start then return cs_vhs(dax,cs_vvk,pixelurl,labels)
+if cs_vvk=cseventtype().aggregate then return cs_vih(dax,cs_vvk,pixelurl,labels)
+return csapplicationmeasurement(dax,cs_vvk,pixelurl,labels)
 end function
 function csmeasurement(dax as object)as object
-cs_vxw=createobject("roAssociativeArray")
-cs_vxw.labels=createobject("roAssociativeArray")
-cs_vxw.setpixelurl=function(pixelurl as string)as void
-cs_vew=instr(1,pixelurl,"?")
-if cs_vew>=1 and len(pixelurl)>cs_vew then
-m.labels["name"]=right(pixelurl,len(pixelurl)-cs_vew)
-m.pixelurl=left(pixelurl,cs_vew)
+cs_vyf=createobject("roAssociativeArray")
+cs_vyf.labels=createobject("roAssociativeArray")
+cs_vyf.setpixelurl=function(pixelurl as string)as void
+cs_vgn=instr(1,pixelurl,"?")
+if cs_vgn>=1 and len(pixelurl)>cs_vgn then
+m.labels["name"]=right(pixelurl,len(pixelurl)-cs_vgn)
+m.pixelurl=left(pixelurl,cs_vgn)
 else
 m.pixelurl=pixelurl
 end if
 end function
-cs_vxw.setpixelurl(dax.pixelurl())
-cs_vxw.cs_vex=comscore_unix_time()
-cs_vxw.cs_vey=function()as string
-cs_vkd=""
-cs_vfb=createobject("roArray",110,true)
-cs_vfb=["c1","c2","ca2","cb2","cc2","cd2","ns_site","ca_ns_site","cb_ns_site","cc_ns_site","cd_ns_site","ns_vsite","ca_ns_vsite","cb_ns_vsite","cc_ns_vsite","cd_ns_vsite","ns_alias","ca_ns_alias","cb_ns_alias","cc_ns_alias","cd_ns_alias","ns_ap_an","ca_ns_ap_an","cb_ns_ap_an","cc_ns_ap_an","cd_ns_ap_an","ns_ap_pn","ns_ap_pv","c12","ca12","cb12","cc12","cd12","ns_ak","ns_ap_hw","name","ns_ap_ni","ns_ap_ec","ns_ap_ev","ns_ap_device","ns_ap_id","ns_ap_csf","ns_ap_bi","ns_ap_pfm","ns_ap_pfv","ns_ap_ver","ca_ns_ap_ver","cb_ns_ap_ver","cc_ns_ap_ver","cd_ns_ap_ver","ns_ap_sv","ns_ap_bv","ns_ap_cv","ns_ap_smv","ns_type","ca_ns_type","cb_ns_type","cc_ns_type","cd_ns_type","ns_radio","ns_nc","cs_partner","cs_xcid","cs_impid","ns_ap_ui","ca_ns_ap_ui","cb_ns_ap_ui","cc_ns_ap_ui","cd_ns_ap_ui","ns_ap_gs","ns_ap_ie","ns_st_sv","ns_st_pv","ns_st_smv","ns_st_it","ns_st_id","ns_st_ec","ns_st_sp","ns_st_sc","ns_st_psq","ns_st_asq","ns_st_sq","ns_st_ppc","ns_st_apc","ns_st_spc","ns_st_atpc","ns_st_cn","ns_st_ev","ns_st_po","ns_st_cl","ns_st_el","ns_st_sl","ns_st_pb","ns_st_hc","ns_st_mp","ca_ns_st_mp","cb_ns_st_mp","cc_ns_st_mp","cd_ns_st_mp","ns_st_mv","ca_ns_st_mv","cb_ns_st_mv","cc_ns_st_mv","cd_ns_st_mv","ns_st_pn","ns_st_tp","ns_st_ad","ns_st_li","ns_st_ci","ns_st_si","ns_st_pt","ns_st_dpt","ns_st_ipt","ns_st_ap","ns_st_dap","ns_st_et","ns_st_det","ns_st_upc","ns_st_dupc","ns_st_iupc","ns_st_upa","ns_st_dupa","ns_st_iupa","ns_st_lpc","ns_st_dlpc","ns_st_lpa","ns_st_dlpa","ns_st_pa","ns_st_ldw","ns_st_ldo","ns_st_ie","ns_ap_jb","ns_ap_et","ns_ap_res","ns_ap_sd","ns_ap_po","ns_ap_ot","ns_ap_c12m","cs_c12u","ca_cs_c12u","cb_cs_c12u","cc_cs_c12u","cd_cs_c12u","ns_ap_install","ns_ap_updated","ns_ap_lastrun","ns_ap_cs","ns_ap_runs","ns_ap_usage","ns_ap_fg","ns_ap_ft","ns_ap_dft","ns_ap_bt","ns_ap_dbt","ns_ap_dit","ns_ap_as","ns_ap_das","ns_ap_it","ns_ap_uc","ns_ap_aus","ns_ap_daus","ns_ap_us","ns_ap_dus","ns_ap_ut","ns_ap_oc","ns_ap_uxc","ns_ap_uxs","ns_ap_lang","ns_ap_ar","ns_ap_miss","ns_ts","ns_ap_cfg","ns_ap_env","ns_st_ca","ns_st_cp","ns_st_er","ca_ns_st_er","cb_ns_st_er","cc_ns_st_er","cd_ns_st_er","ns_st_pe","ns_st_ui","ca_ns_st_ui","cb_ns_st_ui","cc_ns_st_ui","cd_ns_st_ui","ns_st_bc","ns_st_dbc","ns_st_bt","ns_st_dbt","ns_st_bp","ns_st_lt","ns_st_skc","ns_st_dskc","ns_st_ska","ns_st_dska","ns_st_skd","ns_st_skt","ns_st_dskt","ns_st_pc","ns_st_dpc","ns_st_pp","ns_st_br","ns_st_pbr","ns_st_rt","ns_st_prt","ns_st_ub","ns_st_vo","ns_st_pvo","ns_st_ws","ns_st_pws","ns_st_ki","ns_st_rp","ns_st_bn","ns_st_tb","ns_st_an","ns_st_ta","ns_st_pl","ns_st_pr","ns_st_tpr","ns_st_sn","ns_st_en","ns_st_ep","ns_st_tep","ns_st_sr","ns_st_ty","ns_st_ct","ns_st_cs","ns_st_ge","ns_st_st","ns_st_stc","ns_st_ce","ns_st_ia","ns_st_dt","ns_st_ddt","ns_st_tdt","ns_st_tm","ns_st_dtm","ns_st_ttm","ns_st_de","ns_st_pu","ns_st_ti","ns_st_cu","ns_st_fee","ns_st_ft","ns_st_at","ns_st_pat","ns_st_vt","ns_st_pvt","ns_st_tt","ns_st_ptt","ns_st_cdn","ns_st_pcdn","ns_st_amg","ns_st_ami","ns_st_amp","ns_st_amt","ns_st_ams","ns_ap_i1","ns_ap_i2","ns_ap_i3","ns_ap_i4","ns_ap_i5","ns_ap_i6","ns_ap_referrer","ns_clid","ns_campaign","ns_source","ns_mchannel","ns_linkname","ns_fee","gclid","utm_campaign","utm_source","utm_medium","utm_term","utm_content","ns_ecommerce","ns_ec_sv","ns_client_id","ns_order_id","ns_ec_cur","ns_orderline_id","ns_orderlines","ns_prod_id","ns_qty","ns_prod_price","ns_prod_grp","ns_brand","ns_shop","ns_category","category","ns_c","ns_search_term","ns_search_result","ns_m_exp","ns_m_chs","c3","ca3","cb3","cc3","cd3","c4","ca4","cb4","cc4","cd4","c5","ca5","cb5","cc5","cd5","c6","ca6","cb6","cc6","cd6","c10","c11","c13","c14","c15","c16","c7","c8","c9","ns_ap_er","ns_st_amc"]
-cs_vfc={}
-for each label in cs_vfb
+cs_vyf.setpixelurl(dax.pixelurl())
+cs_vyf.cs_vgo=comscore_unix_time()
+cs_vyf.cs_vgp=function()as string
+cs_vlk=""
+cs_vgs=createobject("roArray",110,true)
+cs_vgs=["c1","c2","ca2","cb2","cc2","cd2","ns_site","ca_ns_site","cb_ns_site","cc_ns_site","cd_ns_site","ns_vsite","ca_ns_vsite","cb_ns_vsite","cc_ns_vsite","cd_ns_vsite","ns_alias","ca_ns_alias","cb_ns_alias","cc_ns_alias","cd_ns_alias","ns_ap_an","ca_ns_ap_an","cb_ns_ap_an","cc_ns_ap_an","cd_ns_ap_an","ns_ap_pn","ns_ap_pv","c12","ca12","cb12","cc12","cd12","ns_ak","ns_ar","ns_ap_hw","name","ns_ap_ni","ns_ap_ec","ns_ap_ev","ns_ap_device","ns_ap_id","ns_ap_csf","ns_ap_bi","ns_ap_pfm","ns_ap_pfv","ns_ap_ver","ca_ns_ap_ver","cb_ns_ap_ver","cc_ns_ap_ver","cd_ns_ap_ver","ns_ap_sv","ns_ap_bv","ns_ap_cv","ns_ap_smv","ns_type","ca_ns_type","cb_ns_type","cc_ns_type","cd_ns_type","ns_radio","ns_nc","cs_partner","cs_xcid","cs_impid","ns_ap_ui","ca_ns_ap_ui","cb_ns_ap_ui","cc_ns_ap_ui","cd_ns_ap_ui","ns_ap_gs","ns_ap_ie","ns_st_sv","ns_st_pv","ns_st_smv","ns_st_it","ns_st_id","ns_st_ec","ns_st_sp","ns_st_sc","ns_st_psq","ns_st_asq","ns_st_sq","ns_st_ppc","ns_st_apc","ns_st_spc","ns_st_atpc","ns_st_cn","ns_st_ev","ns_st_po","ns_st_cl","ns_st_el","ns_st_sl","ns_st_pb","ns_st_hc","ns_st_mp","ca_ns_st_mp","cb_ns_st_mp","cc_ns_st_mp","cd_ns_st_mp","ns_st_mv","ca_ns_st_mv","cb_ns_st_mv","cc_ns_st_mv","cd_ns_st_mv","ns_st_pn","ns_st_tp","ns_st_ad","ns_st_li","ns_st_ci","ns_st_si","ns_st_pt","ns_st_dpt","ns_st_ipt","ns_st_ap","ns_st_dap","ns_st_et","ns_st_det","ns_st_upc","ns_st_dupc","ns_st_iupc","ns_st_upa","ns_st_dupa","ns_st_iupa","ns_st_lpc","ns_st_dlpc","ns_st_lpa","ns_st_dlpa","ns_st_pa","ns_st_ldw","ns_st_ldo","ns_st_ie","ns_ap_jb","ns_ap_et","ns_ap_res","ns_ap_sd","ns_ap_po","ns_ap_ot","ns_ap_c12m","cs_c12u","ca_cs_c12u","cb_cs_c12u","cc_cs_c12u","cd_cs_c12u","ns_ap_install","ns_ap_updated","ns_ap_lastrun","ns_ap_cs","ns_ap_runs","ns_ap_usage","ns_ap_fg","ns_ap_ft","ns_ap_dft","ns_ap_bt","ns_ap_dbt","ns_ap_dit","ns_ap_as","ns_ap_das","ns_ap_it","ns_ap_uc","ns_ap_aus","ns_ap_daus","ns_ap_us","ns_ap_dus","ns_ap_ut","ns_ap_oc","ns_ap_uxc","ns_ap_uxs","ns_ap_lang","ns_ap_ar","ns_ap_miss","ns_ts","ns_ap_cfg","ns_ap_env","ns_st_ca","ns_st_cp","ns_st_er","ca_ns_st_er","cb_ns_st_er","cc_ns_st_er","cd_ns_st_er","ns_st_pe","ns_st_ui","ca_ns_st_ui","cb_ns_st_ui","cc_ns_st_ui","cd_ns_st_ui","ns_st_bc","ns_st_dbc","ns_st_bt","ns_st_dbt","ns_st_bp","ns_st_lt","ns_st_skc","ns_st_dskc","ns_st_ska","ns_st_dska","ns_st_skd","ns_st_skt","ns_st_dskt","ns_st_pc","ns_st_dpc","ns_st_pp","ns_st_br","ns_st_pbr","ns_st_rt","ns_st_prt","ns_st_ub","ns_st_vo","ns_st_pvo","ns_st_ws","ns_st_pws","ns_st_ki","ns_st_rp","ns_st_bn","ns_st_tb","ns_st_an","ns_st_ta","ns_st_pl","ns_st_pr","ns_st_tpr","ns_st_sn","ns_st_en","ns_st_ep","ns_st_tep","ns_st_sr","ns_st_ty","ns_st_ct","ns_st_cs","ns_st_ge","ns_st_st","ns_st_stc","ns_st_ce","ns_st_ia","ns_st_dt","ns_st_ddt","ns_st_tdt","ns_st_tm","ns_st_dtm","ns_st_ttm","ns_st_de","ns_st_pu","ns_st_ti","ns_st_cu","ns_st_fee","ns_st_ft","ns_st_at","ns_st_pat","ns_st_vt","ns_st_pvt","ns_st_tt","ns_st_ptt","ns_st_cdn","ns_st_pcdn","ns_st_amg","ns_st_ami","ns_st_amp","ns_st_amt","ns_st_ams","ns_ap_i1","ns_ap_i2","ns_ap_i3","ns_ap_i4","ns_ap_i5","ns_ap_i6","ns_ap_referrer","ns_clid","ns_campaign","ns_source","ns_mchannel","ns_linkname","ns_fee","gclid","utm_campaign","utm_source","utm_medium","utm_term","utm_content","ns_ecommerce","ns_ec_sv","ns_client_id","ns_order_id","ns_ec_cur","ns_orderline_id","ns_orderlines","ns_prod_id","ns_qty","ns_prod_price","ns_prod_grp","ns_brand","ns_shop","ns_category","category","ns_c","ns_search_term","ns_search_result","ns_m_exp","ns_m_chs","c3","ca3","cb3","cc3","cd3","c4","ca4","cb4","cc4","cd4","c5","ca5","cb5","cc5","cd5","c6","ca6","cb6","cc6","cd6","c10","c11","c13","c14","c15","c16","c7","c8","c9","ns_ap_er","ns_st_amc"]
+cs_vgt={}
+for each label in cs_vgs
 if m.labels[label]<>invalid then
-cs_vkd=cs_vkd+"&" +comscore_url_encode(label)+ "=" +comscore_url_encode(m.labels[label])
-cs_vfc.addreplace(label,true)
+cs_vlk=cs_vlk+"&" +comscore_url_encode(label)+ "=" +comscore_url_encode(m.labels[label])
+cs_vgt.addreplace(label,true)
 end if
 end for
 for each key in m.labels
-if m.labels[key]<>invalid and cs_vfc[key]=invalid then
-cs_vkd=cs_vkd+"&" +comscore_url_encode(key)+ "=" +comscore_url_encode(m.labels[key])
+if m.labels[key]<>invalid and cs_vgt[key]=invalid then
+cs_vlk=cs_vlk+"&" +comscore_url_encode(key)+ "=" +comscore_url_encode(m.labels[key])
 end if
 end for
-if len(cs_vkd)>0 then
-return right(cs_vkd,len(cs_vkd)-1)
+if len(cs_vlk)>0 then
+return right(cs_vlk,len(cs_vlk)-1)
 else
-return cs_vkd
+return cs_vlk
 end if
 end function
-return cs_vxw
+return cs_vyf
 end function
-function cs_vff(dax as object,cs_vud as string,pixelurl as string,labels as object)as object
-cs_vxw=csmeasurement(dax)
-di=createobject("roDeviceInfo")
-if pixelurl<>invalid and pixelurl<>"" then cs_vxw.setpixelurl(pixelurl)
-cs_vxw.labels["c1"]= "19"
-cs_vxw.labels["ns_ap_an"]=dax.appname()
-cs_vxw.labels["ns_ap_pn"]= "roku"
-if dax.version()<>dax.previousversion()or(dax.p_storage.cs_vhh("runs")=true and comscore_stoi(dax.p_storage.cs_vhg("runs"))=0)then
-cs_vxw.labels["c12"]=dax.visitorid()
+function cs_vgw(dax as object,cs_vvk as string,pixelurl as string,labels as object)as object
+cs_vyf=csmeasurement(dax)
+cs_vhq=createobject("roDeviceInfo")
+if pixelurl<>invalid and pixelurl<>"" then cs_vyf.setpixelurl(pixelurl)
+cs_vyf.labels["c1"]= "19"
+cs_vyf.labels["ns_ap_an"]=dax.appname()
+cs_vyf.labels["ns_ap_pn"]= "roku"
+if dax.cs_vhv then
+dax.cs_vcw.cs_ven()
+cs_vyf.labels["ns_ar"]=dax.cs_vcw.cs_vfh()
+if dax.cs_vcw.cs_vfi()then
+cs_vyf.labels["ns_ap_ni"]= "1"
+end if
+end if
+if dax.version()<>dax.previousversion()or(dax.p_storage.cs_viy("runs")=true and comscore_stoi(dax.p_storage.cs_vix("runs"))=0)then
+cs_vyf.labels["c12"]=dax.visitorid()
 else
 visitorid=""
-if dax.p_storage.cs_vhh("visitorId")then
-visitorid=dax.p_storage.cs_vhg("visitorId")
+if dax.p_storage.cs_viy("visitorId")then
+visitorid=dax.p_storage.cs_vix("visitorId")
 else
-di=createobject("roDeviceInfo")
-cs_vfj=di.getdeviceuniqueid()+dax.cs_vca
-cs_vfk=createobject("roByteArray")
-cs_vfk.fromasciistring(cs_vfj)
-cs_vfl=createobject("roEVPDigest")
-cs_vfl.setup("md5")
-cs_vfl.update(cs_vfk)
-visitorid=cs_vfl.final()
-dax.p_storage.cs_vhi("visitorId",visitorid)
+cs_vhq=createobject("roDeviceInfo")
+cs_vha=cs_vhq.getchannelclientid()+dax.cs_vce
+cs_vhb=createobject("roByteArray")
+cs_vhb.fromasciistring(cs_vha)
+cs_vhc=createobject("roEVPDigest")
+cs_vhc.setup("md5")
+cs_vhc.update(cs_vhb)
+visitorid=cs_vhc.final()
+dax.p_storage.cs_viz("visitorId",visitorid)
 end if
-cs_vxw.labels["c12"]=visitorid
+cs_vyf.labels["c12"]=visitorid
 end if
-if findmemberfunction(di,"GetDeviceUniqueId")<>invalid then
-cs_vfm=createobject("roByteArray")
-cs_vfm.fromasciistring(di.getdeviceuniqueid())
-cs_vfn=createobject("roEVPDigest")
-cs_vfn.setup("md5")
-cs_vfn.update(cs_vfm)
-cs_vxw.labels["ns_ap_i1"]=cs_vfn.final()
-cs_vfo=createobject("roEVPDigest")
-cs_vfo.setup("sha1")
-cs_vfo.update(cs_vfm)
-cs_vxw.labels["ns_ap_i6"]=cs_vfo.final()
+if findmemberfunction(cs_vhq,"GetChannelClientId")<>invalid then
+cs_vhd=createobject("roByteArray")
+cs_vhd.fromasciistring(cs_vhq.getchannelclientid())
+cs_vhe=createobject("roEVPDigest")
+cs_vhe.setup("md5")
+cs_vhe.update(cs_vhd)
+cs_vyf.labels["ns_ap_i1"]=cs_vhe.final()
+cs_vhf=createobject("roEVPDigest")
+cs_vhf.setup("sha1")
+cs_vhf.update(cs_vhd)
+cs_vyf.labels["ns_ap_i6"]=cs_vhf.final()
 end if
-if findmemberfunction(di,"IsAdIdTrackingDisabled")<>invalid and findmemberfunction(di,"GetAdvertisingId")<>invalid then
-if di.isadidtrackingdisabled()=false then
-cs_vfp=createobject("roByteArray")
-cs_vfp.fromasciistring(di.getadvertisingid())
-cs_vfq=createobject("roEVPDigest")
-cs_vfq.setup("md5")
-cs_vfq.update(cs_vfp)
-cs_vxw.labels["ns_ap_i3"]=cs_vfq.final()
-cs_vfr=createobject("roEVPDigest")
-cs_vfr.setup("sha1")
-cs_vfr.update(cs_vfp)
-cs_vxw.labels["ns_ap_i5"]=cs_vfr.final()
+if findmemberfunction(cs_vhq,"IsRIDADisabled")<>invalid and findmemberfunction(cs_vhq,"GetRIDA")<>invalid then
+if cs_vhq.isridadisabled()=false then
+cs_vhg=createobject("roByteArray")
+cs_vhg.fromasciistring(cs_vhq.getrida())
+cs_vhh=createobject("roEVPDigest")
+cs_vhh.setup("md5")
+cs_vhh.update(cs_vhg)
+cs_vyf.labels["ns_ap_i3"]=cs_vhh.final()
+cs_vhi=createobject("roEVPDigest")
+cs_vhi.setup("sha1")
+cs_vhi.update(cs_vhg)
+cs_vyf.labels["ns_ap_i5"]=cs_vhi.final()
 end if
 end if
-cs_vxw.labels["ns_ap_device"]=di.getmodel()
-cs_vxw.labels["ns_ap_as"]=comscore_tostr(dax.p_genesis)
-cs_vxw.labels["ns_type"]=cs_vud
-cs_vxw.labels["ns_ap_ev"]=cs_vud
-cs_vxw.labels["ns_ts"]=comscore_tostr(cs_vxw.cs_vex)
-cs_vxw.labels["ns_ap_pfv"]=di.getversion()
-cs_vxw.labels["ns_nc"]= "1"
+cs_vyf.labels["ns_ap_device"]=cs_vhq.getmodel()
+cs_vyf.labels["ns_ap_as"]=comscore_tostr(dax.p_genesis)
+cs_vyf.labels["ns_type"]=cs_vvk
+cs_vyf.labels["ns_ap_ev"]=cs_vvk
+cs_vyf.labels["ns_ts"]=comscore_tostr(cs_vyf.cs_vgo)
+cs_vyf.labels["ns_ap_pfv"]=cs_vhq.getversion()
+cs_vyf.labels["ns_nc"]= "1"
 if(labels["ns_st_ev"]=invalid)then
-if dax.cs_vfs=0 then
-if dax.cs_vct>0 then
-cs_vxw.labels["ns_ap_dft"]=comscore_tostr(dax.cs_vcs)
-cs_vxw.labels["ns_ap_ft"]=comscore_tostr(dax.cs_vct)
+if dax.cs_vhj=0 then
+if dax.cs_vcy>0 then
+cs_vyf.labels["ns_ap_dft"]=comscore_tostr(dax.cs_vcx)
+cs_vyf.labels["ns_ap_ft"]=comscore_tostr(dax.cs_vcy)
 end if
 else
-cs_vxw.labels["ns_ap_dft"]=comscore_tostr(dax.cs_vj.totalmilliseconds())
-cs_vxw.labels["ns_ap_ft"]=comscore_tostr(dax.cs_vk.totalmilliseconds())
+cs_vyf.labels["ns_ap_dft"]=comscore_tostr(dax.cs_vm.totalmilliseconds())
+cs_vyf.labels["ns_ap_ft"]=comscore_tostr(dax.cs_vn.totalmilliseconds())
 end if
 end if
-cs_vft=dax.getlabels()
-for each key in cs_vft
-cs_vxw.labels[key]=cs_vft[key]
+cs_vhk=dax.getlabels()
+for each key in cs_vhk
+cs_vyf.labels[key]=cs_vhk[key]
 end for
 for each key in labels
-cs_vxw.labels[key]=labels[key]
+cs_vyf.labels[key]=labels[key]
 end for
-return cs_vxw
+return cs_vyf
 end function
-function csapplicationmeasurement(dax as object,cs_vud as string,pixelurl as string,labels as object)as object
-cs_vfx=cseventtype().hidden
-if cs_vud=cseventtype().start or cs_vud=cseventtype().view then cs_vfx=cseventtype().view
-cs_vxw=cs_vff(dax,cs_vfx,pixelurl,labels)
-cs_vxw.labels["ns_ap_ev"]=cs_vud
-cs_vxw.labels["ns_ap_ver"]=dax.appversion()
-di=createobject("roDeviceInfo")
-if comscore_is26()then
-cs_vga=di.getdisplaysize()
-cs_vxw.labels["ns_ap_res"]=stri(cs_vga.w).trim()+ "x" +stri(cs_vga.h).trim()
-end if
-if comscore_is43()then cs_vxw.labels["ns_ap_lang"]=di.getcurrentlocale()
-cs_vxw.labels["ns_ap_sv"]=dax.version()
-cs_vxw.labels["ns_ap_smv"]= "2.10"
-return cs_vxw
+function csapplicationmeasurement(dax as object,cs_vvk as string,pixelurl as string,labels as object)as object
+cs_vho=cseventtype().hidden
+if cs_vvk=cseventtype().start or cs_vvk=cseventtype().view then cs_vho=cseventtype().view
+cs_vyf=cs_vgw(dax,cs_vho,pixelurl,labels)
+cs_vyf.labels["ns_ap_ev"]=cs_vvk
+cs_vyf.labels["ns_ap_ver"]=dax.appversion()
+cs_vhq=createobject("roDeviceInfo")
+cs_vhr=cs_vhq.getdisplaysize()
+cs_vyf.labels["ns_ap_res"]=stri(cs_vhr.w).trim()+ "x" +stri(cs_vhr.h).trim()
+cs_vyf.labels["ns_ap_lang"]=cs_vhq.getcurrentlocale()
+cs_vyf.labels["ns_ap_sv"]=dax.version()
+cs_vyf.labels["ns_ap_smv"]= "2.10"
+return cs_vyf
 end function
-function cs_vgb(dax as object,cs_vud as string,pixelurl as string,labels as object)as object
-cs_vxw=csapplicationmeasurement(dax,cs_vud,pixelurl,labels)
-cs_vxw.labels["ns_ap_install"]= "yes"
-cs_vxw.labels["ns_ap_runs"]=dax.p_storage.cs_vhg("runs")
-cs_vxw.labels["ns_ap_gs"]=comscore_tostr(dax.cs_vci())
-cs_vxw.labels["ns_ap_lastrun"]=comscore_tostr(dax.cs_vcm())
-cs_vgp=""
-if dax.cs_vge=true then
-cs_vgp=cs_vgp+"1"
+function cs_vhs(dax as object,cs_vvk as string,pixelurl as string,labels as object)as object
+cs_vyf=csapplicationmeasurement(dax,cs_vvk,pixelurl,labels)
+cs_vyf.labels["ns_ap_install"]= "yes"
+cs_vyf.labels["ns_ap_runs"]=dax.p_storage.cs_vix("runs")
+cs_vyf.labels["ns_ap_gs"]=comscore_tostr(dax.cs_vcm())
+cs_vyf.labels["ns_ap_lastrun"]=comscore_tostr(dax.cs_vcq())
+cs_vig=""
+if dax.cs_vhv=true then
+cs_vig=cs_vig+"1"
 else
-cs_vgp=cs_vgp+"0"
+cs_vig=cs_vig+"0"
 end if
-if dax.cs_vgh=true then
-cs_vgp=cs_vgp+"1"
+if dax.cs_vhy=true then
+cs_vig=cs_vig+"1"
 else
-cs_vgp=cs_vgp+"0"
+cs_vig=cs_vig+"0"
 end if
-if dax.cs_vgk=true then
-cs_vgp=cs_vgp+"1"
+if dax.cs_vib=true then
+cs_vig=cs_vig+"1"
 else
-cs_vgp=cs_vgp+"0"
+cs_vig=cs_vig+"0"
 end if
-if dax.cs_vgn=true then
-cs_vgp=cs_vgp+"1"
+if dax.cs_vie=true then
+cs_vig=cs_vig+"1"
 else
-cs_vgp=cs_vgp+"0"
+cs_vig=cs_vig+"0"
 end if
-cs_vxw.labels["ns_ap_cfg"]=cs_vgp
-return cs_vxw
+cs_vyf.labels["ns_ap_cfg"]=cs_vig
+return cs_vyf
 end function
-function cs_vgq(dax as object,cs_vud as string,pixelurl as string,labels as object)as object
-cs_vxw=csapplicationmeasurement(dax,cs_vud,pixelurl,labels)
-return cs_vxw
+function cs_vih(dax as object,cs_vvk as string,pixelurl as string,labels as object)as object
+cs_vyf=csapplicationmeasurement(dax,cs_vvk,pixelurl,labels)
+return cs_vyf
 end function
-function cs_vgs(cs_vmu as object)as object
-cs_vxw=createobject("roAssociativeArray")
-cs_vxw.cs_vmu=cs_vmu
-cs_vxw.cs_vgv=function()as object
-cs_vgw=createobject("roUrlTransfer")
-m.cs_vgx=createobject("roMessagePort")
-cs_vgw.setport(m.cs_vgx)
-cs_vgw.setcertificatesfile("common:/certs/ca-bundle.crt")
-cs_vgw.enableencodings(true)
-cs_vgw.addheader("Expect","")
-url=m.cs_vmu.pixelurl+m.cs_vmu.cs_vey()
-if cscomscore().log_debug then print"Dispatching: " +url
-cs_vgw.seturl(url)
-cs_vgw.setrequest("GET")
-m.dispatch(cs_vgw)
-cscomscore().cs_vbc()
-if(m.cs_vmu.labels["ns_st_ev"]=invalid)then
-cscomscore().cs_vbd()
+function cs_vij(cs_vob as object)as object
+cs_vyf=createobject("roAssociativeArray")
+cs_vyf.cs_vob=cs_vob
+cs_vyf.cs_vim=function()as object
+cs_vin=createobject("roUrlTransfer")
+m.cs_vio=createobject("roMessagePort")
+cs_vin.setport(m.cs_vio)
+cs_vin.setcertificatesfile("common:/certs/ca-bundle.crt")
+cs_vin.enableencodings(true)
+cs_vin.addheader("Expect","")
+cs_vip=m.cs_vob.pixelurl+m.cs_vob.cs_vgp()
+if cscomscore().log_debug then print"Dispatching: " +cs_vip
+cs_vin.seturl(cs_vip)
+cs_vin.setrequest("GET")
+m.dispatch(cs_vin)
+cscomscore().cs_vbg()
+if(m.cs_vob.labels["ns_st_ev"]=invalid)then
+cscomscore().cs_vbh()
 end if
 end function
-cs_vxw.dispatch=function(cs_vgw as object)
-if(cs_vgw.asyncgettostring())then wait(500,cs_vgw.getport())
+cs_vyf.dispatch=function(cs_vin as object)
+if(cs_vin.asyncgettostring())then wait(500,cs_vin.getport())
 end function
-return cs_vxw
+return cs_vyf
 end function
-function comscoresgbridge(cs_vwe as object)as object
-cs_vxw=createobject("roAssociativeArray")
-cs_vxw.cs_vwe=cs_vwe
-cs_vxw.comscoretask=function()as object
-return m.cs_vwe
+function comscoresgbridge(cs_vxl as object)as object
+cs_vyf=createobject("roAssociativeArray")
+cs_vyf.cs_vxl=cs_vxl
+cs_vyf.comscoretask=function()as object
+return m.cs_vxl
 end function
-cs_vxw.setcustomerc2=function(c2 as string)as void
-m.cs_vwg("SetCustomerC2",[c2])
+cs_vyf.setcustomerc2=function(c2 as string)as void
+m.cs_vxn("SetCustomerC2",[c2])
 end function
-cs_vxw.setpublishersecret=function(salt as string)as void
-m.cs_vwg("SetPublisherSecret",[salt])
+cs_vyf.setpublishersecret=function(salt as string)as void
+m.cs_vxn("SetPublisherSecret",[salt])
 end function
-cs_vxw.start=function(labels=invalid as object)as void
-m.cs_vwg("Start",[labels])
+cs_vyf.start=function(labels=invalid as object)as void
+m.cs_vxn("Start",[labels])
 end function
-cs_vxw.view=function(labels=invalid as object)as void
-m.cs_vwg("View",[labels])
+cs_vyf.view=function(labels=invalid as object)as void
+m.cs_vxn("View",[labels])
 end function
-cs_vxw.hidden=function(labels=invalid as object)as void
-m.cs_vwg("Hidden",[labels])
+cs_vyf.hidden=function(labels=invalid as object)as void
+m.cs_vxn("Hidden",[labels])
 end function
-cs_vxw.close=function(labels=invalid as object)as void
-m.cs_vwg("Close",[labels])
+cs_vyf.close=function()as void
+m.cs_vxn("Close",invalid)
 end function
-cs_vxw.tick=function()as void
-m.cs_vwg("Tick",invalid)
+cs_vyf.tick=function()as void
+m.cs_vxn("Tick",invalid)
 end function
-cs_vxw.setpixelurl=function(cs_vvw as string)as void
-m.cs_vwg("SetPixelURL",[cs_vvw])
+cs_vyf.setpixelurl=function(cs_vxd as string)as void
+m.cs_vxn("SetPixelURL",[cs_vxd])
 end function
-cs_vxw.setsecure=function(secure as boolean)as void
-m.cs_vwg("SetSecure",[secure])
+cs_vyf.setsecure=function(secure as boolean)as void
+m.cs_vxn("SetSecure",[secure])
 end function
-cs_vxw.setlabels=function(cs_vtw as object)as void
-m.cs_vwg("SetLabels",[cs_vtw])
+cs_vyf.setlabels=function(cs_vvd as object)as void
+m.cs_vxn("SetLabels",[cs_vvd])
 end function
-cs_vxw.setlabel=function(key as string,cs_vvw as string)as void
-m.cs_vwg("SetLabel",[key,cs_vvw])
+cs_vyf.setlabel=function(key as string,cs_vxd as string)as void
+m.cs_vxn("SetLabel",[key,cs_vxd])
 end function
-cs_vxw.setappname=function(name as string)as void
-m.cs_vwg("SetAppName",[name])
+cs_vyf.setappname=function(name as string)as void
+m.cs_vxn("SetAppName",[name])
 end function
-cs_vxw.setappversion=function(version as string)as void
-m.cs_vwg("SetAppVersion",[version])
+cs_vyf.setappversion=function(version as string)as void
+m.cs_vxn("SetAppVersion",[version])
 end function
-cs_vxw.cs_vwg=function(name as string,args)
-cs_vwh={}
-cs_vwh["component"]= "app"
-cs_vwh["methodName"]=name
-cs_vwh["args"]=args
-m.cs_vwe["apiCall"]=cs_vwh
+cs_vyf.setuseraf=function(enabled as boolean)as void
+m.cs_vxn("SetUseRAF",[enabled])
 end function
-return cs_vxw
+cs_vyf.setuserafsettermethods=function(enabled as boolean)as void
+m.cs_vxn("SetUseRAFSetterMethods",[enabled])
 end function
-function cs_vhd(context as object)as object
-cs_vxw=createobject("roAssociativeArray")
-cs_vxw.cs_vhf=createobject("roRegistrySection","com.comscore." +context.appname()+ "-2")
-cs_vxw.cs_vhg=function(key)as string
-if m.cs_vhf.exists(key)then return m.cs_vhf.read(key)
+cs_vyf.cs_vxn=function(name as string,args)
+cs_vxo={}
+cs_vxo["component"]= "app"
+cs_vxo["methodName"]=name
+cs_vxo["args"]=args
+m.cs_vxl["apiCall"]=cs_vxo
+end function
+return cs_vyf
+end function
+function cs_viu(context as object)as object
+cs_vyf=createobject("roAssociativeArray")
+cs_vyf.cs_viw=createobject("roRegistrySection","com.comscore." +context.appname()+ "-2")
+cs_vyf.cs_vix=function(key)as string
+if m.cs_viw.exists(key)then return m.cs_viw.read(key)
 return""
 end function
-cs_vxw.cs_vhh=function(key)as boolean
-return m.cs_vhf.exists(key)
+cs_vyf.cs_viy=function(key)as boolean
+return m.cs_viw.exists(key)
 end function
-cs_vxw.cs_vhi=function(key,val)as void
-m.cs_vhf.write(key,val)
-m.cs_vhf.flush()
+cs_vyf.cs_viz=function(key,val)as void
+m.cs_viw.write(key,val)
+m.cs_viw.flush()
 end function
-cs_vxw.cs_vhj=function(key)as void
-m.cs_vhf.delete(key)
-m.cs_vhf.flush()
+cs_vyf.cs_vja=function(key)as void
+m.cs_viw.delete(key)
+m.cs_viw.flush()
 end function
-return cs_vxw
-end function
-function comscore_is26()as boolean
-if m.cs_vho=invalid then
-di=createobject("roDeviceInfo")
-
-'cs_vld=eval("country=di.GetCountryCode()")
-country=di.GetCountryCode()
-cs_vld = 252
-
-if cs_vld=252
-m.cs_vho=true
-else
-m.cs_vho=false
-end if
-end if
-return m.cs_vho
-end function
-function comscore_is43()as boolean
-if m.cs_vht=invalid then
-di=createobject("roDeviceInfo")
-
-'cs_vld=eval("locale=di.GetCurrentLocale()")
-locale=di.GetCurrentLocale()
-cs_vld = 252
-
-if cs_vld=252
-m.cs_vht=true
-else
-m.cs_vht=false
-end if
-end if
-return m.cs_vht
+return cs_vyf
 end function
 function comscore_unix_time()as double
-if m.cs_vhv=invalid then
-m.cs_vhv=createobject("roAssociativeArray")
-m.cs_vhv.cs_vhw=createobject("roTimespan")
-cs_vzg=createobject("roDateTime")
-cs_vzg.mark()
-m.cs_vhv.offset#=cs_vzg.asseconds()*1000#
-m.cs_vhv.cs_vhw.mark()
+if m.cs_vjc=invalid then
+m.cs_vjc=createobject("roAssociativeArray")
+m.cs_vjc.cs_vjd=createobject("roTimespan")
+cs_vzr=createobject("roDateTime")
+cs_vzr.mark()
+m.cs_vjc.offset#=cs_vzr.asseconds()*1000#
+m.cs_vjc.cs_vjd.mark()
 end if
-m.p_csmillis#=m.cs_vhv.cs_vhw.totalmilliseconds()
-return m.cs_vhv.offset#+m.p_csmillis#
+m.p_csmillis#=m.cs_vjc.cs_vjd.totalmilliseconds()
+return m.cs_vjc.offset#+m.p_csmillis#
 end function
 function comscore_tostr(obj as object)as string
-cs_vig=type(obj)
-if cs_vig="String" or cs_vig="roString" then return obj
-if cs_vig="Integer" or cs_vig="roInt" then return stri(obj).trim()
-if cs_vig="Double" or cs_vig="roIntrinsicDouble" or cs_vig="Float" or cs_vig="roFloat" then
+cs_vjn=type(obj)
+if cs_vjn="String" or cs_vjn="roString" then return obj
+if cs_vjn="Integer" or cs_vjn="roInt" then return stri(obj).trim()
+if cs_vjn="Double" or cs_vjn="roIntrinsicDouble" or cs_vjn="Float" or cs_vjn="roFloat" then
 num#=obj
 mil#=1000000
 if abs(num#)<=mil#then return str(num#).trim()
-cs_vii=int(num#/mil#)
-if num#/mil#-cs_vii<0 then cs_vii=cs_vii-1
-cs_vij=int((num#-mil#*cs_vii))
-cs_vik=cs_vii.tostr()
-cs_vil=string(6-cs_vij.tostr().len(),"0")+cs_vij.tostr()
-return cs_vik+cs_vil
+cs_vjp=int(num#/mil#)
+if num#/mil#-cs_vjp<0 then cs_vjp=cs_vjp-1
+cs_vjq=int((num#-mil#*cs_vjp))
+cs_vjr=cs_vjp.tostr()
+cs_vjs=string(6-cs_vjq.tostr().len(),"0")+cs_vjq.tostr()
+return cs_vjr+cs_vjs
 end if
-return"UNKN" +cs_vig
+return"UNKN" +cs_vjn
 end function
 function comscore_stod(obj as string)as double
 len=obj.len()
 if len<=6 then
-cs_vkd#=val(obj)
-return cs_vkd#
+cs_vlk#=val(obj)
+return cs_vlk#
 end if
 left=obj.left(len-6)
 right=obj.right(6)
 left#=val(left)
 right#=val(right)
 mil#=1000000
-cs_vkd#=left#*mil#+right#
-return cs_vkd#
+cs_vlk#=left#*mil#+right#
+return cs_vlk#
 end function
 function comscore_stoi(obj as string)as integer
 return int(val(obj))
 end function
-function comscore_url_encode(cs_vfj as string)as string
-if m.cs_vin=invalid then m.cs_vin=createobject("roUrlTransfer")
-return m.cs_vin.urlencode(cs_vfj)
+function comscore_url_encode(cs_vha as string)as string
+if m.cs_vju=invalid then m.cs_vju=createobject("roUrlTransfer")
+return m.cs_vju.urlencode(cs_vha)
 end function
 function comscore_extend(toobject as object,fromobject as object)
 if toobject<>invalid and fromobject<>invalid and type(toobject)= "roAssociativeArray" and type(fromobject)= "roAssociativeArray" then
@@ -795,1200 +841,1162 @@ end for
 end if
 end function
 function csstreamsense(dax=invalid as object)as object
-cs_vxw=createobject("roAssociativeArray")
+cs_vyf=createobject("roAssociativeArray")
 onstatechange=invalid
 labels=invalid
-cs_vxw.cs_vip="roku"
-cs_vxw.cs_viq="4.1503.03"
-cs_vxw.cs_vir=500#
-cs_vxw.cs_vis=10#*1000#
-cs_vxw.cs_vit=60#*1000#
-cs_vxw.cs_viu=6
-cs_vxw.cs_viv=1200000#
-cs_vxw.cs_viw=500#
-cs_vxw.cs_vix=1500
-cs_vxw.cs_vqa=invalid
-cs_vxw.cs_vqb=invalid
-cs_vxw.p_pixelurl=""
-cs_vxw.cs_vpl=0#
-cs_vxw.cs_vou=0#
-cs_vxw.cs_vpk=invalid
-cs_vxw.cs_vnu=0
-cs_vxw.cs_vqc=invalid
-cs_vxw.cs_vkp=true
-cs_vxw.cs_voy=true
-cs_vxw.cs_vnw=-1#
-cs_vxw.cs_vnf=0
-cs_vxw.cs_vng=-1#
-cs_vxw.cs_vnc=-1#
-cs_vxw.cs_vnn=-1#
-cs_vxw.cs_vpf=invalid
-cs_vxw.cs_voa=invalid
-cs_vxw.cs_vly=invalid
-cs_vxw.cs_vka=invalid
-cs_vxw.cs_vjx=invalid
-cs_vxw.cs_vmp=""
-cs_vxw.cs_vmr=""
-cs_vxw.cs_vkr=false
-cs_vxw.cs_vmk=-1#
-cs_vxw.cs_vml=invalid
-cs_vxw.cs_vmm=invalid
-cs_vxw.engageto=function(screen as object)as void
+cs_vyf.cs_vjw="roku"
+cs_vyf.cs_vjx="4.1503.03"
+cs_vyf.cs_vjy=500#
+cs_vyf.cs_vjz=10#*1000#
+cs_vyf.cs_vka=60#*1000#
+cs_vyf.cs_vkb=6
+cs_vyf.cs_vkc=1200000#
+cs_vyf.cs_vkd=500#
+cs_vyf.cs_vke=1500
+cs_vyf.cs_vrh=invalid
+cs_vyf.cs_vri=invalid
+cs_vyf.p_pixelurl=""
+cs_vyf.cs_vqs=0#
+cs_vyf.cs_vqb=0#
+cs_vyf.cs_vqr=invalid
+cs_vyf.cs_vpb=0
+cs_vyf.cs_vrj=invalid
+cs_vyf.cs_vlw=true
+cs_vyf.cs_vqf=true
+cs_vyf.cs_vpd=-1#
+cs_vyf.cs_vom=0
+cs_vyf.cs_von=-1#
+cs_vyf.cs_voj=-1#
+cs_vyf.cs_vou=-1#
+cs_vyf.cs_vqm=invalid
+cs_vyf.cs_vph=invalid
+cs_vyf.cs_vnf=invalid
+cs_vyf.cs_vlh=invalid
+cs_vyf.cs_vle=invalid
+cs_vyf.cs_vnw=""
+cs_vyf.cs_vny=""
+cs_vyf.cs_vly=false
+cs_vyf.cs_vnr=-1#
+cs_vyf.cs_vns=invalid
+cs_vyf.cs_vnt=invalid
+cs_vyf.engageto=function(screen as object)as void
 m.reset()
-m.cs_vjx=screen
-screen.cs_vlz=m
-cs_vjz={}
-cs_vjz["ns_st_cu"]=screen.cs_vws.streamurls[0]
-if screen.cs_vws.title<>invalid then cs_vjz["ns_st_ep"]=screen.cs_vws.title
-m.setclip(cs_vjz)
-m.cs_vka=createobject("roTimespan")
+m.cs_vle=screen
+screen.cs_vng=m
+cs_vlg={}
+cs_vlg["ns_st_cu"]=screen.videoclip.streamurls[0]
+if screen.videoclip.cs_vdv<>invalid then cs_vlg["ns_st_ep"]=screen.videoclip.cs_vdv
+m.setclip(cs_vlg)
+m.cs_vlh=createobject("roTimespan")
 end function
-cs_vxw.onplayerevent=function(cs_vwu as object)as boolean
-cs_vkd=false
-m.cs_vqa.tick()
-if cs_vwu=invalid then
-if m.getstate()=csstreamsensestate().playing and m.cs_vka.totalmilliseconds()>m.cs_vix then
+cs_vyf.onplayerevent=function(cs_vlj as object)as boolean
+cs_vlk=false
+m.cs_vrh.tick()
+if cs_vlj=invalid then
+if m.getstate()=csstreamsensestate().playing and m.cs_vlh.totalmilliseconds()>m.cs_vke then
 m.notify(csstreamsenseeventtype().pause)
 else
 m.tick()
 end if
-else if comscore_is26()and cs_vwu.ispaused()then
+else if cs_vlj.ispaused()then
 m.notify(csstreamsenseeventtype().pause)
-else if comscore_is26()and cs_vwu.isstreamstarted()then
+else if cs_vlj.isstreamstarted()then
 m.notify(csstreamsenseeventtype().buffer)
-else if cs_vwu.isplaybackposition()then
-m.notify(csstreamsenseeventtype().play,cs_vwu.getindex()*1000)
-m.cs_vka.mark()
-else if cs_vwu.isscreenclosed()or cs_vwu.isfullresult()or cs_vwu.ispartialresult()or cs_vwu.isrequestfailed()then
+else if cs_vlj.isplaybackposition()then
+m.notify(csstreamsenseeventtype().play,cs_vlj.getindex()*1000)
+m.cs_vlh.mark()
+else if cs_vlj.isscreenclosed()or cs_vlj.isfullresult()or cs_vlj.ispartialresult()or cs_vlj.isrequestfailed()then
 m.notify(csstreamsenseeventtype().end)
-cs_vkd=true
+cs_vlk=true
 end if
-return cs_vkd
+return cs_vlk
 end function
-cs_vxw.tick=function()as void
-cs_vzg=comscore_unix_time()
-if m.cs_vnc>=0 and m.cs_vnc<=cs_vzg then
-m.cs_vne()
+cs_vyf.tick=function()as void
+cs_vzr=comscore_unix_time()
+if m.cs_voj>=0 and m.cs_voj<=cs_vzr then
+m.cs_vol()
 end if
-if m.cs_vnn>=0 and m.cs_vnn<=cs_vzg then
-m.cs_vnl()
+if m.cs_vou>=0 and m.cs_vou<=cs_vzr then
+m.cs_vos()
 end if
-if m.cs_vnw>=0 and m.cs_vnw<=cs_vzg then
-m.cs_vns()
+if m.cs_vpd>=0 and m.cs_vpd<=cs_vzr then
+m.cs_voz()
 end if
-if m.cs_vmk>=0 and m.cs_vmk<=cs_vzg then
-m.cs_vma(m.cs_vml,m.cs_vmm)
+if m.cs_vnr>=0 and m.cs_vnr<=cs_vzr then
+m.cs_vnh(m.cs_vns,m.cs_vnt)
 end if
 end function
-cs_vxw.isidle=function()as boolean
+cs_vyf.isidle=function()as boolean
 return m.getstate()=csstreamsensestate().idle
 end function
-cs_vxw.setpixelurl=invalid
-cs_vxw.pixelurl=invalid
-cs_vxw.notify=function(cs_vud as object,position=-1#as double,eventlabelmap=invalid as object)as void
-cs_voz=m.cs_voe(cs_vud)
-cs_vmg=createobject("roAssociativeArray")
-if eventlabelmap<>invalid then cs_vmg.append(eventlabelmap)
-m.cs_vnx(cs_vmg)
-if not cs_vmg.doesexist("ns_st_po")then
-cs_vmg["ns_st_po"]=comscore_tostr(position)
+cs_vyf.setpixelurl=invalid
+cs_vyf.pixelurl=invalid
+cs_vyf.notify=function(cs_vvk as object,position=-1#as double,eventlabelmap=invalid as object)as void
+cs_vqg=m.cs_vpl(cs_vvk)
+cs_vnn=createobject("roAssociativeArray")
+if eventlabelmap<>invalid then cs_vnn.append(eventlabelmap)
+m.cs_vpe(cs_vnn)
+if not cs_vnn.doesexist("ns_st_po")then
+cs_vnn["ns_st_po"]=comscore_tostr(position)
 end if
-if cs_vud=csstreamsenseeventtype().play or cs_vud=csstreamsenseeventtype().pause or cs_vud=csstreamsenseeventtype().buffer or cs_vud=csstreamsenseeventtype().end then
-if m.ispauseplayswitchdelayenabled()and m.cs_vob(m.cs_vpk)and m.cs_vob(cs_voz)and not(m.cs_vpk=csstreamsensestate().playing and cs_voz=csstreamsensestate().paused and m.cs_vmm=invalid)then
-m.cs_vma(cs_voz,cs_vmg,m.cs_vir)
+if cs_vvk=csstreamsenseeventtype().play or cs_vvk=csstreamsenseeventtype().pause or cs_vvk=csstreamsenseeventtype().buffer or cs_vvk=csstreamsenseeventtype().end then
+if m.ispauseplayswitchdelayenabled()and m.cs_vpi(m.cs_vqr)and m.cs_vpi(cs_vqg)and not(m.cs_vqr=csstreamsensestate().playing and cs_vqg=csstreamsensestate().paused and m.cs_vnt=invalid)then
+m.cs_vnh(cs_vqg,cs_vnn,m.cs_vjy)
 else
-m.cs_vma(cs_voz,cs_vmg)
+m.cs_vnh(cs_vqg,cs_vnn)
 end if
 else
-if m.cs_vpg(cs_vmg)<0 then
-cs_vmg["ns_st_po"]=comscore_tostr(m.cs_vpa(m.cs_vph(cs_vmg)))
+if m.cs_vqn(cs_vnn)<0 then
+cs_vnn["ns_st_po"]=comscore_tostr(m.cs_vqh(m.cs_vqo(cs_vnn)))
 end if
-labels=m.cs_vpm(cs_vud,cs_vmg)
-labels.append(cs_vmg)
+labels=m.cs_vqt(cs_vvk,cs_vnn)
+labels.append(cs_vnn)
 m.dispatch(labels,false)
-m.cs_vnu=m.cs_vnu+1
+m.cs_vpb=m.cs_vpb+1
 end if
 end function
-cs_vxw.getlabels=function()as object
-return m.cs_vqb
+cs_vyf.getlabels=function()as object
+return m.cs_vri
 end function
-cs_vxw.sharingsdkpersistentlabels=function()as boolean
-return m.cs_vkp
+cs_vyf.sharingsdkpersistentlabels=function()as boolean
+return m.cs_vlw
 end function
-cs_vxw.sharesdkpersistentlabels=function(flag as boolean)
-m.cs_vkp=flag
+cs_vyf.sharesdkpersistentlabels=function(flag as boolean)
+m.cs_vlw=flag
 end function
-cs_vxw.ispauseonbufferingenabled=function()as boolean
-return m.cs_voy
+cs_vyf.ispauseonbufferingenabled=function()as boolean
+return m.cs_vqf
 end function
-cs_vxw.setpauseonbufferingenabled=function(pauseonbufferingenabled as boolean)
-m.cs_voy=pauseonbufferingenabled
+cs_vyf.setpauseonbufferingenabled=function(pauseonbufferingenabled as boolean)
+m.cs_vqf=pauseonbufferingenabled
 end function
-cs_vxw.ispauseplayswitchdelayenabled=function()as boolean
-return m.cs_vkr
+cs_vyf.ispauseplayswitchdelayenabled=function()as boolean
+return m.cs_vly
 end function
-cs_vxw.setpauseplayswitchdelayenabled=function(pauseplayswitchdelayenabled as boolean)as void
-m.cs_vkr=pauseplayswitchdelayenabled
+cs_vyf.setpauseplayswitchdelayenabled=function(pauseplayswitchdelayenabled as boolean)as void
+m.cs_vly=pauseplayswitchdelayenabled
 end function
-cs_vxw.setclip=function(labels as object,loop=false as boolean)as boolean
-cs_vld=false
-if m.cs_vpk=csstreamsensestate().idle then
-m.cs_vqc.getclip().reset()
-m.cs_vqc.getclip().setlabels(labels,invalid)
+cs_vyf.setclip=function(labels as object,loop=false as boolean)as boolean
+cs_vmk=false
+if m.cs_vqr=csstreamsensestate().idle then
+m.cs_vrj.getclip().reset()
+m.cs_vrj.getclip().setlabels(labels,invalid)
 if loop=true then
-m.cs_vqc.cs_vuk()
+m.cs_vrj.cs_vvr()
 end if
-if m.cs_vqa.useraf()=true and m.cs_vqa.userafsettermethods()=true and m.cs_vky(labels)=true then
+if m.cs_vrh.useraf()=true and m.cs_vrh.userafsettermethods()=true and m.cs_vmf(labels)=true then
 if labels["ns_st_ci"]<>invalid and labels["ns_st_ci"]<>"*null" then
-m.cs_vkv(labels["ns_st_ci"])
+m.cs_vmc(labels["ns_st_ci"])
 else
-m.cs_vkv("")
+m.cs_vmc("")
 end if
 if labels["ns_st_ge"]<>invalid and labels["ns_st_ge"]<>"*null" then
-m.cs_vkw(labels["ns_st_ge"],false)
+m.cs_vmd(labels["ns_st_ge"],false)
 else
-m.cs_vkw("",false)
+m.cs_vmd("",false)
 end if
 if labels["ns_st_cl"]<>invalid and labels["ns_st_cl"]<>"*null" then
-m.cs_vkx(int(comscore_stoi(labels["ns_st_cl"])/1000))
+m.cs_vme(int(comscore_stoi(labels["ns_st_cl"])/1000))
 else
-m.cs_vkx(0)
+m.cs_vme(0)
 end if
 end if
-cs_vld=true
+cs_vmk=true
 end if
-return cs_vld
+return cs_vmk
 end function
-cs_vxw.cs_vkv=function(id as string)as void
-if m.cs_vqa.useraf()=true and m.cs_vqa.userafsettermethods()=true and m.cs_vqa.adinterface()<>invalid then
-m.cs_vqa.adinterface().setcontentid(id)
-if m.cs_vqa.log_debug then print"Content Id successfully set with value " +id
-end if
-end function
-cs_vxw.cs_vkw=function(genres as string,kidscontent as boolean)as void
-if m.cs_vqa.useraf()=true and m.cs_vqa.userafsettermethods()=true and m.cs_vqa.adinterface()<>invalid then
-m.cs_vqa.adinterface().setcontentgenre(genres,kidscontent)
-if m.cs_vqa.log_debug then print"Genre successfully set with value " +genres
+cs_vyf.cs_vmc=function(id as string)as void
+if m.cs_vrh.useraf()=true and m.cs_vrh.userafsettermethods()=true and m.cs_vrh.adinterface()<>invalid then
+m.cs_vrh.adinterface().setcontentid(id)
+if m.cs_vrh.log_debug then print"Content Id successfully set with value " +id
 end if
 end function
-cs_vxw.cs_vkx=function(length as integer)as void
-if m.cs_vqa.useraf()=true and m.cs_vqa.userafsettermethods()=true and m.cs_vqa.adinterface()<>invalid then
-m.cs_vqa.adinterface().setcontentlength(length)
-if m.cs_vqa.log_debug then print"Content Length successfully set with value " +comscore_tostr(length)
+cs_vyf.cs_vmd=function(genres as string,kidscontent as boolean)as void
+if m.cs_vrh.useraf()=true and m.cs_vrh.userafsettermethods()=true and m.cs_vrh.adinterface()<>invalid then
+m.cs_vrh.adinterface().setcontentgenre(genres,kidscontent)
+if m.cs_vrh.log_debug then print"Genre successfully set with value " +genres
 end if
 end function
-cs_vxw.cs_vky=function(labels as object)as boolean
-cs_vld=false
+cs_vyf.cs_vme=function(length as integer)as void
+if m.cs_vrh.useraf()=true and m.cs_vrh.userafsettermethods()=true and m.cs_vrh.adinterface()<>invalid then
+m.cs_vrh.adinterface().setcontentlength(length)
+if m.cs_vrh.log_debug then print"Content Length successfully set with value " +comscore_tostr(length)
+end if
+end function
+cs_vyf.cs_vmf=function(labels as object)as boolean
+cs_vmk=false
 if labels=invalid then
 return true
 end if
 if labels["ns_st_ad"]=invalid or(labels["ns_st_ad"]<>invalid and(labels["ns_st_ad"]= "pre-roll" or labels["ns_st_ct"]= "aa11" or labels["ns_st_ct"]= "aa31" or labels["ns_st_ct"]= "va11" or labels["ns_st_ct"]= "va31"))then
-cs_vld=true
+cs_vmk=true
 end if
-return cs_vld
+return cs_vmk
 end function
-cs_vxw.setplaylist=function(labels as object)as boolean
-cs_vld=false
-if m.cs_vpk=csstreamsensestate().idle then
-m.cs_vqc.cs_vvg()
-m.cs_vqc.reset()
-m.cs_vqc.getclip().reset()
-m.cs_vqc.setlabels(labels,invalid)
-cs_vld=true
+cs_vyf.setplaylist=function(labels as object)as boolean
+cs_vmk=false
+if m.cs_vqr=csstreamsensestate().idle then
+m.cs_vrj.cs_vwn()
+m.cs_vrj.reset()
+m.cs_vrj.getclip().reset()
+m.cs_vrj.setlabels(labels,invalid)
+cs_vmk=true
 end if
-return cs_vld
+return cs_vmk
 end function
-cs_vxw.importstate=function(labels as object)as void
+cs_vyf.importstate=function(labels as object)as void
 m.reset()
-cs_vle=createobject("roAssociativeArray")
-cs_vle.append(labels)
-m.cs_vqc.cs_vvl(cs_vle,invalid)
-m.cs_vqc.getclip().cs_vvl(cs_vle,invalid)
-m.cs_vvl(cs_vle)
-m.cs_vnu=m.cs_vnu+1
+cs_vml=createobject("roAssociativeArray")
+cs_vml.append(labels)
+m.cs_vrj.cs_vws(cs_vml,invalid)
+m.cs_vrj.getclip().cs_vws(cs_vml,invalid)
+m.cs_vws(cs_vml)
+m.cs_vpb=m.cs_vpb+1
 end function
-cs_vxw.exportstate=function()as object
-return m.cs_voa
+cs_vyf.exportstate=function()as object
+return m.cs_vph
 end function
-cs_vxw.getversion=function()as string
-return m.cs_viq
+cs_vyf.getversion=function()as string
+return m.cs_vjx
 end function
-cs_vxw.addlistener=function(cs_vlh as object)as void
-if cs_vlh=invalid or cs_vlh.onstatechange=invalid then return
-m.cs_vly.push(cs_vlh)
+cs_vyf.addlistener=function(cs_vmo as object)as void
+if cs_vmo=invalid or cs_vmo.onstatechange=invalid then return
+m.cs_vnf.push(cs_vmo)
 end function
-cs_vxw.removelistener=function(cs_vlh as object)as void
-if cs_vlh=invalid or cs_vlh.onstatechange=invalid then return
-if m.cs_vly.count()>0 then
-cs_vlj=0
-while cs_vlj<m.cs_vly.count()
-if cs_vlh.onstatechange=m.cs_vly[cs_vlj].onstatechange then exit while
-cs_vlj=cs_vlj+1
+cs_vyf.removelistener=function(cs_vmo as object)as void
+if cs_vmo=invalid or cs_vmo.onstatechange=invalid then return
+if m.cs_vnf.count()>0 then
+cs_vmq=0
+while cs_vmq<m.cs_vnf.count()
+if cs_vmo.onstatechange=m.cs_vnf[cs_vmq].onstatechange then exit while
+cs_vmq=cs_vmq+1
 end while
-if cs_vlj<m.cs_vly.count()then m.cs_vly.delete(cs_vlj)
+if cs_vmq<m.cs_vnf.count()then m.cs_vnf.delete(cs_vmq)
 end if
 end function
-cs_vxw.getclip=function()as object
-return m.cs_vqc.getclip()
+cs_vyf.getclip=function()as object
+return m.cs_vrj.getclip()
 end function
-cs_vxw.getplaylist=function()as object
-return m.cs_vqc
+cs_vyf.getplaylist=function()as object
+return m.cs_vrj
 end function
-cs_vxw.setlabels=function(cs_vtw as object)as void
-if cs_vtw<>invalid then
-for each label in cs_vtw
-m.setlabel(label,cs_vtw[label])
+cs_vyf.setlabels=function(cs_vvd as object)as void
+if cs_vvd<>invalid then
+for each label in cs_vvd
+m.setlabel(label,cs_vvd[label])
 end for
 end if
 end function
-cs_vxw.getlabel=function(name as string)as string
-return m.cs_vqb[name]
+cs_vyf.getlabel=function(name as string)as string
+return m.cs_vri[name]
 end function
-cs_vxw.setlabel=function(name as string,cs_vvw as string)as void
-if cs_vvw=invalid then
-m.cs_vqb.delete(name)
+cs_vyf.setlabel=function(name as string,cs_vxd as string)as void
+if cs_vxd=invalid then
+m.cs_vri.delete(name)
 else
-m.cs_vqb[name]=cs_vvw
+m.cs_vri[name]=cs_vxd
 end if
 end function
-cs_vxw.reset=function(keeplabels=invalid as object)as void
-m.cs_vqc.reset(keeplabels)
-m.cs_vqc.cs_vve(0)
-m.cs_vqc.cs_vuf(comscore_tostr(comscore_unix_time())+ "_1")
-m.cs_vqc.getclip().reset(keeplabels)
+cs_vyf.reset=function(keeplabels=invalid as object)as void
+m.cs_vrj.reset(keeplabels)
+m.cs_vrj.cs_vwl(0)
+m.cs_vrj.cs_vvm(comscore_tostr(comscore_unix_time())+ "_1")
+m.cs_vrj.getclip().reset(keeplabels)
 if keeplabels<>invalid and type(keeplabels)= "roArray" and keeplabels.count()>0 then
-cs_vwm(m.cs_vqb,keeplabels)
+cs_vxt(m.cs_vri,keeplabels)
 else
-m.cs_vqb.clear()
+m.cs_vri.clear()
 end if
-m.cs_vnu=1
-m.cs_vnf=0
-m.cs_vmx()
-m.cs_vna()
-m.cs_vnw=-1#
-m.cs_vnc=-1#
-m.cs_vng=-1#
-m.cs_vnn=-1#
-m.cs_vpk=csstreamsensestate().idle
-m.cs_vpl=-1#
-m.cs_vpf=invalid
-m.cs_vmp=m.cs_vip
-m.cs_vmr=m.cs_viq
-m.cs_voa=invalid
-m.cs_vou=0#
-m.cs_vly=createobject("roArray",1,true)
-m.cs_vmj()
-if m.cs_vjx<>invalid then m.cs_vjx.cs_vlz=invalid
+m.cs_vpb=1
+m.cs_vom=0
+m.cs_voe()
+m.cs_voh()
+m.cs_vpd=-1#
+m.cs_voj=-1#
+m.cs_von=-1#
+m.cs_vou=-1#
+m.cs_vqr=csstreamsensestate().idle
+m.cs_vqs=-1#
+m.cs_vqm=invalid
+m.cs_vnw=m.cs_vjw
+m.cs_vny=m.cs_vjx
+m.cs_vph=invalid
+m.cs_vqb=0#
+m.cs_vnf=createobject("roArray",1,true)
+m.cs_vnq()
+if m.cs_vle<>invalid then m.cs_vle.cs_vng=invalid
 end function
-cs_vxw.getstate=function()as object
-return m.cs_vpk
+cs_vyf.getstate=function()as object
+return m.cs_vqr
 end function
-cs_vxw.cs_vma=function(cs_voz as object,eventlabelmap as object,cs_vmb=-1#as double)as void
-m.cs_vmj()
-if cs_vmb>=0 then
-m.cs_vmk=comscore_unix_time()+cs_vmb
-m.cs_vml=cs_voz
-m.cs_vmm=eventlabelmap
-else if m.cs_vpi(cs_voz)=true then
-cs_vor=m.getstate()
-previousstatechangetimestamp#=m.cs_vpl
-eventtime#=m.cs_vph(eventlabelmap)
+cs_vyf.cs_vnh=function(cs_vqg as object,eventlabelmap as object,cs_vni=-1#as double)as void
+m.cs_vnq()
+if cs_vni>=0 then
+m.cs_vnr=comscore_unix_time()+cs_vni
+m.cs_vns=cs_vqg
+m.cs_vnt=eventlabelmap
+else if m.cs_vqp(cs_vqg)=true then
+cs_vpy=m.getstate()
+previousstatechangetimestamp#=m.cs_vqs
+eventtime#=m.cs_vqo(eventlabelmap)
 delta#=0
 if previousstatechangetimestamp#>=0 then
 delta#=eventtime#-previousstatechangetimestamp#
 end if
-m.cs_voo(m.getstate(),eventlabelmap)
-m.cs_vot(cs_voz,eventlabelmap)
-m.cs_vpj(cs_voz)
-for each cs_vlh in m.cs_vly
-if cs_vlh.onstatechange<>invalid then cs_vlh.onstatechange(cs_vor,cs_voz,eventlabelmap,delta#)
+m.cs_vpv(m.getstate(),eventlabelmap)
+m.cs_vqa(cs_vqg,eventlabelmap)
+m.cs_vqq(cs_vqg)
+for each cs_vmo in m.cs_vnf
+if cs_vmo.onstatechange<>invalid then cs_vmo.onstatechange(cs_vpy,cs_vqg,eventlabelmap,delta#)
 end for
-m.cs_vvl(eventlabelmap)
-m.cs_vqc.cs_vvl(eventlabelmap,cs_voz)
-m.cs_vqc.getclip().cs_vvl(eventlabelmap,cs_voz)
-cs_vmg=m.cs_vpm(m.cs_voj(cs_voz),eventlabelmap)
-cs_vmg.append(eventlabelmap)
-if m.cs_vpc(m.cs_vpk)=true then
-m.dispatch(cs_vmg)
-m.cs_vpf=m.cs_vpk
-m.cs_vnu=m.cs_vnu+1
+m.cs_vws(eventlabelmap)
+m.cs_vrj.cs_vws(eventlabelmap,cs_vqg)
+m.cs_vrj.getclip().cs_vws(eventlabelmap,cs_vqg)
+cs_vnn=m.cs_vqt(m.cs_vpq(cs_vqg),eventlabelmap)
+cs_vnn.append(eventlabelmap)
+if m.cs_vqj(m.cs_vqr)=true then
+m.dispatch(cs_vnn)
+m.cs_vqm=m.cs_vqr
+m.cs_vpb=m.cs_vpb+1
 end if
 end if
 end function
-cs_vxw.cs_vmj=function()as void
-m.cs_vmk=-1#
-m.cs_vml=invalid
-m.cs_vmm=invalid
+cs_vyf.cs_vnq=function()as void
+m.cs_vnr=-1#
+m.cs_vns=invalid
+m.cs_vnt=invalid
 end function
-cs_vxw.cs_vvl=function(labels as object)as void
-cs_vvw=labels["ns_st_mp"]
-if cs_vvw<>invalid then
-m.cs_vmp=cs_vvw
+cs_vyf.cs_vws=function(labels as object)as void
+cs_vxd=labels["ns_st_mp"]
+if cs_vxd<>invalid then
+m.cs_vnw=cs_vxd
 labels.delete("ns_st_mp")
 end if
-cs_vvw=labels["ns_st_mv"]
-if cs_vvw<>invalid then
-m.cs_vmr=cs_vvw
+cs_vxd=labels["ns_st_mv"]
+if cs_vxd<>invalid then
+m.cs_vny=cs_vxd
 labels.delete("ns_st_mv")
 end if
-cs_vvw=labels["ns_st_ec"]
-if cs_vvw<>invalid then
-m.cs_vnu=comscore_stoi(cs_vvw)
+cs_vxd=labels["ns_st_ec"]
+if cs_vxd<>invalid then
+m.cs_vpb=comscore_stoi(cs_vxd)
 labels.delete("ns_st_ec")
 end if
 end function
-cs_vxw.dispatch=function(eventlabelmap as object,snapshot=true as boolean)as void
-if snapshot=true then m.cs_vnz(eventlabelmap)
-if not m.cs_vny()then
-cs_vmu=cs_vsw(m,m.cs_vqa,eventlabelmap,m.pixelurl())
-m.cs_vqa.dispatch(cs_vmu)
+cs_vyf.dispatch=function(eventlabelmap as object,snapshot=true as boolean)as void
+if snapshot=true then m.cs_vpg(eventlabelmap)
+if not m.cs_vpf()then
+cs_vob=cs_vud(m,m.cs_vrh,eventlabelmap,m.pixelurl())
+m.cs_vrh.dispatch(cs_vob)
 end if
 end function
-cs_vxw.cs_vmv=function()as void
-if m.cs_vng>=0 then
-interval#=m.cs_vng
+cs_vyf.cs_voc=function()as void
+if m.cs_von>=0 then
+interval#=m.cs_von
 else
-interval#=m.cs_vit
-if m.cs_vnf<m.cs_viu then interval#=m.cs_vis
+interval#=m.cs_vka
+if m.cs_vom<m.cs_vkb then interval#=m.cs_vjz
 end if
-m.cs_vnc=comscore_unix_time()+interval#
+m.cs_voj=comscore_unix_time()+interval#
 end function
-cs_vxw.cs_vmx=function()as void
-m.cs_vng=m.cs_vnc-comscore_unix_time()
-m.cs_vnc=-1#
+cs_vyf.cs_voe=function()as void
+m.cs_von=m.cs_voj-comscore_unix_time()
+m.cs_voj=-1#
 end function
-cs_vxw.cs_vna=function()as void
-m.cs_vng=-1#
-m.cs_vnc=-1#
-m.cs_vnf=0
+cs_vyf.cs_voh=function()as void
+m.cs_von=-1#
+m.cs_voj=-1#
+m.cs_vom=0
 end function
-cs_vxw.cs_vne=function()as void
-m.cs_vnf=m.cs_vnf+1
-eventlabelmap=m.cs_vpm(csstreamsenseeventtype().heart_beat,invalid)
+cs_vyf.cs_vol=function()as void
+m.cs_vom=m.cs_vom+1
+eventlabelmap=m.cs_vqt(csstreamsenseeventtype().heart_beat,invalid)
 m.dispatch(eventlabelmap)
-m.cs_vng=-1
-m.cs_vmv()
+m.cs_von=-1
+m.cs_voc()
 end function
-cs_vxw.cs_vnh=function()as void
-m.cs_vnj()
-m.cs_vnn=comscore_unix_time()+m.cs_viv
+cs_vyf.cs_voo=function()as void
+m.cs_voq()
+m.cs_vou=comscore_unix_time()+m.cs_vkc
 end function
-cs_vxw.cs_vnj=function()as void
-m.cs_vnn=-1#
+cs_vyf.cs_voq=function()as void
+m.cs_vou=-1#
 end function
-cs_vxw.cs_vnl=function()as void
-eventlabelmap=m.cs_vpm(csstreamsenseeventtype().keep_alive,invalid)
+cs_vyf.cs_vos=function()as void
+eventlabelmap=m.cs_vqt(csstreamsenseeventtype().keep_alive,invalid)
 m.dispatch(eventlabelmap)
-m.cs_vnu=m.cs_vnu+1
-m.cs_vnn=comscore_unix_time()+m.cs_viv
+m.cs_vpb=m.cs_vpb+1
+m.cs_vou=comscore_unix_time()+m.cs_vkc
 end function
-cs_vxw.cs_vno=function()as void
-m.cs_vnw=comscore_unix_time()+m.cs_viw
+cs_vyf.cs_vov=function()as void
+m.cs_vpd=comscore_unix_time()+m.cs_vkd
 end function
-cs_vxw.cs_vnq=function()as void
-m.cs_vnw=-1#
+cs_vyf.cs_vox=function()as void
+m.cs_vpd=-1#
 end function
-cs_vxw.cs_vns=function()as void
-if m.cs_vpf=csstreamsensestate().playing then
-m.cs_vqc.cs_vva()
-m.cs_vqc.cs_vux()
-labels=m.cs_vpm(csstreamsenseeventtype().pause,invalid)
+cs_vyf.cs_voz=function()as void
+if m.cs_vqm=csstreamsensestate().playing then
+m.cs_vrj.cs_vwh()
+m.cs_vrj.cs_vwe()
+labels=m.cs_vqt(csstreamsenseeventtype().pause,invalid)
 m.dispatch(labels)
-m.cs_vnu=m.cs_vnu+1
-m.cs_vpf=csstreamsensestate().paused
+m.cs_vpb=m.cs_vpb+1
+m.cs_vqm=csstreamsensestate().paused
 end if
-m.cs_vnw=-1#
+m.cs_vpd=-1#
 end function
-cs_vxw.cs_vnx=function(eventlabelmap as object)as void
-cs_vcr#=m.cs_vph(eventlabelmap)
-if cs_vcr#<0 then
+cs_vyf.cs_vpe=function(eventlabelmap as object)as void
+cs_vcv#=m.cs_vqo(eventlabelmap)
+if cs_vcv#<0 then
 eventlabelmap["ns_ts"]=comscore_tostr(comscore_unix_time())
 end if
 end function
-cs_vxw.cs_vny=function()as boolean
-if m.cs_vqa.publishersecret()= "" or m.cs_vqa.customerc2()=invalid then return true
+cs_vyf.cs_vpf=function()as boolean
+if m.cs_vrh.publishersecret()= "" or m.cs_vrh.customerc2()=invalid then return true
 return false
 end function
-cs_vxw.cs_vnz=function(labels as object)as void
-m.cs_voa=m.cs_vpm(m.cs_voj(m.cs_vpk),invalid)
-m.cs_voa.append(labels)
+cs_vyf.cs_vpg=function(labels as object)as void
+m.cs_vph=m.cs_vqt(m.cs_vpq(m.cs_vqr),invalid)
+m.cs_vph.append(labels)
 end function
-cs_vxw.cs_vob=function(state as object)as boolean
+cs_vyf.cs_vpi=function(state as object)as boolean
 if state=csstreamsensestate().playing or state=csstreamsensestate().paused then return true
 return false
 end function
-cs_vxw.cs_voe=function(cs_voi as object)as object
-if cs_voi=csstreamsenseeventtype().play then return csstreamsensestate().playing
-if cs_voi=csstreamsenseeventtype().pause then return csstreamsensestate().paused
-if cs_voi=csstreamsenseeventtype().buffer then return csstreamsensestate().buffering
-if cs_voi=csstreamsenseeventtype().end then return csstreamsensestate().idle
+cs_vyf.cs_vpl=function(cs_vpp as object)as object
+if cs_vpp=csstreamsenseeventtype().play then return csstreamsensestate().playing
+if cs_vpp=csstreamsenseeventtype().pause then return csstreamsensestate().paused
+if cs_vpp=csstreamsenseeventtype().buffer then return csstreamsensestate().buffering
+if cs_vpp=csstreamsenseeventtype().end then return csstreamsensestate().idle
 return invalid
 end function
-cs_vxw.cs_voj=function(state as object)as object
+cs_vyf.cs_vpq=function(state as object)as object
 if state=csstreamsensestate().playing then return csstreamsenseeventtype().play
 if state=csstreamsensestate().paused then return csstreamsenseeventtype().pause
 if state=csstreamsensestate().buffering then return csstreamsenseeventtype().buffer
 if state=csstreamsensestate().idle then return csstreamsenseeventtype().end
 return invalid
 end function
-cs_vxw.cs_voo=function(cs_vor as object,eventlabelmap as object)as void
-eventtime#=m.cs_vph(eventlabelmap)
-if cs_vor=csstreamsensestate().playing then
-m.cs_vqc.cs_vum(eventtime#)
-m.cs_vmx()
-m.cs_vnj()
-else if cs_vor=csstreamsensestate().buffering then
-m.cs_vqc.cs_vun(eventtime#)
-m.cs_vnq()
-else if cs_vor=csstreamsensestate().idle then
+cs_vyf.cs_vpv=function(cs_vpy as object,eventlabelmap as object)as void
+eventtime#=m.cs_vqo(eventlabelmap)
+if cs_vpy=csstreamsensestate().playing then
+m.cs_vrj.cs_vvt(eventtime#)
+m.cs_voe()
+m.cs_voq()
+else if cs_vpy=csstreamsensestate().buffering then
+m.cs_vrj.cs_vvu(eventtime#)
+m.cs_vox()
+else if cs_vpy=csstreamsensestate().idle then
 keeplabels=createobject("roArray",1,true)
-cs_vos=m.cs_vqc.getclip().getlabels()
-if cs_vos<>invalid then
-for each key in cs_vos
+cs_vpz=m.cs_vrj.getclip().getlabels()
+if cs_vpz<>invalid then
+for each key in cs_vpz
 keeplabels.push(key)
 end for
 end if
-m.cs_vqc.getclip().reset(keeplabels)
+m.cs_vrj.getclip().reset(keeplabels)
 end if
 end function
-cs_vxw.cs_vot=function(cs_voz as object,eventlabelmap as object)as void
-eventtime#=m.cs_vph(eventlabelmap)
-if m.cs_vpg(eventlabelmap)<0 then
-eventlabelmap["ns_st_po"]=comscore_tostr(m.cs_vpa(eventtime#))
+cs_vyf.cs_vqa=function(cs_vqg as object,eventlabelmap as object)as void
+eventtime#=m.cs_vqo(eventlabelmap)
+if m.cs_vqn(eventlabelmap)<0 then
+eventlabelmap["ns_st_po"]=comscore_tostr(m.cs_vqh(eventtime#))
 end if
-playerposition#=m.cs_vpg(eventlabelmap)
-m.cs_vou=playerposition#
-if cs_voz=csstreamsensestate().playing then
-m.cs_vmv()
-m.cs_vnh()
-m.cs_vqc.getclip().cs_vrx(eventtime#)
-if m.cs_vpc(cs_voz)=true then
-m.cs_vqc.getclip().cs_vuk()
-if m.cs_vqc.cs_vuh()<1 then
-m.cs_vqc.cs_vui(1)
+playerposition#=m.cs_vqn(eventlabelmap)
+m.cs_vqb=playerposition#
+if cs_vqg=csstreamsensestate().playing then
+m.cs_voc()
+m.cs_voo()
+m.cs_vrj.getclip().cs_vte(eventtime#)
+if m.cs_vqj(cs_vqg)=true then
+m.cs_vrj.getclip().cs_vvr()
+if m.cs_vrj.cs_vvo()<1 then
+m.cs_vrj.cs_vvp(1)
 end if
 end if
-else if cs_voz=csstreamsensestate().paused then
-if m.cs_vpc(cs_voz)then
-m.cs_vqc.cs_vux()
+else if cs_vqg=csstreamsensestate().paused then
+if m.cs_vqj(cs_vqg)then
+m.cs_vrj.cs_vwe()
 end if
-else if cs_voz=csstreamsensestate().buffering then
-m.cs_vqc.getclip().cs_vsa(eventtime#)
-if m.cs_voy=true then
-m.cs_vno()
+else if cs_vqg=csstreamsensestate().buffering then
+m.cs_vrj.getclip().cs_vth(eventtime#)
+if m.cs_vqf=true then
+m.cs_vov()
 end if
-else if cs_voz=csstreamsensestate().idle then
-m.cs_vna()
+else if cs_vqg=csstreamsensestate().idle then
+m.cs_voh()
 end if
 end function
-cs_vxw.cs_vpa=function(eventtime as double)as double
-cs_vkd#=m.cs_vou
-if m.cs_vpk=csstreamsensestate().playing then
-cs_vkd#=cs_vkd#+ (eventtime-m.cs_vpl)
+cs_vyf.cs_vqh=function(eventtime as double)as double
+cs_vlk#=m.cs_vqb
+if m.cs_vqr=csstreamsensestate().playing then
+cs_vlk#=cs_vlk#+ (eventtime-m.cs_vqs)
 end if
-return cs_vkd#
+return cs_vlk#
 end function
-cs_vxw.cs_vpc=function(state as object)as boolean
-if state=csstreamsensestate().paused and(m.cs_vpf=csstreamsensestate().idle or m.cs_vpf=invalid)then
+cs_vyf.cs_vqj=function(state as object)as boolean
+if state=csstreamsensestate().paused and(m.cs_vqm=csstreamsensestate().idle or m.cs_vqm=invalid)then
 return false
 else
-return state<>csstreamsensestate().buffering and m.cs_vpf<>state
+return state<>csstreamsensestate().buffering and m.cs_vqm<>state
 end if
 end function
-cs_vxw.cs_vpg=function(cs_vtw as object)as double
+cs_vyf.cs_vqn=function(cs_vvd as object)as double
 playerposition#= -1#
-if cs_vtw.doesexist("ns_st_po")then
-playerposition#=comscore_stod(cs_vtw["ns_st_po"])
+if cs_vvd.doesexist("ns_st_po")then
+playerposition#=comscore_stod(cs_vvd["ns_st_po"])
 end if
 return playerposition#
 end function
-cs_vxw.cs_vph=function(cs_vtw as object)as double
-cs_vcr#= -1#
-if cs_vtw.doesexist("ns_ts")then
-cs_vcr#=comscore_stod(cs_vtw["ns_ts"])
+cs_vyf.cs_vqo=function(cs_vvd as object)as double
+cs_vcv#= -1#
+if cs_vvd.doesexist("ns_ts")then
+cs_vcv#=comscore_stod(cs_vvd["ns_ts"])
 end if
-return cs_vcr#
+return cs_vcv#
 end function
-cs_vxw.cs_vpi=function(cs_voz as object)as boolean
-if cs_voz<>invalid and m.getstate()<>cs_voz then return true
+cs_vyf.cs_vqp=function(cs_vqg as object)as boolean
+if cs_vqg<>invalid and m.getstate()<>cs_vqg then return true
 return false
 end function
-cs_vxw.cs_vpj=function(cs_voz as object)as void
-m.cs_vpk=cs_voz
-m.cs_vpl=comscore_unix_time()
+cs_vyf.cs_vqq=function(cs_vqg as object)as void
+m.cs_vqr=cs_vqg
+m.cs_vqs=comscore_unix_time()
 end function
-cs_vxw.cs_vpm=function(cs_vud as object,cs_vtt as object)as object
-cs_vtw=createobject("roAssociativeArray")
-if cs_vtt<>invalid then
-cs_vtw.append(cs_vtt)
+cs_vyf.cs_vqt=function(cs_vvk as object,cs_vva as object)as object
+cs_vvd=createobject("roAssociativeArray")
+if cs_vva<>invalid then
+cs_vvd.append(cs_vva)
 end if
-if not cs_vtw.doesexist("ns_ts")then
-cs_vtw["ns_ts"]=comscore_tostr(comscore_unix_time())
+if not cs_vvd.doesexist("ns_ts")then
+cs_vvd["ns_ts"]=comscore_tostr(comscore_unix_time())
 end if
-if cs_vud<>invalid and not cs_vtw.doesexist("ns_st_ev")then
-cs_vtw["ns_st_ev"]=cs_vud
+if cs_vvk<>invalid and not cs_vvd.doesexist("ns_st_ev")then
+cs_vvd["ns_st_ev"]=cs_vvk
 end if
 if m.sharingsdkpersistentlabels()then
-cs_vtw.append(m.cs_vqa.getlabels())
+cs_vvd.append(m.cs_vrh.getlabels())
 end if
-cs_vtw.append(m.getlabels())
-m.cs_vts(cs_vud,cs_vtw)
-m.cs_vqc.cs_vts(cs_vud,cs_vtw)
-m.cs_vqc.getclip().cs_vts(cs_vud,cs_vtw)
-cs_vpo=createobject("roAssociativeArray")
-cs_vpo["ns_st_mp"]=m.cs_vmp
-cs_vpo["ns_st_mv"]=m.cs_vmr
-cs_vpo["ns_st_ub"]= "0"
-cs_vpo["ns_st_br"]= "0"
-cs_vpo["ns_st_pn"]= "1"
-cs_vpo["ns_st_tp"]= "1"
-for each key in cs_vpo
-if not cs_vtw.doesexist(key)then cs_vtw[key]=cs_vpo[key]
+cs_vvd.append(m.getlabels())
+m.cs_vuz(cs_vvk,cs_vvd)
+m.cs_vrj.cs_vuz(cs_vvk,cs_vvd)
+m.cs_vrj.getclip().cs_vuz(cs_vvk,cs_vvd)
+cs_vqv=createobject("roAssociativeArray")
+cs_vqv["ns_st_mp"]=m.cs_vnw
+cs_vqv["ns_st_mv"]=m.cs_vny
+cs_vqv["ns_st_ub"]= "0"
+cs_vqv["ns_st_br"]= "0"
+cs_vqv["ns_st_pn"]= "1"
+cs_vqv["ns_st_tp"]= "1"
+for each key in cs_vqv
+if not cs_vvd.doesexist(key)then cs_vvd[key]=cs_vqv[key]
 end for
-return cs_vtw
+return cs_vvd
 end function
-cs_vxw.cs_vts=function(cs_vud as object,cs_vtt as object)as object
-cs_vtw=cs_vtt
-if cs_vtw=invalid then
-cs_vtw=createobject("roAssociativeArray")
+cs_vyf.cs_vuz=function(cs_vvk as object,cs_vva as object)as object
+cs_vvd=cs_vva
+if cs_vvd=invalid then
+cs_vvd=createobject("roAssociativeArray")
 end if
-cs_vtw["ns_st_ec"]=comscore_tostr(m.cs_vnu)
-if not cs_vtw.doesexist("ns_st_po")then
-currentposition#=m.cs_vou
-eventtime#=m.cs_vph(cs_vtw)
-if cs_vud=csstreamsenseeventtype().play or cs_vud=csstreamsenseeventtype().keep_alive or cs_vud=csstreamsenseeventtype().heart_beat or(cs_vud=invalid and cs_vpx=csstreamsensestate().playing)then
-currentposition#=currentposition#+ (eventtime#-m.cs_vqc.getclip().cs_vrw())
+cs_vvd["ns_st_ec"]=comscore_tostr(m.cs_vpb)
+if not cs_vvd.doesexist("ns_st_po")then
+currentposition#=m.cs_vqb
+eventtime#=m.cs_vqo(cs_vvd)
+if cs_vvk=csstreamsenseeventtype().play or cs_vvk=csstreamsenseeventtype().keep_alive or cs_vvk=csstreamsenseeventtype().heart_beat or(cs_vvk=invalid and cs_vre=csstreamsensestate().playing)then
+currentposition#=currentposition#+ (eventtime#-m.cs_vrj.getclip().cs_vtd())
 end if
-cs_vtw["ns_st_po"]=comscore_tostr(currentposition#)
+cs_vvd["ns_st_po"]=comscore_tostr(currentposition#)
 end if
-if cs_vud=csstreamsenseeventtype().heart_beat then
-cs_vtw["ns_st_hc"]=comscore_tostr(m.cs_vnf)
+if cs_vvk=csstreamsenseeventtype().heart_beat then
+cs_vvd["ns_st_hc"]=comscore_tostr(m.cs_vom)
 end if
-return cs_vtw
+return cs_vvd
 end function
 if dax<>invalid then
-cs_vxw.cs_vqa=dax
+cs_vyf.cs_vrh=dax
 else
-cs_vxw.cs_vqa=cscomscore()
+cs_vyf.cs_vrh=cscomscore()
 end if
-cs_vxw.setpixelurl=cs_vxw.cs_vqa.setpixelurl
-cs_vxw.pixelurl=cs_vxw.cs_vqa.pixelurl
-cs_vxw.cs_vqb=createobject("roAssociativeArray")
-cs_vxw.cs_vqc=cs_vsy()
-cs_vxw.reset()
-return cs_vxw
+cs_vyf.setpixelurl=cs_vyf.cs_vrh.setpixelurl
+cs_vyf.pixelurl=cs_vyf.cs_vrh.pixelurl
+cs_vyf.cs_vri=createobject("roAssociativeArray")
+cs_vyf.cs_vrj=cs_vuf()
+cs_vyf.reset()
+return cs_vyf
 end function
-function cs_vqd()as object
-cs_vxw=createobject("roAssociativeArray")
-cs_vxw.cs_vvx=0
-cs_vxw.cs_vvn=0
-cs_vxw.cs_vvr=0#
-cs_vxw.cs_vsb=-1#
-cs_vxw.cs_vut=0#
-cs_vxw.cs_vry=-1#
-cs_vxw.cs_vsh="1"
-cs_vxw.cs_vth=createobject("roAssociativeArray")
-cs_vxw.reset=function(keeplabels=invalid as object)as void
+function cs_vrk()as object
+cs_vyf=createobject("roAssociativeArray")
+cs_vyf.cs_vxe=0
+cs_vyf.cs_vwu=0
+cs_vyf.cs_vwy=0#
+cs_vyf.cs_vti=-1#
+cs_vyf.cs_vwa=0#
+cs_vyf.cs_vtf=-1#
+cs_vyf.cs_vto="1"
+cs_vyf.cs_vuo=createobject("roAssociativeArray")
+cs_vyf.reset=function(keeplabels=invalid as object)as void
 if keeplabels<>invalid and type(keeplabels)= "roArray" and keeplabels.count()>0 then
-cs_vwm(m.cs_vth,keeplabels)
+cs_vxt(m.cs_vuo,keeplabels)
 else
-m.cs_vth.clear()
+m.cs_vuo.clear()
 end if
-if m.cs_vth["ns_st_cl"]=invalid then
-m.cs_vth["ns_st_cl"]= "0"
+if m.cs_vuo["ns_st_cl"]=invalid then
+m.cs_vuo["ns_st_cl"]= "0"
 end if
-if m.cs_vth["ns_st_pn"]=invalid then
-m.cs_vth["ns_st_pn"]= "1"
+if m.cs_vuo["ns_st_pn"]=invalid then
+m.cs_vuo["ns_st_pn"]= "1"
 end if
-if m.cs_vth["ns_st_tp"]=invalid then
-m.cs_vth["ns_st_tp"]= "1"
+if m.cs_vuo["ns_st_tp"]=invalid then
+m.cs_vuo["ns_st_tp"]= "1"
 end if
-m.cs_vvx=0
-m.cs_vvn=0
-m.cs_vvr=0#
-m.cs_vsb=-1#
-m.cs_vut=0#
-m.cs_vry=-1#
+m.cs_vxe=0
+m.cs_vwu=0
+m.cs_vwy=0#
+m.cs_vti=-1#
+m.cs_vwa=0#
+m.cs_vtf=-1#
 end function
-cs_vxw.setlabels=function(newlabels as object,state=invalid as object)as void
+cs_vyf.setlabels=function(newlabels as object,state=invalid as object)as void
 if newlabels<>invalid then
-m.cs_vth.append(newlabels)
+m.cs_vuo.append(newlabels)
 end if
-m.cs_vvl(m.cs_vth,state)
+m.cs_vws(m.cs_vuo,state)
 end function
-cs_vxw.getlabels=function()as object
-return m.cs_vth
+cs_vyf.getlabels=function()as object
+return m.cs_vuo
 end function
-cs_vxw.setlabel=function(label as string,cs_vvw as string)as void
-cs_vtr=createobject("roAssociativeArray")
-cs_vtr[label]=cs_vvw
-m.setlabels(cs_vtr)
+cs_vyf.setlabel=function(label as string,cs_vxd as string)as void
+cs_vuy=createobject("roAssociativeArray")
+cs_vuy[label]=cs_vxd
+m.setlabels(cs_vuy)
 end function
-cs_vxw.getlabel=function(label as string)as string
-return m.cs_vth[label]
+cs_vyf.getlabel=function(label as string)as string
+return m.cs_vuo[label]
 end function
-cs_vxw.cs_vts=function(cs_vud as object,cs_vtt=invalid as object)as object
-cs_vtw=cs_vtt
-if cs_vtw=invalid then
-cs_vtw=createobject("roAssociativeArray")
+cs_vyf.cs_vuz=function(cs_vvk as object,cs_vva=invalid as object)as object
+cs_vvd=cs_vva
+if cs_vvd=invalid then
+cs_vvd=createobject("roAssociativeArray")
 end if
-cs_vtw["ns_st_cn"]=m.cs_vsh
-cs_vtw["ns_st_bt"]=comscore_tostr(m.cs_vuo())
-if cs_vud=csstreamsenseeventtype().play or cs_vud=invalid
-cs_vtw["ns_st_sq"]=comscore_tostr(m.cs_vvn)
+cs_vvd["ns_st_cn"]=m.cs_vto
+cs_vvd["ns_st_bt"]=comscore_tostr(m.cs_vvv())
+if cs_vvk=csstreamsenseeventtype().play or cs_vvk=invalid
+cs_vvd["ns_st_sq"]=comscore_tostr(m.cs_vwu)
 end if
-if cs_vud=csstreamsenseeventtype().pause or cs_vud=csstreamsenseeventtype().end or cs_vud=csstreamsenseeventtype().keep_alive or cs_vud=csstreamsenseeventtype().heart_beat or cs_vud=invalid
-cs_vtw["ns_st_pt"]=comscore_tostr(m.cs_vur())
-cs_vtw["ns_st_pc"]=comscore_tostr(m.cs_vvx)
+if cs_vvk=csstreamsenseeventtype().pause or cs_vvk=csstreamsenseeventtype().end or cs_vvk=csstreamsenseeventtype().keep_alive or cs_vvk=csstreamsenseeventtype().heart_beat or cs_vvk=invalid
+cs_vvd["ns_st_pt"]=comscore_tostr(m.cs_vvy())
+cs_vvd["ns_st_pc"]=comscore_tostr(m.cs_vxe)
 end if
-cs_vtw.append(m.cs_vth)
-return cs_vtw
+cs_vvd.append(m.cs_vuo)
+return cs_vvd
 end function
-cs_vxw.cs_vuu=function()as integer
-return m.cs_vvx
+cs_vyf.cs_vwb=function()as integer
+return m.cs_vxe
 end function
-cs_vxw.cs_vuv=function(pauses as integer)as void
-m.cs_vvx=pauses
+cs_vyf.cs_vwc=function(pauses as integer)as void
+m.cs_vxe=pauses
 end function
-cs_vxw.cs_vux=function()as void
-m.cs_vvx=m.cs_vvx+1
+cs_vyf.cs_vwe=function()as void
+m.cs_vxe=m.cs_vxe+1
 end function
-cs_vxw.cs_vuh=function()as integer
-return m.cs_vvn
+cs_vyf.cs_vvo=function()as integer
+return m.cs_vwu
 end function
-cs_vxw.cs_vui=function(starts as integer)as void
-m.cs_vvn=starts
+cs_vyf.cs_vvp=function(starts as integer)as void
+m.cs_vwu=starts
 end function
-cs_vxw.cs_vuk=function()as void
-m.cs_vvn=m.cs_vvn+1
+cs_vyf.cs_vvr=function()as void
+m.cs_vwu=m.cs_vwu+1
 end function
-cs_vxw.cs_vuo=function()as double
-cs_vkd#=m.cs_vvr
-if m.cs_vsb>=0 then
-cs_vkd#=cs_vkd#+ (comscore_unix_time()-m.cs_vsb)
+cs_vyf.cs_vvv=function()as double
+cs_vlk#=m.cs_vwy
+if m.cs_vti>=0 then
+cs_vlk#=cs_vlk#+ (comscore_unix_time()-m.cs_vti)
 end if
-return cs_vkd#
+return cs_vlk#
 end function
-cs_vxw.cs_vup=function(bufferingtime as double)as void
-m.cs_vvr=bufferingtime
+cs_vyf.cs_vvw=function(bufferingtime as double)as void
+m.cs_vwy=bufferingtime
 end function
-cs_vxw.cs_vur=function()as double
-cs_vkd#=m.cs_vut
-if m.cs_vry>=0 then
-cs_vkd#=cs_vkd#+ (comscore_unix_time()-m.cs_vry)
+cs_vyf.cs_vvy=function()as double
+cs_vlk#=m.cs_vwa
+if m.cs_vtf>=0 then
+cs_vlk#=cs_vlk#+ (comscore_unix_time()-m.cs_vtf)
 end if
-return cs_vkd#
+return cs_vlk#
 end function
-cs_vxw.cs_vus=function(cs_vvv as double)as void
-m.cs_vut=cs_vvv
+cs_vyf.cs_vvz=function(cs_vxc as double)as void
+m.cs_vwa=cs_vxc
 end function
-cs_vxw.cs_vrw=function()as double
-return m.cs_vry
+cs_vyf.cs_vtd=function()as double
+return m.cs_vtf
 end function
-cs_vxw.cs_vrx=function(playbacktimestamp as double)as void
-m.cs_vry=playbacktimestamp
+cs_vyf.cs_vte=function(playbacktimestamp as double)as void
+m.cs_vtf=playbacktimestamp
 end function
-cs_vxw.cs_vrz=function()as double
-return m.cs_vsb
+cs_vyf.cs_vtg=function()as double
+return m.cs_vti
 end function
-cs_vxw.cs_vsa=function(bufferingtimestamp as double)as void
-m.cs_vsb=bufferingtimestamp
+cs_vyf.cs_vth=function(bufferingtimestamp as double)as void
+m.cs_vti=bufferingtimestamp
 end function
-cs_vxw.cs_vsc=function()as string
-return m.cs_vsh
+cs_vyf.cs_vtj=function()as string
+return m.cs_vto
 end function
-cs_vxw.cs_vsd=function(clipid as string)as void
-m.cs_vsh=clipid
+cs_vyf.cs_vtk=function(clipid as string)as void
+m.cs_vto=clipid
 end function
-cs_vxw.cs_vvl=function(labels as object,state as object)as void
-cs_vvw=labels["ns_st_cn"]
-if cs_vvw<>invalid
-m.cs_vsh=cs_vvw
+cs_vyf.cs_vws=function(labels as object,state as object)as void
+cs_vxd=labels["ns_st_cn"]
+if cs_vxd<>invalid
+m.cs_vto=cs_vxd
 labels.delete("ns_st_cn")
 end if
-cs_vvw=labels["ns_st_bt"]
-if cs_vvw<>invalid
-m.cs_vvr=comscore_stod(cs_vvw)
+cs_vxd=labels["ns_st_bt"]
+if cs_vxd<>invalid
+m.cs_vwy=comscore_stod(cs_vxd)
 labels.delete("ns_st_bt")
 end if
-m.cs_vsq("ns_st_cl",labels)
-m.cs_vsq("ns_st_pn",labels)
-m.cs_vsq("ns_st_tp",labels)
-m.cs_vsq("ns_st_ub",labels)
-m.cs_vsq("ns_st_br",labels)
+m.cs_vtx("ns_st_cl",labels)
+m.cs_vtx("ns_st_pn",labels)
+m.cs_vtx("ns_st_tp",labels)
+m.cs_vtx("ns_st_ub",labels)
+m.cs_vtx("ns_st_br",labels)
 if state=csstreamsensestate().playing or state=invalid
-cs_vvw=labels["ns_st_sq"]
-if(cs_vvw<>invalid)
-m.cs_vvn=comscore_stoi(cs_vvw)
+cs_vxd=labels["ns_st_sq"]
+if(cs_vxd<>invalid)
+m.cs_vwu=comscore_stoi(cs_vxd)
 labels.delete("ns_st_sq")
 end if
 end if
 if state<>csstreamsensestate().buffering
-cs_vvw=labels["ns_st_pt"]
-if cs_vvw<>invalid
-m.cs_vut=comscore_stod(cs_vvw)
+cs_vxd=labels["ns_st_pt"]
+if cs_vxd<>invalid
+m.cs_vwa=comscore_stod(cs_vxd)
 labels.delete("ns_st_pt")
 end if
 end if
 if state=csstreamsensestate().paused or state=csstreamsensestate().idle or state=invalid
-cs_vvw=labels["ns_st_pc"]
-if cs_vvw<>invalid
-m.cs_vvx=comscore_stoi(cs_vvw)
+cs_vxd=labels["ns_st_pc"]
+if cs_vxd<>invalid
+m.cs_vxe=comscore_stoi(cs_vxd)
 labels.delete("ns_st_pc")
 end if
 end if
 end function
-cs_vxw.cs_vsq=function(key as string,labels as object)as void
-cs_vvw=labels[key]
-if cs_vvw<>invalid then
-m.cs_vth[key]=cs_vvw
+cs_vyf.cs_vtx=function(key as string,labels as object)as void
+cs_vxd=labels[key]
+if cs_vxd<>invalid then
+m.cs_vuo[key]=cs_vxd
 end if
 end function
-cs_vxw.reset()
-return cs_vxw
+cs_vyf.reset()
+return cs_vyf
 end function
 function csstreamsenseeventtype()
-if m.cs_vst=invalid then m.cs_vst=cs_vsu()
-return m.cs_vst
+if m.cs_vua=invalid then m.cs_vua=cs_vub()
+return m.cs_vua
 end function
-function cs_vsu()as object
-cs_vsv=createobject("roAssociativeArray")
-cs_vsv.buffer="buffer"
-cs_vsv.play="play"
-cs_vsv.pause="pause"
-cs_vsv.end="end"
-cs_vsv.heart_beat="hb"
-cs_vsv.custom="custom"
-cs_vsv.keep_alive="keep-alive"
-return cs_vsv
+function cs_vub()as object
+cs_vuc=createobject("roAssociativeArray")
+cs_vuc.buffer="buffer"
+cs_vuc.play="play"
+cs_vuc.pause="pause"
+cs_vuc.end="end"
+cs_vuc.heart_beat="hb"
+cs_vuc.custom="custom"
+cs_vuc.keep_alive="keep-alive"
+return cs_vuc
 end function
-function cs_vsw(streamsense as object,dax as object,labels as object,pixelurl as string)as object
-cs_vxw=csapplicationmeasurement(dax,cseventtype().hidden,pixelurl,labels)
-if pixelurl<>invalid and pixelurl<>"" then cs_vxw.setpixelurl(pixelurl)
-cs_vxw.labels["ns_st_sv"]=streamsense.getversion()
-return cs_vxw
+function cs_vud(streamsense as object,dax as object,labels as object,pixelurl as string)as object
+cs_vyf=csapplicationmeasurement(dax,cseventtype().hidden,pixelurl,labels)
+if pixelurl<>invalid and pixelurl<>"" then cs_vyf.setpixelurl(pixelurl)
+cs_vyf.labels["ns_st_sv"]=streamsense.getversion()
+return cs_vyf
 end function
-function cs_vsy()as object
-cs_vxw=createobject("roAssociativeArray")
-cs_vxw.cs_vta=cs_vqd()
-cs_vxw.cs_vvt=""
-cs_vxw.cs_vvn=0
-cs_vxw.cs_vvx=0
-cs_vxw.cs_vvp=0
-cs_vxw.cs_vvr=0#
-cs_vxw.cs_vut=0#
-cs_vxw.cs_vth=createobject("roAssociativeArray")
-cs_vxw.cs_vvh=0
-cs_vxw.cs_vvk=false
-cs_vxw.reset=function(keeplabels=invalid as object)as void
+function cs_vuf()as object
+cs_vyf=createobject("roAssociativeArray")
+cs_vyf.cs_vuh=cs_vrk()
+cs_vyf.cs_vxa=""
+cs_vyf.cs_vwu=0
+cs_vyf.cs_vxe=0
+cs_vyf.cs_vww=0
+cs_vyf.cs_vwy=0#
+cs_vyf.cs_vwa=0#
+cs_vyf.cs_vuo=createobject("roAssociativeArray")
+cs_vyf.cs_vwo=0
+cs_vyf.cs_vwr=false
+cs_vyf.reset=function(keeplabels=invalid as object)as void
 if keeplabels<>invalid and type(keeplabels)= "roArray" and keeplabels.count()>0 then
-cs_vwm(m.cs_vth,keeplabels)
+cs_vxt(m.cs_vuo,keeplabels)
 else
-m.cs_vth.clear()
+m.cs_vuo.clear()
 end if
-m.cs_vvt=comscore_tostr(comscore_unix_time())+ "_" +comscore_tostr(m.cs_vvh)
-m.cs_vvr=0#
-m.cs_vut=0#
-m.cs_vvn=0
-m.cs_vvx=0
-m.cs_vvp=0
-m.cs_vvk=false
+m.cs_vxa=comscore_tostr(comscore_unix_time())+ "_" +comscore_tostr(m.cs_vwo)
+m.cs_vwy=0#
+m.cs_vwa=0#
+m.cs_vwu=0
+m.cs_vxe=0
+m.cs_vww=0
+m.cs_vwr=false
 end function
-cs_vxw.setlabels=function(newlabels as object,state=invalid as object)as void
+cs_vyf.setlabels=function(newlabels as object,state=invalid as object)as void
 if newlabels<>invalid then
-m.cs_vth.append(newlabels)
+m.cs_vuo.append(newlabels)
 end if
-m.cs_vvl(m.cs_vth,state)
+m.cs_vws(m.cs_vuo,state)
 end function
-cs_vxw.getlabels=function()as object
-return m.cs_vth
+cs_vyf.getlabels=function()as object
+return m.cs_vuo
 end function
-cs_vxw.setlabel=function(label as string,cs_vvw as string)as void
-cs_vtr=createobject("roAssociativeArray")
-cs_vtr[label]=cs_vvw
-m.setlabels(cs_vtr)
+cs_vyf.setlabel=function(label as string,cs_vxd as string)as void
+cs_vuy=createobject("roAssociativeArray")
+cs_vuy[label]=cs_vxd
+m.setlabels(cs_vuy)
 end function
-cs_vxw.getlabel=function(label as string)as string
-return m.cs_vth[label]
+cs_vyf.getlabel=function(label as string)as string
+return m.cs_vuo[label]
 end function
-cs_vxw.cs_vts=function(cs_vud as object,cs_vtt=invalid as object)as object
-cs_vtw=cs_vtt
-if cs_vtw=invalid then
-cs_vtw=createobject("roAssociativeArray")
+cs_vyf.cs_vuz=function(cs_vvk as object,cs_vva=invalid as object)as object
+cs_vvd=cs_vva
+if cs_vvd=invalid then
+cs_vvd=createobject("roAssociativeArray")
 end if
-cs_vtw["ns_st_bp"]=comscore_tostr(m.cs_vuo())
-cs_vtw["ns_st_sp"]=comscore_tostr(m.cs_vvn)
-cs_vtw["ns_st_id"]=comscore_tostr(m.cs_vvt)
-if m.cs_vvp>0 then
-cs_vtw["ns_st_bc"]=comscore_tostr(m.cs_vvp)
+cs_vvd["ns_st_bp"]=comscore_tostr(m.cs_vvv())
+cs_vvd["ns_st_sp"]=comscore_tostr(m.cs_vwu)
+cs_vvd["ns_st_id"]=comscore_tostr(m.cs_vxa)
+if m.cs_vww>0 then
+cs_vvd["ns_st_bc"]=comscore_tostr(m.cs_vww)
 end if
-if cs_vud=csstreamsenseeventtype().pause or cs_vud=csstreamsenseeventtype().end or cs_vud=csstreamsenseeventtype().keep_alive or cs_vud=csstreamsenseeventtype().heart_beat or cs_vud=invalid then
-cs_vtw["ns_st_pa"]=comscore_tostr(m.cs_vur())
-cs_vtw["ns_st_pp"]=comscore_tostr(m.cs_vvx)
+if cs_vvk=csstreamsenseeventtype().pause or cs_vvk=csstreamsenseeventtype().end or cs_vvk=csstreamsenseeventtype().keep_alive or cs_vvk=csstreamsenseeventtype().heart_beat or cs_vvk=invalid then
+cs_vvd["ns_st_pa"]=comscore_tostr(m.cs_vvy())
+cs_vvd["ns_st_pp"]=comscore_tostr(m.cs_vxe)
 end if
-if cs_vud=csstreamsenseeventtype().play or cs_vud=invalid then
-if not m.cs_vvi()then
-cs_vtw["ns_st_pb"]= "1"
-m.cs_vvj(true)
+if cs_vvk=csstreamsenseeventtype().play or cs_vvk=invalid then
+if not m.cs_vwp()then
+cs_vvd["ns_st_pb"]= "1"
+m.cs_vwq(true)
 end if
 end if
-cs_vtw.append(m.cs_vth)
-return cs_vtw
+cs_vvd.append(m.cs_vuo)
+return cs_vvd
 end function
-cs_vxw.getclip=function()as object
-return m.cs_vta
+cs_vyf.getclip=function()as object
+return m.cs_vuh
 end function
-cs_vxw.cs_vue=function()as string
-return m.cs_vvt
+cs_vyf.cs_vvl=function()as string
+return m.cs_vxa
 end function
-cs_vxw.cs_vuf=function(playlistid as string)as void
-m.cs_vvt=playlistid
+cs_vyf.cs_vvm=function(playlistid as string)as void
+m.cs_vxa=playlistid
 end function
-cs_vxw.cs_vuh=function()as integer
-return m.cs_vvn
+cs_vyf.cs_vvo=function()as integer
+return m.cs_vwu
 end function
-cs_vxw.cs_vui=function(starts as integer)as void
-m.cs_vvn=starts
+cs_vyf.cs_vvp=function(starts as integer)as void
+m.cs_vwu=starts
 end function
-cs_vxw.cs_vuk=function()as void
-m.cs_vvn=m.cs_vvn+1
+cs_vyf.cs_vvr=function()as void
+m.cs_vwu=m.cs_vwu+1
 end function
-cs_vxw.cs_vum=function(cs_vzg as double)as void
-if m.cs_vta.cs_vrw()>=0 then
-diff#=cs_vzg-m.cs_vta.cs_vrw()
-m.cs_vta.cs_vrx(-1)
-m.cs_vta.cs_vus(m.cs_vta.cs_vur()+diff#)
-m.cs_vus(m.cs_vur()+diff#)
-end if
-end function
-cs_vxw.cs_vun=function(cs_vzg as double)as void
-if m.cs_vta.cs_vrz()>=0 then
-diff#=cs_vzg-m.cs_vta.cs_vrz()
-m.cs_vta.cs_vsa(-1)
-m.cs_vta.cs_vup(m.cs_vta.cs_vuo()+diff#)
-m.cs_vup(m.cs_vuo()+diff#)
+cs_vyf.cs_vvt=function(cs_vzr as double)as void
+if m.cs_vuh.cs_vtd()>=0 then
+diff#=cs_vzr-m.cs_vuh.cs_vtd()
+m.cs_vuh.cs_vte(-1)
+m.cs_vuh.cs_vvz(m.cs_vuh.cs_vvy()+diff#)
+m.cs_vvz(m.cs_vvy()+diff#)
 end if
 end function
-cs_vxw.cs_vuo=function()as double
-cs_vkd#=m.cs_vvr
-if m.cs_vta.cs_vrz()>=0 then
-cs_vkd#=cs_vkd#+ (comscore_unix_time()-m.cs_vta.cs_vrz())
+cs_vyf.cs_vvu=function(cs_vzr as double)as void
+if m.cs_vuh.cs_vtg()>=0 then
+diff#=cs_vzr-m.cs_vuh.cs_vtg()
+m.cs_vuh.cs_vth(-1)
+m.cs_vuh.cs_vvw(m.cs_vuh.cs_vvv()+diff#)
+m.cs_vvw(m.cs_vvv()+diff#)
 end if
-return cs_vkd#
 end function
-cs_vxw.cs_vup=function(bufferingtime as double)as void
-m.cs_vvr=bufferingtime
-end function
-cs_vxw.cs_vur=function()as double
-cs_vkd#=m.cs_vut
-if m.cs_vta.cs_vrw()>=0 then
-cs_vkd#=cs_vkd#+ (comscore_unix_time()-m.cs_vta.cs_vrw())
+cs_vyf.cs_vvv=function()as double
+cs_vlk#=m.cs_vwy
+if m.cs_vuh.cs_vtg()>=0 then
+cs_vlk#=cs_vlk#+ (comscore_unix_time()-m.cs_vuh.cs_vtg())
 end if
-return cs_vkd#
+return cs_vlk#
 end function
-cs_vxw.cs_vus=function(cs_vvv as double)as void
-m.cs_vut=cs_vvv
+cs_vyf.cs_vvw=function(bufferingtime as double)as void
+m.cs_vwy=bufferingtime
 end function
-cs_vxw.cs_vuu=function()as integer
-return m.cs_vvx
+cs_vyf.cs_vvy=function()as double
+cs_vlk#=m.cs_vwa
+if m.cs_vuh.cs_vtd()>=0 then
+cs_vlk#=cs_vlk#+ (comscore_unix_time()-m.cs_vuh.cs_vtd())
+end if
+return cs_vlk#
 end function
-cs_vxw.cs_vuv=function(pauses as integer)as void
-cs_vxw.cs_vvx=pauses
+cs_vyf.cs_vvz=function(cs_vxc as double)as void
+m.cs_vwa=cs_vxc
 end function
-cs_vxw.cs_vux=function()as void
-m.cs_vvx=m.cs_vvx+1
-m.cs_vta.cs_vux()
+cs_vyf.cs_vwb=function()as integer
+return m.cs_vxe
 end function
-cs_vxw.cs_vuz=function()as integer
-return m.cs_vvp
+cs_vyf.cs_vwc=function(pauses as integer)as void
+cs_vyf.cs_vxe=pauses
 end function
-cs_vxw.cs_vva=function()as void
-m.cs_vvp=m.cs_vvp+1
+cs_vyf.cs_vwe=function()as void
+m.cs_vxe=m.cs_vxe+1
+m.cs_vuh.cs_vwe()
 end function
-cs_vxw.cs_vvc=function(rebuffercount as integer)
-m.cs_vvp=rebuffercount
+cs_vyf.cs_vwg=function()as integer
+return m.cs_vww
 end function
-cs_vxw.cs_vve=function(playlistcounter as integer)as void
-m.cs_vvh=playlistcounter
+cs_vyf.cs_vwh=function()as void
+m.cs_vww=m.cs_vww+1
 end function
-cs_vxw.cs_vvg=function()as void
-m.cs_vvh=m.cs_vvh+1
+cs_vyf.cs_vwj=function(rebuffercount as integer)
+m.cs_vww=rebuffercount
 end function
-cs_vxw.cs_vvi=function()as boolean
-return m.cs_vvk
+cs_vyf.cs_vwl=function(playlistcounter as integer)as void
+m.cs_vwo=playlistcounter
 end function
-cs_vxw.cs_vvj=function(firstplayoccurred as boolean)as void
-m.cs_vvk=firstplayoccurred
+cs_vyf.cs_vwn=function()as void
+m.cs_vwo=m.cs_vwo+1
 end function
-cs_vxw.cs_vvl=function(labels as object,state as object)as void
-cs_vvw=labels["ns_st_sp"]
-if cs_vvw<>invalid then
-m.cs_vvn=comscore_stoi(cs_vvw)
+cs_vyf.cs_vwp=function()as boolean
+return m.cs_vwr
+end function
+cs_vyf.cs_vwq=function(firstplayoccurred as boolean)as void
+m.cs_vwr=firstplayoccurred
+end function
+cs_vyf.cs_vws=function(labels as object,state as object)as void
+cs_vxd=labels["ns_st_sp"]
+if cs_vxd<>invalid then
+m.cs_vwu=comscore_stoi(cs_vxd)
 labels.delete("ns_st_sp")
 end if
-cs_vvw=labels["ns_st_bc"]
-if cs_vvw<>invalid then
-m.cs_vvp=comscore_stoi(cs_vvw)
+cs_vxd=labels["ns_st_bc"]
+if cs_vxd<>invalid then
+m.cs_vww=comscore_stoi(cs_vxd)
 labels.delete("ns_st_bc")
 end if
-cs_vvw=labels["ns_st_bp"]
-if cs_vvw<>invalid then
-m.cs_vvr=comscore_stod(cs_vvw)
+cs_vxd=labels["ns_st_bp"]
+if cs_vxd<>invalid then
+m.cs_vwy=comscore_stod(cs_vxd)
 labels.delete("ns_st_bp")
 end if
-cs_vvw=labels["ns_st_id"]
-if cs_vvw<>invalid then
-m.cs_vvt=cs_vvw
+cs_vxd=labels["ns_st_id"]
+if cs_vxd<>invalid then
+m.cs_vxa=cs_vxd
 labels.delete("ns_st_id")
 end if
 if state<>csstreamsensestate().buffering then
-cs_vvw=labels["ns_st_pa"]
-if cs_vvw<>invalid then
-cs_vvv=comscore_stod(cs_vvw)
+cs_vxd=labels["ns_st_pa"]
+if cs_vxd<>invalid then
+cs_vxc=comscore_stod(cs_vxd)
 labels.delete("ns_st_pa")
 end if
 end if
 if state=csstreamsensestate().paused or state=csstreamsensestate().idle or state=invalid then
-cs_vvw=labels["ns_st_pp"]
-if cs_vvw<>invalid then
-m.cs_vvx=comscore_stoi(cs_vvw)
+cs_vxd=labels["ns_st_pp"]
+if cs_vxd<>invalid then
+m.cs_vxe=comscore_stoi(cs_vxd)
 labels.delete("ns_st_pp")
 end if
 end if
 end function
-cs_vxw.reset()
-return cs_vxw
+cs_vyf.reset()
+return cs_vyf
 end function
-function csstreamsensesgbridge(cs_vwe as object)as object
-cs_vxw=createobject("roAssociativeArray")
-cs_vxw.cs_vwe=cs_vwe
-cs_vwf={}
-cs_vwf["component"]= "sta"
-cs_vwf["methodName"]= "init"
-cs_vxw.cs_vwe["apiCall"]=cs_vwf
-cs_vxw.comscoretask=function()as object
-return m.cs_vwe
+function csstreamsensesgbridge(cs_vxl as object)as object
+cs_vyf=createobject("roAssociativeArray")
+cs_vyf.cs_vxl=cs_vxl
+cs_vxm={}
+cs_vxm["component"]= "sta"
+cs_vxm["methodName"]= "init"
+cs_vyf.cs_vxl["apiCall"]=cs_vxm
+cs_vyf.comscoretask=function()as object
+return m.cs_vxl
 end function
-cs_vxw.engageto=function(screen as object)as void
-m.cs_vwg("EngageTo",[screen])
+cs_vyf.engageto=function(screen as object)as void
+m.cs_vxn("EngageTo",[screen])
 end function
-cs_vxw.tick=function()as void
-m.cs_vwg("Tick",invalid)
+cs_vyf.tick=function()as void
+m.cs_vxn("Tick",invalid)
 end function
-cs_vxw.notify=function(cs_vud as object,position=-1#as double,eventlabelmap=invalid as object)as void
-m.cs_vwg("Notify",[cs_vud,position,eventlabelmap])
+cs_vyf.notify=function(cs_vvk as object,position=-1#as double,eventlabelmap=invalid as object)as void
+m.cs_vxn("Notify",[cs_vvk,position,eventlabelmap])
 end function
-cs_vxw.sharesdkpersistentlabels=function(flag as boolean)
-m.cs_vwg("ShareSDKPersistentLabels",[flag])
+cs_vyf.sharesdkpersistentlabels=function(flag as boolean)
+m.cs_vxn("ShareSDKPersistentLabels",[flag])
 end function
-cs_vxw.setpauseonbufferingenabled=function(pauseonbufferingenabled as boolean)
-m.cs_vwg("SetPauseOnBufferingEnabled",[pauseonbufferingenabled])
+cs_vyf.setpauseonbufferingenabled=function(pauseonbufferingenabled as boolean)
+m.cs_vxn("SetPauseOnBufferingEnabled",[pauseonbufferingenabled])
 end function
-cs_vxw.setpauseplayswitchdelayenabled=function(pauseplayswitchdelayenabled as boolean)as void
-m.cs_vwg("SetPausePlaySwitchDelayEnabled",[pauseplayswitchdelayenabled])
+cs_vyf.setpauseplayswitchdelayenabled=function(pauseplayswitchdelayenabled as boolean)as void
+m.cs_vxn("SetPausePlaySwitchDelayEnabled",[pauseplayswitchdelayenabled])
 end function
-cs_vxw.setclip=function(labels as object,loop=false as boolean)as boolean
-m.cs_vwg("SetClip",[labels,loop])
+cs_vyf.setclip=function(labels as object,loop=false as boolean)as boolean
+m.cs_vxn("SetClip",[labels,loop])
 end function
-cs_vxw.setplaylist=function(labels as object)as boolean
-m.cs_vwg("SetPlaylist",[labels])
+cs_vyf.setplaylist=function(labels as object)as boolean
+m.cs_vxn("SetPlaylist",[labels])
 end function
-cs_vxw.addlistener=function(cs_vlh as object)as void
-m.cs_vwg("AddListener",[cs_vlh])
+cs_vyf.addlistener=function(cs_vmo as object)as void
+m.cs_vxn("AddListener",[cs_vmo])
 end function
-cs_vxw.removelistener=function(cs_vlh as object)as void
-m.cs_vwg("RemoveListener",[cs_vlh])
+cs_vyf.removelistener=function(cs_vmo as object)as void
+m.cs_vxn("RemoveListener",[cs_vmo])
 end function
-cs_vxw.setlabels=function(cs_vtw as object)as void
-m.cs_vwg("SetLabels",[cs_vtw])
+cs_vyf.setlabels=function(cs_vvd as object)as void
+m.cs_vxn("SetLabels",[cs_vvd])
 end function
-cs_vxw.setlabel=function(name as string,cs_vvw as string)as void
-m.cs_vwg("SetLabel",[name,cs_vvw])
+cs_vyf.setlabel=function(name as string,cs_vxd as string)as void
+m.cs_vxn("SetLabel",[name,cs_vxd])
 end function
-cs_vxw.reset=function(keeplabels=invalid as object)as void
-m.cs_vwg("Reset",[keeplabels])
+cs_vyf.reset=function(keeplabels=invalid as object)as void
+m.cs_vxn("Reset",[keeplabels])
 end function
-cs_vxw.cs_vwg=function(name as string,args)
-cs_vwh={}
-cs_vwh["component"]= "sta"
-cs_vwh["methodName"]=name
-cs_vwh["args"]=args
-m.cs_vwe["apiCall"]=cs_vwh
+cs_vyf.cs_vxn=function(name as string,args)
+cs_vxo={}
+cs_vxo["component"]= "sta"
+cs_vxo["methodName"]=name
+cs_vxo["args"]=args
+m.cs_vxl["apiCall"]=cs_vxo
 end function
-return cs_vxw
+return cs_vyf
 end function
-function csstreamingsgbridge(cs_vwe as object)as object
-cs_vxw=createobject("roAssociativeArray")
-cs_vxw.cs_vwe=cs_vwe
-cs_vwf={}
-cs_vwf["component"]= "ssw"
-cs_vwf["methodName"]= "init"
-cs_vxw.cs_vwe["apiCall"]=cs_vwf
-cs_vxw.comscoretask=function()as object
-return m.cs_vwe
+function csstreamingsgbridge(cs_vxl as object)as object
+cs_vyf=createobject("roAssociativeArray")
+cs_vyf.cs_vxl=cs_vxl
+cs_vxm={}
+cs_vxm["component"]= "ssw"
+cs_vxm["methodName"]= "init"
+cs_vyf.cs_vxl["apiCall"]=cs_vxm
+cs_vyf.comscoretask=function()as object
+return m.cs_vxl
 end function
-cs_vxw.playvideoadvertisement=function(metadata=invalid as object)as void
-m.cs_vwg("PlayVideoAdvertisement",[metadata])
+cs_vyf.playvideoadvertisement=function(metadata=invalid as object,mediatype=invalid as object)as void
+m.cs_vxn("PlayVideoAdvertisement",[metadata,mediatype])
 end function
-cs_vxw.playaudioadvertisement=function(metadata=invalid as object)as void
-m.cs_vwg("PlayAudioAdvertisement",[metadata])
+cs_vyf.playaudioadvertisement=function(metadata=invalid as object,mediatype=invalid as object)as void
+m.cs_vxn("PlayAudioAdvertisement",[metadata,mediatype])
 end function
-cs_vxw.playvideocontentpart=function(metadata=invalid as object)as void
-m.cs_vwg("PlayVideoContentPart",[metadata])
+cs_vyf.playvideocontentpart=function(metadata=invalid as object,mediatype=invalid as object)as void
+m.cs_vxn("PlayVideoContentPart",[metadata,mediatype])
 end function
-cs_vxw.playaudiocontentpart=function(metadata=invalid as object)as void
-m.cs_vwg("PlayAudioContentPart",[metadata])
+cs_vyf.playaudiocontentpart=function(metadata=invalid as object,mediatype=invalid as object)as void
+m.cs_vxn("PlayAudioContentPart",[metadata,mediatype])
 end function
-cs_vxw.stop=function()as void
-m.cs_vwg("Stop",invalid)
+cs_vyf.stop=function()as void
+m.cs_vxn("Stop",invalid)
 end function
-cs_vxw.tick=function()as void
-m.cs_vwg("Tick",invalid)
+cs_vyf.tick=function()as void
+m.cs_vxn("Tick",invalid)
 end function
-cs_vxw.cs_vwg=function(name as string,args)
-cs_vwh={}
-cs_vwh["component"]= "ssw"
-cs_vwh["methodName"]=name
-cs_vwh["args"]=args
-m.cs_vwe["apiCall"]=cs_vwh
+cs_vyf.reset=function()as void
+m.cs_vxn("Reset",invalid)
 end function
-return cs_vxw
+cs_vyf.cs_vxn=function(name as string,args)
+cs_vxo={}
+cs_vxo["component"]= "ssw"
+cs_vxo["methodName"]=name
+cs_vxo["args"]=args
+m.cs_vxl["apiCall"]=cs_vxo
+end function
+return cs_vyf
 end function
 function csstreamsensestate()
-if m.cs_vwj=invalid then m.cs_vwj=cs_vwk()
-return m.cs_vwj
+if m.cs_vxq=invalid then m.cs_vxq=cs_vxr()
+return m.cs_vxq
 end function
-function cs_vwk()as object
-cs_vwl=createobject("roAssociativeArray")
-cs_vwl.buffering="buffering"
-cs_vwl.playing="playing"
-cs_vwl.paused="paused"
-cs_vwl.idle="idle"
-return cs_vwl
+function cs_vxr()as object
+cs_vxs=createobject("roAssociativeArray")
+cs_vxs.buffering="buffering"
+cs_vxs.playing="playing"
+cs_vxs.paused="paused"
+cs_vxs.idle="idle"
+return cs_vxs
 end function
-function cs_vwm(cs_vtr as object,keepkeys as object)
-cs_vwn=createobject("roAssociativeArray")
+function cs_vxt(cs_vuy as object,keepkeys as object)
+cs_vxu=createobject("roAssociativeArray")
 for each keyname in keepkeys
-cs_vwn[keyname]=true
+cs_vxu[keyname]=true
 end for
-cs_vwo=createobject("roArray",30,true)
-for each keyname in cs_vtr
-if not cs_vwn.doesexist(keyname)then
-cs_vwo.push(keyname)
+cs_vxv=createobject("roArray",30,true)
+for each keyname in cs_vuy
+if not cs_vxu.doesexist(keyname)then
+cs_vxv.push(keyname)
 end if
 end for
-for each keyname in cs_vwo
-cs_vtr.delete(keyname)
+for each keyname in cs_vxv
+cs_vuy.delete(keyname)
 end for
-end function
-function csstreamsensevideoscreenwrapper(args as object)as object
-cs_vxw=createobject("roAssociativeArray")
-cs_vwq=createobject("roMessagePort")
-cs_vxw.cs_vwr=createobject("roVideoScreen")
-cs_vxw.cs_vwr.setmessageport(cs_vwq)
-cs_vxw.cs_vws=createobject("roAssociativeArray")
-if type(args)= "roAssociativeArray"
-if type(args.url)= "roString" and args.url<>"" then
-url=args.url
-cs_vxw.cs_vws.streamurls=[url]
-end if
-if type(args.streamformat)= "roString" and args.streamformat<>"" then
-cs_vxw.cs_vws.streamformat=args.streamformat
-end if
-if type(args.title)= "roString" and args.title<>"" then
-cs_vxw.cs_vws.title=args.title
-else
-cs_vxw.cs_vws.title=""
-end if
-end if
-cs_vxw.cs_vws.streambitrates=[0]
-cs_vxw.cs_vws.streamqualities=["SD"]
-cs_vxw.cs_vwr.setcontent(cs_vxw.cs_vws)
-cs_vxw.cs_vwr.setpositionnotificationperiod(1)
-cs_vxw.show=function()as void
-m.cs_vwr.show()
-while true
-cs_vwu=wait(50,m.cs_vwr.getmessageport())
-if type(cs_vwu)= "roVideoScreenEvent" then
-if cs_vwu.isscreenclosed()
-exit while
-else if m.cs_vlz<>invalid
-if m.cs_vlz.onplayerevent(cs_vwu)then exit while
-end if
-else if cs_vwu=invalid then
-if m.cs_vlz<>invalid then m.cs_vlz.onplayerevent(cs_vwu)
-end if
-end while
-end function
-return cs_vxw
 end function
 function cscontenttype()as object
-cs_vxw=createobject("roAssociativeArray")
-cs_vxw.cs_vww="12"
-cs_vxw.cs_vwx="11"
-cs_vxw.cs_vwy="13"
-cs_vxw.cs_vwz="22"
-cs_vxw.cs_vxa="21"
-cs_vxw.cs_vxb="23"
-cs_vxw.cs_vxc="99"
-cs_vxw.cs_vxo="00"
-return cs_vxw
+cs_vyf=createobject("roAssociativeArray")
+cs_vyf.long_form_on_demand="12"
+cs_vyf.short_form_on_demand="11"
+cs_vyf.live="13"
+cs_vyf.user_generated_long_form_on_demand="22"
+cs_vyf.user_generated_short_form_on_demand="21"
+cs_vyf.user_generated_live="23"
+cs_vyf.bumper="99"
+cs_vyf.other="00"
+return cs_vyf
 end function
 function csadtype()as object
-cs_vxw=createobject("roAssociativeArray")
-cs_vxw.cs_vxf="11"
-cs_vxw.cs_vxg="12"
-cs_vxw.cs_vxh="13"
-cs_vxw.cs_vxi="21"
-cs_vxw.cs_vxj="31"
-cs_vxw.cs_vxk="32"
-cs_vxw.cs_vxl="33"
-cs_vxw.cs_vxm="34"
-cs_vxw.cs_vxn="35"
-cs_vxw.cs_vxo="00"
-return cs_vxw
+cs_vyf=createobject("roAssociativeArray")
+cs_vyf.linear_on_demand_pre_roll="11"
+cs_vyf.linear_on_demand_mid_roll="12"
+cs_vyf.linear_on_demand_post_roll="13"
+cs_vyf.linear_live="21"
+cs_vyf.branded_on_demand_pre_roll="31"
+cs_vyf.branded_on_demand_mid_roll="32"
+cs_vyf.branded_on_demand_post_roll="33"
+cs_vyf.branded_on_demand_content="34"
+cs_vyf.branded_on_demand_live="35"
+cs_vyf.other="00"
+return cs_vyf
 end function
 function csstreamingtag(dax=invalid as object)as object
-cs_vxw=createobject("roAssociativeArray")
-cs_vxw.cs_vyq=0
-cs_vxw.cs_vyl=invalid
-cs_vxw.cs_vxs=0
-cs_vxw.cs_vze=false
-cs_vxw.cs_vxu=csstreamsense(dax)
-cs_vxw.cs_vxu.setlabel("ns_st_it","r")
-cs_vxw.cs_vxv=function()as object
-cs_vxw=createobject("roAssociativeArray")
-cs_vxw.cs_vxx="0"
-cs_vxw.cs_vxy="1"
-cs_vxw.cs_vxz="2"
-return cs_vxw
+cs_vyf=createobject("roAssociativeArray")
+cs_vyf.cs_vyz=0
+cs_vyf.cs_vyu=invalid
+cs_vyf.cs_vyb=0
+cs_vyf.cs_vzn=false
+cs_vyf.cs_vyd=csstreamsense(dax)
+cs_vyf.cs_vyd.setlabel("ns_st_it","r")
+cs_vyf.cs_vye=function()as object
+cs_vyf=createobject("roAssociativeArray")
+cs_vyf.cs_vyg="0"
+cs_vyf.cs_vyh="1"
+cs_vyf.cs_vyi="2"
+return cs_vyf
 end function
-cs_vxw.cs_vzf=cs_vxw.cs_vxv().cs_vxx
-cs_vxw.cs_vyb=["ns_st_st","ns_st_ci","ns_st_pr","ns_st_sn","ns_st_en","ns_st_ep","ns_st_ct","ns_st_pu","c3","c4","c6"]
-cs_vxw.cs_vzd=0
-cs_vxw.cs_vyw=0
-cs_vxw.cs_vye=function(metadata as object)as object
+cs_vyf.cs_vzo=cs_vyf.cs_vye().cs_vyg
+cs_vyf.cs_vyk=["ns_st_st","ns_st_ci","ns_st_pr","ns_st_sn","ns_st_en","ns_st_ep","ns_st_ct","ns_st_pu","c3","c4","c6"]
+cs_vyf.cs_vzm=0
+cs_vyf.cs_vzf=0
+cs_vyf.cs_vyn=function(metadata as object)as object
 if metadata=invalid then
 metadata={}
 end if
-for cs_vyh=0 to m.cs_vyb.count()-1 step 1
-if m.cs_vyb[cs_vyh]= "ns_st_ci" and metadata["ns_st_ci"]=invalid then
+for cs_vyq=0 to m.cs_vyk.count()-1 step 1
+if m.cs_vyk[cs_vyq]= "ns_st_ci" and metadata["ns_st_ci"]=invalid then
 metadata["ns_st_ci"]= "0"
-else if metadata[m.cs_vyb[cs_vyh]]=invalid then
-metadata[m.cs_vyb[cs_vyh]]= "*null"
+else if metadata[m.cs_vyk[cs_vyq]]=invalid then
+metadata[m.cs_vyk[cs_vyq]]= "*null"
 end if
 end for
 return metadata
 end function
-cs_vxw.cs_vyg=function(metadata as object)as boolean
-for cs_vyh=0 to m.cs_vyb.count()-1 step 1
-if not m.cs_vyi(m.cs_vyb[cs_vyh],m.cs_vyl,metadata)then
+cs_vyf.cs_vyp=function(metadata as object)as boolean
+for cs_vyq=0 to m.cs_vyk.count()-1 step 1
+if not m.cs_vyr(m.cs_vyk[cs_vyq],m.cs_vyu,metadata)then
 return false
 end if
 end for
 return true
 end function
-cs_vxw.cs_vyi=function(label as string,map1 as object,map2 as object)as boolean
+cs_vyf.cs_vyr=function(label as string,map1 as object,map2 as object)as boolean
 if label<>invalid and map1<>invalid and map2<>invalid then
 if map1[label]<>invalid and map2[label]<>invalid then
 return map1[label]=map2[label]
@@ -1996,139 +2004,144 @@ end if
 end if
 return false
 end function
-cs_vxw.cs_vyj=function(cs_vzg as double,metadata as object)as void
-m.cs_vzh(cs_vzg)
-m.cs_vyq=m.cs_vyq+1
+cs_vyf.cs_vys=function(cs_vzr as double,metadata as object)as void
+m.cs_vzq(cs_vzr)
+m.cs_vyz=m.cs_vyz+1
 labels={}
-labels["ns_st_cn"]=comscore_tostr(m.cs_vyq)
+labels["ns_st_cn"]=comscore_tostr(m.cs_vyz)
 labels["ns_st_pn"]= "1"
 labels["ns_st_tp"]= "0"
 comscore_extend(labels,metadata)
-m.cs_vxu.setclip(labels)
-m.cs_vyl=metadata
-m.cs_vzd=cs_vzg
-m.cs_vyw=0
-m.cs_vxu.notify(csstreamsenseeventtype().play,m.cs_vyw)
+m.cs_vyd.setclip(labels)
+m.cs_vyu=metadata
+m.cs_vzm=cs_vzr
+m.cs_vzf=0
+m.cs_vyd.notify(csstreamsenseeventtype().play,m.cs_vzf)
 end function
-cs_vxw.cs_vyo=function(metadata as object)as void
-cs_vzg=comscore_unix_time()
-m.cs_vzh(cs_vzg)
-m.cs_vyq=m.cs_vyq+1
-metadata=m.cs_vye(metadata)
+cs_vyf.cs_vyx=function(metadata as object)as void
+cs_vzr=comscore_unix_time()
+m.cs_vzq(cs_vzr)
+m.cs_vyz=m.cs_vyz+1
+metadata=m.cs_vyn(metadata)
 labels={}
-labels["ns_st_cn"]=comscore_tostr(m.cs_vyq)
+labels["ns_st_cn"]=comscore_tostr(m.cs_vyz)
 labels["ns_st_pn"]= "1"
 labels["ns_st_tp"]= "1"
 labels["ns_st_ad"]= "1"
 comscore_extend(labels,metadata)
-m.cs_vxu.setclip(labels)
-m.cs_vyw=0
-m.cs_vxu.notify(csstreamsenseeventtype().play,m.cs_vyw)
-m.cs_vzd=cs_vzg
-m.cs_vze=false
+m.cs_vyd.setclip(labels)
+m.cs_vzf=0
+m.cs_vyd.notify(csstreamsenseeventtype().play,m.cs_vzf)
+m.cs_vzm=cs_vzr
+m.cs_vzn=false
 end function
-cs_vxw.cs_vyu=function(timestamp as double)as double
-if m.cs_vzd>0 and timestamp>=m.cs_vzd then
-m.cs_vyw=m.cs_vyw+timestamp-m.cs_vzd
+cs_vyf.cs_vzd=function(timestamp as double)as double
+if m.cs_vzm>0 and timestamp>=m.cs_vzm then
+m.cs_vzf=m.cs_vzf+timestamp-m.cs_vzm
 else
-m.cs_vyw=0
+m.cs_vzf=0
 end if
-return m.cs_vyw
+return m.cs_vzf
 end function
-cs_vxw.cs_vyx=function(metadata as object,contenttype as string)as void
-cs_vzg=comscore_unix_time()
-metadata=m.cs_vye(metadata)
-if m.cs_vzf=m.cs_vxv().cs_vxx then
-m.cs_vzf=contenttype
+cs_vyf.cs_vzg=function(metadata as object,contenttype as string)as void
+cs_vzr=comscore_unix_time()
+metadata=m.cs_vyn(metadata)
+if m.cs_vzo=m.cs_vye().cs_vyg then
+m.cs_vzo=contenttype
 end if
-if m.cs_vze=true and m.cs_vzf=contenttype then
-if not m.cs_vyg(metadata)then
-m.cs_vyj(cs_vzg,metadata)
+if m.cs_vzn=true and m.cs_vzo=contenttype then
+if not m.cs_vyp(metadata)then
+m.cs_vys(cs_vzr,metadata)
 else
-m.cs_vxu.getclip().setlabels(metadata)
-if m.cs_vxu.getstate()<>csstreamsensestate().playing then
-m.cs_vzd=cs_vzg
-m.cs_vxu.notify(csstreamsenseeventtype().play,m.cs_vyw)
+m.cs_vyd.getclip().setlabels(metadata)
+if m.cs_vyd.getstate()<>csstreamsensestate().playing then
+m.cs_vzm=cs_vzr
+m.cs_vyd.notify(csstreamsenseeventtype().play,m.cs_vzf)
 end if
 end if
 else
-m.cs_vyj(cs_vzg,metadata)
+m.cs_vys(cs_vzr,metadata)
 end if
-m.cs_vze=true
-m.cs_vzf=contenttype
+m.cs_vzn=true
+m.cs_vzo=contenttype
 end function
-cs_vxw.playvideoadvertisement=function(metadata=invalid as object,mediatype=invalid as object)as void
+cs_vyf.playvideoadvertisement=function(metadata=invalid as object,mediatype=invalid as object)as void
 labels={}
 labels["ns_st_ct"]= "va"
 if mediatype<>invalid then
 labels["ns_st_ct"]= "va" +comscore_tostr(mediatype)
-if mediatype=csadtype().cs_vxi or mediatype=csadtype().cs_vxn then
+if mediatype=csadtype().linear_live or mediatype=csadtype().branded_on_demand_live then
 labels["ns_st_li"]= "1"
 end if
 end if
 if metadata<>invalid then
 comscore_extend(labels,metadata)
 end if
-m.cs_vyo(labels)
+m.cs_vyx(labels)
 end function
-cs_vxw.playaudioadvertisement=function(metadata=invalid as object,mediatype=invalid as object)as void
+cs_vyf.playaudioadvertisement=function(metadata=invalid as object,mediatype=invalid as object)as void
 labels={}
 labels["ns_st_ct"]= "aa"
 if mediatype<>invalid then
 labels["ns_st_ct"]= "aa" +comscore_tostr(mediatype)
-if mediatype=csadtype().cs_vxi or mediatype=csadtype().cs_vxn then
+if mediatype=csadtype().linear_live or mediatype=csadtype().branded_on_demand_live then
 labels["ns_st_li"]= "1"
 end if
 end if
 if metadata<>invalid then
 comscore_extend(labels,metadata)
 end if
-m.cs_vyo(labels)
+m.cs_vyx(labels)
 end function
-cs_vxw.playvideocontentpart=function(metadata=invalid as object,mediatype=invalid as object)as void
+cs_vyf.playvideocontentpart=function(metadata=invalid as object,mediatype=invalid as object)as void
 labels={}
 labels["ns_st_ct"]= "vc"
 if mediatype<>invalid then
 labels["ns_st_ct"]= "vc" +comscore_tostr(mediatype)
-if mediatype=cscontenttype().cs_vwy or mediatype=cscontenttype().cs_vxb then
+if mediatype=cscontenttype().live or mediatype=cscontenttype().user_generated_live then
 labels["ns_st_li"]= "1"
 end if
 end if
 if metadata<>invalid then
 comscore_extend(labels,metadata)
 end if
-m.cs_vyx(labels,m.cs_vxv().cs_vxz)
+m.cs_vzg(labels,m.cs_vye().cs_vyi)
 end function
-cs_vxw.playaudiocontentpart=function(metadata=invalid as object,mediatype=invalid as object)as void
+cs_vyf.playaudiocontentpart=function(metadata=invalid as object,mediatype=invalid as object)as void
 labels={}
 labels["ns_st_ct"]= "ac"
 if mediatype<>invalid then
 labels["ns_st_ct"]= "ac" +comscore_tostr(mediatype)
-if mediatype=cscontenttype().cs_vwy or mediatype=cscontenttype().cs_vxb then
+if mediatype=cscontenttype().live or mediatype=cscontenttype().user_generated_live then
 labels["ns_st_li"]= "1"
 end if
 end if
 if metadata<>invalid then
 comscore_extend(labels,metadata)
 end if
-m.cs_vyx(labels,m.cs_vxv().cs_vxy)
+m.cs_vzg(labels,m.cs_vye().cs_vyh)
 end function
-cs_vxw.stop=function()as void
-cs_vzg=comscore_unix_time()
-m.cs_vxu.notify(csstreamsenseeventtype().pause,m.cs_vyu(cs_vzg))
+cs_vyf.stop=function()as void
+cs_vzr=comscore_unix_time()
+m.cs_vyd.notify(csstreamsenseeventtype().pause,m.cs_vzd(cs_vzr))
 end function
-cs_vxw.cs_vzh=function(cs_vzg as double)as void
-if m.cs_vxu.getstate()<>csstreamsensestate().idle and m.cs_vxu.getstate()<>csstreamsensestate().paused then
-m.cs_vxu.notify(csstreamsenseeventtype().end,m.cs_vyu(cs_vzg))
-else if m.cs_vxu.getstate()=csstreamsensestate().paused then
-m.cs_vxu.notify(csstreamsenseeventtype().end,m.cs_vyw)
+cs_vyf.cs_vzq=function(cs_vzr as double)as void
+if m.cs_vyd.getstate()<>csstreamsensestate().idle and m.cs_vyd.getstate()<>csstreamsensestate().paused then
+m.cs_vyd.notify(csstreamsenseeventtype().end,m.cs_vzd(cs_vzr))
+else if m.cs_vyd.getstate()=csstreamsensestate().paused then
+m.cs_vyd.notify(csstreamsenseeventtype().end,m.cs_vzf)
 end if
 end function
-cs_vxw.tick=function()as void
-m.cs_vxu.tick()
+cs_vyf.tick=function()as void
+m.cs_vyd.tick()
 end function
-cs_vxw.getstate=function()as object
-return m.cs_vxu.getstate()
+cs_vyf.getstate=function()as object
+return m.cs_vyd.getstate()
 end function
-return cs_vxw
+cs_vyf.reset=function()as void
+cs_vzr=comscore_unix_time()
+m.cs_vzq(cs_vzr)
+m.cs_vyd.setplaylist({})
+end function
+return cs_vyf
 end function

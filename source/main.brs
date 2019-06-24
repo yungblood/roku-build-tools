@@ -1,9 +1,13 @@
 sub runUserInterface(ecp as object)
-    m.port = CreateObject("roMessagePort")
-    m.screen = CreateObject("roSGScreen")
+
+    m.port = createObject("roMessagePort")
+    m.inputListener = createObject("roInput")
+    m.inputListener.setMessagePort(m.port)
+
+    m.screen = createObject("roSGScreen")
     m.screen.setMessagePort(m.port)
-    scene = m.screen.CreateScene("AppScene")
-    
+    scene = m.screen.createScene("AppScene")
+
     appInfo = createObject("roAppInfo")
     m.config = parseJson(readAsciiFile(appInfo.getValue("config_file")))
     if m.config = invalid then
@@ -14,17 +18,15 @@ sub runUserInterface(ecp as object)
     displaySize = createObject("roDeviceInfo").getDisplaySize()
     m.config.screenDims = displaySize.w.toStr() + "x" + displaySize.h.toStr()
 
-    globalNode = m.screen.getGlobalNode()
-    globalNode.addField("config", "assocarray", false)
-    globalNode.setField("config", m.config)
-    
-    models = ["2000X", "2050X", "2100X", "2400X", "2450X", "2500X", "3000X", "3050X", "3100X", "3400X", "3420X"]
-    globalNode.addField("extremeMemoryManagement", "boolean", false)
-    globalNode.setField("extremeMemoryManagement", arrayContains(models, getModel()))
-    
     m.screen.show()
-    scene.ecp = ecp
     scene.observeField("close", m.port)
+
+    models = ["2000X", "2050X", "2100X", "2400X", "2450X", "2500X", "3000X", "3050X", "3100X", "3400X", "3420X"]
+    scene.setField("extremeMemoryManagement", false) 'arrayContains(models, getModel()))
+    scene.setField("config", m.config)
+    scene.setField("ecp", ecp)
+    
+    scene.callFunc("reinit", {})
 
     m.exitApp = false
     while true
@@ -36,6 +38,8 @@ sub runUserInterface(ecp as object)
             if msg.getField() = "close" then
                 exit while
             end if
+        else if msgType = "roInputEvent" then
+            scene.setField("deeplink", msg.getInfo())
         end if
     end while
 end sub

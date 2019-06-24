@@ -19,10 +19,15 @@ sub onItemContentChanged()
     end if
 end sub
 
-sub onUriChanged()
+sub onUriChanged(nodeEvent as object)
     ' Rotate the back poster to the front
     poster = m.top.getChild(0)
     poster.uri = "invalid"
-    poster.uri = m.top.uri
+    poster.uri = nodeEvent.getData()
     m.top.appendChild(poster)
+end sub
+
+sub onFailedBitmapUriChanged(nodeEvent as object)
+    poster = m.top.getChild(1)
+    poster.failedBitmapUri = nodeEvent.getData()
 end sub

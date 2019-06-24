@@ -2,6 +2,11 @@
 <component name="Movie" extends="Episode">
     <script type="text/brightscript" uri="pkg:/components/models/movie.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
     <interface>
         <field id="trailer" type="node" />
         <field id="subtitle" type="string" />

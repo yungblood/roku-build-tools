@@ -7,6 +7,7 @@
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
     <interface>
+        <function name="read" />
     </interface>
     <children>
         <Font
@@ -23,7 +24,8 @@
                 id="signedOut"
                 text="You must be signed in to choose a local station"
                 color="0xffffffff"
-                opacity=".75">
+                opacity=".75"
+                visible="false">
                 <Font
                     role="font"
                     size="35"
@@ -36,7 +38,8 @@
                 color="0xffffffff"
                 opacity=".75"
                 wrap="true"
-                lineSpacing="0">
+                lineSpacing="0"
+                visible="false">
                 <Font
                     role="font"
                     size="35"

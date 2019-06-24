@@ -1,6 +1,7 @@
 sub init()
     m.top.omnitureName = "/all access/upsell"
-    m.top.omniturePageType = "upsell"
+    m.top.omniturePageType = "svod_upsell"
+    m.top.omnitureSiteHier = "other|other|settings|home"
 
     m.top.observeField("focusedChild", "onFocusChanged")
     
@@ -15,17 +16,19 @@ sub init()
     
     m.buttonFont = m.top.findNode("buttonFont")
     
-    m.top.setFocus(true)
+    m.tts = createObject("roTextToSpeech")
+
+    trackRMFEvent("RBK")
 end sub
 
 sub onFocusChanged()
-    if m.top.hasFocus() then
+    if m.top.hasFocus() and m.top.upsellInfo <> invalid then
         m.buttons.setFocus(true)
     end if
 end sub
 
 sub onUpsellTypeChanged()
-    m.global.showSpinner = true
+    showSpinner()
 
     m.loadTask = createObject("roSGNode", "LoadUpsellInfoTask")
     m.loadTask.observeField("upsellInfo", "onUpsellInfoLoaded")
@@ -38,6 +41,7 @@ sub onButtonSelected(nodeEvent as object)
     
     buttonText = button.text
     params = {}
+    params["siteHier"] = "all access|upsell"
     if buttonText = constants().signUpText then
         params["podType"] = "upsell"
         params["podText"] = "sign up"
@@ -56,11 +60,13 @@ sub onButtonSelected(nodeEvent as object)
     m.top.buttonSelected = buttonText
 end sub
 
-sub onButtonsChanged()
-    buttons = m.top.buttons
+sub onButtonsChanged(nodeEvent as object)
+    buttons = nodeEvent.getData()
     m.buttons.removeChildrenIndex(m.buttons.getChildCount(), 0)
+    
+    newButtons = []
     for each buttonText in buttons
-        button = m.buttons.createChild("LabelButton")
+        button = createObject("roSGNode", "LabelButton")
         button.width = 701
         button.height = 88
         button.textColor = "0xffffffff"
@@ -70,22 +76,40 @@ sub onButtonsChanged()
         button.processKeyEvents = false
         button.font = m.buttonFont
         button.text = buttonText
+        newButtons.push(button)
     next
+    ' Append after all have been created, so TTS works correctly
+    m.buttons.appendChildren(newButtons)
 end sub
 
-sub onUpsellInfoLoaded()
-    m.top.upsellInfo = m.loadTask.upsellInfo
+sub onUpsellInfoLoaded(nodeEvent as object)
+    task = nodeEvent.getRoSGNode()
+    upsellInfo = nodeEvent.getData()
     
-    m.global.showSpinner = false
+    if upsellInfo <> invalid and task.errorCode = 0 then
+        m.top.upsellInfo = upsellInfo
+    else
+        if task.errorCode > 0 then
+            showApiError(true)
+        end if
+    end if
+
+    hideSpinner()
+    m.loadTask = invalid
 end sub
 
-sub onUpsellInfoChanged()
-    upsellInfo = m.top.upsellInfo
+sub onUpsellInfoChanged(nodeEvent as object)
+    upsellInfo = nodeEvent.getData()
     if upsellInfo <> invalid then
         m.logo.uri = upsellInfo.logoUrl
         m.background.uri = upsellInfo.hdPosterUrl
         m.message1.text = upsellInfo.message1
         m.message2.text = upsellInfo.message2
         m.message3.text = upsellInfo.message3
+        
+        if createObject("roDeviceInfo").isAudioGuideEnabled() then
+            m.tts.say(upsellInfo.message1 + " " + upsellInfo.message2 + " " + upsellInfo.message3)
+        end if
+        m.buttons.setFocus(true)
     end if
 end sub

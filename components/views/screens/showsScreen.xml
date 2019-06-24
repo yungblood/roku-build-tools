@@ -12,14 +12,14 @@
             id="groups"
             translation="[100,135]"
             layoutDirection="vert"
-            itemSpacings="[35]">
+            itemSpacings="[30]">
         </LabelButtonGroup>
         
         <MarkupGrid
             id="grid"
             translation="[350,142]"
             itemComponentName="ShowTile"
-            itemSize="[266,400]"
+            itemSize="[266,399]"
             itemSpacing="[30,30]"
             numColumns="5"
             numRows="2"

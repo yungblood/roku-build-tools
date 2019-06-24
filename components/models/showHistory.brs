@@ -9,13 +9,19 @@ sub update()
 end sub
 
 sub onShowHistoryLoaded(nodeEvent as Object)
+'    task = nodeEvent.getRoSGNode()
+'    m.top.title = "Shows You Watch (" + task.sortOrder + ")"
+
     m.top.content = nodeEvent.getData()
 end sub
 
 sub onContentChanged(nodeEvent as object)
     m.updateTask = invalid
-    shows =[]
+
+    shows = []
     shows.append(nodeEvent.getData())
     m.top.removeChildrenIndex(m.top.getChildCount(), 0)
     m.top.appendChildren(shows)
+    
+    m.top.firstLoad = false
 end sub

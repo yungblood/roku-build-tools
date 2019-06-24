@@ -2,6 +2,7 @@
 <component name="ShowsScreenTask" extends="ApiTask">
     <script type="text/brightscript" uri="pkg:/components/tasks/showsScreenTask.brs" />
     <interface>
-        <field id="groups" type="nodearray" />
+        <field id="errorCode" type="integer" />
+        <field id="groups" type="nodearray" alwaysNotify="true" />
     </interface>
 </component>

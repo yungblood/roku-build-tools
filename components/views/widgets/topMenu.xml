@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component name="TopMenu" extends="Group">
     <script type="text/brightscript" uri="pkg:/components/views/widgets/topMenu.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
@@ -19,7 +20,7 @@
             width="131"
             height="39"
             uri="pkg:/images/cbsNavLogoConsole.png" />
-        <LayoutGroup
+        <LabelButtonGroup
             id="navButtons"
             translation="[304,47]"
             layoutDirection="horiz"
@@ -31,8 +32,10 @@
                 focusedTextColor="0xffffffff"
                 width="77"
                 height="46"
+                backgroundUri=""
                 focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
                 font="dictionary:buttonFont"
+                ttsComponentType="tab"
                 processKeyEvents="false" />
             <LabelButton
                 id="shows"
@@ -43,6 +46,7 @@
                 height="46"
                 focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
                 font="dictionary:buttonFont"
+                ttsComponentType="tab"
                 processKeyEvents="false" />
             <LabelButton
                 id="liveTV"
@@ -53,6 +57,7 @@
                 height="46"
                 focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
                 font="dictionary:buttonFont"
+                ttsComponentType="tab"
                 processKeyEvents="false" />
             <LabelButton
                 id="movies"
@@ -63,6 +68,7 @@
                 height="46"
                 focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
                 font="dictionary:buttonFont"
+                ttsComponentType="tab"
                 processKeyEvents="false" />
             <LabelButton
                 id="search"
@@ -73,6 +79,7 @@
                 height="46"
                 focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
                 font="dictionary:buttonFont"
+                ttsComponentType="tab"
                 processKeyEvents="false" />
             <LabelButton
                 id="settings"
@@ -83,7 +90,8 @@
                 height="46"
                 focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
                 font="dictionary:buttonFont"
+                ttsComponentType="tab"
                 processKeyEvents="false" />
-        </LayoutGroup>
+        </LabelButtonGroup>
     </children>
 </component>

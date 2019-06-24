@@ -9,10 +9,18 @@ sub init()
     m.group.translation = [m.top.width / 2, m.top.height / 2]
 
     m.logo = m.top.findNode("logo")
+    m.frame = m.top.findNode("frame")
+    m.frame.width = m.top.width
+    m.frame.height = m.top.height
+    m.frame.visible = false
 end sub
 
 sub onStationChanged()
     if m.top.station.affiliate <> invalid then
         m.logo.uri = m.top.station.affiliate.hdPosterUrl
     end if
+end sub
+
+sub onSelectedChanged()
+    m.frame.visible = m.top.selected
 end sub

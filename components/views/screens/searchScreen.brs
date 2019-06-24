@@ -1,6 +1,7 @@
 sub init()
     m.top.omnitureName = "/search/"
     m.top.omniturePageType = "search"
+    m.top.omnitureSiteHier = "search"
 
     m.top.observeField("focusedChild", "onFocusChanged")
 

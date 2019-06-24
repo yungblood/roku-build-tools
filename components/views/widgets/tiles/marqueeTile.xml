@@ -23,7 +23,7 @@
         <Label
             id="title"
             translation="[99,200]"
-            width="500"
+            width="800"
             height="296"
             lineSpacing="-20"
             color="0xffffffff"

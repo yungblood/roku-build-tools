@@ -1,7 +1,9 @@
 sub init()
-    m.top.observeField("focusedChild", "onFocusedIDChanged")
+    m.top.observeField("focusedChild", "onFocusChanged")
 
     m.navButtons = m.top.findNode("navButtons")
+    m.navButtons.observeField("buttonSelected", "onButtonSelected")
+
     m.home = m.top.findNode("home")
     m.shows = m.top.findNode("shows")
     m.liveTV = m.top.findNode("liveTV")
@@ -9,67 +11,36 @@ sub init()
     m.search = m.top.findNode("search")
     m.settings = m.top.findNode("settings")
     
-    m.tabOrder = [
-        m.home
-        m.shows
-        m.liveTV
-        m.movies
-        m.search
-        m.settings
-    ]
-    m.tabIndex = 0
-    
     m.color = &hffffff66
     m.focusedColor = &hffffffff
 
-    m.global.observeField("config", "onConfigChanged")
+    observeGlobalField("config", "onConfigChanged")
     onConfigChanged()
     onFocusedIDChanged()
 end sub
 
 sub onConfigChanged()
-    config = m.global.config
+    config = getGlobalField("config")
     if asString(config.movies_enabled) = "false" then
         m.navButtons.removeChild(m.movies)
-        for i = 0 to m.tabOrder.count() - 1
-            if m.tabOrder[i].isSameNode(m.movies) then
-                m.tabOrder.delete(i)
-                exit for
-            end if
-        next
     end if
 end sub
 
-function onKeyEvent(key as string, press as boolean) as boolean
-?"TopMenu.onKeyEvent", key, press
-    if press then
-        if key = "right" then
-            if m.tabIndex < m.tabOrder.count() - 1 then
-                m.tabIndex++
-                m.top.focusedID = m.tabOrder[m.tabIndex].id
-                return true
-            end if
-        else if key = "left" then
-            if m.tabIndex > 0 then
-                m.tabIndex--
-                m.top.focusedID = m.tabOrder[m.tabIndex].id
-                return true
-            end if
-        else if key = "OK" then
-            m.top.buttonSelected = m.top.focusedID
-            return true
+sub onFocusChanged()
+    if m.top.hasFocus() then
+        if not isNullOrEmpty(m.top.focusedID) then
+            m.navButtons.jumpToButton = m.top.focusedID
         end if
+        m.navButtons.setFocus(true)
     end if
-    return false
-end function
+end sub
 
 sub onFocusedIDChanged()
-    for i = 0 to m.tabOrder.count() - 1
-        button = m.tabOrder[i]
+    for i = 0 to m.navButtons.getChildCount() - 1
+        button = m.navButtons.getChild(i)
         if button.id = m.top.focusedID then
             if m.top.isInFocusChain() then
-                button.setFocus(true)
-                m.tabIndex = i
+                m.navButtons.jumpToIndex = i
             else
                 button.textColor = m.focusedColor
             end if
@@ -78,4 +49,13 @@ sub onFocusedIDChanged()
         end if
     next
 end sub
+
+sub onButtonSelected(nodeEvent as object)
+    index = nodeEvent.getData()
+    button = m.navButtons.getChild(index)
+    if button <> invalid then
+        m.top.buttonSelected = button.id
+    end if
+end sub
+
 

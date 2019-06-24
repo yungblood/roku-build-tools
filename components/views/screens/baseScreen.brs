@@ -5,7 +5,6 @@ sub init()
 end sub
 
 sub onScreenVisibleChanged()
-    ?"onScreenVisibleChanged()",m.top.subtype(),m.top.visible
     if m.top.visible and not m.visible then
         trackScreenView()
     end if

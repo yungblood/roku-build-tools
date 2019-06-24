@@ -4,14 +4,16 @@ end sub
 
 sub doWork()
     api = cbs()
-    api.initialize(m.global.config, m.global.user, m.global.cookies)
+    api.initialize(m.top)
     
+    upsellInfo = invalid
+    screenInfo = invalid
     if m.top.upsellType = "rendezvous" then
-        m.top.upsellInfo = api.getUpsellInfo("RENDEZVOUS_SCREEN", m.top.campaign)
+        upsellInfo = api.getUpsellInfo("RENDEZVOUS_SCREEN", m.top.campaign)
     else if m.top.upsellType = "launch" then
-        m.top.upsellInfo = api.getUpsellInfo("AA_LAUNCH_SCREEN", m.top.campaign)
+        upsellInfo = api.getUpsellInfo("AA_LAUNCH_SCREEN", m.top.campaign)
     else if m.top.upsellType = "liveTV" then
-        m.top.upsellInfo = api.getUpsellInfo("AA_LIVE_LAUNCH_SCREEN", m.top.campaign)
+        upsellInfo = api.getUpsellInfo("AA_LIVE_LAUNCH_SCREEN", m.top.campaign)
     else if m.top.upsellType = "reg" then
         screenInfo = createObject("roSGNode", "UpsellScreenInfo")
         screenInfo.backgroundInfo = api.getUpsellInfo("AAUPSELLBKCD")
@@ -19,9 +21,10 @@ sub doWork()
         lcInfo = api.getUpsellInfo("CBS_ALL_ACCESS_PACKAGE", lcCampaign)
         if lcInfo <> invalid then
             omnitureData = {}
-            omnitureData["podText"] = "select"
+            omnitureData["podText"] = lcInfo.callToAction
             omnitureData["podSection"] = "limited commercials"
             omnitureData["podPosition"] = 1
+            omnitureData["podTitle"] = "pick your plan"
             lcInfo.omnitureData = omnitureData
         end if
         
@@ -29,12 +32,12 @@ sub doWork()
         cfInfo = api.getUpsellInfo("CBS_ALL_ACCESS_AD_FREE_PACKAGE", cfCampaign)
         if cfInfo <> invalid then
             omnitureData = {}
-            omnitureData["podText"] = "select"
+            omnitureData["podText"] = cfInfo.callToAction
             omnitureData["podSection"] = "commercial free"
             omnitureData["podPosition"] = 2
+            omnitureData["podTitle"] = "pick your plan"
             cfInfo.omnitureData = omnitureData
         end if
-
         if lcInfo <> invalid and cfInfo <> invalid then
             screenInfo.options = [lcInfo, cfInfo]
 '        else if lcInfo <> invalid then
@@ -43,11 +46,9 @@ sub doWork()
 '            screenInfo.options = [ cfInfo]
         end if
         screenInfo.buttons = [
-            constants().tourText
-            constants().browseText
+'            constants().tourText
+'            constants().browseText
         ]
-
-        m.top.upsellScreenInfo = screenInfo
     else if m.top.upsellType = "newSub" then
         screenInfo = createObject("roSGNode", "UpsellScreenInfo")
         screenInfo.backgroundInfo = api.getUpsellInfo("AAUPSELLBKCD")
@@ -55,9 +56,10 @@ sub doWork()
         lcInfo = api.getUpsellInfo("CBS_ALL_ACCESS_PACKAGE", lcCampaign)
         if lcInfo <> invalid then
             omnitureData = {}
-            omnitureData["podText"] = "select"
+            omnitureData["podText"] = lcInfo.callToAction
             omnitureData["podSection"] = "limited commercials"
             omnitureData["podPosition"] = 1
+            omnitureData["podTitle"] = "pick your plan"
             lcInfo.omnitureData = omnitureData
         end if
         
@@ -65,9 +67,10 @@ sub doWork()
         cfInfo = api.getUpsellInfo("CBS_ALL_ACCESS_AD_FREE_PACKAGE", cfCampaign)
         if cfInfo <> invalid then
             omnitureData = {}
-            omnitureData["podText"] = "select"
+            omnitureData["podText"] = cfInfo.callToAction
             omnitureData["podSection"] = "commercial free"
             omnitureData["podPosition"] = 2
+            omnitureData["podTitle"] = "pick your plan"
             cfInfo.omnitureData = omnitureData
         end if
 
@@ -79,11 +82,9 @@ sub doWork()
 '            screenInfo.options = [ cfInfo]
         end if
         screenInfo.buttons = [
-            constants().tourText
-            constants().signInText
+'            constants().tourText
+'            constants().signInText
         ]
-
-        m.top.upsellScreenInfo = screenInfo
     else if m.top.upsellType = "liveTVSub" then
         screenInfo = createObject("roSGNode", "UpsellScreenInfo")
         screenInfo.backgroundInfo = api.getUpsellInfo("AAUPSELLBKCD")
@@ -92,10 +93,9 @@ sub doWork()
             screenInfo.options = [liveInfo]
         end if
         screenInfo.buttons = [
-            constants().tourText
-            constants().signInText
+'            constants().tourText
+'            constants().signInText
         ]
-        m.top.upsellScreenInfo = screenInfo
     else if m.top.upsellType = "upgrade" then
         screenInfo = createObject("roSGNode", "UpsellScreenInfo")
         screenInfo.backgroundInfo = api.getUpsellInfo("AAUPSELLBKCD")
@@ -108,7 +108,6 @@ sub doWork()
             screenInfo.options = [optionInfo]
         end if
         screenInfo.buttons = []
-        m.top.upsellScreenInfo = screenInfo
     else if m.top.upsellType = "upgradeExternal" then
         screenInfo = createObject("roSGNode", "UpsellScreenInfo")
         screenInfo.backgroundInfo = api.getUpsellInfo("AAUPSELLBKCD")
@@ -117,7 +116,6 @@ sub doWork()
             optionInfo.disabled = true
             screenInfo.options = [optionInfo]
         end if
-        m.top.upsellScreenInfo = screenInfo
     else if m.top.upsellType = "downgrade" then
         screenInfo = createObject("roSGNode", "UpsellScreenInfo")
         screenInfo.backgroundInfo = api.getUpsellInfo("AAUPSELLBKCD")
@@ -133,7 +131,6 @@ sub doWork()
         screenInfo.buttons = [
             constants().switchText
         ]
-        m.top.upsellScreenInfo = screenInfo
     else if m.top.upsellType = "downgradeExternal" then
         screenInfo = createObject("roSGNode", "UpsellScreenInfo")
         screenInfo.backgroundInfo = api.getUpsellInfo("AAUPSELLBKCD")
@@ -143,7 +140,17 @@ sub doWork()
             screenInfo.options = [optionInfo]
         end if
         screenInfo.buttons = []
-        m.top.upsellScreenInfo = screenInfo
+    else
+        upsellInfo = invalid
+    end if
+
+    if upsellInfo <> invalid then
+        m.top.errorCode = asInteger(upsellInfo.errorCode)
+    end if
+    m.top.upsellScreenInfo = screenInfo
+    
+    if isSGNode(upsellInfo) then
+        m.top.upsellInfo = upsellInfo
     else
         m.top.upsellInfo = invalid
     end if

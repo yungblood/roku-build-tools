@@ -11,6 +11,9 @@
         <field id="firstName" type="string" />
         <field id="lastName" type="string" />
         <field id="fullName" type="string" />
+        <field id="maskedFullName" type="string" />
+        <field id="email" type="string" />
+        <field id="maskedEmail" type="string" />
         <field id="gender" type="string" />
         
         <field id="status" type="string" value="ANONYMOUS" />

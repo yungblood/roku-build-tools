@@ -4,7 +4,7 @@ end sub
 sub onJsonChanged()
     json = m.top.json
     if json <> invalid then
-        shows = m.global.showCache
+        shows = getGlobalField("showCache")
         for each term in json.terms
             result = createObject("roSGNode", "SearchResult")
             result.json = term

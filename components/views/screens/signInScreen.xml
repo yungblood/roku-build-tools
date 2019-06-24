@@ -16,6 +16,7 @@
             height="1080"
             uri="pkg:/images/bg_upsell.jpg"
             loadDisplayMode="scaleToZoom" />
+
         <Label
             translation="[0,100]"
             width="1920"
@@ -38,14 +39,14 @@
             itemSpacings="[60]"
             horizAlignment="center"
             vertAlignment="center">
-            <SubscriptionOptionButton
+            <SignInOptionButton
                 id="signInWithEmail"
                 width="734"
                 height="444"
                 title="On Roku"
                 subtitle="Using your CBS All Access email and password"
                 processKeyEvents="false" />
-            <SubscriptionOptionButton
+            <SignInOptionButton
                 id="signInOnWeb"
                 width="734"
                 height="444"

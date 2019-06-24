@@ -11,6 +11,14 @@
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
     <interface>
         <field id="buttonSelected" type="string" alwaysNotify="true" />
+        
+        <field id="cookies" type="string" />
+        <field id="localStation" type="string" />
+        <field id="lastLiveChannel" type="string" />
+        <field id="shows" type="nodearray" />
+        <field id="showCache" type="assocarray" />
+        <field id="user" type="node" />
+
         <field id="success" type="boolean" alwaysNotify="true" />
     </interface>
     <children>
@@ -60,7 +68,7 @@
                 focusedBackgroundUri="pkg:/images/frame_grid.9.png"
                 focusedBackgroundColor="0xffffff22"
                 inputMask="^([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6})$"
-                validationError="Please enter a valid email address."
+                validationError="Please return to the previous screen and enter the email address you used to subscribe to CBS All Access.\n\nForgot your email? Please visit cbs.com/help."
                 processKeyEvents="false" />
             <TextBox
                 id="password"

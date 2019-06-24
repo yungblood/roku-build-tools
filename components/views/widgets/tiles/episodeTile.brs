@@ -111,6 +111,7 @@ sub updatePoster()
                 uri = uri + "?"
             end if
             uri = uri + "cachebuster=" + createObject("roDateTime").asSeconds().toStr()
+?"updatePoster: ";uri
             if m.updateTimer = invalid then
                 m.updateTimer = createObject("roSGNode", "Timer")
                 m.updateTimer.observeField("fire", "updatePoster")

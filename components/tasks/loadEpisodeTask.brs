@@ -4,7 +4,7 @@ end sub
 
 sub doWork()
     api = cbs()
-    api.initialize(m.global.config, m.global.user, m.global.cookies)
+    api.initialize(m.top)
 
     if m.top.populateStream then
         if api.isOverStreamLimit() then
@@ -14,20 +14,27 @@ sub doWork()
         end if
     end if
     episode = api.getEpisode(m.top.episodeID, m.top.populateStream)
-    
-    if episode <> invalid and episode.isLive and m.top.populateStream then
-        hls = parseHls(episode.videoStream.url)
-        if hls <> invalid and hls.playlists <> invalid and hls.playlists.count() > 0 then
-            hls = parseHls(hls.playlists[0].url)
-            if hls <> invalid then
-                if hls.metadata["#EXT-X-PLAYLIST-TYPE"] = "VOD" then
-                    episode.videoStream.playStart = 0
+    if episode <> invalid and episode.errorCode = invalid then
+        if episode <> invalid and episode.isLive and m.top.populateStream then
+            hls = parseHls(episode.videoStream.url)
+            if hls <> invalid and hls.playlists <> invalid and hls.playlists.count() > 0 then
+                hls = parseHls(hls.playlists[0].url)
+                if hls <> invalid then
+                    if hls.metadata["#EXT-X-PLAYLIST-TYPE"] = "VOD" then
+                        episode.videoStream.playStart = 0
+                    end if
                 end if
             end if
+        end if   
+        
+        m.top.episode = episode
+    else
+        if episode <> invalid then
+            m.top.errorCode = asInteger(episode.errorCode)
         end if
-    end if   
-    
-    m.top.episode = episode
+        m.top.episode = invalid
+    end if
+
     if episode <> invalid and m.top.loadNextEpisode and not episode.isLive then
         if episode.isFullEpisode then
             m.top.nextEpisode = api.getNextEpisode(episode.id, episode.showID, m.top.populateStream)

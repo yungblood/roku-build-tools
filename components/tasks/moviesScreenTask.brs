@@ -4,7 +4,15 @@ end sub
 
 sub doWork()
     api = cbs()
-    api.initialize(m.global.config, m.global.user, m.global.cookies)
+    api.initialize(m.top)
     
-    m.top.movies = api.getMovies()
+    movieGroup = createObject("roSGNode", "MovieGroup")
+    
+    movies = api.getMovies(0, 24)
+    if isAssociativeArray(movies) and movies.errorCode <> invalid then
+        m.top.errorCode = movies.errorCode
+    else
+        movieGroup.appendChildren(movies)
+    end if
+    m.top.movies = movieGroup
 end sub

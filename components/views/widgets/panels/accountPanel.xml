@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component name="AccountPanel" extends="Group">
     <script type="text/brightscript" uri="pkg:/components/views/widgets/panels/accountPanel.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
     <interface>
         <field id="buttonSelected" type="string" alwaysNotify="true" />
+
+        <function name="read" />
     </interface>
     <children>
         <Font
@@ -14,11 +20,15 @@
             id="content"
             layoutDirection="vert"
             translation="[0,375]"
-            itemSpacings="[69]"
+            itemSpacings="[40]"
             vertAlignment="center">
             <SettingsLabel
                 id="name"
                 title="SIGNED IN AS"
+                value="" />
+            <SettingsLabel
+                id="email"
+                title="EMAIL"
                 value="" />
             <SettingsLabel
                 id="level"

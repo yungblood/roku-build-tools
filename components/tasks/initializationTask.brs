@@ -3,55 +3,49 @@ sub init()
 end sub
 
 sub doWork()
-    m.global.addField("cookies", "string", false)
-    m.global.addField("shows", "nodearray", false)
-    m.global.addField("showCache", "assocarray", false)
-    m.global.addField("liveTVChannels", "node", false)
-    m.global.addField("liveTVChannel", "string", false)
-    m.global.addField("stations", "nodearray", false)
-    m.global.addField("station", "string", false)
+    addGlobalField("deviceID", "string", false)
+    addGlobalField("cookies", "string", false)
+    addGlobalField("shows", "nodearray", false)
+    addGlobalField("showCache", "assocarray", false)
+    addGlobalField("liveTVChannels", "node", false)
+    addGlobalField("lastLiveChannel", "string", false)
+    addGlobalField("stations", "nodearray", false)
+    addGlobalField("localStation", "string", false)
+    addGlobalField("deeplinkForTracking", "string", false)
+    addGlobalField("correlator", "string", false)
+    addGlobalField("spotXCampaign", "stringarray", false)
 
-    config = m.global.config
+    config = getGlobalField("config")
     api = cbs()
-    api.initialize(config)
+    api.initialize(m.top)
     config.append(api.getConfiguration())
     config.ipAddress = api.getIPAddress()
+    config.geoBlocked = false
 
-    m.global.config = config
+    setGlobalField("config", config)
 
-    m.global.shows = []
-    m.global.showCache = {}
-    m.global.stations = []
+    setGlobalField("shows", [])
+    setGlobalField("showCache", {})
+    setGlobalField("stations", [])
 
-    m.global.addField("user", "node", false)
-    m.global.user = createObject("roSGNode", "User")
+    addGlobalField("user", "node", false)
+    setglobalField("user", createObject("roSGNode", "User"))
     
-    m.global.addField("analytics", "node", false)
+    addGlobalField("analytics", "node", false)
     analyticsTask = createObject("roSGNode", "AnalyticsTask")
     analyticsTask.control = "run"
-    m.global.analytics = analyticsTask
+    setGlobalField("analytics", analyticsTask)
     
-    m.global.addField("adobe", "node", false)
+    addGlobalField("adobe", "node", false)
     adobeTask = createObject("roSGNode", "adbmobileTask")
     ' The ADBMobileTask automatically starts itself in init()
     'adobeTask.control = "run"
-    m.global.adobe = adobeTask
+    setGlobalField("adobe", adobeTask)
     
-    m.global.addField("comscore", "node", false)
-    comscoreTask = createObject("roSGNode", "ComscoreTask")
-    comscoreTask.control = "run"
-    m.global.comscore = comscoreTask
-    
-    ' Add BrightlineTask here 
-    m.global.addField("brightline", "node", false)
-    brightlineTask = createObject("roSGNode", "BrightlineTask")
-    brightlineTask.control = "run"
-    m.global.brightline = brightlineTask    
-    
-    m.global.addField("dai", "node", false)
-    daiTask = createObject("roSGNode", "DaiTask")
-    daiTask.control = "run"
-    m.global.dai = daiTask
+    ' Started in video thread
+    addGlobalField("comscore", "node", false)
+    addGlobalField("brightline", "node", false)
+    addGlobalField("dai", "node", false)
     
     m.top.initialized = true
 end sub

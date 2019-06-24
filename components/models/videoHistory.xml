@@ -2,10 +2,15 @@
 <component name="VideoHistory" extends="ContentNode">
     <script type="text/brightscript" uri="pkg:/components/models/videoHistory.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
     <interface>
         <field id="update" type="boolean" onChange="update" alwaysNotify="true" />
 
-        <field id="content" type="nodearray" onChange="onContentChanged" />
+        <field id="content" type="nodearray" onChange="onContentChanged" alwaysNotify="true" />
         <field id="cache" type="assocarray" />
     </interface>
 </component>

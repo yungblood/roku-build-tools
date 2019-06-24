@@ -86,18 +86,18 @@
                     </Label>
                     <MarkupGrid
                         id="channelGrid"
-                        translation="[100,60]"
+                        translation="[100,73]"
                         numRows="1"
                         numColumns="4"
                         itemComponentName="ChannelTile"
-                        itemSize="[436,261]"
-                        itemSpacing="[34,0]"
+                        itemSize="[384,216]"
+                        itemSpacing="[61,0]"
                         horizFocusAnimationStyle="floatingFocus"
                         drawFocusFeedback="false" />
                 </Group>
                 <Group
                     id="scheduleOverlay"
-                    translation="[0,676]"
+                    translation="[0,692]"
                     visible="false">
                     <Poster
                         translation="[0,-200]"
@@ -115,7 +115,7 @@
                            uri="pkg:/fonts/Lato-Regular.ttf" />
                     </Label>
                     <LayoutGroup
-                        translation="[1855,23]"
+                        translation="[1820,23]"
                         layoutDirection="horiz"
                         itemSpacings="[18]"
                         horizAlignment="right"
@@ -137,17 +137,17 @@
                     </LayoutGroup>
                     <MarkupGrid
                         id="scheduleGrid"
-                        translation="[100,60]"
+                        translation="[100,73]"
                         numRows="1"
                         numColumns="4"
                         itemComponentName="ScheduleTile"
-                        itemSize="[436,261]"
-                        itemSpacing="[34,0]"
+                        itemSize="[384,216]"
+                        itemSpacing="[61,0]"
                         horizFocusAnimationStyle="floatingFocus"
                         drawFocusFeedback="false" />
                     <Poster
                         id="scheduleDismiss"
-                        translation="[851,337]"
+                        translation="[851,317]"
                         width="218"
                         height="50"
                         uri="pkg:/images/text_dismiss.png" />

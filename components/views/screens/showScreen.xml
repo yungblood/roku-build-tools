@@ -6,6 +6,7 @@
         <field id="showID" type="string" onChange="onShowIDChanged" alwaysNotify="true" />
         <field id="show" type="node" onChange="onShowChanged" alwaysNotify="true" />
         <field id="episodeID" type="string" onChange="onEpisodeIDChanged" alwaysNotify="true" />
+        <field id="autoplay" type="boolean" />
 
         <field id="itemSelected" type="node" alwaysNotify="true" />
         <field id="buttonSelected" type="string" alwaysNotify="true" />
@@ -19,26 +20,15 @@
            size="43"
            uri="pkg:/fonts/Lato-Light.ttf" />
 
-        <Poster
-            id="hero"
-            width="1920"
-            height="1080"
-            loadDisplayMode="scaleToZoom" />
-        <Poster
-            id="heroDarken"
-            width="1920"
-            height="1080"
-            uri="pkg:/images/show-detail-hero-darken_int_480.png" />
+        <DynamicPlayMarqueeTile
+            id="dynamicPlay" />
+
         <Rectangle
             id="heroFadeRect"
             width="1920"
             height="1080"
             color="0x000000ff"
             opacity="0" />
-        
-        <DynamicPlayMarqueeTile
-            id="dynamicPlay"
-            translation="[100,297]" />
 
         <RowList
             id="list"
@@ -73,7 +63,7 @@
                 keyValue="[[0,0],[0,0]]"
                 fieldToInterp="list.translation" />
         </Animation>
-
+        
         <ParallelAnimation
             id="fadeOutAnimation">
             <Animation
@@ -83,8 +73,8 @@
                 repeat="false">
                 <FloatFieldInterpolator
                     key="[0,1]"
-                    keyValue="[1,0]"
-                    fieldToInterp="hero.opacity" />
+                    keyValue="[0,1]"
+                    fieldToInterp="heroFadeRect.opacity" />
             </Animation>
             <Animation
                 id="dynamicPlayFadeOutAnimation"
@@ -106,8 +96,8 @@
                 repeat="false">
                 <FloatFieldInterpolator
                     key="[0,1]"
-                    keyValue="[0,1]"
-                    fieldToInterp="hero.opacity" />
+                    keyValue="[1,0]"
+                    fieldToInterp="heroFadeRect.opacity" />
             </Animation>
             <Animation
                 id="dynamicPlayFadeInAnimation"

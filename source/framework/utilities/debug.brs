@@ -24,7 +24,9 @@ Sub DebugPrint(data As Object, prefix = "" As String, logLevel = 0 As Integer, r
         remoteLoggingUrl = m.RemoteLogUrl
     End If
     If AsInteger(m.DebugLogLevel) >= logLevel Then
-        print Serialize(data, prefix)
+        date = createObject("roDateTime")
+        dateStamp = date.ToISOString().mid(5).replace("T", " ").replace("Z", "") + "." + padLeft(date.getMilliseconds().toStr(), "0", 3)
+        print Serialize(data, "[" + dateStamp + "] " + prefix)
         If Not IsNullOrEmpty(remoteLoggingUrl) And m.RemoteLogging <> True Then
             ' Set flag to prevent recursive logging
             m.RemoteLogging = True

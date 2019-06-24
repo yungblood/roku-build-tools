@@ -4,7 +4,8 @@ end sub
 
 sub doWork()
     content = m.top.content
-    history = m.global.user.videoHistory
+    user = getGlobalField("user")
+    history = user.videoHistory
     controls = []
     for i = 0 to content.getChildCount() - 1
         item = content.getChild(i)

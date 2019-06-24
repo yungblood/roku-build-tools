@@ -52,11 +52,7 @@ sub onJsonChanged()
         if showAssets <> invalid then
             m.top.heroImageUrl = showAssets.filepath_show_page_header
             m.top.myCbsImageUrl = showAssets.filepath_mycbs_show_image
-            
-            ' we're not using the gradient version anymore, so commenting
-            ' this out should force it to use the description poster
-            'm.top.browseImageUrl = showAssets.filepath_show_browse_poster
-            
+
             m.top.descriptionImageUrl = showAssets.filepath_show_description_poster
             if isNullOrEmpty(m.top.browseImageUrl) then
                 m.top.browseImageUrl = m.top.descriptionImageUrl
@@ -64,6 +60,13 @@ sub onJsonChanged()
             if isNullOrEmpty(m.top.descriptionImageUrl) then
                 m.top.descriptionImageUrl = m.top.browseImageUrl
             end if
+
+            if isNullOrEmpty(m.top.browseImageUrl) then
+                m.top.browseImageUrl = showAssets.filepath_show_browse_poster
+            end if
+
         end if
+
+        m.top.hasNewEpisodes = asBoolean(json.hasNewEpisodes, false)
     end if
 end sub

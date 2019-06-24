@@ -14,6 +14,8 @@
         <field id="episodeCount" type="integer" />
         <field id="clipCount" type="integer" />
         <field id="isClassic" type="boolean" />
+
+        <field id="hasNewEpisodes" type="boolean" />
         
         <field id="heroImageUrl" type="string" />
         <field id="myCbsImageUrl" type="string" />

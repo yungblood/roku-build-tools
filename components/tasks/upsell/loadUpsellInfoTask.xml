@@ -7,6 +7,7 @@
         <field id="campaign" type="string" />
         <field id="upsellInfo" type="node" alwaysNotify="true" />
         
+        <field id="errorCode" type="integer" />
         <field id="upsellScreenInfo" type="node" />
     </interface>
 </component>

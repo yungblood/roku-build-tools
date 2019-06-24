@@ -3,30 +3,31 @@ sub init()
 end sub
 
 sub doWork()
-    config = m.global.config
+    config = getGlobalField("config")
     
     api = cbs()
-    api.initialize(config)
+    api.initialize(m.top)
     
     deleteRegistryValue("AuthToken", api.registrySection)
     deleteRegistryValue("Username", api.registrySection)
     deleteRegistryValue("Password", api.registrySection)
     deleteRegistryValue("liveTV", api.registrySection)
     deleteRegistryValue("liveTVChannel", api.registrySection)
-    m.global.cookies = ""
-    m.global.stations = []
-    m.global.station = ""
-    m.global.liveTVChannel = ""
-    api.signOut()
+    deleteRegistryValue("persistedDeviceID", api.registrySection)
+    setGlobalField("cookies", "")
+    setGlobalField("stations", [])
+    setGlobalField("localStation", "")
+    setGlobalField("lastLiveChannel", "")
+    api.signOut(getPersistedDeviceID())
 
     shows = api.getGroupShows(config.allShowsGroupID)
     showCache = {}
     for each show in shows
         showCache[show.id] = show
     next
-    m.global.shows = shows
-    m.global.showCache = showCache
-    m.global.user = createObject("roSGNode", "User")
+    setGlobalField("shows", shows)
+    setGlobalField("showCache", showCache)
+    setGlobalField("user", createObject("roSGNode", "User"))
 
     m.top.signedOut = true
 end sub

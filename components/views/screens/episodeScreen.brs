@@ -16,6 +16,8 @@ sub init()
     
     m.buttons = m.top.findNode("buttons")
     m.buttons.observeField("buttonSelected", "onButtonSelected")
+
+    m.tts = createObject("roTextToSpeech")
 end sub
 
 sub onFocusChanged()
@@ -35,7 +37,7 @@ sub onVisibleChanged()
 end sub
 
 sub onEpisodeIDChanged()
-    m.global.showSpinner = true
+    showSpinner()
     m.loadTask = createObject("roSGNode", "LoadEpisodeTask")
     m.loadTask.observeField("episode", "onEpisodeLoaded")
     m.loadTask.episodeID = m.top.episodeID
@@ -44,13 +46,20 @@ end sub
 
 sub onEpisodeLoaded(nodeEvent as object)
     episode = nodeEvent.getData()
-    m.top.episode = episode
+    task = nodeEvent.getRoSGNode()
+    if episode <> invalid then
+        m.top.episode = episode
+    else if task.errorCode > 0 then
+        showApiError(true)
+    else
+        m.top.close = true
+    end if
     m.loadTask = invalid
 end sub
 
 sub refreshEpisodeState()
     if m.top.episode <> invalid then
-        m.global.showSpinner = true
+        showSpinner()
         m.refreshTask = createObject("roSGNode", "LoadEpisodeTask")
         m.refreshTask.observeField("episode", "onEpisodeRefreshed")
         m.refreshTask.episodeID = m.top.episode.id
@@ -62,14 +71,20 @@ sub onEpisodeRefreshed(nodeEvent as object)
     ' We can't update the episode itself here, because it
     ' will trigger the itemSelected event in the appScene,
     ' as it registers as a change
-    m.episode = nodeEvent.getData()
-    m.top.episode = m.episode
-    onEpisodeChanged()
+    episode = nodeEvent.getData()
+    task = nodeEvent.getRoSGNode()
+    if episode <> invalid then
+        m.episode = episode
+        m.top.episode = m.episode
+        onEpisodeChanged()
+    else if task.errorCode > 0 then
+        showApiError(true)
+    end if
     m.refreshTask = invalid
 end sub
 
 sub onEpisodeChanged()
-    m.global.showSpinner = false
+    hideSpinner()
     episode = m.top.episode
     if episode <> invalid then
         if m.episode = invalid then
@@ -97,29 +112,39 @@ sub onEpisodeChanged()
                 m.progressBar.visible = false
             end if
             
-            show = m.global.showCache[episode.showID]
+            showCache = getGlobalField("showCache")
+            show = showCache[episode.showID]
             if show <> invalid then
                 m.background.uri = getImageUrl(show.heroImageUrl, m.background.width)
             end if
             
             ' NOTE: We're checking the refreshed version of the episode here
-            if canWatch(m.episode, m.global) then
+            if canWatch(m.episode, m.top) then
                 m.watch.text = "WATCH"
             else
                 m.watch.text = "SUBSCRIBE TO WATCH"
             end if
-            
+
             m.buttons.visible = true
+            m.buttons.setFocus(false)
+            m.buttons.setFocus(true)
             
             if m.top.autoPlay then
                 m.top.buttonSelected = m.watch.id
                 m.top.autoPlay = false
+            else
+                if createObject("roDeviceInfo").isAudioGuideEnabled() then
+                    m.tts.say(m.showTitle.text)
+                    m.tts.say(m.episodeTitle.text)
+                    m.tts.say(m.episodeSubtitle.text)
+                    m.tts.say(m.episodeDescription.text)
+                end if
             end if
         end if
     else
         dialog = createCbsDialog("Content Unavailable", "The content you are trying to play is currently unavailable. Please try again later.", ["OK"])
         dialog.observeField("buttonSelected", "onUnavailableDialogClosed")
-        m.global.dialog = dialog
+        setGlobalField("cbsDialog", dialog)
     end if
 end sub
 

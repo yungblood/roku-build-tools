@@ -6,6 +6,14 @@
         <field id="authToken" type="string" />
         <field id="username" type="string" />
         <field id="password" type="string" />
+        
+        <field id="cookies" type="string" />
+        <field id="localStation" type="string" />
+        <field id="lastLiveChannel" type="string" />
+        <field id="shows" type="nodearray" />
+        <field id="showCache" type="assocarray" />
+        <field id="user" type="node" />
+
         <field id="signedIn" type="boolean" alwaysNotify="true" />
     </interface>
 </component>

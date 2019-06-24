@@ -8,15 +8,22 @@ sub init()
     
     m.ctaButton = m.top.findNode("ctaButton")
     m.showInfo = m.top.findNode("showInfo")
-    
     m.metadata = m.top.findNode("metadata")
     m.progressSpacer = m.top.findNode("progressSpacer")
     m.progress = m.top.findNode("progress")
     m.progressBar = m.top.findNode("progressBar")
     m.timeIndicator = m.top.findNode("timeIndicator")
+    
+    m.hero = m.top.findNode("hero")
+
+    m.previewGroup = m.top.findnode("previewGroup")
+    'm.vilynxPreview = m.top.findNode("vilynxPreview")
+    
+    m.vilynxFadeInAnimation = m.top.findNode("vilynxFadeInAnimation")
+    m.vilynxFadeOutAnimation = m.top.findNode("vilynxFadeOutAnimation")
 end sub
 
-sub onFocusChanged()
+sub onFocusChanged(nodeEvent)
     if m.top.hasFocus() then
         m.ctaButton.setFocus(true)
     end if
@@ -84,11 +91,59 @@ sub onEpisodeLoaded(nodeEvent as object)
             m.progressSpacer.height = 11
         end if
         m.top.visible = true
+
+        m.loadVilynxTask = createObject("roSGNode", "LoadVilynxVideosTask")
+        m.loadVilynxTask.vilynxIDs = [dynamicPlay.episode.id]
+        m.loadVilynxTask.observeField("vilynxVideos","onVilynxVideosLoaded")
+        m.loadVilynxTask.control = "run"
     else
         ' We don't have content, so hide ourselves
         m.top.visible = false
     end if
     m.loadTask = invalid
     m.top.contentLoaded = true
+end sub
+
+sub startVideoPreview(vilynxThumbnail as string, vilynxUrl as string)
+    if m.vilynxPreview = invalid then
+        m.vilynxPreview = createObject("roSGNode", "VilynxPreview")
+        m.vilynxPreview.width = 1920
+        m.vilynxPreview.height = 1080
+        m.vilynxPreview.shadeOpacity = .1
+        m.previewGroup.appendChild(m.vilynxPreview)
+    end if
+    m.vilynxPreview.thumbnailUri = vilynxThumbnail
+    m.vilynxPreview.heroUri = getImageUrl(m.show.heroImageUrl, m.vilynxPreview.width)
+    m.vilynxPreview.videoUri = vilynxUrl
+    m.vilynxPreview.control = "play"
+    m.vilynxPreview.visible = true
+end sub
+
+sub onVilynxVideosLoaded(nodeEvent as object)
+    m.loadVilynxTask = invalid
+    videos = nodeEvent.getData()
+
+    if m.top.opacity = 1 and videos <> invalid and videos.count() > 0 and videos[0] <> invalid then
+        video = videos[0]
+        if video <> invalid then
+            startVideoPreview(video.vilynxThumbnail, video.vilynxUrlHigh)
+        end if
+        m.hero.visible = false
+    else
+        m.hero.uri = getImageUrl(m.show.heroImageUrl, m.hero.width)
+        m.hero.visible = true
+    end if
+end sub
+
+sub onVilynxControlChanged(nodeEvent as object)
+    control = nodeEvent.getData()
+    if m.vilynxPreview <> invalid then
+        m.vilynxPreview.control = control
+        if control = "stop" then
+            m.previewGroup.removeChild(m.vilynxPreview)
+            m.vilynxPreview = invalid
+            ?runGarbageCollector()
+        end if
+    end if
 end sub
 

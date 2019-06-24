@@ -6,6 +6,7 @@
         <field id="episodeID" type="string" />
         <field id="episode" type="node" alwaysNotify="true" />
         <field id="error" type="string" />
+        <field id="errorCode" type="integer" />
         <field id="nextEpisode" type="node" alwaysNotify="true" />
         <field id="populateStream" type="boolean" />
         <field id="loadNextEpisode" type="boolean" />

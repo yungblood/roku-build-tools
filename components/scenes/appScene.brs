@@ -3,7 +3,7 @@ sub init()
     m.top.backgroundColor = "0x000000ff"
     m.top.setFocus(true)
     m.top.observeField("focusedChild", "onFocusChanged")
-
+    
     m.screens = m.top.findNode("screens")
     m.dialogs = m.top.findNode("dialogs")
     m.waitRect = m.top.findNode("waitRect")
@@ -13,33 +13,22 @@ sub init()
     m.dialogTimer = m.top.findNode("dialogTimer")
     m.dialogTimer.observeField("fire", "onDialogTimerFired")
 
-    m.global.addField("dialog", "node", false)
-    m.global.observeField("dialog", "onDialogChanged")
+    addGlobalField("cbsDialog", "node", false)
+    observeGlobalField("cbsDialog", "onDialogChanged")
     
-    m.global.addField("showSpinner", "boolean", true)
-    m.global.observeField("showSpinner", "onShowSpinner")
-    m.global.addField("showWaitScreen", "boolean", true)
-    m.global.observeField("showWaitScreen", "onShowWaitScreen")
+    addGlobalField("showWaitScreen", "boolean", true)
+    observeGlobalField("showWaitScreen", "onShowWaitScreen")
     
     m.navigationStack = []
-    reinit()
 end sub
 
-sub reinit()
+sub reinit(params = {} as object)
     m.initTask = createObject("roSGNode", "InitializationTask")
     m.initTask.observeField("initialized", "onInitialized")
     m.initTask.control = "RUN"
 end sub
 
-sub onFocusChanged()
-'    if m.dialogs.getChildCount() > 0 then
-'        if not m.dialogs.isInFocusChain() then
-'            dialog = m.dialogs.getChild(m.dialogs.getChildCount() - 1)
-'            if not dialog.close then
-'                dialog.close = true
-'            end if
-'        end if
-'    end if
+sub onFocusChanged(nodeEvent as object)
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
@@ -49,7 +38,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
             if not goBackInNavigationStack() then
                 dialog = createCbsDialog("", "Are you sure you would like to exit CBS All Access?", ["No", "Yes"])
                 dialog.observeField("buttonSelected", "onExitDialogButtonSelected")
-                m.global.dialog = dialog
+                setGlobalField("cbsDialog", dialog)
             end if
             return true
         else if key = "unknown" then
@@ -63,6 +52,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
             next
             ?"NODE COUNTS: ";counts
             ?"NODE TOTAL: ";nodes.count()
+        else if key = "options" then
         end if
     end if
     return false
@@ -79,11 +69,19 @@ end sub
 
 sub onInitialized(nodeEvent as object)
     m.initTask = invalid
+
+    config = getGlobalField("config")
+    if config <> invalid and config.enableTaplytics = true then
+        m.taplytics = m.top.findNode("taplytics")
+        m.taplytics.callFunc("startTaplytics", {})
+    end if
+
+    'signUp("PROD1")
     signIn()
 end sub
 
 sub signIn(username = "" as string, password = "" as string)
-    m.global.showWaitScreen = true
+    setGlobalField("showWaitScreen", true)
     m.signInTask = createObject("roSGNode", "SignInTask")
     m.signInTask.observeField("signedIn", "onSignedIn")
     m.signInTask.username = username
@@ -96,48 +94,122 @@ sub onSignedIn(nodeEvent as object)
     ' needs to set it
     upsellItem = m.upsellItem
     m.upsellItem = invalid
-    
-    clearNavigationStack()
-    if m.global.dialog <> invalid then
-        m.global.dialog.close = true
+
+    config = getGlobalField("config")
+
+    task = nodeEvent.getRoSGNode()
+
+    setGlobalField("cookies", task.cookies)
+    setGlobalField("localStation", task.localStation)
+    setGlobalField("lastLiveChannel", task.lastLiveChannel)
+    setGlobalField("user", task.user)
+
+    user = getGlobalField("user")
+    user.favorites.update = true
+    user.videoHistory.update = true
+
+    ' Notify Roku that we're an authenticated user
+    if isAuthenticated(m.top) then
+        trackRMFEvent("Roku_Authenticated")
+        
+        adobe = getGlobalField("adobe")
+        if adobe <> invalid then
+            adobe.syncIdentifier = user.id
+        end if
     end if
-    m.global.showWaitScreen = false
+
+    if m.taplytics <> invalid then
+        m.taplytics.callFunc("setUserAttributes", { user_id: user.id, plan: user.trackingProduct })
+    end if
+
+    clearNavigationStack()
+    
+    dialog = getGlobalField("dialog")
+    if dialog <> invalid then
+        dialog.close = true
+    end if
+    setGlobalField("showWaitScreen", false)
     if upsellItem <> invalid then
         if isString(upsellItem) then
             if upsellItem = "liveTV" then
                 showLiveTVScreen()
             end if
         else
-            if canWatch(upsellItem, m.global, true) then
+            if canWatch(upsellItem, m.top, true) then
                 if upsellItem.subtype() = "Episode" then
                     showVideoScreen(upsellItem.id, upsellItem.getParent(), m.upsellSource)
                 else
                     showVideoScreen(upsellItem.id, invalid, m.upsellSource, false)
                 end if
             else
-                showUpsellScreen(upsellItem)
+                if isAuthenticated(m.top) and not isSubscriber(m.top) then
+                    if m.navigationStack.count() = 0 then
+                        ' This is the first screen of the app, so we need to give
+                        ' the user something to "back" up to from the upsell
+                        showUpsellScreen()
+                    end if
+                    m.upsellItem = upsellItem
+                    showAccountUpsellScreen("reg")
+                else
+                    showUpsellScreen(upsellItem)
+                end if
             end if
         end if
     else
-        if isAuthenticated(m.global) then
-            if not isSubscriber(m.global) then
+        if isAuthenticated(m.top) then
+            if not isSubscriber(m.top) then
+                if m.navigationStack.count() = 0 then
+                    ' This is the first screen of the app, so we need to give
+                    ' the user something to "back" up to from the upsell
+                    showUpsellScreen()
+                end if
                 showAccountUpsellScreen("reg")
+                m.top.ecp = invalid
             else
                 showHomeScreen()
             end if
         else
             showUpsellScreen()
         end if
-        openDeepLink(m.top.ecp)
+        if m.top.deeplink <> invalid then
+            openDeepLink(m.top.deeplink)
+        else
+            openDeepLink(m.top.ecp)
+        end if 
     end if
     m.top.ecp = invalid
     m.signInTask = invalid
+    
+    ' (re)load show cache
+    setGlobalField("shows", [])
+    m.showCacheTask = createObject("roSGNode", "LoadShowsTask")
+    m.showCacheTask.observeField("shows", "onShowCacheLoaded")
+    m.showCacheTask.groupID = config.allShowsGroupID
+    m.showCacheTask.control = "run"
+end sub
+
+sub onDeeplinkChanged(nodeEvent as object)
+    deeplink = nodeEvent.getData()
+    if deeplink <> invalid and not deeplink.isEmpty() then
+        openDeepLink(deeplink)
+    end if
+end sub
+
+sub onShowCacheLoaded(nodeEvent as object)
+    shows = nodeEvent.getData()
+    showCache = {}
+    for each show in shows
+        showCache[show.id] = show
+    next
+    setGlobalField("shows", shows)
+    setGlobalField("showCache", showCache)
+    m.showCacheTask = invalid
 end sub
 
 sub confirmSignOut()
     dialog = createCbsDialog("", "Are you sure you want to sign out?", ["No", "Yes"])
     dialog.observeField("buttonSelected", "onSignOutDialogButtonSelected")
-    m.global.dialog = dialog
+    setGlobalField("cbsDialog", dialog)
 end sub
 
 sub onSignOutDialogButtonSelected(nodeEvent as object)
@@ -150,7 +222,7 @@ sub onSignOutDialogButtonSelected(nodeEvent as object)
 end sub
 
 sub signOut()
-    m.global.showWaitScreen = true
+    setGlobalField("showWaitScreen", true)
     m.signOutTask = createObject("roSGNode", "SignOutTask")
     m.signOutTask.observeField("signedOut", "onSignedOut")
     m.signOutTask.control = "run"
@@ -158,13 +230,17 @@ end sub
 
 sub onSignedOut()
     clearNavigationStack()
-    m.global.showWaitScreen = false
+    setGlobalField("showWaitScreen", false)
+
+    if m.taplytics <> invalid then
+        m.taplytics.callFunc("resetAppUser")
+    end if
 
     showUpsellScreen()
 end sub
 
 sub upgrade()
-    user = m.global.user
+    user = getGlobalField("user")
     if user.isRokuSubscriber then
         showAccountUpsellScreen("upgrade")
     else
@@ -173,7 +249,7 @@ sub upgrade()
 end sub
 
 sub downgrade()
-    user = m.global.user
+    user = getGlobalField("user")
     if user.isRokuSubscriber then
         showAccountUpsellScreen("downgrade")
     else
@@ -186,11 +262,15 @@ sub showTestScreen()
     addToNavigationStack(screen)
 end sub
 
-sub showUpsellScreen(item = invalid as object)
+sub showUpsellScreen(item = invalid as object, bypassUpsellIfAuth = false as boolean)
+    m.upsellItem = item
+    if bypassUpsellIfAuth and isAuthenticated(m.top) then
+        showAccountUpsellScreen("reg")
+        return
+    end if
     screen = createObject("roSGNode", "UpsellScreen")
     screen.observeField("buttonSelected", "onUpsellButtonSelected")
     screen.upsellType = "launch"
-    m.upsellItem = item
     
     signUpText = constants().signUpText
     signInText = constants().signInText
@@ -277,37 +357,46 @@ sub onAccountDetailsCollected(nodeEvent as object)
     source = nodeEvent.getRoSGNode()
     details = nodeEvent.getData()
     if details <> invalid then
-        showTosScreen(source.productCode, details)
-    end if
-end sub
-
-sub showTosScreen(productCode as string, accountDetails as object)
-    screen = createObject("roSGNode", "TOSScreen")
-    screen.observeField("buttonSelected", "onTosButtonSelected")
-    screen.productCode = productCode
-    screen.accountDetails = accountDetails
-    addToNavigationStack(screen)
-end sub
-
-sub onTosButtonSelected(nodeEvent as object)
-    source = nodeEvent.getRoSGNode()
-    button = nodeEvent.getData()
-    if button = "agree" then
-        m.global.showWaitScreen = true
+        'showTosScreen(source.productCode, details)
+        setGlobalField("showWaitScreen", true)
 
         m.createTask = createObject("roSGNode", "CreateAccountTask")
         m.createTask.observeField("success", "onCreateAccountSuccess")
         m.createTask.productCode = source.productCode
-        m.createTask.accountDetails = source.accountDetails
+        m.createTask.accountDetails = details
         m.createTask.control = "run"
     else
         clearNavigationStack("UpsellScreen")
     end if
 end sub
 
+sub showTosScreen()
+    screen = createObject("roSGNode", "TOSScreen")
+    screen.observeField("buttonSelected", "onTosButtonSelected")
+    addToNavigationStack(screen)
+end sub
+
+sub onTosButtonSelected(nodeEvent as object)
+    goBackInNavigationStack()
+'    source = nodeEvent.getRoSGNode()
+'    button = nodeEvent.getData()
+'    if button = "agree" then
+'        setGlobalField("showWaitScreen", true)
+'
+'        m.createTask = createObject("roSGNode", "CreateAccountTask")
+'        m.createTask.observeField("success", "onCreateAccountSuccess")
+'        m.createTask.productCode = source.productCode
+'        m.createTask.accountDetails = source.accountDetails
+'        m.createTask.control = "run"
+'    else
+'        clearNavigationStack("UpsellScreen")
+'    end if
+end sub
+
 sub onCreateAccountSuccess(nodeEvent as object)
     m.createTask = invalid
-    m.global.showWaitScreen = false
+    setGlobalField("showWaitScreen", false)
+    config = getGlobalField("config")
     task = nodeEvent.getRoSGNode()
     if task <> invalid then
         product = task.product
@@ -320,11 +409,12 @@ sub onCreateAccountSuccess(nodeEvent as object)
         if task.success then
             dialog = createCbsDialog("Congratulations!", "Your CBS All Access account has been created.", ["OK"])
             dialog.observeField("buttonSelected", "onCreateAccountSuccessDialogClose")
-            m.global.dialog = dialog
+            setGlobalField("cbsDialog", dialog)
 
             params = {}
             screenName = "all-access/subscription/payment/confirmation/"
             pageType = "svod_complete"
+            siteHier = iif(params["purchasePrice"] = "5.99", "billing|payment complete|limited commercial", "billing|payment complete|commercial free")
             params["siteHier"] = "billing|payment complete"
             params["purchaseProduct"] = "new"
             params["purchaseOrderID"] = asString(task.transactionID)
@@ -337,32 +427,35 @@ sub onCreateAccountSuccess(nodeEvent as object)
             params["purchaseProductName"] = iif(params["purchasePrice"] = "5.99", "limited commercials", "commercial free")
             params["purchaseQuantity"] = "1"
             params["productPricingPlan"] = "monthly"
-            'params["productOfferperiod"] = "1-"
+            params["productOfferperiod"] = "1-week trial"
             params["purchasePaymentMethod"] = "roku"
             params["purchaseEventOrderComplete"] = "1"
             params["&&products"] = join([params["purchaseCategory"], params["purchaseProduct"], params["purchaseQuantity"], params["purchasePrice"]], ";")
-            trackScreenAction("trackPaymentComplete", params, screenName, pageType, ["event76"])
+            trackScreenAction("trackPaymentComplete", params, screenName, pageType, ["event76"], siteHier)
+
+            trackRMFEvent("USC")
         else
             if task.error <> "NO_TRANSACTION_ID" then
-                dialog = createCbsDialog("Error", "An error occurred when creating your CBS All Access account. Please contact customer support for assistance at " + m.global.config.supportPhone + ".", ["OK"])
+                dialog = createCbsDialog("Error", "An error occurred when creating your CBS All Access account. Please contact customer support for assistance at " + config.supportPhone + ".", ["OK"])
                 dialog.observeField("buttonSelected", "onCreateAccountFailDialogClose")
-                m.global.dialog = dialog
+                setGlobalField("cbsDialog", dialog)
 
                 params = {}
                 screenName = "/all access/upsell"
                 pageType = "billing_failure" 'iif(product.price.replace("$", "") = "5.99", "billing_failure_Limited Commercial", "billing_failure_Commercial Free")
-                trackScreenAction("trackAppLog", params, screenName, pageType, ["event20"])
+                siteHier = "upsell|payment|fail"
+                trackScreenAction("trackAppLog", params, screenName, pageType, ["event20"], siteHier)
             end if
         end if
     else
-        dialog = createCbsDialog("Error", "An error occurred validating your subscription. Please contact customer support for assistance at " + m.global.config.supportPhone + ".", ["OK"])
+        dialog = createCbsDialog("Error", "An error occurred validating your subscription. Please contact customer support for assistance at " + config.supportPhone + ".", ["OK"])
         dialog.observeField("buttonSelected", "onCreateAccountFailDialogClose")
-        m.global.dialog = dialog
+        setGlobalField("cbsDialog", dialog)
     end if
 end sub
 
 sub onCreateAccountSuccessDialogClose(nodeEvent as object)
-    m.global.showWaitScreen = true
+    setGlobalField("showWaitScreen", true)
 
     dialog = nodeEvent.getRoSGNode()
     if dialog <> invalid then
@@ -377,15 +470,16 @@ sub onCreateAccountFailDialogClose(nodeEvent as object)
         dialog.close = true
     end if
     clearNavigationStack("UpsellScreen")
-    m.global.showWaitScreen = false
+    setGlobalField("showWaitScreen", false)
 end sub
 
 sub performSubscription(productCode as string)
-    m.global.showWaitScreen = true
+    setGlobalField("showWaitScreen", true)
 
     m.subTask = createObject("roSGNode", "SubscriptionTask")
     m.subTask.observeField("success", "onSubscriptionSuccess")
-    if m.global.user.status = "EX_SUBSCRIBER" then
+    user = getGlobalField("user")
+    if user.status = "EX_SUBSCRIBER" then
         m.subTask.type = "exsub"
     else
         m.subTask.type = "sub"
@@ -395,7 +489,7 @@ sub performSubscription(productCode as string)
 end sub
 
 sub performUpgrade(productCode as string)
-    m.global.showWaitScreen = true
+    setGlobalField("showWaitScreen", true)
 
     m.subTask = createObject("roSGNode", "SubscriptionTask")
     m.subTask.observeField("success", "onSubscriptionSuccess")
@@ -405,7 +499,7 @@ sub performUpgrade(productCode as string)
 end sub
 
 sub performDowngrade(productCode as string)
-    m.global.showWaitScreen = true
+    setGlobalField("showWaitScreen", true)
 
     m.subTask = createObject("roSGNode", "SubscriptionTask")
     m.subTask.observeField("success", "onSubscriptionSuccess")
@@ -416,7 +510,8 @@ end sub
 
 sub onSubscriptionSuccess(nodeEvent as object)
     m.subTask = invalid
-    m.global.showWaitScreen = false
+    setGlobalField("showWaitScreen", false)
+    config = getGlobalField("config")
     task = nodeEvent.getRoSGNode()
     if task <> invalid then
         if task.success then
@@ -431,10 +526,12 @@ sub onSubscriptionSuccess(nodeEvent as object)
                 params = {}
                 screenName = "all-access/subscription/payment/confirmation/"
                 pageType = "svod_complete"
+                siteHier = "billing|payment complete|upgrade"
                 params["purchaseOrderID"] = task.transactionID
                 params["purchaseCategory"] = "commercial free"
                 params["purchaseProduct"] = "upgrade"
                 params["purchaseProductName"] = "commercial free"
+                params["productOfferperiod"] = "full"
                 params["purchaseQuantity"] = "1"
                 params["purchasePrice"] = asString(product.price).replace("$", "")
                 ' It seems at some point "price" changed to "cost", so support both
@@ -442,14 +539,16 @@ sub onSubscriptionSuccess(nodeEvent as object)
                     params["purchasePrice"] = asString(product.cost).replace("$", "")
                 end if
                 params["&&products"] = join([params["purchaseCategory"], params["purchaseProduct"], params["purchaseQuantity"], params["purchasePrice"]], ";")
-                trackScreenAction("trackUpgrade", params, screenName, pageType, ["event107"])
+                trackScreenAction("trackUpgrade", params, screenName, pageType, ["event107"], siteHier)
             else if task.type = "downgrade" then
                 params = {}
                 screenName = "all-access/subscription/payment/confirmation/"
                 pageType = "billing|downgrade complete"
+                siteHier = "billing|payment complete|downgrade"
                 params["purchaseOrderID"] = task.transactionID
                 params["purchaseCategory"] = "limited commercials"
                 params["purchaseProduct"] = "downgrade"
+                params["productOfferperiod"] = "full"
                 params["purchaseProductName"] = "limited commercials"
                 params["purchaseQuantity"] = "1"
                 params["purchasePrice"] = asString(product.price).replace("$", "")
@@ -458,47 +557,51 @@ sub onSubscriptionSuccess(nodeEvent as object)
                     params["purchasePrice"] = asString(product.cost).replace("$", "")
                 end if
                 params["&&products"] = join([params["purchaseCategory"], params["purchaseProduct"], params["purchaseQuantity"], params["purchasePrice"]], ";")
-                trackScreenAction("trackDowngrade", params, screenName, pageType, ["event108"])
+                trackScreenAction("trackDowngrade", params, screenName, pageType, ["event108"], siteHier)
             else if task.type = "exsub" then
                 dialog = createCbsDialog("Congratulations!", "Your account has been re-activated!", ["OK"])
                 dialog.observeField("buttonSelected", "onSubscriptionSuccessDialogClose")
-                m.global.dialog = dialog
+                setGlobalField("cbsDialog", dialog)
                 return
             else if task.type = "sub" then
             end if
 
+            trackRMFEvent("USC")
+
             clearNavigationStack("AccountUpsellScreen")
             goBackInNavigationStack()
-            signIn()
+            reinit()
         else
             if isNullOrEmpty(task.error) then
                 if task.type = "upgrade" then
                     params = {}
                     screenName = "/all access/upsell"
                     pageType = "billing_failure"
-                    trackScreenAction("trackUpgrade", params, screenName, pageType)
+                    siteHier = "upsell|payment|fail"
+                    trackScreenAction("trackUpgrade", params, screenName, pageType, [], siteHier)
                 else if task.type = "downgrade" then
                     params = {}
                     screenName = "/all access/upsell"
                     pageType = "billing_failure"
-                    trackScreenAction("trackDowngrade", params, screenName, pageType)
+                    siteHier = "upsell|payment|fail"
+                    trackScreenAction("trackDowngrade", params, screenName, pageType, [], siteHier)
                 else if task.type = "sub" then
                 end if
 
-                dialog = createCbsDialog("Error", "An error occurred when switching your CBS All Access plan. Please contact customer support for assistance at " + m.global.config.supportPhone + ".", ["OK"])
+                dialog = createCbsDialog("Error", "An error occurred when switching your CBS All Access plan. Please contact customer support for assistance at " + config.supportPhone + ".", ["OK"])
                 dialog.observeField("buttonSelected", "onSubscriptionFailDialogClose")
-                m.global.dialog = dialog
+                setGlobalField("cbsDialog", dialog)
             end if
         end if
     else
-        dialog = createCbsDialog("Error", "An error occurred validating your subscription. Please contact customer support for assistance at " + m.global.config.supportPhone + ".", ["OK"])
+        dialog = createCbsDialog("Error", "An error occurred validating your subscription. Please contact customer support for assistance at " + config.supportPhone + ".", ["OK"])
         dialog.observeField("buttonSelected", "onSubscriptionFailDialogClose")
-        m.global.dialog = dialog
+        setGlobalField("cbsDialog", dialog)
     end if
 end sub
 
 sub onSubscriptionSuccessDialogClose(nodeEvent as object)
-    m.global.showWaitScreen = true
+    setGlobalField("showWaitScreen", true)
 
     clearNavigationStack("AccountUpsellScreen")
     goBackInNavigationStack()
@@ -570,7 +673,7 @@ sub showMoviesScreen()
 end sub
 
 sub showLiveTVScreen()
-    if isSubscriber(m.global) then
+    if isSubscriber(m.top) then
         current = getCurrentScreen()
         if current <> invalid and current.subtype() = "LiveTVScreen" then
             current.showChannels = true
@@ -582,7 +685,7 @@ sub showLiveTVScreen()
             addToNavigationStack(screen, true, true)
         end if
     else
-        if isAuthenticated(m.global) then
+        if isAuthenticated(m.top) then
             m.upsellItem = "liveTV"
             showAccountUpsellScreen("reg")
         else
@@ -620,10 +723,11 @@ sub showSettingsScreen()
     addToNavigationStack(screen, true, true)
 end sub
 
-sub showShowScreen(showID = "" as string, episodeID = "" as string, source = invalid as object, replaceCurrent = false as boolean)
+sub showShowScreen(showID = "" as string, episodeID = "" as string, source = invalid as object, replaceCurrent = false as boolean, autoplay = false as boolean)
     screen = createObject("roSGNode", "ShowScreen")
     screen.showID = showID
     screen.episodeID = episodeID
+    screen.autoplay = autoplay
     if source <> invalid then
         if source.hasField("additionalContext") then
             screen.additionalContext = source.additionalContext
@@ -649,6 +753,13 @@ sub showEpisodeScreen(episode as object, episodeID = "" as string, autoPlay = fa
         screen.omnitureData = source.omnitureData
         if source.hasField("additionalContext") then
             screen.additionalContext = source.additionalContext
+        end if
+        
+        ' override autoplay, if the source screen has it set (typically for "series" deeplink)
+        if source.autoplay = true then
+            ' reset outoplay on the source
+            source.autoplay = false
+            autoPlay = true
         end if
     end if
     screen.autoPlay = autoPlay
@@ -689,9 +800,16 @@ sub showUvpVideoScreen(episodeID as string, section = invalid as object, source 
 end sub
 
 sub showVideoScreen(episodeID as string, section = invalid as object, source = invalid as object, useDai = true as boolean)
-    config = m.global.config
+    config = getGlobalField("config")
+    if config.enableGeoBlock and config.currentCountryCode <> config.appCountryCode and not config.geoBlocked then
+        dialog = createCbsDialog("", "Due to licensing restrictions, video is not available outside your country.", ["CLOSE"])
+        dialog.observeField("buttonSelected", "onLicensingDialogClosed")
+        setGlobalField("cbsDialog", dialog)
+        return
+    end if
 
     screen = createObject("roSGNode", "VideoScreen")
+    screen.observeField("buttonSelected", "onButtonSelected")
     screen.useDai = useDai and config.useDai
     screen.episodeID = episodeID
     screen.section = section
@@ -704,8 +822,35 @@ sub showVideoScreen(episodeID as string, section = invalid as object, source = i
     addToNavigationStack(screen)
 end sub
 
+sub onLicensingDialogClosed(nodeEvent as object)
+    dialog = nodeEvent.getRoSGNode()
+    button = nodeEvent.getData()
+    if button = "CLOSE" then
+        dialog.close = true
+    end if
+end sub
+
 function openDeepLink(params as object, item = invalid as object) as boolean
     if params <> invalid then
+        ' If video is currently playing, close the video screen
+        current = getCurrentScreen()
+        if current <> invalid and current.subtype() = "VideoScreen" then
+            current.close = true
+        end if
+
+        if not isNullOrEmpty(params.correlator) then
+            setGlobalField("correlator", params.correlator)
+        end if
+        if params.source <> invalid and params.mediaType <> invalid then
+            deeplink = ""
+            if params.source = "meta-search" then
+                deeplink = "roku_global_search|roku|search"
+            else
+                deeplink = "roku_" + params.source + "|roku|referral"
+            end if
+            deeplink = deeplink + "|open"
+            setGlobalField("deeplinkForTracking", deeplink)
+        end if
         if params.mediaType = "screen" then
             if params.contentID = "home" then
                 showHomeScreen()
@@ -721,7 +866,7 @@ function openDeepLink(params as object, item = invalid as object) as boolean
                 ' "stream" is used to indicate the last played stream
                 ' versus an empty string which indicates local
                 if liveTVChannel <> "stream" then
-                    m.global.liveTVChannel = liveTVChannel
+                    setGlobalField("lastLiveChannel", liveTVChannel)
                 end if
                 showLiveTVScreen()
                 return true
@@ -743,7 +888,11 @@ function openDeepLink(params as object, item = invalid as object) as boolean
             return true
         else if params.mediaType = "series" or params.mediaType = "special" then
             if not isNullOrEmpty(params.contentID) then
-                showShowScreen(params.contentID)
+                if params.mediaType = "series" then
+                    showShowScreen("", params.contentID, invalid, false, true)
+                else
+                    showShowScreen(params.contentID)
+                end if
                 return true
             else if item <> invalid then
                 showShowScreen(item.showID)
@@ -759,16 +908,17 @@ function openDeepLink(params as object, item = invalid as object) as boolean
     return false
 end function
 
-sub onShowSpinner(nodeEvent as object)
-    m.loading.visible = nodeEvent.getData()
-    if m.loading.visible then
-        if m.spinner.state <> "running" then
-            m.spinner.control = "start"
-        end if
-    else
-        m.spinner.control = "stop"
+function showLoading()
+    m.loading.visible = true
+    if m.spinner.state <> "running" then
+        m.spinner.control = "start"
     end if
-end sub
+end function
+
+function hideLoading()
+    m.loading.visible = false
+    m.spinner.control = "stop"
+end function
 
 sub onShowWaitScreen(nodeEvent as object)
     m.waitRect.visible = nodeEvent.getData()
@@ -780,16 +930,16 @@ sub onShowWaitScreen(nodeEvent as object)
     end if
 end sub
 
-sub onDialogChanged()
-    dialog = m.global.dialog
+sub onDialogChanged(nodeEvent as object)
+    dialog = nodeEvent.getData()
     if dialog <> invalid then
         dialog.unobserveField("close")
         dialog.observeField("close", "onDialogClosed")
         if dialog.subtype() = "CbsDialog" then
             m.dialogs.appendChild(dialog)
             dialog.setFocus(true)
-            m.global.dialog = invalid
-        else if (m.top.dialog = invalid or not m.global.dialog.isSameNode(m.top.dialog)) then
+            setGlobalField("cbsDialog", invalid)
+        else if (m.top.dialog = invalid or not dialog.isSameNode(m.top.dialog)) then
             if m.top.dialog <> invalid then
                 ' HACK: When swapping out the modal dialog, if one is already open
                 '       the device will hang and reboot, so we use a timer to insert
@@ -798,9 +948,9 @@ sub onDialogChanged()
                 'm.top.dialog = invalid
                 m.dialogTimer.control = "start"
             else
-                m.top.dialog = m.global.dialog
+                m.top.dialog = dialog
                 m.top.dialog.setFocus(true)
-                m.global.dialog = invalid
+                setGlobalField("cbsDialog", invalid)
             end if
         end if
     end if
@@ -827,10 +977,10 @@ sub onDialogClosed(nodeEvent as object)
 end sub
 
 sub onDialogTimerFired()
-    m.top.dialog = m.global.dialog
+    m.top.dialog = getGlobalField("cbsDialog")
     if m.top.dialog <> invalid then
         m.top.dialog.setFocus(true)
-        m.global.dialog = invalid
+        setGlobalField("cbsDialog", invalid)
     end if
 end sub
 
@@ -861,9 +1011,10 @@ function goBackInNavigationStack(setFocus = true as boolean) as boolean
                 episodeID = screen.episodeID
 
                 ' update the recently watched
-                m.global.user.videoHistory.update = true
-                m.global.user.continueWatching.update = true
-                m.global.user.showHistory.update = true
+                user = getGlobalField("user")
+                user.videoHistory.update = true
+                user.continueWatching.update = true
+                user.showHistory.update = true
             else if screen.subtype() = "LiveTVScreen" then
                 screen.control = "stop"
             else
@@ -893,8 +1044,8 @@ function goBackInNavigationStack(setFocus = true as boolean) as boolean
             end if
             
             ' close the wait spinner, if open
-            m.global.showSpinner = false
-            m.global.showWaitScreen = false
+            hideSpinner()
+            setGlobalField("showWaitScreen", false)
         end if
         return true
     end if
@@ -902,7 +1053,6 @@ function goBackInNavigationStack(setFocus = true as boolean) as boolean
 end function
 
 sub addToNavigationStack(screen as object, setFocus = true as boolean, replaceCurrent = false as boolean)
-    ?"addToNavigationStack()",screen.subtype()
     if m.navigationStack.count() > 0 then
         previous = m.navigationStack.peek()
         if isSGNode(previous) then
@@ -915,7 +1065,7 @@ sub addToNavigationStack(screen as object, setFocus = true as boolean, replaceCu
                 m.screens.removeChild(previous)
             end if
         else
-            if isSGNode(previous) and m.global.extremeMemoryManagement then
+            if isSGNode(previous) and getGlobalField("extremeMemoryManagement") = true then
                 history = {
                     screenType: previous.subtype()
                 }
@@ -981,38 +1131,38 @@ sub onButtonSelected(nodeEvent as object)
             showShowScreen(source.showID, "", source)
         end if
     else if buttonID = "favorite" then
-        toggleFavorite(source.showID, m.global)
+        toggleFavorite(source.showID, m.top)
     else if buttonID = "watch" then
         if source.hasField("episode") and source.episode <> invalid then
             episode = source.episode
-            if canWatch(episode, m.global) then
+            if canWatch(episode, m.top) then
                 showVideoScreen(episode.ID, episode.getParent(), source)
             else
-                showUpsellScreen(episode)
+                showUpsellScreen(episode, true)
             end if
         else if source.hasField("liveFeed") and source.liveFeed <> invalid then
             liveFeed = source.liveFeed
-            if canWatch(liveFeed, m.global) then
+            if canWatch(liveFeed, m.top) then
                 showVideoScreen(liveFeed.id, liveFeed.getParent(), source)
             else
-                showUpsellScreen(liveFeed)
+                showUpsellScreen(liveFeed, true)
             end if
         else if source.hasField("movie") and source.movie <> invalid then
             movie = source.movie
-            if canWatch(movie, m.global) then
+            if canWatch(movie, m.top) then
                 showVideoScreen(movie.id, movie.getParent(), source)
             else
-                showUpsellScreen(movie)
+                showUpsellScreen(movie, true)
             end if
         end if
     else if buttonID = "trailer" then
         if source.hasField("movie") and source.movie <> invalid then
             movie = source.movie
             if movie.trailer <> invalid then
-                if canWatch(movie.trailer, m.global) then
+                if canWatch(movie.trailer, m.top) then
                     showVideoScreen(movie.trailer.id, invalid, source)
                 else
-                    showUpsellScreen(movie.trailer)
+                    showUpsellScreen(movie.trailer, true)
                 end if
             end if
         end if
@@ -1030,6 +1180,8 @@ sub onButtonSelected(nodeEvent as object)
         downgrade()
     else if buttonID = "upgrade" then
         upgrade()
+    else if buttonID = "tos" then
+        showTosScreen()
     else if buttonID = "back" or buttonID = "close" then
         goBackInNavigationStack()
     end if
@@ -1038,7 +1190,6 @@ end sub
 sub onItemSelected(nodeEvent as object)
     source = nodeEvent.getRoSGNode()
     item = nodeEvent.getData()
-    
     ?"onItemSelected()", item.title
     if item <> invalid then
         if source <> invalid then

@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component name="Station" extends="ContentNode">
     <script type="text/brightscript" uri="pkg:/components/models/station.brs" />
+
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
     <interface>
         <field id="json" type="assocarray" onChange="onJsonChanged" />
 
+        <field id="location" type="string" />
         <field id="parentStationID" type="string" />
         <field id="mediaID" type="string" />
         <field id="scheduleUrl" type="string" />

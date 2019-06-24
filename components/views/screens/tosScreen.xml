@@ -59,22 +59,10 @@
             itemSpacings="[20]"
             horizAlignment="right">
             <LabelButton
-                id="cancel"
+                id="ok"
                 width="400"
                 height="88"
-                text="Cancel"
-                textColor="0xffffffff"
-                focusedTextColor="0xffffffff"
-                backgroundUri="pkg:/images/upsell_button.9.png"
-                focusedBackgroundUri="pkg:/images/upsell_button_focused.9.png"
-                font="dictionary:buttonFont"
-                focusedFont="dictionary:focusedButtonFont"
-                processKeyEvents="false" />
-            <LabelButton
-                id="agree"
-                width="400"
-                height="88"
-                text="I Agree"
+                text="OK"
                 textColor="0xffffffff"
                 focusedTextColor="0xffffffff"
                 backgroundUri="pkg:/images/upsell_button.9.png"

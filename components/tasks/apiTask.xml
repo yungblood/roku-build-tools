@@ -2,6 +2,7 @@
 <component name="ApiTask" extends="Task">
     <script type="text/brightscript" uri="pkg:/components/services/cbs.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/constants.brs" />
 
     <script type="text/brightscript" uri="pkg:/source/framework/components/channelStore.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/application.brs" />

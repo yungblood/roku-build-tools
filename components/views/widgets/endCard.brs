@@ -65,32 +65,48 @@ sub onContinuousPlayInfoChanged()
     if cpInfo.episode <> invalid then
         episode = cpInfo.episode
         if episode <> invalid then
-            m.selector.visible = false
-            m.autoplay.visible = true
-
-            viewport = {}
-            viewport.x = m.autoplayButtons.translation[0] + 4
-            viewport.y = m.autoplayButtons.translation[1] + 4
-            viewport.width = m.autoplayZoom.width - 8
-            viewport.height = m.autoplayZoom.height - 8
-            m.top.viewport = viewport
-
-            show = m.global.showCache[episode.showID]
-            if show <> invalid then
-                m.background.uri = getImageUrl(show.heroImageUrl, m.background.width)
+            if canWatch(episode, m.top) then
+                m.selector.visible = false
+                m.autoplay.visible = true
+                viewport = {}
+                viewport.x = m.autoplayButtons.translation[0] + 4
+                viewport.y = m.autoplayButtons.translation[1] + 4
+                viewport.width = m.autoplayZoom.width - 8
+                viewport.height = m.autoplayZoom.height - 8
+                m.top.viewport = viewport
+    
+                showCache = getGlobalField("showCache")
+                show = showCache[episode.showID]
+                if show <> invalid then
+                    m.background.uri = getImageUrl(show.heroImageUrl, m.background.width)
+                else
+                    m.background.uri = ""
+                end if
+                m.upNext.backgroundUri = getImageUrl(episode.thumbnailUrl, m.upNext.width)
+                m.upNext.focusedBackgroundUri = getImageUrl(episode.thumbnailUrl, m.upNext.width)
+                m.upNextShowName.text = episode.showName
+                
+                upNextEpisodeNumber = (episode.seasonString + " " + episode.episodeString).trim()
+                if not isNullOrEmpty(upNextEpisodeNumber) then
+                    upNextEpisodeNumber = upNextEpisodeNumber + " | "
+                end if
+                m.upNextEpisodeNumber.text = upNextEpisodeNumber + episode.durationString
+                m.upNextEpisodeName.text = episode.title
             else
-                m.background.uri = ""
+                m.selector.visible = true
+                m.autoplay.visible = false
+        
+                viewport = {}
+                viewport.x = m.selectorZoom.translation[0] + 4
+                viewport.y = m.selectorZoom.translation[1] + 4
+                viewport.width = m.selectorZoom.width - 8
+                viewport.height = m.selectorZoom.height - 8
+                m.top.viewport = viewport
+
+                m.selectorButtons.removeChildrenIndex(m.selectorButtons.getChildCount(), 0)
+                button = m.selectorButtons.createChild("RecommendationTile")
+                button.itemContent = episode
             end if
-            m.upNext.backgroundUri = getImageUrl(episode.thumbnailUrl, m.upNext.width)
-            m.upNext.focusedBackgroundUri = getImageUrl(episode.thumbnailUrl, m.upNext.width)
-            m.upNextShowName.text = episode.showName
-            
-            upNextEpisodeNumber = (episode.seasonString + " " + episode.episodeString).trim()
-            if not isNullOrEmpty(upNextEpisodeNumber) then
-                upNextEpisodeNumber = upNextEpisodeNumber + " | "
-            end if
-            m.upNextEpisodeNumber.text = upNextEpisodeNumber + episode.durationString
-            m.upNextEpisodeName.text = episode.title
         end if
     else if cpInfo.videos.count() > 0 then
         m.selector.visible = true
@@ -103,7 +119,8 @@ sub onContinuousPlayInfoChanged()
         viewport.height = m.selectorZoom.height - 8
         m.top.viewport = viewport
 
-'        show = m.global.showCache[cpInfo.showID]
+'        showCache = getGlobalField("showCache")
+'        show = showCache[cpInfo.showID]
 '        if show <> invalid then
 '            m.background.uri = getImageUrl(show.heroImageUrl, m.background.width)
 '        else
@@ -114,6 +131,11 @@ sub onContinuousPlayInfoChanged()
         for each video in cpInfo.videos
             button = m.selectorButtons.createChild("RecommendationTile")
             button.itemContent = video
+            
+            ' We shouldn't display more than 3 recommendations
+            if m.selectorButtons.getChildCount() >= 3 then
+                exit for
+            end if
         next
     end if
 end sub
@@ -144,7 +166,18 @@ sub onSelectorButtonFocused(nodeEvent as object)
     button = m.selectorButtons.getChild(nodeEvent.getData())
     if button <> invalid then
         m.top.buttonFocused = button
-        m.background.uri = getImageUrl(button.itemContent.backgroundUrl, m.background.width)
+        content = button.itemContent
+        if content.subtype() = "Episode" then
+            showCache = getGlobalField("showCache")
+            show = showCache[content.showID]
+            if show <> invalid then
+                m.background.uri = getImageUrl(show.heroImageUrl, m.background.width)
+            else
+                m.background.uri = ""
+            end if
+        else
+            m.background.uri = getImageUrl(content.backgroundUrl, m.background.width)
+        end if
     end if
 end sub
 

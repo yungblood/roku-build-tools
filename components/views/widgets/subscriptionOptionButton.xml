@@ -11,7 +11,9 @@
         <field id="title" type="string" alias="title.text" />
         <field id="subtitle" type="string" alias="subtitle.text" />
         <field id="cta" type="string" alias="cta.text" />
-        <!-- field id="disclaimer" type="string" alias="disclaimer.text" / -->
+        <field id="promo" type="string" alias="promo.text" />
+        <field id="disclaimer" type="string" alias="disclaimer.text" />
+        <field id="tts" type="string" />
         
         <field id="disabled" type="boolean" />
         <field id="upsellInfo" type="node" onChange="onUpsellInfoChanged" />
@@ -22,19 +24,23 @@
     <children>
         <Font
             id="titleFont"
-            size="68"
+            size="34"
+            uri="pkg:/fonts/Lato-Bold.ttf" />
+        <Font
+            id="ctaFont"
+            size="36"
             uri="pkg:/fonts/Lato-Regular.ttf" />
         <Font
             id="subtitleFont"
-            size="43"
+            size="28"
             uri="pkg:/fonts/Lato-Regular.ttf" />
         <Font
-            id="ctaFont"
-            size="32"
-            uri="pkg:/fonts/Lato-Bold.ttf" />
+            id="promoFont"
+            size="28"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
         <Font
             id="disclaimerFont"
-            size="24"
+            size="20"
             uri="pkg:/fonts/Lato-Regular.ttf" />
         <Rectangle
             id="backgroundRect"
@@ -45,12 +51,23 @@
             uri="pkg:/images/upsell_button.9.png" />
         <Poster
             id="focusedBackground"
-            uri="pkg:/images/upsell_button_focused.9.png"
+            uri="pkg:/images/upsell_button_focused_noborder.9.png"
             visible="false" />
+            
+        <Label
+            id="promo"
+            height="60"
+            horizAlign="center"
+            vertAlign="center"
+            font="dictionary:promoFont"
+            text=""
+            color="0xffffffff"
+            visible="false" />
+
         <LayoutGroup
             id="content"
             layoutDirection="vert"
-            itemSpacings="[30]"
+            itemSpacings="[40,10]"
             horizAlignment="center"
             vertAlignment="center">
             <Label
@@ -62,29 +79,31 @@
                 text=""
                 font="dictionary:titleFont" />
             <Label
-                id="subtitle"
+                id="cta"
                 color="0xbab9b9ff"
                 horizAlign="center"
                 lineSpacing="-10"
                 wrap="true"
                 text=""
-                font="dictionary:subtitleFont" />
-            <Label
-                id="cta"
-                color="0xffffffff"
-                horizAlign="center"
-                wrap="false"
-                text=""
                 font="dictionary:ctaFont" />
-<!--             <Label -->
-<!--                 id="disclaimer" -->
-<!--                 width="575" -->
-<!--                 color="0xbab9b9ff" -->
-<!--                 horizAlign="center" -->
-<!--                 lineSpacing="0" -->
-<!--                 wrap="true" -->
-<!--                 text="" -->
-<!--                 font="dictionary:disclaimerFont" /> -->
+            <Label
+                id="subtitle"
+                color="0xbab9b9ff"
+                horizAlign="center"
+                wrap="true"
+                lineSpacing="0"
+                text=""
+                font="dictionary:subtitleFont" />
         </LayoutGroup>
+
+        <Label
+            id="disclaimer"
+            width="575"
+            color="0xbab9b9ff"
+            horizAlign="center"
+            lineSpacing="0"
+            wrap="true"
+            text=""
+            font="dictionary:disclaimerFont" />
     </children>
 </component>

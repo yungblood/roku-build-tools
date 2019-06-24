@@ -9,7 +9,7 @@ sub doWork()
     port = createObject("roMessagePort")
     m.top.observeField("control", port)
 
-    config = m.global.config
+    config = getGlobalField("config")
     video = m.top.video
     view = video.getParent()
     content = m.top.content
@@ -24,11 +24,11 @@ sub doWork()
 
     'RAF content params
     raf.setContentID(content.id)
-    raf.SetContentGenre("General Variety")
+    raf.setContentGenre("General Variety")
     
     'Nielsen content params
     raf.enableNielsenDAR(true)
-    raf.setContentLength(content.length)
+    raf.setContentLength(asInteger(content.length))
     raf.setNielsenGenre(content.nielsenGenre)
     raf.setNielsenAppID(config.nielsenAppID)
 

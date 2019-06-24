@@ -7,56 +7,67 @@
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
     <interface>
+        <field id="height" type="float" onChange="updateLayout" />
+        <field id="width" type="float" onChange="updateLayout" />
+
         <field id="itemContent" type="node" onChange="onContentChanged" />
         <field id="gridHasFocus" type="boolean" onChange="onFocusChanged" />
         <field id="focusPercent" type="float" onChange="onFocusChanged" />
     </interface>
     <children>
         <Rectangle
-            translation="[0,13]"
+            id="background"
             width="435"
             height="261"
             color="0x2b2b2bff">
-            <Label
-                id="time"
-                translation="[44,54]"
-                width="282"
-                color="0xffffffff">
-                <Font
-                    role="font"
-                    size="25"
-                    uri="pkg:/fonts/Lato-Bold.ttf" />
-            </Label>
-            <Label
-                id="showTitle"
-                translation="[44,96]"
-                width="348"
-                color="0xffffffff"
-                wrap="true"
-                text=""
-                maxLines="2"
-                lineSpacing="-10">
-                <Font
-                    role="font"
-                    size="42"
-                    uri="pkg:/fonts/Lato-Regular.ttf" />
-            </Label>
-            <Label
-                id="episodeTitle"
-                translation="[44,160]"
-                width="348"
-                color="0xffffffff"
-                wrap="false"
-                text="">
-                <Font
-                    role="font"
-                    size="24"
-                    uri="pkg:/fonts/Lato-Regular.ttf" />
-            </Label>
+            <LayoutGroup
+                id="metadata"
+                translation="[217,130]"
+                layoutDirection="vert"
+                horizAlignment="center"
+                vertAlignment="center"
+                itemSpacings="[30,0]">
+                <Label
+                    id="time"
+                    width="282"
+                    height="25"
+                    color="0xffffffff">
+                    <Font
+                        role="font"
+                        size="23"
+                        uri="pkg:/fonts/Lato-Regular.ttf" />
+                </Label>
+                <Label
+                    id="showTitle"
+                    width="348"
+                    height="85"
+                    color="0xffffffff"
+                    wrap="true"
+                    text=""
+                    maxLines="2"
+                    lineSpacing="-10">
+                    <Font
+                        role="font"
+                        size="32"
+                        uri="pkg:/fonts/Lato-Regular.ttf" />
+                </Label>
+<!--                 <Label -->
+<!--                     id="episodeTitle" -->
+<!--                     width="348" -->
+<!--                     height="25" -->
+<!--                     color="0xffffffff" -->
+<!--                     wrap="false" -->
+<!--                     text=""> -->
+<!--                     <Font -->
+<!--                         role="font" -->
+<!--                         size="24" -->
+<!--                         uri="pkg:/fonts/Lato-Regular.ttf" /> -->
+<!--                 </Label> -->
+            </LayoutGroup>
         </Rectangle>
         <Rectangle
             id="liveNow"
-            translation="[354,13]"
+            translation="[354,0]"
             width="81"
             height="32"
             color="0x0092f3ff"
@@ -77,7 +88,6 @@
         </Rectangle>
         <Poster
             id="focusFrame"
-            translation="[0,13]"
             width="436"
             height="248"
             uri="pkg:/images/frame_grid.9.png"

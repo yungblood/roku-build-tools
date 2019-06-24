@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component name="DynamicPlayMarqueeTile" extends="Group">
     <script type="text/brightscript" uri="pkg:/components/views/widgets/tiles/dynamicPlayMarqueeTile.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+        
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/device.brs" />
+    
     <interface>
         <field id="show" type="node" onChange="onShowChanged" />
         <field id="update" type="boolean" onChange="updateContent" alwaysNotify="true" />
         <field id="episode" type="node" />
         <field id="contentLoaded" type="boolean" alwaysNotify="true" />
+        <field id="vilynxControl" type="string" onChange="onVilynxControlChanged" alwaysNotify="true" />
 
         <field id="buttonSelected" type="string" alwaysNotify="true" />
     </interface>
@@ -31,14 +39,24 @@
             id="buttonFont"
             size="26"
             uri="pkg:/fonts/Lato-Regular.ttf" />
-            
+        
+        <FadeInPoster
+            id="hero"
+            width="1920"
+            height="1080"
+            loadDisplayMode="scaleToZoom"
+            visible="false" />
+        <Group
+            id="previewGroup" />
+
         <LayoutGroup
             id="metadata"
             layoutDirection="vert"
-            itemSpacings="[0]">
+            itemSpacings="[0]"
+            translation="[100,297]" >
             <Label
                 id="showTitle"
-                width="500"
+                width="800"
                 font="dictionary:titleFont"
                 maxLines="2"
                 wrap="true"
@@ -97,7 +115,7 @@
         </LayoutGroup>
         <LabelButton
             id="ctaButton"
-            translation="[0,423]"
+            translation="[100,720]"
             width="600"
             height="88"
             text=""
@@ -106,33 +124,26 @@
             font="dictionary:buttonFont"
             processKeyEvents="false"
             visible="false" />
-<!--         <LayoutGroup -->
-<!--             translation="[1720,467]" -->
-<!--             layoutDirection="horiz" -->
-<!--             itemSpacings="[10]" -->
-<!--             horizAlignment="right" -->
-<!--             vertAlignment="center"> -->
-<!--             <LabelButton -->
-<!--                 id="showInfo" -->
-<!--                 width="60" -->
-<!--                 height="70" -->
-<!--                 foregroundUri="pkg:/images/icon-info-unselected-unfocused.png" -->
-<!--                 foregroundImageWidth="45" -->
-<!--                 foregroundImageHeight="45" -->
-<!--                 focusedForegroundUri="pkg:/images/icon-info-unselected-focused.png" -->
-<!--                 focusedForegroundImageWidth="45" -->
-<!--                 focusedForegroundImageHeight="45" -->
-<!--                 focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png" -->
-<!--                 processKeyEvents="false" /> -->
-<!--             <Label -->
-<!--                 id="airtime" -->
-<!--                 vertAlign="center" -->
-<!--                 color="0xffffffff"> -->
-<!--                 <Font -->
-<!--                     role="font" -->
-<!--                     size="26" -->
-<!--                     uri="pkg:/fonts/Lato-Regular.ttf" /> -->
-<!--             </Label> -->
-<!--         </LayoutGroup> -->
+
+        <Animation
+            id="vilynxFadeOutAnimation"
+            duration=".1"
+            delay="0"
+            repeat="false">
+            <FloatFieldInterpolator
+                key="[0,1]"
+                keyValue="[1,0]"
+                fieldToInterp="vilynxPreview.opacity" />
+        </Animation>
+        <Animation
+            id="vilynxFadeInAnimation"
+            duration=".1"
+            delay="0"
+            repeat="false">
+            <FloatFieldInterpolator
+                key="[0,1]"
+                keyValue="[0,1]"
+                fieldToInterp="vilynxPreview.opacity" />
+        </Animation>
     </children>
 </component>

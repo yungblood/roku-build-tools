@@ -3,9 +3,9 @@ sub init()
 end sub
 
 sub doWork()
-    config = m.global.config
+    config = getGlobalField("config")
     api = cbs()
-    api.initialize(config)
+    api.initialize(m.top)
     
     stream = invalid
     station = m.top.station

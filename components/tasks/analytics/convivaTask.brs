@@ -13,10 +13,13 @@ sub doWork()
     
     m.inAd = false
 
-    config = m.global.config
-    user = m.global.user
+    config = getGlobalField("config")
+    user = getGlobalField("user")
     video = m.top.video
     content = m.top.content
+
+    lastCdnReportTime = 0
+    cdnReportInterval = 60
 
     convivaTags = {}
     contentInfo = {}
@@ -65,14 +68,24 @@ sub doWork()
     contentInfo["playerName"]       = "ROKU"
     contentInfo["viewerId"]         = user.id
 
-    contentInfo["defaultReportingCdnName"]  = "AKAMAI"
-    contentInfo["defaultReportingResource"] = "AKAMAI"
-
     settings = {}
-    'settings.gatewayUrl = "https://cbscom.testonly.conviva.com"
+    if not isNullOrEmpty(config.convivaGateway) then
+        settings.gatewayUrl = config.convivaGateway
+    end if
+    
     livePass = convivaLivePassInitWithSettings(config.convivaKey, settings)
     livePass.toggleTraces(m.debug)
-
+    
+    video.observeField("streamInfo", port)
+    video.observeField("position", port)
+    video.observeField("state", port)
+    video.observeField("duration", port)
+    video.observeField("streamingSegment", port)
+    video.observeField("errorCode", port)
+    video.observeField("errorMsg", port)
+    video.observeField("downloadedSegment", port)
+    video.observeField("content", port)
+    
     convivaSession = livePass.createSession(true, contentInfo, video.notificationInterval, video, port)
     livePass.attachStreamer()
     while true
@@ -81,7 +94,7 @@ sub doWork()
         if msgType = "roSGNodeEvent"
             if msg.getField() = "control" then
                 if m.debug
-                    print "msgType="+msgType + "       getField="+msg.getField() + "       data="+(msg.getData())
+                    print "msgType=";msgType,"getField=";msg.getField(),"data=";msg.getData()
                 end if
                 if msg.getData() = "stop" then
                     exit while
@@ -104,9 +117,37 @@ sub doWork()
                     m.inAd = false
                 end if
             else if msg.getField() = "position" then
+            else if msg.getField() = "downloadedSegment" then
+                now = createObject("roDateTime").asSeconds()
+                if now - lastCdnReportTime >= cdnReportInterval then
+                    segmentInfo = msg.getData()
+                    headers = getUrlHeaders(segmentInfo.segUrl)
+                    if headers <> invalid then
+                        cdn = headers["x-cdn"]
+                        if not isNullOrEmpty(cdn) then
+                            ?"UPDATING CDN: ";cdn
+                            newContentInfo = {}
+                            newContentInfo.append(contentInfo)
+                            newContentInfo["defaultReportingCdnName"] = cdn
+                            newContentInfo["defaultReportingResource"] = cdn
+                            livePass.updateContentMetadata(convivaSession, newContentInfo)
+                            lastCdnReportTime = now
+                            contentInfo = newContentInfo
+                        end if
+                    end if
+                end if
+            else if msg.getField() = "content" then
+                videoContent = msg.getData()
+                if videoContent <> invalid and videoContent.streamDetails <> invalid then
+                    newContentInfo = {}
+                    newContentInfo.append(contentInfo)
+                    newContentInfo.tags["stream_id"] = videoContent.streamDetails.streamID
+                    livePass.updateContentMetadata(convivaSession, newContentInfo)
+                    contentInfo = newContentInfo
+                end if  
             else if msg.getField() = "state" then
                 if m.debug then
-                    print "msgType="+msgType + "       getField="+msg.getField() + "       data="+(msg.getData())
+                    print "msgType=";msgType,"getField=";msg.getField(),"data=";msg.getData()
                 end if
                 curState = msg.getData()
                 if curState = "stopped" and not m.inAd then
@@ -136,6 +177,8 @@ sub doWork()
         convivaSession = invalid
     end if
     livePass.cleanup()
+    video = invalid
+    m.top.video = invalid
     if m.debug then
         print "raftask - exiting client-stitched loop",m.id
     end if

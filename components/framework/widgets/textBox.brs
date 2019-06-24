@@ -15,12 +15,19 @@ end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
     ' Only process key events if we're not in a grid
-    if m.top.processKeyEvents and not m.top.disabled then
+    if not m.top.disabled then
         if press then
-            key = LCase(key)
-            if key = "ok" then
+            if m.top.processKeyEvents and key = "OK" then
                 m.top.textboxSelected = true
                 return true
+            else if key.inStr("Lit_") = 0 then
+                m.top.text = m.top.text + key.mid(4)
+                return true
+            else if key = "backspace" then
+                if m.top.text.len() > 0 then
+                    m.top.text = m.top.text.mid(0, m.top.text.len() - 1)
+                    return true
+                end if
             end if
         end if
     end if
@@ -80,6 +87,16 @@ sub onFocusChanged()
     end if
     if m.focusedHintLabel.color = -1 then
         m.focusedHintLabel.color = m.hintLabel.color
+    end if
+    
+    if m.hintLabel.visible or m.focusedHintLabel.visible then
+        m.top.tts = m.top.hintText
+    else
+        if m.top.secureMode then
+            m.top.tts = "text hidden"
+        else
+            m.top.tts = m.top.text
+        end if
     end if
 end sub
 

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="LoadMoviesPageTask" extends="ApiTask">
+    <script type="text/brightscript" uri="pkg:/components/tasks/loadMoviesPageTask.brs" />
+    <interface>
+        <field id="page" type="integer" />
+        <field id="pageSize" type="integer" />
+
+        <field id="movies" type="nodearray" alwaysNotify="true" />
+    </interface>
+</component>

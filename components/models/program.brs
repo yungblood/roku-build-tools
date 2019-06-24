@@ -38,6 +38,16 @@ sub onJsonChanged()
             end if
             m.top.endTime = date.asSeconds()
             m.top.length = m.top.endTime - m.top.startTime
+        else if json.StoryHead <> invalid then
+            m.top.id = json.StoryId
+            m.top.title = "ET Live"
+            m.top.episodeTitle = json.StoryHead
+            m.top.description = json.description
+            m.top.length = getTotalSecondsFromTime(json.duration)
+            m.top.startTime = json.StartTime
+            if m.top.length > 0 then
+                m.top.endTime = m.top.startTime + m.top.length
+            end if
         else
             m.top.id = json.programId
             m.top.title = json.name
@@ -49,7 +59,9 @@ sub onJsonChanged()
             m.top.description = json.description
             m.top.length = json.duration
             m.top.startTime = json.startTime
-            m.top.endTime = m.top.startTime + m.top.length
+            if m.top.length > 0 then
+                m.top.endTime = m.top.startTime + m.top.length
+            end if
         end if
     end if
 end sub

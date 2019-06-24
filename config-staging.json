@@ -5,13 +5,19 @@
     
     "appRegion":       "us",
     "appName":         "Roku",
+    "appCountryCode":  "us",
     
     "syncbakKey":      "50d49a504117416c818d04f12b387c4c",
     "syncbakSecret":   "8e60ba369c7f46ba9c6b72b0f1548979",
     "syncbakBaseUrl":  "https://stage-cbsservice.aws.syncbak.com",
     
-    "enableDW":        true,
-    "enableSparrow":   false,
+    "enableGeoBlock":  false,
+    
+    "enableTaplytics": false,
+
+    "enableDW":        false,
+    "enableSparrow":   true,
+    "sparrowUrl":      "http://stage-sparrow.cbs.com/streamer/v1.0/ingest/beacon.json",
     
     "omnitureSuiteID": "cnetcbscomsite-dev",
     "omnitureEvar5":   "cnetcbscomsite-dev",
@@ -22,6 +28,9 @@
     "brightLineUrl":   "http://services.brightline.tv/api/v2/config/",
     "brightLineID":    "1020",
     "brightLinePkg":   "http://cdn-media.brightline.tv/sdk/gen2/roku/direct/cbs/BrightLineDirect.pkg",
+    
+    "spotXBaseUrl":    "https://search.spotxchange.com/insights/85394",
+    "spotXPageUrl":    "www.spotx.tv",
 
     "akamaiUrl":       "http://ma61-r.analytics.edgesuite.net/config/beacon-5508.xml",
 
@@ -31,7 +40,7 @@
     "nielsenAppID":    "PEEF1AF93-F59E-414A-96BE-DCE421E5C92D",
 
     "vmapUrl":         "http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/8264/vaw-can/ott/cbs_roku_app&ciu_szs=300x60,300x250&impl=s&gdfp_req=1&env=vp&output=xml_vmap1&unviewed_position_start=1&url=&description_url=&correlator=ROKU_ADS_TIMESTAMP&scor=ROKU_ADS_TIMESTAMP&cmsid=2289&vid=ROKU_ADS_CONTENT_ID",
-    "fixedAdParams":   "iu=/8264/vaw-can/ott/cbs_roku_app&url=cbs.com&cmsid=20289",
+    "fixedAdParams":   "iu=/8264/vaw-can/ott/cbs_roku_app&url=cbs.com&cmsid=20289&dai-sr=1628&dai-excl=codec%3Aec-3",
     
     "touUrl":          "legalterms.cbsinteractive.com/terms-of-use",
     "privacyUrl":      "legalterms.cbsinteractive.com/privacy",
@@ -47,62 +56,46 @@
 
     "liveTimeout":     600,
     
+    "enable51Audio":   true,
+
     "useDai":          true,
-    "daiSourceID":     "2475217",
+    "daiSourceID":     "20289",
+    "dai51SourceID":   "2478978",
     "daiKey":          "7j3n273bfj7jcnvf22d713a51f",
     "uvpConfigUrl":    "http://can.cbs.com/thunder/player/chromeless/uvp/cbs_roku_app/cbs_roku_app_stage.xml",
 
     "dashSelectorUrl": "http://link.theplatform.com/s/dJ5BDC/[PID]?sig=[SIGNATURE]&switch=roku",
     "selectorUrl":     "http://link.theplatform.com/s/dJ5BDC/[PID]?sig=[SIGNATURE]&mbr=true&manifest=m3u&format=redirect&assetTypes=StreamPack%7COTT",
-    
+    "vilynxOwnerKey":  "5844474da56c8d121101c27f4c277200",
+   
     "liveTVChannels":  [
         {
             "id": "local",
-            "title": "Local",
-            "icon": "pkg:/images/icon_livetv_local.png",
-            "streamUrl": "",
             "scheduleUrl": "",
-            "trackingID": "",
-            "trackingContentID": "",
-            "trackingAstID": "",
-            "trackingTitle": "",
-            "convivaTrackingTitle": "",
-            "comscoreTrackingTitle": "",
-            "comscoreC2": "",
             "comscoreC3": "",
             "comscoreC4": ""
         },
         {
             "id": "cbsn",
-            "title": "",
-            "icon": "pkg:/images/icon_livetv_cbsn.png",
-            "streamUrl": "https://dai.google.com/ssai/event/Sid4xiTQTkCT1SLu6rjUSQ/master.m3u8?iu=/8264/vaw-can/ott/cbs_roku_app",
             "scheduleUrl": "v3.0/roku/cbsn/schedule/feed.json",
-            "trackingID": "1004533827514",
-            "trackingContentID": "C4552942-B263-B8ED-C2AD-612113A59478",
-            "trackingAstID": "595",
             "trackingTitle": "CBSN Live Video",
-            "convivaTrackingTitle": "CBSN-LiveTV",
-            "comscoreTrackingTitle": "CBSN-LiveTV",
-            "comscoreC2": "3005086",
+            "convivaTrackingTitle": "CBSN Live Video",
+            "comscoreTrackingTitle": "CBSN Live Video",
             "comscoreC3": "CBSNewsRoku",
             "comscoreC4": "CBSNews.com"
         },
         {
-            "id": "cbssports",
-            "title": "News, Scores and Highlights",
-            "icon": "pkg:/images/icon_livetv_cbssports.png",
-            "streamUrl": "https://dai.google.com/ssai/event/lKh5_XooSbam79G4T7KvYQ/master.m3u8?iu=/8264/vaw-can/ott/cbs_roku_app",
+            "id": "cbssportshq",
             "scheduleUrl": "v3.0/roku/cbssports/events/proxy.json?as=json&transform=cbsnews-fusion&device=roku&iu=/8264/vaw-can/ott/cbs_roku_app",
-            "trackingID": "1130505795504",
-            "trackingContentID": "vn4vERdyJhcFf688ZEsPEWc6b943_FW8",
-            "trackingAstID": "595",
-            "trackingTitle": "Sports HQ",
-            "convivaTrackingTitle": "CBSHQ-LiveTV",
-            "comscoreTrackingTitle": "CBSHQ-LiveTV",
-            "comscoreC2": "3005086",
             "comscoreC3": "CBSSportsRoku",
             "comscoreC4": "CBSSports.com"
+        },
+        {
+            "id": "etl",
+            "scheduleUrl": "v3.0/roku/etl/liveschedule/feed.json",
+            "scheduleUnavailableText": "ET Live",
+            "comscoreC3": "CBSRoku",
+            "comscoreC4": "etonline.com"
         }
     ]
 }

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="LiveTVTile" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/views/widgets/tiles/liveTVTile.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
+    <interface>
+        <field id="itemContent" type="node" onChange="onContentChanged" />
+
+        <field id="width" type="float" onChange="updateLayout" />
+        <field id="height" type="float" onChange="updateLayout" />
+
+        <field id="gridHasFocus" type="boolean" onChange="updateFocus" />
+        <field id="focusPercent" type="float" onChange="updateFocus"  alias="focusedBackground.opacity" />
+    </interface>
+    <children>
+        <Font
+            id="callSignFont"
+            size="44"
+            uri="pkg:/fonts/Lato-Bold.ttf" />
+        <Font
+            id="locationFont"
+            size="28"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+
+        <Rectangle
+            id="background"
+            color="0x212121ff" />
+        <Rectangle
+            id="focusedBackground"
+            color="0x3e96efff"
+            opacity="0" />
+
+        <LayoutGroup
+            id="iconGroup"
+            horizAlignment="center"
+            vertAlignment="center">
+            <Poster
+                id="icon"
+                height="144"
+                loadDisplayMode="scaleToFit" />
+        </LayoutGroup>
+        <Label
+            id="callSign"
+            font="dictionary:callSignFont"
+            vertAlign="bottom" />
+        <Label
+            id="location"
+            font="dictionary:locationFont"
+            vertAlign="top" />
+    </children>
+</component>

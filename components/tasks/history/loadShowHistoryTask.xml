@@ -2,6 +2,7 @@
 <component name="LoadShowHistoryTask" extends="ApiTask">
 	<script type="text/brightscript" uri="pkg:/components/tasks/history/loadShowHistoryTask.brs" />
 	<interface>
-		<field id="history" type="nodearray" alwaysNotify="true" />
+        <field id="sortOrder" type="string" value="recency" />
+        <field id="history" type="nodearray" alwaysNotify="true" />
 	</interface>
 </component>

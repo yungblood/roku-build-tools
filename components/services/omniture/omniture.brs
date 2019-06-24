@@ -29,7 +29,7 @@ sub omniture_initialize(suiteID as string, userID as string, subscriberStatus as
     m.omniture.persistentParams.v5 = evar5
     m.omniture.persistentParams.v15 = subscriberStatus
     m.omniture.persistentParams.v32 = "cbs_roku_app|can"
-    m.omniture.persistentParams.v58 = getDeviceID()
+    m.omniture.persistentParams.v58 = getPersistedDeviceID()
     m.omniture.persistentParams.v69 = userID
     m.omniture.persistentParams.l1 = subscriberStatus
     m.omniture.persistentParams.pl = subscriberProduct

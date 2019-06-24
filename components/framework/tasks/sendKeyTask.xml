@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="SendKeyTask" extends="Task">
+    <script type="text/brightscript" uri="pkg:/components/framework/tasks/sendKeyTask.brs" />
+    
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/web.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/debug.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/device.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/ecp.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/cookies.brs" />
+
+    <interface>
+        <field id="key" type="string" />
+        <field id="sent" type="boolean" />
+    </interface>
+</component>

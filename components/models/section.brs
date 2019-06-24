@@ -2,7 +2,7 @@ sub init()
     m.loadedPages = []
     m.loadTasks = []
     
-    user = m.global.user
+    user = getGlobalField("user")
     if user <> invalid and user.videoHistory <> invalid then
         user.videoHistory.observeField("cache", "onVideoHistoryChanged")
     end if
@@ -30,6 +30,9 @@ sub onJsonChanged()
                 if item.mediaType = "Movie" then
                     movie = m.top.createChild("Movie")
                     movie.json = item
+                else if item.isLive then
+                    episode = m.top.createChild("LiveFeed")
+                    episode.json = item
                 else
                     episode = m.top.createChild("Episode")
                     episode.json = item
@@ -74,7 +77,7 @@ end sub
 
 sub updateResumePoints(history = invalid as object)
     if history = invalid then
-        user = m.global.user
+        user = getGlobalField("user")
         if user <> invalid and user.videoHistory <> invalid then
             history = user.videoHistory.cache
         end if

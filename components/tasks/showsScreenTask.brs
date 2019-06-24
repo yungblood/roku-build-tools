@@ -4,7 +4,14 @@ end sub
 
 sub doWork()
     api = cbs()
-    api.initialize(m.global.config, m.global.user, m.global.cookies)
+    api.initialize(m.top)
 
-    m.top.groups = api.getShowGroups()
+    groups = api.getShowGroups()
+    
+    if isAssociativeArray(groups) and groups.errorCode <> invalid then
+        m.top.errorCode = groups.errorCode
+        m.top.groups = []
+    else
+        m.top.groups = groups
+    end if
 end sub

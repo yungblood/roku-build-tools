@@ -160,7 +160,7 @@ end function
 
 sub dw_playerInit(generateNewPlayerID = true as boolean, vguid = "" as string)
     if isNullOrEmpty(m.playerID) or generateNewPlayerID then
-        m.playerID = md5Hash(getDeviceID() + nowDate().asSeconds().toStr())
+        m.playerID = md5Hash(getPersistedDeviceID() + nowDate().asSeconds().toStr())
         m.contsessID = ""
     else
         m.contSessID = m.playerID

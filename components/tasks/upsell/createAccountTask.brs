@@ -4,15 +4,17 @@ end sub
 
 sub doWork()
     api = cbs()
-    api.initialize(m.global.config, m.global.user, m.global.cookies)
+    api.initialize(m.top)
 
     m.top.product = channelStore().getProduct(m.top.productCode)
+    
+    trackRMFEvent("PNT")
     transactionID = api.subscribe(m.top.productCode)
     if not isNullOrEmpty(transactionID) then
         m.top.transactionID = transactionID
-        activationCode = api.createAccount(m.top.accountDetails, transactionID, m.top.productCode)
+        activationCode = api.createAccount(m.top.accountDetails, transactionID, m.top.productCode, getPersistedDeviceID())
         if not isNullOrEmpty(activationCode) then
-            cookies = api.checkActivationCode(activationCode)
+            cookies = api.checkActivationCode(activationCode, getPersistedDeviceID())
             if not isNullOrEmpty(cookies) then
                 setRegistryValue("AuthToken", activationCode, api.registrySection)
                 m.top.cookies = cookies

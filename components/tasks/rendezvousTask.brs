@@ -4,17 +4,17 @@ end sub
 
 sub doWork()
     api = cbs()
-    api.initialize(m.global.config, m.global.user, m.global.cookies)
+    api.initialize(m.top)
     
     while true and not m.top.cancel
-        authCode = api.getActivationCode()
+        authCode = api.getActivationCode(getPersistedDeviceID())
         if authCode <> invalid then
             m.top.code = authCode.code
             
             timeout = createObject("roTimespan")
             while timeout.totalMilliseconds() < authCode.retryDuration and not m.top.cancel
                 sleep(authCode.retryInterval)
-                cookies = api.checkActivationCode(authCode.code)
+                cookies = api.checkActivationCode(authCode.code, getPersistedDeviceID())
                 if not isNullOrEmpty(cookies) then
                     setRegistryValue("AuthToken", authCode.code, api.registrySection)
                     m.top.cookies = cookies

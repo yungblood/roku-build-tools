@@ -4,6 +4,6 @@ end sub
 
 sub doWork()
     api = cbs()
-    api.initialize(m.global.config, m.global.user, m.global.cookies)
+    api.initialize(m.top)
     m.top.success = api.forgotPassword(m.top.email)
 end sub

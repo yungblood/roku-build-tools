@@ -45,7 +45,8 @@ sub onJsonChanged()
             video.json = model
             m.top.video = video
             
-            show = m.global.showCache[asString(video.showId)]
+            showCache = getGlobalField("showCache")
+            show = showCache[asString(video.showId)]
             if show <> invalid then
                 m.top.backgroundUrl = show.heroImageUrl
             end if

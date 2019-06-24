@@ -2,9 +2,15 @@
 <component name="ShowHistory" extends="ContentNode">
 	<script type="text/brightscript" uri="pkg:/components/models/showHistory.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
     <interface>
+        <field id="firstLoad" type="boolean" value="true" />
         <field id="update" type="boolean" onChange="update" alwaysNotify="true" />
         
-        <field id="content" type="nodearray" onChange="onContentChanged" />
+        <field id="content" type="nodearray" onChange="onContentChanged" alwaysNotify="true" />
     </interface>
 </component>

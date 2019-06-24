@@ -3,10 +3,22 @@ sub init()
 end sub
 
 sub doWork()
-    config = m.global.config
-    
+    config = getGlobalField("config")
+
+    deviceID = ""
+    legacyDeviceID = ""
+    persistedDeviceID = getRegistryValue("persistedDeviceID", "", constants().registrySection)
+    if isNullOrEmpty(persistedDeviceID) then
+        deviceInfo = createObject("roDeviceInfo")
+        legacyDeviceID = deviceInfo.getDeviceUniqueID()
+        if legacyDeviceID.mid(0, 1) = "0" then
+            legacyDeviceID = ""
+        end if
+        deviceID = deviceInfo.getChannelClientID()
+    end if
+
     api = cbs()
-    api.initialize(config)
+    api.initialize(m.top)
     api.clearCache()
     
     authCode = ""
@@ -22,78 +34,106 @@ sub doWork()
         if purchases <> invalid and purchases.count() > 0 then
             transactionID = purchases[0].purchaseId
             if not isNullOrEmpty(transactionID) then
-                authCode = api.restoreAccount(transactionID)
+                if not isNullOrEmpty(legacyDeviceID) then
+                    authCode = api.restoreAccount(transactionID, legacyDeviceID)
+                end if
+                if isNullOrEmpty(authCode) then
+                    authCode = api.restoreAccount(transactionID, deviceID)
+                    if not isNullOrEmpty(authCode) then
+                        persistedDeviceID = deviceID
+                    end if
+                else
+                    persistedDeviceID = legacyDeviceID
+                end if
             end if
         end if
     end if
     
     cookies = ""
     if not isNullOrEmpty(authCode) then
-        cookies = api.checkActivationCode(authCode)
+        if not isNullOrEmpty(persistedDeviceID) then
+            cookies = api.checkActivationCode(authCode, persistedDeviceID)
+        else
+            if not isNullOrEmpty(legacyDeviceID) then
+                cookies = api.checkActivationCode(authCode, legacyDeviceID)
+            end if
+            if isNullOrEmpty(cookies) then
+                cookies = api.checkActivationCode(authCode, deviceID)
+                persistedDeviceID = deviceID
+            else
+                persistedDeviceID = legacyDeviceID
+            end if
+        end if
     else if not isNullOrEmpty(username) and not isNullOrEmpty(password) then
-        cookies = api.signIn(username, password)
+        if not isNullOrEmpty(persistedDeviceID) then
+            cookies = api.signIn(username, password, persistedDeviceID)
+        else
+            if not isNullOrEmpty(legacyDeviceID) then
+                cookies = api.signIn(username, password, legacyDeviceID)
+            end if
+            if isNullOrEmpty(cookies) then
+                cookies = api.signIn(username, password, deviceID)
+                persistedDeviceID = deviceID
+            else
+                persistedDeviceID = legacyDeviceID
+            end if
+        end if
     end if
+    if isNullOrEmpty(persistedDeviceID) then
+        persistedDeviceID = deviceID
+    end if
+    setRegistryValue("persistedDeviceID", persistedDeviceID, constants().registrySection)
+    setGlobalField("deviceID", persistedDeviceID)
+
     if not isNullOrEmpty(cookies) then
         ' Save the auth info, in case it's new
         setRegistryValue("AuthToken", authCode, api.registrySection)
         setRegistryValue("Username", username, api.registrySection)
         setRegistryValue("Password", password, api.registrySection)
 
-        m.global.cookies = cookies
+        m.top.cookies = cookies
         api.setCookies(cookies)
     end if
 
-    stations = []
-    if asBoolean(config.syncbak_enabled, true) then
-        syncbak().initialize(config.syncbakKey, config.syncbakSecret, config.syncbakBaseUrl)
-        stations = syncbak().getChannels()
-    else
-        nationalFeedID = config.live_tv_national_feed_content_id
-        if not isNullOrEmpty(nationalFeedID) then
-            nationalFeed = api.getEpisode(nationalFeedID)
-            if nationalFeed <> invalid then
-                stations.push(nationalFeed)
-            end if
-        end if
-    end if
-    channels =  invalid
-    if config.liveTVChannels <> invalid then
-        channels = createObject("roSGNode", "ContentNode")
-        for each item in config.liveTVChannels
-            channel = channels.createChild("LiveTVChannel")
-            channel.id = item.id
-            channel.contentID = item.contentID
-            channel.hdPosterUrl = item.icon
-            channel.sdPosterUrl = item.iconSmall
-            channel.scheduleUrl = item.scheduleUrl
-            channel.streamUrl = item.streamUrl
-            channel.title = item.title
-            channel.trackingID = item.trackingID
-            channel.trackingAstID = item.trackingAstID
-            channel.trackingContentID = item.trackingContentID
-            channel.trackingTitle = item.trackingTitle
-            channel.omnitureTrackingTitle = item.trackingTitle
-            channel.convivaTrackingTitle = item.convivaTrackingTitle
-            channel.comscoreTrackingTitle = item.comscoreTrackingTitle
-            channel.comscoreC2 = item.comscoreC2
-            channel.comscoreC3 = item.comscoreC3
-            channel.comscoreC4 = item.comscoreC4
-        next
-    end if
-    m.global.liveTVChannels = channels
+'    stations = []
+'    if asBoolean(config.syncbak_enabled, true) then
+'        syncbak().initialize(config.syncbakKey, config.syncbakSecret, config.syncbakBaseUrl)
+'        stations = syncbak().getChannels()
+'    else
+'        nationalFeedID = config.live_tv_national_feed_content_id
+'        if not isNullOrEmpty(nationalFeedID) then
+'            nationalFeed = api.getEpisode(nationalFeedID)
+'            if nationalFeed <> invalid then
+'                stations.push(nationalFeed)
+'            end if
+'        end if
+'    end if
+'
+'    liveTVChannels = api.getLiveChannels()
+'    if config.liveTVChannels <> invalid then
+'        for each channel in liveTVChannels
+'            for each override in config.liveTVChannels
+'                if override.id = channel.scheduleType then
+'                    for each field in override.keys()
+'                        if field <> "id" then
+'                            channel.setField(field, override[field])
+'                        end if
+'                    next
+'                    exit for
+'                end if
+'            next
+'        next
+'    end if
+'    channels = createObject("roSGNode", "ContentNode")
+'    channels.appendChildren(liveTVChannels)
+'    setGlobalField("liveTVChannels", channels)
+'
+'    setGlobalField("stations", stations)
+    m.top.localStation = getRegistryValue("liveTV", "", api.registrySection)
+    m.top.lastLiveChannel = getRegistryValue("liveTVChannel", "", api.registrySection)
+    
+    user = api.getUser(true)
+    m.top.user = user
 
-    m.global.stations = stations
-    m.global.station = getRegistryValue("liveTV", "", api.registrySection)
-    m.global.liveTVChannel = getRegistryValue("liveTVChannel", "", api.registrySection)
-
-    shows = api.getGroupShows(config.allShowsGroupID)
-    showCache = {}
-    for each show in shows
-        showCache[show.id] = show
-    next
-    m.global.shows = shows
-    m.global.showCache = showCache
-    m.global.user = api.getUser(true)
-
-    m.top.signedIn = (m.global.user.status <> "ANONYMOUS")
+    m.top.signedIn = (user.status <> "ANONYMOUS")
 end sub

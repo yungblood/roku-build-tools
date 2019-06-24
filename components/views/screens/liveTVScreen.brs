@@ -8,6 +8,7 @@ sub init()
     m.top.observeField("state", "onVideoStateChanged")
 
     m.video = m.top.findNode("video")
+    m.video.observeField("bufferingStatus", "onBufferingStatusChanged")
 
     m.overlay = m.top.findNode("overlay")
     m.darkenTop = m.top.findNode("darkenTop")
@@ -16,38 +17,6 @@ sub init()
     m.channelGrid.observeField("itemFocused", "resetOverlayTimer")
     m.channelGrid.observeField("itemSelected", "onChannelSelected")
 
-    stations = m.global.stations
-    channels = m.global.liveTVChannels
-    for i = 0 to channels.getChildCount() - 1
-        channelItem = channels.getChild(i)
-        if channelItem.id = "local" then
-            if stations.count() > 1 then
-                if m.global.station <> invalid and m.global.station <> "" then
-                    for each station in stations
-                        if station.id = m.global.station then
-                            channelItem.title = station.station
-                            channelItem.affiliate = station.affiliate
-                            channelItem.scheduleUrl = station.scheduleUrl
-                            channelItem.isTuned = false
-                            exit for
-                        end if
-                    next
-                end if
-            else
-                station = stations[0]
-                if station <> invalid then
-                    channelItem.affiliate = station.affiliate
-                    channelItem.title = station.title
-                    channelItem.affiliate = station.affiliate
-                    channelItem.scheduleUrl = station.scheduleUrl
-                    channelItem.isTuned = false
-                end if
-            end if
-            exit for
-        end if
-    next
-    m.channelGrid.content = channels
-            
     m.scheduleOverlay = m.top.findNode("scheduleOverlay")
     m.scheduleGrid = m.top.findNode("scheduleGrid")
     m.scheduleGrid.observeField("itemFocused", "onScheduleItemFocused")
@@ -97,52 +66,113 @@ sub init()
     m.scheduleReload = 12 ' 1 minute (timer fires every 5 seconds)
     m.firstLoad = true
     
-    m.idleTimeout = asInteger(m.global.config.playback_timeout_live_tv, m.global.config.liveTimeout)
+    m.errorRetriesRemaining = 3
+    m.lastUnderrun = 0
+    
+    config = getGlobalField("config")
+    m.idleTimeout = asInteger(config.playback_timeout_live_tv, config.liveTimeout)
 
     m.top.observeField("visible", "onVisibleChanged")
 end sub
 
 sub onVisibleChanged()
     if m.top.visible then
-        ' force a refresh
-        m.station = invalid
-        m.firstLoad = true
-        m.menu.focusedID = "liveTV"
-        if m.global.liveTVChannel = "local" then
-            selectStation()
-        else
-            channels = m.global.liveTVChannels
-            for i = 0 to channels.getChildCount() - 1
-                channelItem = channels.getChild(i)
-                if channelItem.id = m.global.liveTVChannel then
-                    selectChannel(channelItem)
-                    return
-                end if
-            next
-            ' if we get this far, we couldn't find a matching channel,
-            ' so play the local live stream
-            selectStation()
-        end if
+        showSpinner()
+
+        m.loadTask = createObject("roSGNode", "LoadLiveStationsTask")
+        m.loadTask.observeField("stations", "onStationsLoaded")
+        m.loadTask.control = "run"
     else
         m.video.control = "stop"
     end if
 end sub
 
-sub onFocusChanged()
+sub onStationsLoaded(nodeEvent as object)
+    m.loadTask = invalid
+    task = nodeEvent.getRoSGNode()
+    stations = nodeEvent.getData()
+    channels = task.liveTVChannels
+
+    for i = 0 to channels.getChildCount() - 1
+        channelItem = channels.getChild(i)
+        if channelItem.scheduleType = "local" and not channelItem.isFallback then
+            if stations.count() > 1 then
+                stationID = getGlobalField("localStation")
+                if not isNullOrEmpty(stationID) then
+                    for each station in stations
+                        if station.id = stationID then
+                            channelItem.title = station.station
+                            channelItem.affiliate = station.affiliate
+                            channelItem.scheduleUrl = station.scheduleUrl
+                            channelItem.isTuned = false
+                            exit for
+                        end if
+                    next
+                end if
+            else
+                station = stations[0]
+                if station <> invalid then
+                    channelItem.affiliate = station.affiliate
+                    channelItem.title = station.title
+                    channelItem.affiliate = station.affiliate
+                    channelItem.scheduleUrl = station.scheduleUrl
+                    channelItem.isTuned = false
+                end if
+            end if
+            exit for
+        end if
+    next
+    m.channelGrid.content = channels
+
+    m.liveStations = stations
+    hideSpinner()
+
+    ' force a refresh
+    m.station = invalid
+    m.firstLoad = true
+    m.menu.focusedID = "liveTV"
+
+    liveChannel = getGlobalField("lastLiveChannel")
+    if isNullOrEmpty(liveChannel) then 
+        liveChannel = "local"
+    end if
+    for i = 0 to channels.getChildCount() - 1
+        channelItem = channels.getChild(i)
+        if channelItem.scheduleType = liveChannel or (channelItem.type = "syncbak" and liveChannel = "local") then
+            selectChannel(channelItem, true)
+            return
+        end if
+    next
+    ' if we get this far, we couldn't find a matching channel,
+    ' so play the local live stream
+    selectStation()
+end sub
+
+sub onFocusChanged(nodeEvent as object)
     if m.top.hasFocus() then
         if m.firstFocus then
-            showMenu(true)
+            showMenu(false)
             m.firstFocus = false
-        else
-            if m.liveTV.visible then
-            else if m.liveTVSelection.visible then
+            if m.liveTVSelection.visible then
                 m.stations.setFocus(true)
+            else
+                m.channelGrid.setFocus(true)
+            end if
+        else
+            if m.liveTVSelection.visible then
+                m.stations.setFocus(true)
+            else if m.liveTV.visible then
+                if m.channelOverlay.visible then
+                    m.channelGrid.setFocus(true)
+                else if m.scheduleOverlay.visible then
+                    m.scheduleGrid.setFocus(true)
+                end if
             else
                 showMenu(true)
                 m.menu.setFocus(true)
             end if
         end if
-    end if
+   end if
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
@@ -217,7 +247,7 @@ sub onScheduleItemSelected(nodeEvent as object)
 end sub
 
 sub onOverlayTimerFired()
-    if m.video.state = "playing" then
+    if m.video.state = "playing" or m.video.state = "buffering" then
         hideOverlay()
     end if
 end sub
@@ -230,7 +260,7 @@ sub onMenuItemSelected(nodeEvent as object)
     m.top.menuItemSelected = menuItem
 end sub
 
-sub selectChannel(channel as object)
+sub selectChannel(channel as object, showChannels = false as boolean)
     if m.channel = invalid or m.channel.id <> channel.id then
         if m.video.state <> "stopped" then
             m.video.control = "stop"
@@ -240,18 +270,20 @@ sub selectChannel(channel as object)
             m.channel.isTuned = false
         end if
         m.channel = channel
-        if m.channel.id = "local" then
+
+        if m.channel.scheduleType = "local" and not m.channel.isFallback then
             selectStation()
         else
             m.channel.isTuned = true
-            playChannel(m.channel)
+            playChannel(m.channel, showChannels)
         end if
 
-        m.global.liveTVChannel = m.channel.id
+        config = getGlobalField("config")
+        setGlobalField("lastLiveChannel", m.channel.scheduleType)
         m.regTask = createObject("roSGNode", "RegistryTask")
         m.regTask.key = "liveTVChannel"
-        m.regTask.value = m.channel.id
-        m.regTask.section = m.global.config.registrySection
+        m.regTask.value = m.channel.scheduleType
+        m.regTask.section = config.registrySection
         m.regTask.mode = "save"
 
     else if m.video.state <> "stopped" then
@@ -259,20 +291,23 @@ sub selectChannel(channel as object)
     end if
 end sub
 
-sub onStationChanged()
-    if m.station = invalid or not m.station.isSameNode(m.top.station) then
-        m.station = m.top.station
-        playChannel(m.station)
+sub onStationChanged(nodeEvent as object)
+    station = nodeEvent.getData()
+    if m.station = invalid or not m.station.isSameNode(station) then
+        m.station = station
     end if
+    playChannel(m.station, true)
 end sub
 
-sub playChannel(channel as object)
-    m.video.control = "stop"
+sub playChannel(channel as object, showChannels = false as boolean)
+    if m.video.state <> "stopped" then
+        m.video.control = "stop"
+    end if
     if channel = invalid then
         channels = m.channelGrid.content
         for i = 0 to channels.getChildCount() - 1
             channelItem = channels.getChild(i)
-            if channelItem.id = "local" then
+            if channelItem.scheduleType = "local" then
                 m.channel = channelItem
                 channelItem.affiliate = invalid
                 channelItem.isTuned = false
@@ -281,9 +316,10 @@ sub playChannel(channel as object)
         m.liveTV.visible = true
         showOverlay(true)
     else
-        m.global.showSpinner = true
+        showSpinner()
     
-        m.idleTimeout = asInteger(m.global.config.playback_timeout_live_tv, m.global.config.liveTimeout)
+        config = getGlobalField("config")
+        m.idleTimeout = asInteger(config.playback_timeout_live_tv, config.liveTimeout)
     
         m.liveTV.visible = true
         m.liveTVSelection.visible = false
@@ -303,7 +339,7 @@ sub playChannel(channel as object)
             m.channelLogo.uri = channel.sdPosterUrl
         end if
         
-        if channel.subtype() <> "Station" and channel.id = "local" then
+        if channel.subtype() <> "Station" and (channel.scheduleType = "local" and not channel.isFallback) then
             channel = m.top.station
         end if
         m.channel = channel
@@ -311,7 +347,7 @@ sub playChannel(channel as object)
             channels = m.channelGrid.content
             for i = 0 to channels.getChildCount() - 1
                 channelItem = channels.getChild(i)
-                if channelItem.id = "local" then
+                if channelItem.scheduleType = "local" then
                     m.channel = channelItem
                     if channel.subtype() = "LiveFeed" then
                         channelItem.title = ""
@@ -328,7 +364,7 @@ sub playChannel(channel as object)
                 end if
             next
         end if
-    
+
         m.streamTask = createObject("roSGNode", "LoadLiveStreamTask")
         m.streamTask.observeField("stream", "onStreamLoaded")
         m.streamTask.station = channel
@@ -357,7 +393,7 @@ sub playChannel(channel as object)
             m.omnitureParams.v36 = "false"
             m.omnitureParams.v46 = ""
             m.omnitureParams.v59 = iif(channel.subscriptionLevel = "FREE", "non-svod", "svod")
-            m.heartbeatContext["mediaSvodContentType"] = iif(channel.subscriptionLevel = "FREE", "free", "pay")
+            m.heartbeatContext["mediaSvodContentType"] = iif(channel.subscriptionLevel = "FREE", "free", "paid")
             m.omnitureParams.pev2 = "video"
             m.omnitureParams.pev3 = "video"
         else
@@ -371,13 +407,18 @@ sub playChannel(channel as object)
             m.heartbeatContext["mediaContentType"] = "live"
             m.omnitureParams.v38 = "live"
             m.omnitureParams.v46 = ""
+            m.heartbeatContext["mediaSvodContentType"] = iif(channel.subscriptionLevel = "FREE", "free", "paid")
             m.omnitureParams.pev2 = "video"
             m.omnitureParams.pev3 = "video"
         end if
 
         'trackScreenAction("trackVideoLoad", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event52"])
 
-        hideOverlay()
+        if showChannels then
+            showOverlay(true)
+        else
+            hideOverlay()
+        end if
         loadSchedule()
     end if
 end sub
@@ -403,7 +444,7 @@ sub onStreamLoaded(nodeEvent as object)
     m.video.content = stream
     resetOverlayTimer(true)
 
-    if m.channel.id <> "local" then
+    if m.channel.scheduleType <> "local" or m.station = invalid then
         m.station = m.channel
     end if
     sendDWAnalytics({method: "playerInit", params: [true, m.station.trackingContentID] })
@@ -412,18 +453,24 @@ sub onStreamLoaded(nodeEvent as object)
 
     trackVideoLoad(m.station, m.heartbeatContext)
     
-    if m.global.comscore <> invalid then
-        m.global.comscore.reset = true
+    comscore = getGlobalField("comscore")
+    if comscore = invalid then
+        comscore = createObject("roSGNode", "ComscoreTask")
+        comscore.control = "run"
+        setGlobalField("comscore", comscore)
+    end if
+    if comscore <> invalid then
+        comscore.callFunc("reset", {})
         if not isNullOrEmpty(m.station.comscoreC2) then
-            m.global.comscore.c2 = m.station.comscoreC2
+            comscore.c2 = m.station.comscoreC2
         end if
         if not isNullOrEmpty(m.station.comscoreC3) then
-            m.global.comscore.c3 = m.station.comscoreC3
+            comscore.c3 = m.station.comscoreC3
         end if
         if not isNullOrEmpty(m.station.comscoreC4) then
-            m.global.comscore.c4 = m.station.comscoreC4
+            comscore.c4 = m.station.comscoreC4
         end if
-        m.global.comscore.content = m.station
+        comscore.content = m.station
     end if
 
     startConviva()
@@ -431,7 +478,7 @@ sub onStreamLoaded(nodeEvent as object)
 
     trackVideoStart()
         
-    m.global.showSpinner = false
+    hideSpinner()
     if not m.firstLoad then
         showNowPlaying()
     end if
@@ -454,7 +501,7 @@ sub onScheduleLoaded(nodeEvent as object)
         unavailable = createObject("roSGNode", "ContentNode")
         unavailable.title = "Schedule"
         unavailable.addField("episodeTitle", "string", false)
-        unavailable.episodeTitle = "Unavailable At This Time"
+        unavailable.episodeTitle = m.channel.scheduleUnavailableText
         schedule = []
         schedule.push(unavailable)
     end if
@@ -468,22 +515,37 @@ sub onScheduleLoaded(nodeEvent as object)
     m.updateTimer.control = "start"
 end sub
 
+sub onBufferingStatusChanged(nodeEvent as object)
+    status = nodeEvent.getData()
+    if status <> invalid and status.isUnderrun then
+        m.lastUnderrun = createObject("roDateTime").asSeconds()
+    end if
+end sub
+
 sub onVideoStateChanged(nodeEvent as object)
     state = nodeEvent.getData()
-    m.global.showSpinner = (state = "buffering")
-    if state = "playing" then
-        if m.global.comscore <> invalid then
-            m.global.comscore.videoStart = true
+    ? "*****state: " + state
+    comscore = getGlobalField("comscore")
+    if state = "buffering" then
+        showSpinner()
+    else if state = "playing" then
+        hideSpinner()
+        if comscore <> invalid then
+            comscore.videoStart = true
         end if
         trackVideoPlay()
     else if state = "finished" then
         sendDWAnalytics({method: "playerLiveEnd", params: [m.station, getPlayerPosition(), getPlayerPosition()] })
-        if m.global.comscore <> invalid then
-            m.global.comscore.videoEnd = true
+        if comscore <> invalid then
+            comscore.videoEnd = true
         end if
         stopConviva()
         trackVideoComplete()
         trackVideoUnload()
+        
+        if m.errorDialog = invalid or m.errorDialog.close then
+            showOverlay(true)
+        end if
     else if state = "stopped" then
         if m.station <> invalid then
             if m.timedOut then
@@ -491,32 +553,50 @@ sub onVideoStateChanged(nodeEvent as object)
             else
                 sendDWAnalytics({method: "playerLiveStop", params: [m.station, getPlayerPosition(), getPlayerPosition()] })
             end if
-            if m.global.comscore <> invalid then
-                m.global.comscore.videoEnd = true
+            if comscore <> invalid then
+                comscore.videoEnd = true
             end if
             stopConviva()
             trackVideoComplete()
             trackVideoUnload()
         end if
     else if state = "error" then
-        sendDWAnalytics({method: "playerLiveError", params: [m.video.errorMsg, m.station, getPlayerPosition(), getPlayerPosition()] })
-        if m.global.comscore <> invalid then
-            m.global.comscore.videoEnd = true
-        end if
-        stopConviva()
-        trackVideoComplete()
-        trackVideoUnload()
+?m.video.errorCode, m.video.errorMsg
+        ' In some cases, the video player raises back to back error events, so
+        ' only log the new error if no error dialog is being shown
+        if m.errorDialog = invalid then
+            sendDWAnalytics({method: "playerLiveError", params: [m.video.errorMsg, m.station, getPlayerPosition(), getPlayerPosition()] })
 
-        error = "Unfortunately, an error occurred during playback."
-        ' Check for a network connection error
-        if not createObject("roDeviceInfo").getLinkStatus() then
-            error = error + " Please check your network connection and try again."
-        else
-            error = error + " Please try again."
+            ' In order to resolve the issue with underrun errors from accessing
+            ' the master manifest in fw 8.1, this hack will restart the stream
+            ' in order to retrieve a new access token to access the master manifest.
+            ' Logic to handle other errors should be handled separately...
+            if m.errorRetriesRemaining > 0 then
+                if createObject("roDateTime").asSeconds() - m.lastUnderrun < 120 then
+                    m.errorRetriesRemaining--
+                    ? "Stream errored after underrun, force player re-init"
+                    onStationChanged()
+                    return
+                end if
+            end if
+
+            error = "Unfortunately, an error occurred during playback."
+            ' Check for a network connection error
+            if not createObject("roDeviceInfo").getLinkStatus() then
+                error = error + " Please check your network connection and try again."
+            else
+                if m.errorRetriesRemaining <= 1 then
+                    error = error + " Please try again. (Error code: CS-1200)"
+                    trackVideoError("Playback failed due to excessive rebuffering.", "CS-1200")
+                else
+                    error = error + " Please try again."
+                    trackVideoError(m.video.errorMsg, m.video.errorCode)
+                end if
+            end if
+            m.errorDialog = createCbsDialog("Error", error, ["OK"])
+            m.errorDialog.observeField("buttonSelected", "onErrorDialogClose")
+            setGlobalField("cbsDialog", m.errorDialog)
         end if
-        dialog = createCbsDialog("Error", error, ["OK"])
-        dialog.observeField("buttonSelected", "onErrorDialogClose")
-        m.global.dialog = dialog
     end if
 end sub
 
@@ -526,7 +606,8 @@ sub onErrorDialogClose(nodeEvent as object)
         dialog.close = true
     end if
     m.video.control = "stop"
-    showOverlay()
+    showOverlay(true)
+    m.errorDialog = invalid
 end sub
 
 sub onPositionChanged()
@@ -551,7 +632,7 @@ sub onPositionChanged()
     if idleTime >= m.idleTimeout and m.stillWatchingDialog = invalid then
         m.stillWatchingDialog = createCbsDialog("", "Are you still watching?", ["Continue watching"])
         m.stillWatchingDialog.observeField("buttonSelected", "onTimeoutDialogClosed")
-        m.global.dialog = m.stillWatchingDialog
+        setGlobalField("cbsDialog", m.stillWatchingDialog)
         
         m.timeoutTimer.control = "start"
     end if
@@ -572,7 +653,7 @@ sub onTimeoutTimerFired()
     m.video.control = "stop"
     m.stillWatchingDialog.close = true
     m.stillWatchingDialog = invalid
-    showOverlay()
+    showOverlay(true)
 end sub
 
 function getPlayerPosition() as integer
@@ -580,7 +661,7 @@ function getPlayerPosition() as integer
 end function
 
 sub selectStation()
-    stations = m.global.stations
+    stations = m.liveStations
     if stations.count() = 0 then
         m.unavailable.visible = true
        
@@ -593,9 +674,10 @@ sub selectStation()
         m.top.station = stations[0]
         m.liveTV.visible = true
     else
-        if m.global.station <> invalid and m.global.station <> "" then
+        stationID = getGlobalField("localStation")
+        if not isNullOrEmpty(stationID) then
             for each station in stations
-                if station.id = m.global.station then
+                if station.id = stationID then
                     m.top.station = station
                     m.liveTV.visible = true
                     return
@@ -609,6 +691,7 @@ sub selectStation()
             button.processKeyEvents = false
         next
         m.liveTVSelection.visible = true
+        m.stations.setFocus(true)
        
         m.top.omnitureName = "livetv/provider/select"
         m.top.omniturePageType = "provider_select"
@@ -630,11 +713,12 @@ sub onStationSelected(nodeEvent as object)
     if button <> invalid then
         m.top.station = button.station
 
-        m.global.station = button.station.id
+        config = getGlobalField("config")
+        setGlobalField("localStation", button.station.id)
         m.regTask = createObject("roSGNode", "RegistryTask")
         m.regTask.key = "liveTV"
         m.regTask.value = button.station.id
-        m.regTask.section = m.global.config.registrySection
+        m.regTask.section = config.registrySection
         m.regTask.mode = "save"
     end if
     m.channelGrid.setFocus(true)
@@ -657,6 +741,7 @@ sub showOverlay(showChannels = false as boolean, resetIndex = true as boolean)
     m.nowPlayingOverlay.visible = false
     m.overlay.visible = true
     m.overlayTimer.duration = 3.5
+    m.overlayTimer.control = "start"
 
     if showChannels then
         m.channelGrid.setFocus(true)

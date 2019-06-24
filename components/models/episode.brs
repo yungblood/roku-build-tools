@@ -31,6 +31,10 @@ sub onJsonChanged()
         m.top.isProtected       = asBoolean(json.isProtected, false)
         m.top.topLevelCategory  = asString(json.topLevelCategory)
         
+        m.top.audio_guide_text = m.top.showName + " " + m.top.title
+        
+        m.top.premiumAudioAvailable = asBoolean(json.premiumAudioAvailable)
+
         if asInteger(m.top.seasonNumber) > 0 then
             m.top.seasonString = "S" + asString(m.top.seasonNumber)
         end if

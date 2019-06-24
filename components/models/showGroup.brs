@@ -6,6 +6,14 @@ sub onJsonChanged()
     if json <> invalid then
         m.top.title = json.title
         m.top.id = json.id.toStr()
+        
+        if json.shows <> invalid then
+            for each item in json.shows
+                show = createObject("roSGNode", "ShowGroupItem")
+                show.json = item
+                m.top.appendChild(show)
+            next
+        end if
     end if
 end sub
 

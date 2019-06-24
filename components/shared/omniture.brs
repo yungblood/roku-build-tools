@@ -1,11 +1,12 @@
 sub initializeAdobe()
     if m.adobe = invalid then
-        m.adobe = ADBMobile().getADBMobileConnectorInstance(m.global.adobe)
+        adobe = getGlobalField("adobe")
+        m.adobe = ADBMobile().getADBMobileConnectorInstance(adobe)
         m.adobeConstants = m.adobe.sceneGraphConstants()
-        m.global.adobe.observeField(m.adobeConstants.API_RESPONSE, "onAdobeApiResponse")
+        adobe.observeField(m.adobeConstants.API_RESPONSE, "onAdobeApiResponse")
 
-        config = m.global.config
-        user = m.global.user
+        config = getGlobalField("config")
+        user = getGlobalField("user")
         m.persistentParams = {}
         m.persistentParams["siteCode"] = "CBS"
         m.persistentParams["siteEdition"] = "us"
@@ -15,7 +16,8 @@ sub initializeAdobe()
         m.persistentParams["userStatus"] = user.trackingStatus
         m.persistentParams["mediaPartnerId"] = "cbs_roku_app"
         m.persistentParams["mediaDistNetwork"] = "can"
-        m.persistentParams["mediaDeviceId"] = getDeviceID()
+        m.persistentParams["mediaDeviceId"] = getPersistedDeviceID()
+        m.persistentParams["adDeviceId"] = getAdvertisingID()
         m.persistentParams["userRegId"] = user.id
         m.persistentParams["&&products"] = user.trackingProduct
     end if
@@ -36,18 +38,30 @@ sub trackScreenView(screenName = m.top.omnitureName as string)
         params = {}
         params["screenName"] = screenName
         params["pageType"] = m.top.omniturePageType
+        params["siteHier"] = m.top.omnitureSiteHier
+        deeplink = getGlobalField("deeplinkForTracking")
+        if not isNullOrEmpty("deeplinkForTracking") then
+            params["refSource"] = deeplink
+            ' We only track the deeplink on the first screen,
+            ' reset it here
+            setGlobalField("deeplinkForTracking", "")
+        end if
+
         params.append(m.persistentParams)
 
         trackState(screenName, params)
     end if
 end sub
 
-sub trackScreenAction(actionName as string, params = {} as object, screenName = m.top.omnitureName as string, pageType = m.top.omniturePageType as string, events = [] as object)
+sub trackScreenAction(actionName as string, params = {} as object, screenName = m.top.omnitureName as string, pageType = m.top.omniturePageType as string, events = [] as object, siteHier = m.top.omnitureSiteHier as string)
     initializeAdobe()
 
     allParams = {}
     allParams["screenName"] = screenName
     allParams["pageType"] = pageType
+    if not isNullOrEmpty(siteHier) then
+        allParams["siteHier"] = siteHier
+    end if
     allParams.append(m.persistentParams)
     allParams.append(params)
 
@@ -122,11 +136,6 @@ sub trackVideoLoad(video as object, context as object)
     m.mediaContext.append(m.persistentParams)
     m.mediaContext.append(context)
 
-    ?"***************************"
-    ?"***************************"
-    ?m.mediaContext
-    ?"***************************"
-    ?"***************************"
     m.adobe.mediaTrackLoad(m.mediaInfo, m.mediaContext)
 end sub
 
@@ -194,17 +203,14 @@ sub trackVideoPlayhead(position as integer)
     m.adobe.mediaUpdatePlayhead(position)
 end sub
 
-sub trackVideoError(errorMessage as string, errorCode as integer)
+sub trackVideoError(errorMessage as string, errorCode as object)
     initializeAdobe()
-    m.adobe.mediaTrackError(errorMessage, errorCode.toStr())
+    m.adobe.mediaTrackError(errorMessage, asString(errorCode))
 end sub
 
 sub trackState(screenName as string, params as object)
     initializeAdobe()
     m.adobe.trackState(screenName, params)
-'    if m.global.analytics <> invalid then
-'        m.global.analytics.omnitureParams = { method: "trackPage", params: [screenName]}   
-'    end if     
 end sub
 
 sub trackAction(actionName as string, params as object, events = [] as object)
@@ -216,34 +222,4 @@ sub trackAction(actionName as string, params as object, events = [] as object)
         end if
     next
     m.adobe.trackAction(actionName, params)
-'    if m.global.analytics <> invalid then
-'        additionalParams = {}
-'        if actionName = "trackPodSelect" or actionName = "trackShowFilterSelect" then
-'            events = ["event19"]
-'            additionalParams["pev2"] = "trackClick"
-'        end if
-'        additionalParams["pe"] = "lnk_o"
-'    
-'        additionalParams["pageName"] = asString(params["screenName"])
-'        additionalParams["v6"] = asString(params["siteHier"])
-'        additionalParams["v10"] = asString(params["pageType"])
-'        if isNullOrEmpty(params["showEpisodeTitle"]) then
-'            additionalParams["v25"] = asString(params["showTitle"])
-'        else
-'            additionalParams["v25"] = asString(params["showEpisodeTitle"])
-'        end if
-'        additionalParams["v31"] = asString(params["showEpisodeId"])
-'        if params["&&products"] <> invalid then
-'            additionalParams["products"] = params["&&products"]
-'        end if
-'        for each param in params
-'            if param.mid(0, 1) = "v" or param.mid(0, 2) = "pe" then
-'                additionalParams[param] = params[param]
-'            end if
-'        next
-'        linkName = asString(params["podType"]) + "|" + asString(params["podText"]) + "|" + asString(params["podSection"]) + "|" + asString(params["podPosition"]) + "|" + asString(params["podTitle"]) 
-'        m.global.analytics.omnitureParams = { method: "trackEvent", params: [linkName, events, additionalParams]}
-'    
-'        ?"Omniture: ";formatJson({ method: "trackEvent", params: [linkName, events, additionalParams]})
-'    end if
 end sub

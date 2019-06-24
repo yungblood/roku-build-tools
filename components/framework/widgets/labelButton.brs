@@ -2,15 +2,21 @@ sub init()
     m.background = m.top.findNode("background")
     m.backgroundImage = m.top.findNode("backgroundImage")
     m.foregroundImage = m.top.findNode("foregroundImage")
+    m.labelGroup = m.top.findNode("labelGroup")
+    m.icon = m.top.findNode("icon")
     m.label = m.top.findNode("label")
     m.backgroundFocused = m.top.findNode("backgroundFocused")
     m.backgroundImageFocused = m.top.findNode("backgroundImageFocused")
     m.foregroundImageFocused = m.top.findNode("foregroundImageFocused")
+    m.labelGroupFocused = m.top.findNode("labelGroupFocused")
+    m.iconFocused = m.top.findNode("iconFocused")
     m.labelFocused = m.top.findNode("labelFocused")
     
     m.label.observeField("width", "onLabelWidthChanged")
     
     m.top.observeField("focusedChild", "onFocusChanged")
+
+    m.top.muteAudioGuide = true
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
@@ -30,18 +36,18 @@ end function
 sub onLayoutChanged()
     if m.top.width > 0 and m.top.height > 0 then
         if m.top.vertAlignment = "bottom" then
-            m.label.translation = [m.top.padding, 0]
-            m.label.width = m.top.width - m.top.padding * 2
+            m.labelGroup.translation = [m.top.padding, 0]
+            m.label.width = m.top.width - m.top.padding * 2 - m.icon.width
             m.label.height = m.top.height - m.top.padding
-            m.labelFocused.translation = [m.top.padding, 0]
-            m.labelFocused.width = m.top.width - m.top.padding * 2
+            m.labelGroupFocused.translation = [m.top.padding, 0]
+            m.labelFocused.width = m.top.width - m.top.padding * 2 - m.iconFocused.width
             m.labelFocused.height = m.top.height - m.top.padding
         else
-            m.label.translation = [m.top.padding, m.top.padding]
-            m.label.width = m.top.width - m.top.padding * 2
+            m.labelGroup.translation = [m.top.padding, m.top.padding]
+            m.label.width = m.top.width - m.top.padding * 2 - m.icon.width
             m.label.height = m.top.height
-            m.labelFocused.translation = [m.top.padding, m.top.padding]
-            m.labelFocused.width = m.top.width - m.top.padding * 2
+            m.labelGroupFocused.translation = [m.top.padding, m.top.padding]
+            m.labelFocused.width = m.top.width - m.top.padding * 2 - m.iconFocused.width
             m.labelFocused.height = m.top.height
         end if
         
@@ -78,15 +84,15 @@ sub onLayoutChanged()
 end sub
 
 sub onLabelWidthChanged()
-    m.background.width = m.label.width + (m.top.padding * 2)
-    m.backgroundImage.width = m.label.width + (m.top.padding * 2)
+    m.background.width = m.label.width + (m.top.padding * 2) + m.icon.width
+    m.backgroundImage.width = m.label.width + (m.top.padding * 2) + m.icon.width
     if m.top.foregroundImageWidth = 0 then
-        m.foregroundImage.width = m.label.width + (m.top.padding * 2)
+        m.foregroundImage.width = m.label.width + (m.top.padding * 2) + m.icon.width
     end if
-    m.backgroundFocused.width = m.label.width + (m.top.padding * 2)
-    m.backgroundImageFocused.width = m.label.width + (m.top.padding * 2)
+    m.backgroundFocused.width = m.label.width + (m.top.padding * 2) + m.icon.width
+    m.backgroundImageFocused.width = m.label.width + (m.top.padding * 2) + m.icon.width
     if m.top.focusedForegroundImageWidth = 0 then
-        m.foregroundImageFocused.width = m.label.width + (m.top.padding * 2)
+        m.foregroundImageFocused.width = m.label.width + (m.top.padding * 2) + m.icon.width
     end if
 end sub
 
@@ -150,12 +156,14 @@ end sub
 
 sub onFocusPercentChanged()
     m.background.opacity = 1 - m.top.focusPercent
-    m.backgroundImage.opacity = 1 - m.top.focusPercent
+    m.backgroundImage.opacity = (1 - m.top.focusPercent) * m.top.backgroundImageOpacity
     m.foregroundImage.opacity = 1 - m.top.focusPercent
+    m.icon.opacity = 1 - m.top.focusPercent
     m.label.opacity = 1 - m.top.focusPercent
     m.backgroundFocused.opacity = m.top.focusPercent
-    m.backgroundImageFocused.opacity = m.top.focusPercent
+    m.backgroundImageFocused.opacity = m.top.focusPercent * m.top.focusedBackgroundImageOpacity
     m.foregroundImageFocused.opacity = m.top.focusPercent
+    m.iconFocused.opacity = m.top.focusPercent
     m.labelFocused.opacity = m.top.focusPercent
 end sub
 
@@ -167,19 +175,23 @@ sub onFocusChanged()
             m.background.opacity = 0
             m.backgroundImage.opacity = 0
             m.foregroundImage.opacity = 0
+            m.icon.opacity = 0
             m.label.opacity = 0
             m.backgroundFocused.opacity = m.top.focusedOpacity
-            m.backgroundImageFocused.opacity = m.top.focusedOpacity
+            m.backgroundImageFocused.opacity = m.top.focusedOpacity * m.top.focusedBackgroundImageOpacity
             m.foregroundImageFocused.opacity = m.top.focusedOpacity
+            m.iconFocused.opacity = m.top.focusedOpacity
             m.labelFocused.opacity = m.top.focusedOpacity
         else
             m.background.opacity = m.top.normalOpacity
-            m.backgroundImage.opacity = m.top.normalOpacity
+            m.backgroundImage.opacity = m.top.normalOpacity * m.top.backgroundImageOpacity
             m.foregroundImage.opacity = m.top.normalOpacity
+            m.icon.opacity = m.top.normalOpacity
             m.label.opacity = m.top.normalOpacity
             m.backgroundFocused.opacity = 0
             m.backgroundImageFocused.opacity = 0
             m.foregroundImageFocused.opacity = 0
+            m.iconFocused.opacity = 0
             m.labelFocused.opacity = 0
         end if
     end if

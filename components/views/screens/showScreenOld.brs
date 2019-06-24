@@ -74,11 +74,11 @@ sub onShowChanged()
             m.top.close = true
         end if
     end if
-    m.global.showSpinner = false
+    hideSpinner()
 end sub
 
 sub onShowIDChanged()
-    m.global.showSpinner = true
+    showSpinner()
     m.loadTask = createObject("roSGNode", "ShowScreenTask")
     m.loadTask.observeField("content", "onContentLoaded")
     m.loadTask.showID = m.top.showID
@@ -86,7 +86,7 @@ sub onShowIDChanged()
 end sub
 
 sub onContentChanged()
-    m.global.showSpinner = true
+    showSpinner()
     loadContent(m.top.content)
 end sub
 
@@ -114,7 +114,7 @@ sub loadContent(content as object)
         updateRowLayout()
     end if
     m.loadTask = invalid
-    m.global.showSpinner = false
+    hideSpinner()
 end sub
 
 sub updateRowLayout()
@@ -193,7 +193,8 @@ sub onButtonSelected(nodeEvent as object)
     row = nodeEvent.getRoSGNode()
     button = nodeEvent.getData()
     if button = "favorite" then
-        favorites = m.global.user.favorites
+        user = getGlobalField("user")
+        favorites = user.favorites
         if isFavorite(m.top.showID, favorites) then
             trackScreenAction("trackMyCBSRemove", getOmnitureData(row, -1, "remove from mycbs"))
         else

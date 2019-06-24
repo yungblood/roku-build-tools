@@ -13,5 +13,6 @@
         <field id="value" type="string" alwaysNotify="true" />
         <field id="defaultValue" type="string" />
         <field id="mode" type="string" onChange="onModeChanged" />
+        <field id="complete" type="boolean" alwaysNotify="true" />
     </interface>
 </component>

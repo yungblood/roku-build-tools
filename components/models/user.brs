@@ -18,7 +18,11 @@ sub onJsonChanged()
         if not isNullOrEmpty(m.top.fullName) then
             m.top.fullName = m.top.fullName + " "
         end if
+        m.top.maskedFullName = m.top.fullName + m.top.lastName.mid(0, 1)
         m.top.fullName = m.top.fullName + m.top.lastName
+
+        m.top.email = asString(json.email)
+        m.top.maskedEmail = asString(json.maskedEmail)
         
         if json.userStatus <> invalid then
             m.top.status = json.userStatus.description

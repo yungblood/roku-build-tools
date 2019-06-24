@@ -57,7 +57,7 @@ function NWM_Omniture(baseURL, sendVID = false)
   if this.sendVID
     di = CreateObject("roDeviceInfo")
     ba = CreateObject("roByteArray")
-    ba.FromASCIIString(di.GetDeviceUniqueId())
+    ba.FromASCIIString(di.getChannelClientID())
     digest = CreateObject("roEVPDigest") 
     digest.Setup("sha1")
     this.vid = digest.Process(ba)

@@ -9,11 +9,16 @@ sub init()
     m.additionalContent = m.top.findNode("additionalContent")
     m.top.contentGroup = m.additionalContent
     
+    m.tts = createObject("roTextToSpeech")
+    
     m.buttonFont = m.top.findNode("buttonFont")
 end sub
 
 sub onFocusChanged()
     if m.top.hasFocus() then
+        if createObject("roDeviceInfo").isAudioGuideEnabled() then
+            m.tts.say(m.top.title + " " + m.top.message)
+        end if
         m.buttons.setFocus(true)
     end if
 end sub

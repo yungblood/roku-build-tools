@@ -31,7 +31,7 @@ sub onShowChanged()
 end sub
 
 sub updateButtons()
-    user = m.global.user
+    user = getGlobalField("user")
     if user <> invalid and user.status <> "ANONYMOUS" then
         if isFavorite(m.show.id, user.favorites) then
             m.favorite.foregroundUri = "pkg:/images/icon-fav-selected-unfocused.png"

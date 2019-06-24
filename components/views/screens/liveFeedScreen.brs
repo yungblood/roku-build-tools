@@ -42,7 +42,8 @@ sub onLiveFeedChanged()
                 showID = section.showID
             end if
         end if
-        show = m.global.showCache[showID]
+        showCache = getGlobalField("showCache")
+        show = showCache[showID]
         if show = invalid then
             m.buttons.removeChild(m.showButton)
         else
@@ -55,7 +56,7 @@ sub onLiveFeedChanged()
             m.top.autoPlay = false
         end if
         
-        if canWatch(liveFeed, m.global) then
+        if canWatch(liveFeed, m.top) then
             m.watch.text = "WATCH"
         else
             m.watch.text = "SUBSCRIBE TO WATCH"
@@ -67,7 +68,7 @@ sub onLiveFeedChanged()
     else
         dialog = createCbsDialog("Content Unavailable", "The content you are trying to play is currently unavailable. Please try again later.", ["OK"])
         dialog.observeField("buttonSelected", "onUnavailableDialogClosed")
-        m.global.dialog = dialog
+        setGlobalField("cbsDialog", dialog)
     end if
 end sub
 

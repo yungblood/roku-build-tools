@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="HomeShowGroup" extends="ContentNode">
+    <script type="text/brightscript" uri="pkg:/components/models/homeShowGroup.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
+    <interface>
+        <field id="json" type="assocarray" onChange="onJsonChanged" />
+        
+        <field id="loadIndex" type="integer" onChange="onLoadIndexChanged" alwaysNotify="true" />
+        <field id="totalCount" type="integer" value="-1" />
+        
+        <field id="pageSize" type="integer" value="10" />
+        <field id="maxPages" type="integer" value="25" />
+    </interface>
+</component>

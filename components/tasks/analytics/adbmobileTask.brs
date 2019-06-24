@@ -20,6 +20,7 @@
 sub init()
     m.port = createObject("roMessagePort")
     m.top.observeField("adbmobileApiCall", m.port)
+    m.top.observeField("syncIdentifier", m.port)
     m.top.functionName = "initializeRunLoop"
     m.top.control = "RUN"
 end sub
@@ -29,6 +30,12 @@ sub initializeRunLoop()
     m.adbmobile = ADBMobile()
     m.adbmobile.setDebugLogging(false)
     
+    deviceInfo = createObject("roDeviceInfo")
+    if not deviceInfo.isRIDADisabled() then
+        rida = deviceInfo.getRida()
+        m.adbmobile.setAdvertisingIdentifier(rida)
+    end if
+
     while true
         msg = wait(250, m.port)
         
@@ -41,6 +48,10 @@ sub initializeRunLoop()
             if msgType = "roSGNodeEvent"
                 if msg.getField() = m.adbmobile.sgConstants().API_CALL
                     executeBRSApiCall(msg.getData())
+                else if msg.getField() = "syncIdentifier" then
+                    identifiers = {}
+                    identifiers["other"] = msg.getData()
+                    m.adbmobile.visitorSyncIdentifiers(identifiers)
                 end if
             else
         	   print "adbmobileTask Error: unrecognized event type: " + msgType

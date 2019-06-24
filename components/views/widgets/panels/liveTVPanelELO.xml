@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="LiveTVPanelELO" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/views/widgets/panels/liveTVPanelELO.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <interface>
+        <function name="read" />
+    </interface>
+    <children>
+        <Font
+            id="labelFont"
+            size="35"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="labelBoldFont"
+            size="40"
+            uri="pkg:/fonts/Lato-Bold.ttf" />
+        <Font
+            id="buttonFont"
+            size="32"
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="focusedButtonFont"
+            size="32" 
+            uri="pkg:/fonts/Lato-Regular.ttf" />
+
+        <LayoutGroup
+            id="content"
+            layoutDirection="vert"
+            translation="[0,375]"
+            itemSpacings="[0]"
+            vertAlignment="center">
+            <Label
+                id="signedOut"
+                text="You must be signed in to choose a local station"
+                color="0xffffffff"
+                opacity=".75"
+                font="dictionary:labelFont"
+                visible="false" />
+            <Label
+                id="unavailable"
+                width="1000"
+                text="Live TV streams are currently not available in your area. Be sure to check back as we are always adding more stations."
+                color="0xffffffff"
+                opacity=".75"
+                wrap="true"
+                lineSpacing="0"
+                font="dictionary:labelFont"
+                visible="false" />
+            <LayoutGroup
+                id="signedIn"
+                layoutDirection="vert"
+                itemSpacings="[20,-20,40]"
+                visible="false">
+                <Rectangle
+                    color="0x00000000">
+                    <Label
+                        translation="[20,0]"
+                        width="900"
+                        text="Your local station is:"
+                        color="0xffffffff"
+                        font="dictionary:labelFont"
+                        opacity=".75" />
+                </Rectangle>
+                <MarkupGrid
+                    id="channels"
+                    itemComponentName="LiveTVTile"
+                    itemSize="[578,219]"
+                    itemSpacing="[45,45]"
+                    numColumns="1"
+                    numRows="2"
+                    horizFocusAnimationStyle="floatingFocus"
+                    vertFocusAnimationStyle="floatingFocus"
+                    focusBitmapBlendColor="0x3e96ef00" />
+                <Rectangle
+                    color="0x00000000">
+                    <Label
+                        id="checkLocationLabel"
+                        translation="[20,0]"
+                        width="900"
+                        text="If that isn't correct, you can check your location by selecting the button below."
+                        wrap="true"
+                        lineSpacing="0"
+                        color="0xffffffff"
+                        font="dictionary:labelFont"
+                        opacity=".75" />
+
+                    <LabelButton
+                        id="checkLocation"
+                        translation="[20,120]"
+                        width="394"
+                        height="73"
+                        text="CHECK LOCATION"
+                        textColor="0xffffffff"
+                        focusedTextColor="0xffffffff"
+                        backgroundUri="pkg:/images/upsell_button.9.png"
+                        focusedBackgroundUri="pkg:/images/upsell_button_focused_noborder.9.png"
+                        font="dictionary:buttonFont"
+                        focusedFont="dictionary:focusedButtonFont" />
+                </Rectangle>
+            </LayoutGroup>
+            <Group
+                id="override"
+                visible="false">
+                <LayoutGroup
+                    layoutDirection="vert"
+                    itemSpacings="[40]">
+                    <Label
+                        id="currentLocation"
+                        width="800"
+                        text="It looks like you're located in {LOCATION}. Your local station is {CALLSIGN}."
+                        wrap="true"
+                        lineSpacing="0"
+                        color="0xffffffff"
+                        font="dictionary:labelFont"
+                        opacity=".75" />
+                    <Label
+                        id="currentLocationCorrect"
+                        width="800"
+                        text="If that's correct, just select &quot;LIVE TV&quot; from the main menu above and start streaming!"
+                        wrap="true"
+                        lineSpacing="0"
+                        color="0xffffffff"
+                        font="dictionary:labelFont"
+                        opacity=".75" />
+                    <Label
+                        width="800"
+                        text="If that isn't correct, please enter your current ZIP code to reset your location."
+                        wrap="true"
+                        lineSpacing="0"
+                        color="0xffffffff"
+                        font="dictionary:labelFont"
+                        opacity=".75" />
+                </LayoutGroup>
+                <PinPad
+                    id="zipCode"
+                    translation="[850,0]"
+                    pinLength="5"
+                    secureMode="false" />
+                <LabelButton
+                    id="enter"
+                    translation="[956,468]"
+                    width="200"
+                    height="73"
+                    text="ENTER"
+                    textColor="0xffffffff"
+                    focusedTextColor="0xffffffff"
+                    backgroundUri="pkg:/images/upsell_button.9.png"
+                    focusedBackgroundUri="pkg:/images/upsell_button_focused_noborder.9.png"
+                    font="dictionary:buttonFont"
+                    focusedFont="dictionary:focusedButtonFont" />
+            </Group>
+            <LayoutGroup
+                id="zipOverrides"
+                layoutDirection="vert"
+                itemSpacings="[0,-20,-20,40]"
+                visible="false">
+                <Rectangle
+                    color="0x00000000">
+                    <Label
+                        id="zipThanks"
+                        translation="[20,0]"
+                        text="Thanks for entering your zip code."
+                        color="0xffffffff"
+                        opacity=".75"
+                        font="dictionary:labelBoldFont" />
+                </Rectangle>
+                <Rectangle
+                    color="0x00000000">
+                    <Label
+                        id="overridesUnavailable"
+                        translation="[20,0]"
+                        width="1000"
+                        text="Live TV streams are currently not available for the entered zip code."
+                        color="0xffffffff"
+                        opacity=".75"
+                        wrap="true"
+                        lineSpacing="0"
+                        font="dictionary:labelFont" />
+                </Rectangle>
+                <MarkupGrid
+                    id="overrideChannels"
+                    itemComponentName="LiveTVTile"
+                    itemSize="[578,219]"
+                    itemSpacing="[45,45]"
+                    numColumns="1"
+                    numRows="2"
+                    horizFocusAnimationStyle="floatingFocus"
+                    vertFocusAnimationStyle="floatingFocus"
+                    focusBitmapBlendColor="0x3e96ef00" />
+                <Rectangle
+                    color="0x00000000">
+                    <Label
+                        id="checkLocationLabel"
+                        translation="[20,0]"
+                        width="900"
+                        text="Still not right?"
+                        wrap="true"
+                        lineSpacing="0"
+                        color="0xffffffff"
+                        font="dictionary:labelFont"
+                        opacity=".75" />
+
+                    <LabelButton
+                        id="tryAgain"
+                        translation="[20,100]"
+                        width="394"
+                        height="73"
+                        text="TRY AGAIN"
+                        textColor="0xffffffff"
+                        focusedTextColor="0xffffffff"
+                        backgroundUri="pkg:/images/upsell_button.9.png"
+                        focusedBackgroundUri="pkg:/images/upsell_button_focused_noborder.9.png"
+                        font="dictionary:buttonFont"
+                        focusedFont="dictionary:focusedButtonFont" />
+
+                    <LayoutGroup
+                        id="overridesLocked"
+                        translation="[20,100]"
+                        layoutDirection="vert"
+                        itemSpacings="[40]">
+                        <Label
+                            width="1000"
+                            text="We're sorry, but location reset is now locked."
+                            color="0xffffffff"
+                            opacity=".75"
+                            wrap="true"
+                            lineSpacing="0"
+                            font="dictionary:labelFont" />
+                        <Label
+                            width="1000"
+                            text="Please contact customer support at (888) 274-5343 and we'll be happy to help you!"
+                            color="0xffffffff"
+                            opacity=".75"
+                            wrap="true"
+                            lineSpacing="0"
+                            font="dictionary:labelFont" />
+                    </LayoutGroup>
+                </Rectangle>
+            </LayoutGroup>
+        </LayoutGroup>
+    </children>
+</component>

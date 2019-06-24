@@ -1,5 +1,6 @@
 sub init()
     m.top.omniturePageType = "category_door"
+    m.top.omnitureSiteHier = "shows|other|show listings|"
 
     m.top.observeField("focusedChild", "onFocusChanged")
     
@@ -11,13 +12,11 @@ sub init()
     m.grid = m.top.findNode("grid")
     m.grid.observeField("itemSelected", "onItemSelected")
 
-    m.global.showSpinner = true
+    showSpinner()
 
     m.contentTask = createObject("roSGNode", "ShowsScreenTask")
     m.contentTask.observeField("groups", "onGroupsLoaded")
     m.contentTask.control = "run"
-
-    m.top.setFocus(true)
 end sub
 
 sub onFocusChanged()
@@ -69,22 +68,44 @@ function onKeyEvent(key as string, press as boolean) as boolean
     return false
 end function
 
-sub onGroupsLoaded()
-    groups = m.contentTask.groups
+sub onGroupsLoaded(nodeEvent as object)
     m.contentTask = invalid
+    task = nodeEvent.getRoSGNode()
+    groups = nodeEvent.getData()
 
-    initialGroup = groups[0]
-    for each group in groups
-        button = m.groups.createChild("ShowGroupButton")
-        button.observeField("buttonSelected", "onGroupSelected")
-        button.group = group
-        if lCase(group.title) = lCase(m.top.category) then
-            initialGroup = group
+    if groups.count() > 0 then
+        initialGroup = groups[0]
+        for each group in groups
+            button = m.groups.createChild("ShowGroupButton")
+            button.observeField("buttonSelected", "onGroupSelected")
+            button.group = group
+            if lCase(group.title) = lCase(m.top.category) then
+                initialGroup = group
+            end if
+        next
+        selectGroup(initialGroup)
+        m.groups.setFocus(false)
+        m.groups.setFocus(true)
+        
+        config = getGlobalField("config")
+        if config.enableGeoBlock and config.currentCountryCode <> config.appCountryCode and not config.geoBlocked then
+            dialog = createCbsDialog("", "Due to licensing restrictions, video is not available outside your country.", ["CLOSE"])
+            dialog.observeField("buttonSelected", "onLicensingDialogClosed")
+            setGlobalField("cbsDialog", dialog)
         end if
-    next
-    selectGroup(initialGroup)
+    else if task.errorCode > 0 then
+        showApiError(true)
+    end if
     
-    m.global.showSpinner = false
+    hideSpinner()
+end sub
+
+sub onLicensingDialogClosed(nodeEvent as object)
+    dialog = nodeEvent.getRoSGNode()
+    button = nodeEvent.getData()
+    if button = "CLOSE" then
+        dialog.close = true
+    end if
 end sub
 
 sub onGroupSelected(nodeEvent as object)

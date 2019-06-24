@@ -1,6 +1,7 @@
 sub init()
     m.top.omnitureName = "/settings/"
     m.top.omniturePageType = "settings"
+    m.top.omnitureSiteHier = "other|other|settings|home"    
 
     m.top.observeField("focusedChild", "onFocusChanged")
     
@@ -83,7 +84,22 @@ sub onButtonFocused()
         for i = 0 to m.panels.getChildCount() - 1
             panel = m.panels.getChild(i)
             panel.visible = (panel.id.inStr(setting.id) = 0)
+            if panel.visible then
+                m.currentPanel = panel
+                if m.readTimer = invalid then
+                    m.readTimer = createObject("roSGNode", "Timer")
+                    m.readtimer.duration = 1
+                    m.readtimer.observeField("fire", "onReadTimerFired")
+                end if
+                m.readTimer.control = "start"
+            end if
         next
+    end if
+end sub
+
+sub onReadTimerFired(nodeEvent as object)
+    if m.currentPanel <> invalid then
+        m.currentPanel.callFunc("read", {})
     end if
 end sub
 
@@ -122,7 +138,7 @@ function focusPanel() as boolean
                 params["podType"] = "settings"
                 params["podText"] = lCase(currentbutton.text)
                 params["podPosition"] = i
-                trackScreenAction("trackPodSelect", params)                
+                trackScreenAction("trackPodSelect", params)
 
                 return true
             end if

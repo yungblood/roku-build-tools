@@ -1,5 +1,5 @@
-function createMessageDialog(title as string, message as string, buttons = ["OK"] as object) as object
-    dialog = createObject("roSGNode", "Dialog")
+function createMessageDialog(title as string, message as string, buttons = ["OK"] as object, dialogType = "Dialog" as string) as object
+    dialog = createObject("roSGNode", dialogType)
     dialog.title = title
     dialog.message = message
     dialog.buttons = buttons

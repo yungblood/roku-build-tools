@@ -3,10 +3,12 @@ sub init()
     m.content = m.top.findNode("content")
     
     updateContent()
+
+    m.tts = createObject("roTextToSpeech")
 end sub
 
 sub updateContent()
-    config = m.global.config
+    config = getGlobalField("config")
     if config <> invalid then
         m.content.removeChildrenIndex(m.content.getChildCount(), 0)
         if not isNullOrEmpty(config.touUrl) then
@@ -26,3 +28,15 @@ sub updateContent()
         end if
     end if
 end sub
+
+function read(params = {} as object) as boolean
+    if createObject("roDeviceInfo").isAudioGuideEnabled() then
+        for i = 0 to m.content.getChildCount() - 1
+            child = m.content.getChild(i)
+            if child.subtype() = "SettingsLabel" then
+                m.tts.say(child.title)
+                m.tts.say(child.value)
+            end if
+        next
+    end if
+end function

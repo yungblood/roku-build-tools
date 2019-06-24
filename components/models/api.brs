@@ -1,5 +1,5 @@
 sub init()
-    cbs().initialize(m.global.config, m.global.user, m.global.cookies)
+    cbs().initialize(m.top)
 end sub
 
 function request(requestDetails as object) as object

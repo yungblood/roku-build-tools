@@ -4,7 +4,7 @@ end sub
 
 sub doWork()
     api = cbs()
-    api.initialize(m.global.config, m.global.user, m.global.cookies)
+    api.initialize(m.top)
     episode = m.top.episode
     nextEpisode = api.getNextEpisode(episode.id, episode.showID, true)
     if nextEpisode = invalid and not episode.isFullEpisode then

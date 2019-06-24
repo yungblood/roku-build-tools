@@ -7,25 +7,28 @@
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
     <interface>
+        <field id="height" type="float" onChange="updateLayout" />
+        <field id="width" type="float" onChange="updateLayout" />
+
         <field id="itemContent" type="node" onChange="onContentChanged" />
         <field id="gridHasFocus" type="boolean" onChange="onFocusChanged" />
         <field id="focusPercent" type="float" onChange="onFocusChanged" />
     </interface>
     <children>
         <Rectangle
-            translation="[0,13]"
+            id="background"
             width="435"
             height="261"
             color="0x2b2b2bff">
             <Poster
                 id="logo"
-                translation="[0,72]"
+                translation="[0,50]"
                 width="436"
                 height="72"
                 loadDisplayMode="scaleToFit" />
             <Label
                 id="error"
-                translation="[90,65]"
+                translation="[90,52]"
                 width="199"
                 color="0xffffffff"
                 wrap="true"
@@ -52,7 +55,7 @@
         </Rectangle>
         <Rectangle
             id="liveNow"
-            translation="[354,13]"
+            translation="[354,0]"
             width="81"
             height="32"
             color="0x0092f3ff"
@@ -73,7 +76,6 @@
         </Rectangle>
         <Poster
             id="focusFrame"
-            translation="[0,13]"
             width="436"
             height="248"
             uri="pkg:/images/frame_grid.9.png"

@@ -2,6 +2,7 @@
 <component name="UpsellScreen" extends="BaseScreen">
     <script type="text/brightscript" uri="pkg:/components/views/screens/upsellScreen.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/constants.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
     <interface>
         <field id="campaign" type="string" />
         <field id="upsellType" type="string" onChange="onUpsellTypeChanged" />

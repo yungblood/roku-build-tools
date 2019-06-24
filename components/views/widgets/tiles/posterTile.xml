@@ -17,6 +17,10 @@
             id="titleFont"
             size="36"
             uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Font
+            id="badgeFont"
+            size="20"
+            uri="pkg:/fonts/Lato-Bold.ttf" />
         <Rectangle
             id="whiteRect"
             translation="[1,1]"
@@ -37,5 +41,19 @@
         <Poster
             id="poster"
             loadDisplayMode="scaleToZoom" />
+        <Poster
+            id="badge"
+            height="32"
+            uri="pkg:/images/bg_badge.png"
+            visible="false">
+            <Label
+                id="badgeText"
+                height="32"
+                color="0xffffffff"
+                vertAlign="center"
+                horizAlign="center"
+                text="NEW EPISODE"
+                font="dictionary:badgeFont" />
+        </Poster>
     </children>
 </component>

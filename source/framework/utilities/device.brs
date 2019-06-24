@@ -31,9 +31,17 @@ End Function
 Function GetDeviceID() As String
     If m.DeviceID = invalid Then
         deviceInfo = CreateObject("roDeviceInfo")
-        m.DeviceID = deviceInfo.GetDeviceUniqueID()
+        m.DeviceID = deviceInfo.GetChannelClientID() 'GetDeviceUniqueID()
     End If
     Return m.DeviceID
+End Function
+
+Function GetLegacyDeviceID() As String
+    If m.LegacyDeviceID = invalid Then
+        deviceInfo = CreateObject("roDeviceInfo")
+        m.LegacyDeviceID = deviceInfo.GetDeviceUniqueID()
+    End If
+    Return m.LegacyDeviceID
 End Function
 
 Function GetHashedDeviceID() As String
@@ -49,10 +57,22 @@ Function GetPublisherID() As String
             Return GetHashedDeviceID()
         Else
             deviceInfo = CreateObject("roDeviceInfo")
-            m.PublisherID = deviceInfo.getClientTrackingID()
+            if checkFirmware(8, 10) < 0 then
+                m.PublisherID = deviceInfo.GetClientTrackingID()
+            else
+                m.PublisherID = deviceInfo.GetChannelClientID()
+            end if
         End If
     End If
     Return m.PublisherID
+End Function
+
+Function GetChannelClientID() As String
+    If m.ChannelClientID = invalid Then
+        deviceInfo = CreateObject("roDeviceInfo")
+        m.ChannelClientId = deviceInfo.getChannelClientID()
+    End If
+    Return m.ChannelClientID
 End Function
 
 Function GetAdvertisingID() As String
@@ -61,7 +81,15 @@ Function GetAdvertisingID() As String
             Return GetHashedDeviceID()
         Else
             deviceInfo = CreateObject("roDeviceInfo")
-            m.AdvertisingID = deviceInfo.GetAdvertisingID()
+            if not deviceInfo.isRIDADisabled() then
+                if checkFirmware(8, 10) < 0 then
+                    m.AdvertisingID = deviceInfo.GetAdvertisingID()
+                else
+                    m.AdvertisingID = deviceInfo.GetRIDA()
+                end if
+            else
+                Return GetHashedDeviceID()
+            end if
         End If
     End If
     Return m.AdvertisingID
@@ -70,7 +98,7 @@ End Function
 Function GetVerimatrixID() As String
     If m.VerimatrixID = invalid Then
         deviceInfo = CreateObject("roDeviceInfo")
-        verimatrixID = "verimatrix-" + deviceInfo.getDeviceUniqueID()
+        verimatrixID = "verimatrix-" + getChannelClientID()
         m.VerimatrixID = EVPDigest(verimatrixID, "sha1")
     End If
     Return m.VerimatrixID

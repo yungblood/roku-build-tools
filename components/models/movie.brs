@@ -17,5 +17,7 @@ sub onMovieJsonChanged()
         end if
         m.top.comscoreTrackingTitle = m.top.title
         m.top.convivaTrackingTitle = m.top.title
+
+        m.top.audio_guide_text = m.top.title
     end if
 end sub

@@ -16,13 +16,25 @@
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/base64.brs" />
     
     <interface>
-        <field id="config" type="assocarray" onChange="onConfigurationSet" />
+        <field id="extremeMemoryManagement" type="boolean" />
+        <field id="config" type="assocarray" />
+        <field id="rac" type="node" />
         <field id="ecp" type="assocarray" />
+        <field id="deeplink" type="assocarray" onChange="onDeeplinkChanged" alwaysNotify="true" />
         <field id="close" type="boolean" alwaysNotify="true" />
+
+        <function name="reinit" />
+        <function name="showLoading" />
+        <function name="hideLoading" />
     </interface>
     <children>
         <!--  ComponentLibrary id="UVPVideoLib" uri="http://vidtech.cbsinteractive.com/uvproku/1.3.96/UVPPlayer.pkg" / -->
 
+        <TaplyticsAPI
+            id="taplytics"
+            key="022747d4bb445cbe1c25afb96c097a6f390a96be"
+            enablePrint="false" />
+   
         <Group
             id="screens" />
         <Group

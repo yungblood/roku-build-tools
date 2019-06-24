@@ -3,7 +3,10 @@
     <script type="text/brightscript" uri="pkg:/components/views/widgets/tiles/dynamicPlayTile.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
     
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
     <interface>
         <field id="show" type="node" onChange="onShowChanged" />
         <field id="episode" type="node" />

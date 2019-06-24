@@ -6,6 +6,7 @@
         <field id="videoID" type="string" />
         <field id="ppid" type="string" />
         <field id="adTagParameters" type="string" />
+        <field id="campaign" type="string" />
         
         <field id="streamDetails" type="assocarray" />
     </interface>

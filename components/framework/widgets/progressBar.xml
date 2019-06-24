@@ -9,9 +9,16 @@
 
         <field id="backgroundColor" type="color" alias="backgroundRect.color" />
         <field id="backgroundUri" type="string" alias="background.uri" />
+        <field id="backgroundBlendColor" type="float" alias="background.blendColor" />
         <field id="backgroundOpacity" type="float" alias="background.opacity" />
         <field id="barColor" type="color" alias="barRect.color" />
         <field id="barUri" type="string" alias="bar.uri" />
+        <field id="barBlendColor" type="float" alias="bar.blendColor" />
+
+        <field id="thumbUri" type="string" alias="thumb.uri" />
+        <field id="thumbBlendColor" type="float" alias="thumb.blendColor" />
+        <field id="thumbWidth" type="float" alias="thumb.height" />
+        <field id="thumbHeight" type="float" alias="thumb.width" />
         
         <field id="minValue" type="integer" value="0" />
         <field id="maxValue" type="integer" value="100" />
@@ -36,5 +43,8 @@
             loadDisplayMode="scaleToFill" />
         <Group
             id="ticks" />
+        <Poster
+            id="thumb"
+            loadDisplayMode="scaleToFill" />
     </children>
 </component>

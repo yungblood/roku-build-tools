@@ -16,7 +16,7 @@ function init()
     
     m.previousItemFocused = 0
 
-    m.global.observeField("user", "onUserChanged")
+    observeGlobalField("user", "onUserChanged")
 end function
 
 function onKeyEvent(key as string, press as boolean) as boolean
@@ -32,9 +32,10 @@ sub onFocusChanged()
     m.focusFrame.visible = m.top.isInFocusChain()
 end sub
 
-sub onUserChanged()
-    if m.user = invalid or not m.user.isSameNode(m.global.user) then
-        m.user = m.global.user
+sub onUserChanged(nodeEvent as object)
+    user = nodeEvent.getData()
+    if m.user = invalid or not m.user.isSameNode(user) then
+        m.user = user
         m.top.content = m.user.favorites
     end if
 end sub

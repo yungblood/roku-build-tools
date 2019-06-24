@@ -2,6 +2,7 @@
 <component name="MoviesScreenTask" extends="ApiTask">
     <script type="text/brightscript" uri="pkg:/components/tasks/moviesScreenTask.brs" />
     <interface>
-        <field id="movies" type="nodearray" />
+        <field id="errorCode" type="integer" />
+        <field id="movies" type="nodearray" alwaysNotify="true" />
     </interface>
 </component>

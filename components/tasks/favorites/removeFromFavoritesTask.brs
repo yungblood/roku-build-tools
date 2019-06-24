@@ -4,9 +4,9 @@ end sub
 
 sub doWork()
     api = cbs()
-    api.initialize(m.global.config, m.global.user, m.global.cookies)
+    api.initialize(m.top)
 
-    user = m.global.user
+    user = getGlobalField("user")
     if not isNullOrEmpty(m.top.showID) then
         api.removeShowFromFavorites(m.top.showID)
         user.favorites.update = true

@@ -4,8 +4,9 @@ end sub
 
 sub doWork()
     api = cbs()
-    api.initialize(m.global.config, m.global.user, m.global.cookies)
+    api.initialize(m.top)
 
+    trackRMFEvent("PNT")
     if m.top.type = "upgrade" or m.top.type = "downgrade" then
         m.top.product = channelStore().getProduct(m.top.productCode)
         transactionID = api.subscribe(m.top.productCode)
@@ -25,7 +26,7 @@ sub doWork()
         transactionID = api.subscribe(m.top.productCode)
         if not isNullOrEmpty(transactionID) then
             m.top.transactionID = transactionID
-            m.top.success = not isNullOrEmpty(api.getEntitlement(transactionID, m.top.productCode))
+            m.top.success = not isNullOrEmpty(api.getEntitlement(transactionID, m.top.productCode, getPersistedDeviceID()))
             return
         else
             m.top.error = "NO_TRANSACTION_ID"
