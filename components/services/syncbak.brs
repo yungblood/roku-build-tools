@@ -9,12 +9,16 @@ function newSyncbak() as object
     this                    = {}
     this.className          = "syncbak"
     
+    this.latitude           = 0
+    this.longitude          = 0
+    
     this.initialize         = syncbak_initialize
     
     this.getChannels        = syncbak_getChannels
     this.getSchedule        = syncbak_getSchedule
     this.getStream          = syncbak_getStream
     
+    this.setLocation        = syncbak_setLocation
     this.getDeviceData      = syncbak_getDeviceData
     this.makeRequest        = syncbak_makeRequest
     
@@ -90,14 +94,24 @@ function syncbak_getStream(stationID as string, mediaID as string, typeID = -1 a
     return invalid
 end function
 
+sub syncbak_setLocation(latitude as float, longitude as float)
+    m.latitude = latitude
+    m.longitude = longitude
+end sub
+
 function syncbak_getDeviceData() as object
     if m.deviceData = invalid then
         deviceData = {}
         deviceData["deviceId"] = getPersistedDeviceID()
         deviceData["deviceType"] = 8
+        
+        deviceData["locationAccuracy"] = 5
+        if m.latitude <> 0 and m.longitude <> 0 then
+            deviceData["latitude"] = m.latitude
+            deviceData["longitude"] = m.longitude
+        end if
         'deviceData["ip"] = Cbs().GetIPAddress() ' 
         'deviceData["ip"] = "65.111.124.2" '"67.221.255.55" '""67.221.255.55" ' "170.20.96.14" '
-        deviceData["locationAccuracy"] = 5
         deviceData["locationAge"] = 0
         deviceData["MVPDId"] = "AllAccess"
 

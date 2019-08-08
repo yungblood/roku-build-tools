@@ -70,6 +70,8 @@ function newCbs() as object
     this.getVideoSections           = cbs_getVideoSections
     this.getHomeRows                = cbs_getHomeRows
     this.getHomeShowGroupShows      = cbs_getHomeShowGroupShows
+
+    this.getAmlgVariantShows        = cbs_getAmlgVariantShows
     
     this.getMovies                  = cbs_getMovies
 
@@ -644,6 +646,7 @@ timer = createObject("roTimespan")
 
     user = createObject("roSGNode", "User")
     result = m.makeRequest(url, "GET")
+
     if isAssociativeArray(result) and result.isLoggedIn = true then
         user.json = result
         user.eligibleProducts = m.getEligibility()
@@ -784,7 +787,7 @@ function cbs_getHomeRows(itemsPerRow = 50 as integer) as object
     return sections
 end function
 
-function cbs_getHomeShowGroupShows(sectionID as string, page as integer, pageSize as integer) as object
+function cbs_getHomeShowGroupShows(sectionID as string, page = 0 as integer, pageSize = 100 as integer) as object
     shows = []
     url = m.apiBaseUrl + "v3.0/roku/homeshowgroup/" + sectionID + ".json"
     url = addQueryString(url, "start", page * pageSize)
@@ -797,6 +800,30 @@ function cbs_getHomeShowGroupShows(sectionID as string, page as integer, pageSiz
                 show = createObject("roSGNode", "ShowGroupItem")
                 show.json = item
                 shows.push(show)
+            next
+        else if response.errorCode <> invalid then
+            return response
+        end if
+    end if
+    return shows
+end function
+
+function cbs_getAmlgVariantShows(variant = "showRecommendationTrending" as string, page = 0 as integer, pageSize = 100 as integer, skipIfSourceIsTrending = false as boolean) as object
+    shows = []
+    url = m.apiBaseUrl + "v2.0/roku/recommendation/amlg/shows/variant.json"
+    url = addQueryString(url, "variant", variant)
+    url = addQueryString(url, "start", page * pageSize)
+    url = addQueryString(url, "rows", pageSize)
+
+    response = m.makeRequest(url, "GET", invalid, "json", true)
+    if isAssociativeArray(response) then
+        if response.success = true and response.results <> invalid then
+            for each item in response.results
+                if not skipIfSourceIsTrending or item.amlgSource <> "trending" then
+                    show = createObject("roSGNode", "Show")
+                    show.json = item
+                    shows.push(show)
+                end if
             next
         else if response.errorCode <> invalid then
             return response
@@ -1010,9 +1037,14 @@ end function
 function cbs_getDynamicPlayEpisode(show as object, history = invalid as object) as object
     episode = invalid
     dynamicPlay = createObject("roSGNode", "DynamicPlayEpisode")
-    url = m.apiBaseUrl + "v3.0/roku/dynamicplay/show/"+ show.id +".json"
+    if m.user.status = "SUBSCRIBER" then
+        url = m.apiBaseUrl + "v3.0/roku/dynamicplay/show/"+ show.id +".json"
+    else
+        url = m.apiBaseUrl + "v3.0/roku/dynamicplay/show/"+ show.id +"/nonsub.json"
+    end if
     response = m.makeRequest(url, "GET")
     if response <> invalid and response.success = true then
+
          if response.dynamicVideoModel <> invalid then
             if response.dynamicVideoModel.model <> invalid then
                 episode = createObject("roSGNode", "Episode")
@@ -1029,49 +1061,52 @@ function cbs_getDynamicPlayEpisode(show as object, history = invalid as object) 
          end if 
     end if
     
-    if history <> invalid and episode = invalid then
-        for i = 0 to history.getChildCount() - 1
-            item = history.getChild(i)
-            if item.showID = show.id then
-                episode = item
-                exit for
-            end if
-        next
-    end if
-    if episode <> invalid then
-        if episode.resumePoint < (episode.length * .97)  then
-            dynamicPlay.title = "Continue watching"
-        else
-            episode = m.getNextEpisode(episode.id, show.id)
-            if episode <> invalid then
-                dynamicPlay.title = "Watch next"
-            end if
-        end if
-    end if
-    if episode = invalid then
-        for each section in show.sections
-            if section.subtype() = "Section" then
-                videos = m.getSectionVideos(section.id, section.excludeShow, section.params, 0, 1)
-                if videos.count() > 0 then
-                    episode = videos[0]
-                    if episode.subtype() <> "LiveFeed" then
-                        exit for
-                    end if
-                end if
-            end if
-        next
-        if episode <> invalid then
-            if episode.isFullEpisode then
-                if show.isClassic then
-                    dynamicPlay.title = "Watch first episode"
-                else
-                    dynamicPlay.title = "Watch latest episode"
-                end if
-            else
-                dynamicPlay.title = "Watch"
-            end if
-        end if
-    end if
+'    if history <> invalid and episode = invalid then
+'        for i = 0 to history.getChildCount() - 1
+'            item = history.getChild(i)
+'            if item.showID = show.id then
+'                episode = item
+'                exit for
+'            end if
+'        next
+'    end if
+'    if episode <> invalid then
+'        if episode.resumePoint < (episode.length * .97)  then
+'            dynamicPlay.title = "Continue watching"
+'        else
+'            episode = m.getNextEpisode(episode.id, show.id)
+'            if episode <> invalid then
+'                dynamicPlay.title = "Watch next"
+'            end if
+'        end if
+'    end if
+'    if episode = invalid then
+'        for each section in show.sections
+'            if section.subtype() = "Section" then
+'                videos = m.getSectionVideos(section.id, section.excludeShow, section.params, 0, 1)
+'                if videos.count() > 0 then
+'                    episode = videos[0]
+'                    if episode.subtype() <> "LiveFeed" then
+'                        exit for
+'                    end if
+'                end if
+'            end if
+'        next
+'        if episode <> invalid then
+'            if episode.isFullEpisode then
+'                if show.isClassic then
+'                    dynamicPlay.title = "Watch first episode"
+'                else
+'                    dynamicPlay.title = "Watch latest episode"
+'                end if
+'            else
+'                dynamicPlay.title = "Watch"
+'            end if
+'        end if
+'    end if
+'    if m.user.status = "ANONYMOUS" and episode.isFullEpisode then
+'        dynamicPlay.title = "SUBSCRIBE TO WATCH"
+'    end if
     if episode <> invalid then
         dynamicPlay.episode = episode
         return dynamicPlay
@@ -1118,10 +1153,14 @@ function cbs_getDmaFromZip(zipCode as string) as object
     stations = []
     response = m.makeRequest(url, "GET")
     if isAssociativeArray(response) and response.success = true then
-        for each item in asArray(response.markets)
+        markets = response.markets
+        if markets = invalid then
+            markets = response.market
+        end if
+        for each item in asArray(markets)
             station = createObject("roSGNode", "Station")
             station.json = item
-            ' HACK: Trim the callsign to just the station letters (e.g. WLTX-DT-AA to WLTX)
+            ' HACK: Trim the callsign to just the station letters (e.g. KBTX-DT-AA to KBTX)
             if station.title.inStr("-") > 0 then
                 station.title = station.title.mid(0, station.title.inStr("-"))
             end if
@@ -1133,18 +1172,22 @@ function cbs_getDmaFromZip(zipCode as string) as object
 end function
 
 function cbs_registerDmaOverride(zipCode = "" as string) as object
-    url = m.apiBaseUrl + "v3.0/roku/dma/override/register"
+    url = m.apiBaseUrl + "v3.0/roku/dma/override/register.json"
     if not isNullOrEmpty(zipCode)
-        url = url + "/zipcode/" + zipCode
+        url = addQueryString(url, "zipcode", zipCode)
     end if
-    url = url + ".json"
 
-    response = m.makeRequest(url, "POST")
+    stations = []
+    response = m.makeRequest(url, "POST") 'parseJson(readAsciiFile("pkg:/test/dmaOverrideNoZipError.json")) '
     if isAssociativeArray(response) and response.success = true then
-        for each item in asArray(response.markets)
+        markets = response.markets
+        if markets = invalid then
+            markets = response.market
+        end if
+        for each item in asArray(markets)
             station = createObject("roSGNode", "Station")
             station.json = item
-            ' HACK: Trim the callsign to just the station letters (e.g. WLTX-DT-AA to WLTX)
+            ' HACK: Trim the callsign to just the station letters (e.g. KBTX-DT-AA to KBTX)
             if station.title.inStr("-") > 0 then
                 station.title = station.title.mid(0, station.title.inStr("-"))
             end if

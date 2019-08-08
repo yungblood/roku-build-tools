@@ -40,11 +40,7 @@ sub updateContent()
     user = getGlobalField("user")
     if user <> invalid and user.status <> "ANONYMOUS" then
         m.name.value = user.maskedFullName
-        if not isNullOrEmpty(user.email) then
-            m.email.value = user.email
-        else
-            m.email.value = user.maskedEmail
-        end if
+        m.email.value = user.maskedEmail
         m.level.value = user.packageName
         if not user.canUpgrade then
             m.buttons.removeChild(m.upgrade)

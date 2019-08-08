@@ -11,6 +11,8 @@ sub doWork()
     m.lastLoopTime = 0
     m.seekThreshold = 2
     
+    m.adTicksSet = false
+    
     m.cuepoints = []
     m.skippingPod = false
 
@@ -20,11 +22,19 @@ sub doWork()
         m.top.observeField("video", m.port)
         while true
             msg = wait(1000, m.port)
-            if type(msg) = "roSGNodeEvent" and msg.getField() = "video" then
+            if isIrollEvent(msg) then
+                handleIrollEvent(msg)
+            else if isIrollPlaybackRequest(msg) then
+                handleIrollPlaybackRequest(msg) 
+            else if type(msg) = "roSGNodeEvent" and msg.getField() = "video" then
                 onVideoChanged()
             else
                 if not m.top.streamManagerReady then
                     loadStreamManager()
+                    m.adTicksSet = false
+                end if
+                if isVideoPlaybackEvent(msg) then
+                    handlePlaybackStateChanged(msg)
                 end if
                 if m.streamManager <> invalid then
                     m.streamManager.onMessage(msg)
@@ -46,6 +56,20 @@ sub doWork()
                                 onUserSeek(m.lastLoopTime, currentTime)
                             end if
                         else if type(msg) = "roSGNodeEvent" and msg.getField() = "position" then
+                            if not m.adTicksSet then
+                                ' set ad indicators on the playback bar
+                                hashes = []
+                                duration = m.video.duration
+                                if duration > 0 then
+                                    for each cuepoint in m.cuepoints
+                                        if cuepoint.start > 0 then
+                                            hashes.push(cuepoint.start / duration)
+                                        end if
+                                    next
+                                    m.video.trickPlayBar.hashMarkPositions = hashes
+                                    m.adTicksSet = true
+                                end if
+                            end if
                             if not m.skippingPod and not m.top.inSnapback then
                                 for i = 0 to m.cuepoints.count() - 1
                                     cuepoint = m.cuepoints[i]
@@ -152,7 +176,7 @@ sub loadStreamManager()
             request.player = m.player
             request.adTagParameters = streamData.adTagParameters
             request.ppid = streamData.ppid
-            request.campaign = streamData.campaign
+'            request.campaign = streamData.campaign
             
     '        ?"Stream Data: ";streamData
     '        ?"DAI Request: ";request
@@ -197,7 +221,7 @@ sub loadStreamManager()
                     m.streamManager.start()
     
                     m.cuepoints = m.streamManager.getCuePoints()
-                    
+
                     if streamData.bookmarkPosition <> invalid and streamData.bookmarkPosition > 0 then
                         ' Adjust bookmark position for stitched ads
                         streamData.bookmarkPosition = m.streamManager.getStreamTime(streamData.bookmarkPosition * 1000) / 1000
@@ -256,6 +280,7 @@ sub setupVideoPlayer()
                 m.top.snapbackTime = -1
             end if
             m.top.video.enableTrickPlay = true
+            m.top.video.setFocus(true)
         end if
     end function
 
@@ -324,21 +349,34 @@ sub onAdStart(ad as object)
         
         m.top.adStart = getAdEventData(ad)        
        
-        'Check for brightline_direct companion nodes
+        'Check for brightline_direct or innovid campanion companion nodes
         for i = 0 to ad.companions.count()
-           if ad.companions[i] <> invalid and ad.companions[i].apiframework = "brightline_direct" then               
-                ad.adURL = ad.companions[i].url
-                ad.contentId = m.top.streamData.contentSourceID
-                ad.adName = ad.adtitle
-                ad.streamFormat = m.top.streamData.STREAMFORMAT
-                ad.startAt = m.top.video.position
-                ad.rendered = false            
-                            
-                view = m.top.video.getParent()
-                
-                brightline = getGlobalField("brightline")
-                brightline.ad = {adPods: [ad], videoNode : m.top.video, rsgNode : view}
-                brightline.loadAd = "true"
+           if ad.companions[i] <> invalid then
+               apiframework =  ad.companions[i].apiframework 
+               if apiframework <> invalid then
+                    apiframework = LCase(ad.companions[i].apiframework)
+               end if
+               model = getModel().mid (0, 2).toInt() 
+               if apiframework = "brightline_direct" then               
+                    ad.adURL = ad.companions[i].url
+                    ad.contentId = m.top.streamData.contentSourceID
+                    ad.adName = ad.adtitle
+                    ad.streamFormat = m.top.streamData.STREAMFORMAT
+                    ad.startAt = m.top.video.position
+                    ad.rendered = false            
+                                
+                    view = m.top.video.getParent()
+                    
+                    brightline = getGlobalField("brightline")
+                    brightline.ad = {adPods: [ad], videoNode : m.top.video, rsgNode : view}
+                    brightline.loadAd = "true"
+                    
+                else if apiframework = "innovid" and model > 36 then
+                    m.video.enableUI = false
+                    ad.adURL = ad.companions[i].url
+                    ad.streamFormat = "iroll"
+                    createIrollAd(ad.adURL, ad.duration, m.top.video.position)
+                end if
             end if
         next
     end if
@@ -363,7 +401,8 @@ sub onAdComplete(ad as object)
     print "Callback from SDK -- Complete called - "
 
     m.top.adComplete = getAdEventData(ad)
-    
+    're-enableUI in case of Innovid ad
+    m.video.enableUI = true
 end sub
 
 sub onError(error as object)
@@ -386,4 +425,118 @@ function getAdEventData(ad as object) as object
     eventData.adCount = breakInfo.totalAds
     eventData.position = breakInfo.timeOffset
     return eventData
+end function
+
+
+' example or json url - http://video.innovid.com/tags/static.innovid.com/roku/1efrlb.json?cb=659ee1e1-1139-561b-37f1-7688826f630b
+' @param String url_       - json file url ( as it defined in VAST )
+' @param Float duration_   - duration of iroll ad ( as it defined in VAST )
+' @param Float renderTime_ - relative position of iroll ad from beginning of SSAI content
+function createIrollAd(url_ as String, duration_ as Float, renderTime_ as Float) as Void
+  m.irollAd = m.video.getParent().createChild("InnovidAds:DefaultIrollAd")
+  m.irollAd.id = "iroll-ad"
+  m.irollAd.observeField("event", m.port)
+  m.irollAd.observeField("request", m.port)
+
+  size_ = CreateObject("roDeviceInfo").GetUIResolution()
+
+
+  m.irollAd.action = {
+    type:"init",
+    uri:url_,
+    width: 1920,
+    height: 1080,
+    ssai:{
+      adapter:"default",
+      renderTime:renderTime_,
+      duration:duration_
+    }
+  }
+
+  m.irollAd.action = { type : "start" }
+end function
+
+function isIrollEvent(msg_ as Object, field_ = "event") as Boolean
+  if type( msg_ ) <> "roSGNodeEvent" or m.irollAd = invalid then
+    return false
+  end if
+
+  target_ = msg_.getRoSGNode()
+
+  if target_ = invalid or msg_.getField() <> field_ then
+    return false
+  end if
+
+  return m.irollAd.isSameNode( msg_.getRoSGNode() )
+end function
+
+function isIrollPlaybackRequest(msg_ as Object) as Boolean
+  return isIrollEvent( msg_, "request" )
+end function
+
+function isVideoPlaybackEvent(msg_ as Object) as Boolean
+  if type( msg_ ) <> "roSGNodeEvent" or msg_.getRoSGNode() = invalid or m.video = invalid then
+    return false
+  end if
+
+  if not(m.video.isSameNode( msg_.getRoSGNode() )) then
+    return false
+  end if
+
+  field_ = msg_.getField()
+
+  return field_ = "position" or field_ = "state"
+end function
+
+function handleIrollEvent(evt as Object) as Void
+  adEvent = evt.getData()
+  adId = evt.getNode()
+  ' adEvent = {
+  ''    type : string,
+  ''    data? : object
+  ''}
+  ? "handleIrollEvent(";adId;", ";adEvent.type;")"
+end function
+
+function handleIrollPlaybackRequest(msg_ as Object) as Void
+request_ = msg_.getData()
+    if request_.type = "request-playback-pause" then
+    m.top.video.control = "pause"
+    else if request_.type = "request-playback-resume" then
+      m.top.video.control = "resume"
+    else if request_.type = "request-playback-prepare-to-restart" then
+      ' this method called before iroll opens a secondary video player
+      ' so, the host app should ( in general )
+      ' - save a playback position
+      ' - completely stop the current player
+      m._restartPosition = m.top.video.position
+      m.top.video.control = "stop"
+    else if request_.type = "request-playback-restart" then
+      m.top.video.control = "play"
+      m.top.video.seek = m._restartPosition
+      ' this method called after iroll closes a microsite and try to resume ssai playback, the host app should restart a playback from saved position
+    end if
+
+    ? "handleIrollPlaybackRequest(";request_.type;", video.state: ";GetGlobalAA().video.state;")"
+  end function
+
+function handlePlaybackStateChanged(evt_ as Object) as Void
+  ''?"video_ = "video_
+''  ?"evt_.getRoSGNode.streamData = "evt_.getRoSGNode().streamData
+''  ?"evt_.getRoSGNode.video = "evt_.getRoSGNode().video
+''  ?"type of m.irollAd = " type(m.irollAd)
+    if GetInterface(evt_.getRoSGNode(), "ifSGNodeDict") <> invalid then
+      t = evt_.getRoSGNode()
+    end if
+    video_ = evt_.getRoSGNode()
+  if type(m.irollAd) <> "Invalid" THEN
+''  ?" I shouldn't be here"
+''  ?"position_ = "video_.position
+''  ?"state_ = "video_.state
+    m.irollAd.action={
+      type:"notifyPlaybackStateChanged",
+      position:video_.position,
+      state:video_.state
+    }
+  end if
 end function

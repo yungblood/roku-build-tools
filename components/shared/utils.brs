@@ -43,6 +43,7 @@ end sub
 
 function getImageUrl(baseUrl as string, width = 0 as integer, height = 0 as integer) as string
     width = int(width / (1920 / createObject("roDeviceInfo").getUIResolution().width))
+    unscaledImageEndpoint = "http://wwwimage.cbsstatic.com/base/"
     photoImageEndpoint = "http://wwwimage.cbsstatic.com/thumbnails/photos/[WIDTHxHEIGHT]"
     videoImageEndpoint = "https://thumbnails.cbsig.net/_x/[WIDTH]/[HEIGHT]"
     url = baseUrl
@@ -51,18 +52,22 @@ function getImageUrl(baseUrl as string, width = 0 as integer, height = 0 as inte
 '            url = baseUrl.replace("http://thumbnails.cbsig.net", videoImageEndpoint)
 '        else 
         if baseUrl.inStr("files/") > -1 then
-            url = photoImageEndpoint + url.mid(url.inStr(8, "files/") + 6)
-            resize = ""
-            if width > 0 then
-                resize = "w" + width.toStr()
-            end if
-            if height > 0 then
-                if not isNullOrEmpty(resize) then
-                    resize = resize + "-"
+            if width > 0 or height > 0 then
+                url = photoImageEndpoint + url.mid(url.inStr(8, "files/") + 6)
+                resize = ""
+                if width > 0 then
+                    resize = "w" + width.toStr()
                 end if
-                resize = resize + "h" + height.toStr()
+                if height > 0 then
+                    if not isNullOrEmpty(resize) then
+                        resize = resize + "-"
+                    end if
+                    resize = resize + "h" + height.toStr()
+                end if
+                url = url.replace("[WIDTHxHEIGHT]", resize)
+            else
+                url = unscaledImageEndpoint + url
             end if
-            url = url.replace("[WIDTHxHEIGHT]", resize)
         else
             url = videoImageEndpoint + url.mid(url.inStr(8, "/") + 1)
             if width = 0 then
@@ -251,6 +256,76 @@ function parseDeepLink(link as string) as object
     return params
 end function
 
+function loadLocalLiveStations(api as object) as object
+    config = getGlobalField("config")
+    stations = []
+    if asBoolean(config.syncbak_enabled, true) then
+        syncbak().initialize(config.syncbakKey, config.syncbakSecret, config.syncbakBaseUrl)
+        syncbak().setLocation(getGlobalField("localStationLatitude"), getGlobalField("localStationLongitude"))
+        stations = syncbak().getChannels()
+    else
+        nationalFeedID = config.live_tv_national_feed_content_id
+        if not isNullOrEmpty(nationalFeedID) then
+            nationalFeed = api.getEpisode(nationalFeedID)
+            if nationalFeed <> invalid then
+                stations.push(nationalFeed)
+            end if
+        end if
+    end if
+    return stations
+end function
+
+function loadLiveChannels(api as object) as object
+    config = getGlobalField("config")
+    liveTVChannels = api.getLiveChannels()
+    if config.liveTVChannels <> invalid then
+        for each channel in liveTVChannels
+            for each override in config.liveTVChannels
+                if override.id = channel.scheduleType or (override.id = "local" and channel.type = "syncbak") then
+                    for each field in override.keys()
+                        if field <> "id" then
+                            channel.setField(field, override[field])
+                        end if
+                    next
+                    exit for
+                end if
+            next
+        next
+    end if
+    channels = createObject("roSGNode", "LiveTVChannels")
+    channels.appendChildren(liveTVChannels)
+    return channels
+end function
+
+sub updateLocalChannel(liveStations as object, channels as object, stationID = "" as string)
+    for i = 0 to channels.getChildCount() - 1
+        channelItem = channels.getChild(i)
+        if channelItem.scheduleType = "local" and not channelItem.isFallback then
+            if liveStations.count() > 1 and not isNullOrEmpty(stationID) then
+                for each station in liveStations
+                    if station.id = stationID then
+                        channelItem.title = station.station
+                        channelItem.affiliate = station.affiliate
+                        channelItem.scheduleUrl = station.scheduleUrl
+                        channelItem.isTuned = false
+                        exit for
+                    end if
+                next
+            else
+                station = liveStations[0]
+                if station <> invalid then
+                    channelItem.affiliate = station.affiliate
+                    channelItem.title = station.title
+                    channelItem.affiliate = station.affiliate
+                    channelItem.scheduleUrl = station.scheduleUrl
+                    channelItem.isTuned = false
+                end if
+            end if
+            exit for
+        end if
+    next
+end sub
+
 function parseScheduleJson(json as object) as object
     schedule = []
     if json <> invalid then
@@ -292,6 +367,14 @@ function createKeyPadDialog(title as string, message as string, text = "" as str
     dialog.width = 900
     dialog.text = text
     return dialog
+end function
+
+function getParentScreen(context = m.top as object) as object
+    parent = context.getParent()
+    while parent <> invalid and parent.subtype().inStr("Screen") = -1
+        parent = parent.getParent()
+    end while
+    return parent
 end function
 
 sub addGlobalField(field as string, fieldType as string, alwaysNotify = false as boolean, context = m.top as object)
@@ -393,3 +476,14 @@ end sub
 function getPersistedDeviceID() as string
     return getGlobalField("deviceID")
 end function
+
+sub loadCallbackUrl(url as string)
+    m.callbackTask = createObject("roSGNode", "LoadUrlTask")
+    m.callbackTask.observeField("response", "onCallbackTaskResponse")
+    m.callbackTask.uri = url
+    m.callbackTask.control = "run"
+end sub
+
+sub onCallbackTaskResponse(nodeEvent as object)
+    m.callbackTask = invalid
+end sub

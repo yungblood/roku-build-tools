@@ -111,6 +111,9 @@ function getOmnitureData(row as object, index as integer, podText = "" as string
         else if item.subtype() = "SearchResult" then
             data["showId"] = item.id
             data["showTitle"] = item.title
+        else if item.subtype() = "LiveTVChannel" then
+            data["podTitle"] = asString(item.trackingTitle)
+            data["podSection"] = "live channels"
         else if item.subtype() = "Movie" then
         end if
     end if

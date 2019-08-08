@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="MiniKeyboardEx" extends="MiniKeyboard">
+    <script type="text/brightscript" uri="pkg:/components/framework/widgets/keyboards/miniKeyboardEx.brs" />
+    <script type="text/brightscript" uri="pkg:/components/framework/utilities/nodes.brs" />
+
+    <interface>
+        <field id="keyFont" type="node" onChange="onKeyFontChanged" />
+        <field id="textboxFont" type="node" onChange="onTextboxFontChanged" />
+        <field id="focusBitmapBlendColor" type="color" onChange="onFocusBitmapBlendColorChanged" />
+    </interface>
+</component>

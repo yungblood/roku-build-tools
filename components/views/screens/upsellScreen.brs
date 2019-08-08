@@ -85,7 +85,6 @@ end sub
 sub onUpsellInfoLoaded(nodeEvent as object)
     task = nodeEvent.getRoSGNode()
     upsellInfo = nodeEvent.getData()
-    
     if upsellInfo <> invalid and task.errorCode = 0 then
         m.top.upsellInfo = upsellInfo
     else

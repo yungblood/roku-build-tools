@@ -13,7 +13,7 @@
     
     "enableGeoBlock":  false,
     
-    "enableTaplytics": false,
+    "enableTaplytics": true,
 
     "enableDW":        false,
     "enableSparrow":   true,
@@ -78,9 +78,9 @@
         {
             "id": "cbsn",
             "scheduleUrl": "v3.0/roku/cbsn/schedule/feed.json",
-            "trackingTitle": "CBSN Live Video",
-            "convivaTrackingTitle": "CBSN Live Video",
-            "comscoreTrackingTitle": "CBSN Live Video",
+            "trackingTitle": "CBSN Live Stream",
+            "convivaTrackingTitle": "CBSN Live Stream",
+            "comscoreTrackingTitle": "CBSN Live Stream",
             "comscoreC3": "CBSNewsRoku",
             "comscoreC4": "CBSNews.com"
         },

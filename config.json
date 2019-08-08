@@ -29,7 +29,7 @@
     "brightLineID":    "1020",
     "brightLinePkg":   "http://cdn-media.brightline.tv/sdk/gen2/roku/direct/cbs/BrightLineDirect.pkg",
     
-    "spotXBaseUrl":    "https://search.spotxchange.com/insights/85394",
+    "spotXBaseUrl":    "https://search.spotxchange.com/insights/219368",
     "spotXPageUrl":    "www.spotx.tv",
 
     "akamaiUrl":       "http://ma61-r.analytics.edgesuite.net/config/beacon-5508.xml",
@@ -78,9 +78,9 @@
         {
             "id": "cbsn",
             "scheduleUrl": "v3.0/roku/cbsn/schedule/feed.json",
-            "trackingTitle": "CBSN Live Video",
-            "convivaTrackingTitle": "CBSN Live Video",
-            "comscoreTrackingTitle": "CBSN Live Video",
+            "trackingTitle": "CBSN Live Stream",
+            "convivaTrackingTitle": "CBSN Live Stream",
+            "comscoreTrackingTitle": "CBSN Live Stream",
             "comscoreC3": "CBSNewsRoku",
             "comscoreC4": "CBSNews.com"
         },

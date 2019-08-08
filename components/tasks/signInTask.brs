@@ -130,6 +130,8 @@ sub doWork()
 '
 '    setGlobalField("stations", stations)
     m.top.localStation = getRegistryValue("liveTV", "", api.registrySection)
+    m.top.localStationLatitude = getRegistryValue("liveTVLatitude", 0.0, api.registrySection)
+    m.top.localStationLongitude = getRegistryValue("liveTVLongitude", 0.0, api.registrySection)
     m.top.lastLiveChannel = getRegistryValue("liveTVChannel", "", api.registrySection)
     
     user = api.getUser(true)

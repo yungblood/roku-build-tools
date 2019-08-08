@@ -13,7 +13,7 @@
         <LayoutGroup
             id="content"
             layoutDirection="vert"
-            translation="[0,375]"
+            translation="[0,416]"
             itemSpacings="[50]"
             vertAlignment="center">
         </LayoutGroup>

@@ -306,6 +306,7 @@ sub onPositionChanged()
     if not m.top.useDai or dai = invalid or not dai.adPlaying then
         m.video.enableTrickPlay = not m.episode.isLive
     end if 
+
 '    ?"CONTENT POSITION:";m.position,"STREAM POSITION:";m.video.position
     if m.lastPosition = invalid or m.position <> m.lastPosition then
         if m.episode.isLive then
@@ -817,10 +818,10 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                 end if
     
                 'adding spotX data to dai 
-                spotXCampaign = asArray(getGlobalField("spotXCampaign"))
-                if streamData <> invalid then
-                   streamData.campaign = spotXCampaign.join(",")
-                end if
+'                spotXCampaign = asArray(getGlobalField("spotXCampaign"))
+'                if streamData <> invalid then
+'                   streamData.campaign = spotXCampaign.join(",")
+'                end if
                                  
                 m.episode.resume = resumePosition > 0
                 m.episode.resumePoint = resumePosition

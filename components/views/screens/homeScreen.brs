@@ -128,9 +128,12 @@ sub loadContent(content as object)
                     rowHeights.push(298)
                 end if 
             end if
-        else if row.subtype() = "HomeShowGroup" then
+        else if row.subtype() = "HomeShowGroup" or row.subtype() = "AmlgShowGroup" then
+            if row.subtype() = "AmlgShowGroup" then
+                row.loadIndex = 0
+            end if
             rowItemSizes.push([266, 399])
-            rowHeights.push(480)   
+            rowHeights.push(480)
         else if row.subtype() = "ShowHistory" then
             if m.showHistoryObserved <> true then
                 row.observeField("content", "updateContent")

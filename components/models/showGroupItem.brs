@@ -31,5 +31,10 @@ sub onJsonChanged()
                 m.top.browseImageUrl = showAssets.filepath_show_browse_poster
             end if
         end if
+
+        if json.callbacks <> invalid then
+            m.top.displayCallbackUrl = json.callbacks.amlg_onSetDisplayCallback
+            m.top.clickCallbackUrl = json.callbacks.amlg_onItemClickCallback
+        end if
     end if
 end sub

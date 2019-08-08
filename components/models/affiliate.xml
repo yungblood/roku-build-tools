@@ -12,5 +12,8 @@
 
         <field id="station" type="string" />
         <field id="logoUrl" type="string" />
+
+        <field id="latitude" type="float" />
+        <field id="longitude" type="float" />
     </interface>
 </component>

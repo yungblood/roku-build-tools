@@ -40,7 +40,8 @@
             vertAlignment="center">
             <Poster
                 id="icon"
-                height="144"
+                width="150"
+                height="96"
                 loadDisplayMode="scaleToFit" />
         </LayoutGroup>
         <Label

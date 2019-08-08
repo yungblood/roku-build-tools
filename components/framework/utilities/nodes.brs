@@ -117,6 +117,26 @@ function isNodeVisible(node as object) as boolean
     return false
 end function
 
+function findNodeOfType(nodeType as string, parent = m.top as object) as object
+    if parent <> invalid then
+        for i = 0 to parent.getChildCount() - 1
+            child = parent.getChild(i)
+            if child.subtype() = nodeType then
+                return child
+            end if
+        next
+        ' We didn't find it, so check the children of the children
+        for i = 0 to parent.getChildCount() - 1
+            child = parent.getChild(i)
+            node = findNodeOfType(nodeType, child)
+            if node <> invalid then
+                return node
+            end if
+        next
+    end if
+    return invalid
+end function
+
 function safeGetField(node as object, field as string, retryAttempts = 50 as integer) as object
     value = node.getField(field)
     retries = 0

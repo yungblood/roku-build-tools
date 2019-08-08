@@ -28,10 +28,13 @@ function spotx_getCampaign() as object
     params = {}
     campaign = []
     params["content_page_url"] = m.contentPageUrl
-    params["device[ifa]"] = m.deviceID
-    response = m.makeRequest("/insights/85394",params)
+
+    deviceInfo = createObject("roDeviceInfo")
+    params["device[ifa]"] = deviceInfo.getChannelClientID()
+    response = m.makeRequest("",params)
     if response <> invalid then
-        for each item in asArray(response)
+        decodedResponse = urlDecode(response[0])
+        for each item in asArray(decodedResponse)
             campaign.push(item)
         next
         return campaign  

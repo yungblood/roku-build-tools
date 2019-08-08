@@ -4,7 +4,14 @@ end sub
 
 sub doWork()
     if m.top.mode = "save" then
-        setRegistryValue(m.top.key, m.top.value, m.top.section)
+        if m.top.values <> invalid then
+            values = m.top.values
+            for each key in values
+                setRegistryValue(key, values[key], m.top.section)
+            next
+        else
+            setRegistryValue(m.top.key, m.top.value, m.top.section)
+        end if
     else if m.top.mode = "delete" then
         deleteRegistryValue(m.top.key, m.top.section)
     else

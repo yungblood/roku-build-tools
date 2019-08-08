@@ -68,5 +68,10 @@ sub onJsonChanged()
         end if
 
         m.top.hasNewEpisodes = asBoolean(json.hasNewEpisodes, false)
+        
+        if json.callbacks <> invalid then
+            m.top.displayCallbackUrl = json.callbacks.amlg_onSetDisplayCallback
+            m.top.clickCallbackUrl = json.callbacks.amlg_onItemClickCallback
+        end if
     end if
 end sub

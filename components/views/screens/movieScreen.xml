@@ -41,6 +41,14 @@
             width="844"
             height="475"
             loadDisplayMode="scaleToZoom" />
+        <ProgressBar
+            id="progressBar"
+            translation="[143,726]"
+            backgroundColor="0xffffff33"
+            barColor="0x0092f3ff"
+            width="792"
+            height="4"
+            visible="false" />
             
         <LayoutGroup
             translation="[991,278]"

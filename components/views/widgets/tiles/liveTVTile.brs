@@ -18,7 +18,7 @@ sub onContentChanged(nodeEvent as object)
         m.location.text = content.description
         
         if content.affiliate <> invalid then
-            m.icon.uri = getImageUrl(content.affiliate.logoUrl, 0, 144) 
+            m.icon.uri = getImageUrl(content.affiliate.logoUrl, m.icon.width, m.icon.height) 
         end if
     end if
 end sub
@@ -30,13 +30,12 @@ sub updateLayout()
         m.focusedBackground.width = m.top.width
         m.focusedBackground.height = m.top.height
         
-        m.iconGroup.translation = [m.top.width * .3 / 2 + 25, m.top.height / 2]
-        m.icon.width = m.top.width * .3
+        m.iconGroup.translation = [110, m.top.height / 2]
 
-        m.callSign.translation = [m.iconGroup.translation[0] + (m.icon.width / 2) + 10, 0]
+        m.callSign.translation = [220, 0]
         m.callSign.width = m.top.width - m.callSign.translation[0] - 25
         m.callSign.height = m.top.height / 2 + 10
-        m.location.translation = [m.callSign.translation[0], m.top.height / 2 + 10]
+        m.location.translation = [220, m.top.height / 2 + 10]
         m.location.width = m.callSign.width
     end if
 end sub

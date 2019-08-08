@@ -25,5 +25,8 @@
         <field id="sections" type="nodearray" />
         
         <field id="dynamicPlayEpisode" type="node" />
+
+        <field id="displayCallbackUrl" type="string" />
+        <field id="clickCallbackUrl" type="string" />
     </interface>
 </component>

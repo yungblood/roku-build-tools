@@ -2,17 +2,32 @@
 <component name="LiveTVPanelELO" extends="Group">
     <script type="text/brightscript" uri="pkg:/components/views/widgets/panels/liveTVPanelELO.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/omniture.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/constants.brs" />
+    <script type="text/brightscript" uri="pkg:/components/services/adobe/adbmobile.brs" />
 
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/device.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/debug.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/encryption.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+
     <interface>
+        <field id="omnitureName" type="string" value="/settings/livetv" />
+        <field id="omniturePageType" type="string" value="settings" />
+        <field id="omnitureSiteHier" type="string" value="other|other|settings|livetv"/>
+        <field id="omnitureData" type="assocarray" />
+
+        <field id="buttonSelected" type="string" alwaysNotify="true" />
+
         <function name="read" />
     </interface>
     <children>
         <Font
             id="labelFont"
-            size="35"
+            size="32"
             uri="pkg:/fonts/Lato-Regular.ttf" />
         <Font
             id="labelBoldFont"
@@ -30,7 +45,7 @@
         <LayoutGroup
             id="content"
             layoutDirection="vert"
-            translation="[0,375]"
+            translation="[0,416]"
             itemSpacings="[0]"
             vertAlignment="center">
             <Label
@@ -47,29 +62,32 @@
                 color="0xffffffff"
                 opacity=".75"
                 wrap="true"
-                lineSpacing="0"
+                lineSpacing="-1"
                 font="dictionary:labelFont"
                 visible="false" />
             <LayoutGroup
                 id="signedIn"
                 layoutDirection="vert"
-                itemSpacings="[20,-20,40]"
+                itemSpacings="[5,-20,40]"
                 visible="false">
                 <Rectangle
                     color="0x00000000">
                     <Label
+                        id="localStationLabel"
                         translation="[20,0]"
                         width="900"
                         text="Your local station is:"
                         color="0xffffffff"
-                        font="dictionary:labelFont"
+                        wrap="true"
+                        lineSpacing="-1"
+                        font="dictionary:labelBoldFont"
                         opacity=".75" />
                 </Rectangle>
                 <MarkupGrid
                     id="channels"
                     itemComponentName="LiveTVTile"
-                    itemSize="[578,219]"
-                    itemSpacing="[45,45]"
+                    itemSize="[900,172]"
+                    itemSpacing="[24,24]"
                     numColumns="1"
                     numRows="2"
                     horizFocusAnimationStyle="floatingFocus"
@@ -77,60 +95,61 @@
                     focusBitmapBlendColor="0x3e96ef00" />
                 <Rectangle
                     color="0x00000000">
-                    <Label
-                        id="checkLocationLabel"
+                    <LayoutGroup
+                        id="checkLocationGroup"
                         translation="[20,0]"
-                        width="900"
-                        text="If that isn't correct, you can check your location by selecting the button below."
-                        wrap="true"
-                        lineSpacing="0"
-                        color="0xffffffff"
-                        font="dictionary:labelFont"
-                        opacity=".75" />
-
-                    <LabelButton
-                        id="checkLocation"
-                        translation="[20,120]"
-                        width="394"
-                        height="73"
-                        text="CHECK LOCATION"
-                        textColor="0xffffffff"
-                        focusedTextColor="0xffffffff"
-                        backgroundUri="pkg:/images/upsell_button.9.png"
-                        focusedBackgroundUri="pkg:/images/upsell_button_focused_noborder.9.png"
-                        font="dictionary:buttonFont"
-                        focusedFont="dictionary:focusedButtonFont" />
+                        layoutDirection="vert"
+                        itemSpacings="[44]">
+                        <Label
+                            id="checkLocationLabel"
+                            translation="[20,0]"
+                            width="900"
+                            text=""
+                            wrap="true"
+                            lineSpacing="-1"
+                            color="0xffffffff"
+                            font="dictionary:labelFont"
+                            opacity=".75" />
+    
+                        <LabelButton
+                            id="checkLocation"
+                            width="394"
+                            height="73"
+                            text="CHECK LOCATION"
+                            textColor="0xffffffff"
+                            focusedTextColor="0xffffffff"
+                            backgroundUri="pkg:/images/upsell_button.9.png"
+                            focusedBackgroundUri="pkg:/images/upsell_button_focused_noborder.9.png"
+                            font="dictionary:buttonFont"
+                            focusedFont="dictionary:focusedButtonFont" />
+                    </LayoutGroup>
                 </Rectangle>
             </LayoutGroup>
             <Group
                 id="override"
                 visible="false">
                 <LayoutGroup
+                    id="zipOverrideInfo"
                     layoutDirection="vert"
                     itemSpacings="[40]">
                     <Label
+                        width="800"
+                        text="Your local station is:"
+                        color="0xffffffff"
+                        wrap="true"
+                        lineSpacing="-1"
+                        font="dictionary:labelBoldFont"
+                        opacity=".75" />
+                    <LiveTVTile
+                        id="liveTVTile"
+                        width="800"
+                        height="172" />
+                    <Label
                         id="currentLocation"
                         width="800"
-                        text="It looks like you're located in {LOCATION}. Your local station is {CALLSIGN}."
+                        text=""
                         wrap="true"
-                        lineSpacing="0"
-                        color="0xffffffff"
-                        font="dictionary:labelFont"
-                        opacity=".75" />
-                    <Label
-                        id="currentLocationCorrect"
-                        width="800"
-                        text="If that's correct, just select &quot;LIVE TV&quot; from the main menu above and start streaming!"
-                        wrap="true"
-                        lineSpacing="0"
-                        color="0xffffffff"
-                        font="dictionary:labelFont"
-                        opacity=".75" />
-                    <Label
-                        width="800"
-                        text="If that isn't correct, please enter your current ZIP code to reset your location."
-                        wrap="true"
-                        lineSpacing="0"
+                        lineSpacing="-1"
                         color="0xffffffff"
                         font="dictionary:labelFont"
                         opacity=".75" />
@@ -153,94 +172,6 @@
                     font="dictionary:buttonFont"
                     focusedFont="dictionary:focusedButtonFont" />
             </Group>
-            <LayoutGroup
-                id="zipOverrides"
-                layoutDirection="vert"
-                itemSpacings="[0,-20,-20,40]"
-                visible="false">
-                <Rectangle
-                    color="0x00000000">
-                    <Label
-                        id="zipThanks"
-                        translation="[20,0]"
-                        text="Thanks for entering your zip code."
-                        color="0xffffffff"
-                        opacity=".75"
-                        font="dictionary:labelBoldFont" />
-                </Rectangle>
-                <Rectangle
-                    color="0x00000000">
-                    <Label
-                        id="overridesUnavailable"
-                        translation="[20,0]"
-                        width="1000"
-                        text="Live TV streams are currently not available for the entered zip code."
-                        color="0xffffffff"
-                        opacity=".75"
-                        wrap="true"
-                        lineSpacing="0"
-                        font="dictionary:labelFont" />
-                </Rectangle>
-                <MarkupGrid
-                    id="overrideChannels"
-                    itemComponentName="LiveTVTile"
-                    itemSize="[578,219]"
-                    itemSpacing="[45,45]"
-                    numColumns="1"
-                    numRows="2"
-                    horizFocusAnimationStyle="floatingFocus"
-                    vertFocusAnimationStyle="floatingFocus"
-                    focusBitmapBlendColor="0x3e96ef00" />
-                <Rectangle
-                    color="0x00000000">
-                    <Label
-                        id="checkLocationLabel"
-                        translation="[20,0]"
-                        width="900"
-                        text="Still not right?"
-                        wrap="true"
-                        lineSpacing="0"
-                        color="0xffffffff"
-                        font="dictionary:labelFont"
-                        opacity=".75" />
-
-                    <LabelButton
-                        id="tryAgain"
-                        translation="[20,100]"
-                        width="394"
-                        height="73"
-                        text="TRY AGAIN"
-                        textColor="0xffffffff"
-                        focusedTextColor="0xffffffff"
-                        backgroundUri="pkg:/images/upsell_button.9.png"
-                        focusedBackgroundUri="pkg:/images/upsell_button_focused_noborder.9.png"
-                        font="dictionary:buttonFont"
-                        focusedFont="dictionary:focusedButtonFont" />
-
-                    <LayoutGroup
-                        id="overridesLocked"
-                        translation="[20,100]"
-                        layoutDirection="vert"
-                        itemSpacings="[40]">
-                        <Label
-                            width="1000"
-                            text="We're sorry, but location reset is now locked."
-                            color="0xffffffff"
-                            opacity=".75"
-                            wrap="true"
-                            lineSpacing="0"
-                            font="dictionary:labelFont" />
-                        <Label
-                            width="1000"
-                            text="Please contact customer support at (888) 274-5343 and we'll be happy to help you!"
-                            color="0xffffffff"
-                            opacity=".75"
-                            wrap="true"
-                            lineSpacing="0"
-                            font="dictionary:labelFont" />
-                    </LayoutGroup>
-                </Rectangle>
-            </LayoutGroup>
         </LayoutGroup>
     </children>
 </component>

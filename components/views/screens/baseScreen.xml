@@ -5,13 +5,14 @@
     <script type="text/brightscript" uri="pkg:/components/shared/omniture.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/constants.brs" />
     <script type="text/brightscript" uri="pkg:/components/services/adobe/adbmobile.brs" />
+
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/device.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
-    <script type="text/brightscript" uri="pkg:/source/framework/utilities/encryption.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/debug.brs" />
-    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/encryption.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
 
     <interface>
         <field id="omnitureName" type="string" />

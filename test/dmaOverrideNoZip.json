@@ -1,0 +1,12 @@
+{
+  "market": {
+    "callSign": "KPIX-DT-AA",
+    "market": "San Francisco-Oakland-San Jose",
+    "marketId": "807",
+    "stationId": "2445",
+    "updatedDate": 1537223453000,
+    "zipCode": "94105"
+  },
+  "success": true,
+  "zipcode": "94105"
+}

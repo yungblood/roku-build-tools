@@ -184,7 +184,16 @@ Sub SetTime(date As Object, time = "00:00:00" As String)
         milliseconds = time.Mid(millis + 1)
         time = time.Mid(0, millis)
     End If
-    time = PadLeft(time, "00:", 8)
+    
+    timeString = ""
+    timeParts = time.split(":")
+    for each part in timeParts
+        if not isNullOrEmpty(timeString) then
+            timeString = timeString + ":"
+        end if
+        timeString = timeString + padLeft(part, "0", 2)
+    next
+    time = padLeft(timeString, "00:", 8)
     time = time + "." + milliseconds
 
     iso8601 = PadLeft(date.GetYear().ToStr(), "0", 4)

@@ -23,6 +23,10 @@ sub doWork()
 
     convivaTags = {}
     contentInfo = {}
+    convivaTags["accessType"]       = user.trackingStatus
+    convivaTags["connectionType"]   = iif(getEthernetInterface() = "eth0", "ethernet", "wifi")
+    convivaTags["Partner_ID"]       = "cbs_roku_app"
+    convivaTags["Player_Version"]   = getAppVersion()
     if content.subtype() = "Station" or content.isLive then
         convivaTags["contentId"]    = content.mediaID
         convivaTags["contentType"]  = "Live"
@@ -46,6 +50,7 @@ sub doWork()
         convivaTags["isAd"]         = "false"
         convivaTags["isEpisode"]    = iif(content.isFullEpisode , "true", "false")
         convivaTags["seriesTitle"]  = content.showName
+        convivaTags["showId"]       = content.showID
         convivaTags["episodeTitle"] = content.title
         convivaTags["drm"]          = iif(content.isProtected , "true", "false")
         convivaTags["drmType"]      = iif(content.isProtected , "PlayReady", "none")
@@ -60,11 +65,6 @@ sub doWork()
         contentInfo["streamUrl"]    = content.videoStream.url
         contentInfo["streamFormat"] = content.videoStream.streamFormat
     end if
-    convivaTags["accessType"]       = user.trackingStatus
-    convivaTags["connectionType"]   = iif(getEthernetInterface() = "eth0", "ethernet", "wifi")
-    convivaTags["Partner_ID"]       = "cbs_roku_app"
-    convivaTags["Player_Version"]   = getAppVersion()
-
     contentInfo["playerName"]       = "ROKU"
     contentInfo["viewerId"]         = user.id
 

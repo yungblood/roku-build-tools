@@ -1,5 +1,4 @@
 sub runUserInterface(ecp as object)
-
     m.port = createObject("roMessagePort")
     m.inputListener = createObject("roInput")
     m.inputListener.setMessagePort(m.port)

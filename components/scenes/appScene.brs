@@ -101,6 +101,8 @@ sub onSignedIn(nodeEvent as object)
 
     setGlobalField("cookies", task.cookies)
     setGlobalField("localStation", task.localStation)
+    setGlobalField("localStationLatitude", task.localStationLatitude)
+    setGlobalField("localStationLongitude", task.localStationLongitude)
     setGlobalField("lastLiveChannel", task.lastLiveChannel)
     setGlobalField("user", task.user)
 
@@ -960,10 +962,11 @@ sub onDialogClosed(nodeEvent as object)
     dialog = nodeEvent.getRoSGNode()
     if dialog <> invalid then
         dialog.unobserveField("close")
+        current = invalid
         if dialog.subtype() = "CbsDialog" then
             m.dialogs.removeChild(dialog)
+            current = dialog.returnFocus
         end if
-        current = invalid
         if m.dialogs.getChildCount() > 0 then
             current = m.dialogs.getChild(m.dialogs.getChildCount() - 1)
         end if
@@ -1132,6 +1135,8 @@ sub onButtonSelected(nodeEvent as object)
         end if
     else if buttonID = "favorite" then
         toggleFavorite(source.showID, m.top)
+    else if buttonID = "liveTV" then
+        showLiveTVScreen()
     else if buttonID = "watch" then
         if source.hasField("episode") and source.episode <> invalid then
             episode = source.episode
@@ -1196,9 +1201,16 @@ sub onItemSelected(nodeEvent as object)
             ' set the source field to invalid, so we don't get further updates
             source.setField(nodeEvent.getField(), invalid)
         end if
+        
+        if item.hasField("clickCallbackUrl") and not isNullOrEmpty(item.clickCallbackUrl) then
+            loadCallbackUrl(item.clickCallbackUrl)
+        end if
 
         if item.subtype() = "Episode" then
             showEpisodeScreen(item, "", false, source, false)
+        else if item.subtype() = "LiveTVChannel" then
+            setGlobalField("lastLiveChannel", item.scheduleType)
+            showLiveTVScreen()
         else if item.subtype() = "LiveFeed" then
             showLiveFeedScreen(item, source)
         else if item.subtype() = "Show" or item.subtype() = "RelatedShow" or item.subtype() = "ShowGroupItem" then

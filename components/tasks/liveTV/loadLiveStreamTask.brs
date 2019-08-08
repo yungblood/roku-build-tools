@@ -35,6 +35,7 @@ sub doWork()
         stream = station.videoStream
     else
         syncbak().initialize(config.syncbakKey, config.syncbakSecret, config.syncbakBaseUrl)
+        syncbak().setLocation(getGlobalField("localStationLatitude"), getGlobalField("localStationLongitude"))
         stream = syncbak().getStream(station.id, station.mediaID)
     end if
     m.top.stream = stream

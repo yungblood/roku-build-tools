@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="ApiTask" extends="Task">
     <script type="text/brightscript" uri="pkg:/components/services/cbs.brs" />
+    <script type="text/brightscript" uri="pkg:/components/services/syncbak.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/constants.brs" />
 

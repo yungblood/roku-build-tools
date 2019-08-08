@@ -93,35 +93,8 @@ sub onStationsLoaded(nodeEvent as object)
     stations = nodeEvent.getData()
     channels = task.liveTVChannels
 
-    for i = 0 to channels.getChildCount() - 1
-        channelItem = channels.getChild(i)
-        if channelItem.scheduleType = "local" and not channelItem.isFallback then
-            if stations.count() > 1 then
-                stationID = getGlobalField("localStation")
-                if not isNullOrEmpty(stationID) then
-                    for each station in stations
-                        if station.id = stationID then
-                            channelItem.title = station.station
-                            channelItem.affiliate = station.affiliate
-                            channelItem.scheduleUrl = station.scheduleUrl
-                            channelItem.isTuned = false
-                            exit for
-                        end if
-                    next
-                end if
-            else
-                station = stations[0]
-                if station <> invalid then
-                    channelItem.affiliate = station.affiliate
-                    channelItem.title = station.title
-                    channelItem.affiliate = station.affiliate
-                    channelItem.scheduleUrl = station.scheduleUrl
-                    channelItem.isTuned = false
-                end if
-            end if
-            exit for
-        end if
-    next
+    stationID = getGlobalField("localStation")
+    updateLocalChannel(stations, channels, stationID)
     m.channelGrid.content = channels
 
     m.liveStations = stations
@@ -140,6 +113,7 @@ sub onStationsLoaded(nodeEvent as object)
         channelItem = channels.getChild(i)
         if channelItem.scheduleType = liveChannel or (channelItem.type = "syncbak" and liveChannel = "local") then
             selectChannel(channelItem, true)
+            m.channelGrid.jumpToItem = i
             return
         end if
     next

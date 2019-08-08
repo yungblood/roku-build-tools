@@ -12,6 +12,8 @@
         <field id="buttons" type="stringarray" onChange="onButtonsChanged" />
         <field id="itemSpacings" type="intarray" alias="controls.itemSpacings" />
         <field id="contentGroup" type="node" />
+
+        <field id="returnFocus" type="node" />
         
         <field id="buttonSelected" type="string" alwaysNotify="true" />
         <field id="autoClose" type="boolean" />

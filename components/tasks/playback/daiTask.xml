@@ -28,4 +28,7 @@
 
         <function name="reset" />
     </interface>
+    <children>
+        <ComponentLibrary id="_innovidLib" uri="https://s-video.innovid.com/common/roku/innovid-iroll-renderer-sg.pkg" />
+    </children>
 </component>

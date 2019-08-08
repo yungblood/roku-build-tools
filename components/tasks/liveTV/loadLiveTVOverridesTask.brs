@@ -8,7 +8,11 @@ sub doWork()
     api.initialize(m.top)
 
     stations = []
-    stations = api.registerDmaOverride() '.getDmaFromZip(m.top.zipCode)
+    if isNullOrEmpty(m.top.zipCode) then
+        stations = api.registerDmaOverride()
+    else
+        stations = api.registerDmaOverride(m.top.zipCode)
+    end if
 
     m.top.stations = stations
 end sub

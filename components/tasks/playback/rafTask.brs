@@ -2,7 +2,7 @@ Library "Roku_Ads.brs"
 
 sub init()
     m.top.functionName = "doWork"
-    m.debug = true
+    m.debug = false
 end sub
 
 sub doWork()

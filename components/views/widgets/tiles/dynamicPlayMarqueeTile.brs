@@ -15,6 +15,7 @@ sub init()
     m.timeIndicator = m.top.findNode("timeIndicator")
     
     m.hero = m.top.findNode("hero")
+    m.heroDarken = m.top.findNode("heroDarken")
 
     m.previewGroup = m.top.findnode("previewGroup")
     'm.vilynxPreview = m.top.findNode("vilynxPreview")
@@ -98,7 +99,11 @@ sub onEpisodeLoaded(nodeEvent as object)
         m.loadVilynxTask.control = "run"
     else
         ' We don't have content, so hide ourselves
-        m.top.visible = false
+        'm.top.visible = false
+        m.hero.uri = getImageUrl(m.show.heroImageUrl, m.hero.width)
+        m.hero.visible = true
+        m.heroDarken.visible = true
+        
     end if
     m.loadTask = invalid
     m.top.contentLoaded = true

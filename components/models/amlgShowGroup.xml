@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<component name="ShowGroupItem" extends="ContentNode">
-    <script type="text/brightscript" uri="pkg:/components/models/showGroupItem.brs" />
+<component name="AmlgShowGroup" extends="ContentNode">
+    <script type="text/brightscript" uri="pkg:/components/models/amlgShowGroup.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
     
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
@@ -9,17 +9,16 @@
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
     <interface>
         <field id="json" type="assocarray" onChange="onJsonChanged" />
+
+        <field id="variant" type="string" value="" />
+        <field id="hideIfTrending" type="boolean" value="false" />
+
+        <field id="loadIndex" type="integer" onChange="onLoadIndexChanged" alwaysNotify="true" />
+        <field id="totalCount" type="integer" value="-1" />
         
-        <field id="tuneInTime" type="string" />
-        <field id="episodeCount" type="integer" />
-        <field id="clipCount" type="integer" />
-        
-        <field id="heroImageUrl" type="string" />
-        <field id="myCbsImageUrl" type="string" />
-        <field id="browseImageUrl" type="string" />
-        <field id="descriptionImageUrl" type="string" />
+        <field id="pageSize" type="integer" value="20" />
+        <field id="maxPages" type="integer" value="0" />
 
         <field id="displayCallbackUrl" type="string" />
-        <field id="clickCallbackUrl" type="string" />
     </interface>
 </component>

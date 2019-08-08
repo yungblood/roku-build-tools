@@ -15,6 +15,7 @@ sub doWork()
             schedule = parseScheduleJson(scheduleJson)
         else
             syncbak().initialize(config.syncbakKey, config.syncbakSecret, config.syncbakBaseUrl)
+            syncbak().setLocation(getGlobalField("localStationLatitude"), getGlobalField("localStationLongitude"))
             schedule = syncbak().getSchedule(scheduleUrl)
         end if
     end if

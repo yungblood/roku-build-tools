@@ -46,6 +46,14 @@
             height="1080"
             loadDisplayMode="scaleToZoom"
             visible="false" />
+        
+       <Poster
+            id="heroDarken"
+            uri="pkg:/images/show-hero-darken_480.png" 
+            width="1920"
+            height="1080"
+            visible="false"/>    
+            
         <Group
             id="previewGroup" />
 
