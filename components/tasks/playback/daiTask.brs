@@ -177,6 +177,7 @@ sub loadStreamManager()
             request.adTagParameters = streamData.adTagParameters
             request.ppid = streamData.ppid
 '            request.campaign = streamData.campaign
+            request.format = streamData.streamFormat
             
     '        ?"Stream Data: ";streamData
     '        ?"DAI Request: ";request

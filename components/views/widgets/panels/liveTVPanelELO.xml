@@ -55,16 +55,6 @@
                 opacity=".75"
                 font="dictionary:labelFont"
                 visible="false" />
-            <Label
-                id="unavailable"
-                width="1000"
-                text="Live TV streams are currently not available in your area. Be sure to check back as we are always adding more stations."
-                color="0xffffffff"
-                opacity=".75"
-                wrap="true"
-                lineSpacing="-1"
-                font="dictionary:labelFont"
-                visible="false" />
             <LayoutGroup
                 id="signedIn"
                 layoutDirection="vert"

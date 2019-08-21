@@ -6,7 +6,6 @@ sub init()
     m.content = m.top.findNode("content")
     m.signedOut = m.top.findNode("signedOut")
     m.signedIn = m.top.findNode("signedIn")
-    m.unavailable = m.top.findNode("unavailable")
     m.override = m.top.findNode("override")
 
     m.localStationLabel = m.top.findNode("localStationLabel")
@@ -20,6 +19,7 @@ sub init()
     m.defaultStationsMultipleHeader = "Your local stations are:"
     m.defaultStationsText = "If this is correct, select the station and then hit 'OK' on your remote to return to live TV." + chr(10) + chr(10) + "Not the right station? Let's fix that."
     m.defaultStationsMultipleText = "If this is correct, select your preferred station, then hit 'OK' on your remote to return to live TV." + chr(10) + chr(10) + "Not the right stations? Let's fix that."
+    m.defaultStationsUnavailableHeaderText = "Station not available"
     m.defaultStationsUnavailableText = "We're sorry, but live TV is currently not supported in your area.  To make sure we have your correct location, select the button below."
     
     m.accountStationsHeader = "Based on your account information, your local station is:"
@@ -58,6 +58,7 @@ sub init()
     
     m.overrideStage = 0
     m.overrideCount = 0
+    m.currentStation = invalid
 
     m.tts = createObject("roTextToSpeech")
 end sub
@@ -76,8 +77,10 @@ function onKeyEvent(key as string, press as boolean) as boolean
             end if
         else if key = "up" then
             if m.checkLocation.isInFocusChain() then
-                m.channels.setFocus(true)
-                return true
+                if m.channels.visible then
+                    m.channels.setFocus(true)
+                    return true
+                end if
             else if m.enter.isInFocusChain() then
                 m.zipCode.setFocus(true)
                 return true
@@ -99,7 +102,11 @@ sub onFocusChanged()
         if m.override.visible then
             m.zipCode.setFocus(true)
         else if m.signedIn.visible then
-            m.channels.setFocus(true)
+            if m.channels.visible then
+                m.channels.setFocus(true)
+            else
+                m.checkLocation.setFocus(true)
+            end if
         end if
     end if
 end sub
@@ -109,13 +116,15 @@ sub updateContent()
     
     m.overrideStage = 0
 
+    m.override.visible = false
     m.content.removeChild(m.signedOut)
-    m.content.removeChild(m.unavailable)
     m.content.removeChild(m.signedIn)
     m.content.removeChild(m.override)
     m.content.removeChild(m.zipOverrides)
     
     if isAuthenticated(m.top) then
+        showSpinner()
+
         m.loadTask = createObject("roSGNode", "LoadLiveStationsTask")
         m.loadTask.observeField("stations", "onStationsLoaded")
         m.loadTask.loadChannels = false
@@ -127,60 +136,66 @@ sub updateContent()
 end sub
 
 sub onStationsLoaded(nodeEvent as object)
+    hideSpinner()
+
     m.loadTask = invalid
     
     task = nodeEvent.getRoSGNode()
     stations = nodeEvent.getData()
-    m.top.focusable = (stations.count() > 0)
-    if stations.count() = 0 then
-        m.content.appendChild(m.unavailable)
-        m.unavailable.visible = true
-    else
-        m.localStationLabel.text = m.defaultStationsHeader
-        m.checkLocationLabel.text = m.defaultStationsText
-        if stations.count() > 1 then
-            m.localStationLabel.text = m.defaultStationsMultipleHeader
-            m.checkLocationLabel.text = m.defaultStationsMultipleText
-        end if
 
+    m.top.focusable = true
+    m.localStationLabel.text = m.defaultStationsHeader
+    m.checkLocationLabel.text = m.defaultStationsText
+    if stations.count() > 1 then
+        m.localStationLabel.text = m.defaultStationsMultipleHeader
+        m.checkLocationLabel.text = m.defaultStationsMultipleText
+    else if stations.count() = 0 then
+        m.localStationLabel.text = m.defaultStationsUnavailableHeader
+        m.checkLocationLabel.text = m.defaultStationsUnavailableText
+    end if
+
+    if stations.count() > 0 then
         m.signedIn.insertChild(m.channels, 1)
         m.channels.visible = true
         if m.top.isInFocusChain() then
             m.channels.setFocus(true)
         end if
+    else
+        m.channels.visible = false
+    end if
+
+    stationIndex = 0
+    stationID = getGlobalField("localStation")
+    m.content.appendChild(m.signedIn)
+    m.signedIn.visible = true
+
+    m.stations = createObject("roSGNode", "ContentNode")
+    m.stations.appendChildren(stations)
     
-        stationIndex = 0
-        stationID = getGlobalField("localStation")
-        m.content.appendChild(m.signedIn)
-        m.signedIn.visible = true
+    m.channels.itemSize = [900,172]
+    m.channels.numColumns = 1
+    if stations.count() > 2 then
+        m.channels.itemSize = [578,172]
+        m.channels.numColumns = 2
+    end if
+    m.channels.content = m.stations
 
-        m.stations = createObject("roSGNode", "ContentNode")
-        m.stations.appendChildren(stations)
-        
-        m.channels.itemSize = [900,172]
-        m.channels.numColumns = 1
-        if stations.count() > 2 then
-            m.channels.itemSize = [578,172]
-            m.channels.numColumns = 2
+    station = invalid
+    for i = 0 to stations.count() - 1
+        station = stations[i]
+        if station.id = stationID then
+            stationIndex = i
+            exit for
         end if
-        m.channels.content = m.stations
-
-        station = invalid
-        for i = 0 to stations.count() - 1
-            station = stations[i]
-            if station.id = stationID then
-                stationIndex = i
-                exit for
-            end if
-        next
-        if station = invalid then
-            m.currentLocation.text = m.zipEntryStationsUnavailableText
-            m.zipOverrideInfo.removeChild(m.liveTVTile)
-        else
-            m.currentLocation.text = m.zipEntryStationsText
-            m.liveTVTile.itemContent = station
-            m.zipOverrideInfo.insertChild(m.liveTVTile, 1)
-        end if
+    next
+    if station = invalid then
+        m.currentLocation.text = m.zipEntryStationsUnavailableText
+        m.zipOverrideInfo.removeChild(m.liveTVTile)
+    else
+        m.currentStation = station
+        m.currentLocation.text = m.zipEntryStationsText
+        m.liveTVTile.itemContent = station
+        m.zipOverrideInfo.insertChild(m.liveTVTile, 1)
     end if
 
     if task.canOverride then
@@ -190,6 +205,7 @@ sub onStationsLoaded(nodeEvent as object)
         m.checkLocationLabel.text = m.eloUnavailableText
         m.checkLocationGroup.removeChild(m.checkLocation)
         m.checkLocation.visible = false
+        m.top.focusable = (stations.count() > 0)
     end if
 end sub
 
@@ -220,6 +236,9 @@ sub onStationSelected(nodeEvent as object)
     for i = 0 to stations.getChildCount() - 1
         station = stations.getChild(i)
         station.selected = station.isSameNode(button)
+        if station.selected then
+            m.currentStation = station
+        end if
     next
     setGlobalField("lastLiveChannel", "local")
     m.top.buttonSelected = "liveTV"
@@ -232,15 +251,27 @@ sub onCheckLocationSelected(nodeEvent as object)
         m.overridesTask.observeField("stations", "onOverrideStationsLoaded")
         m.overridesTask.control = "run"
         
-        trackScreenAction("trackLocationOverrideCheckLocation_1stCheck")
+        params = {}
+        if m.currentStation <> invalid then
+            params["stationCode"] = m.currentStation.title
+        end if
+        trackScreenAction("trackLocationOverrideCheckLocation_1stCheck", params)
     else
-        trackScreenAction("trackLocationOverrideCheckLocation_2ndCheck")
+        params = {}
+        if m.currentStation <> invalid then
+            params["stationCode"] = m.currentStation.title
+        end if
+        trackScreenAction("trackLocationOverrideCheckLocation_2ndCheck", params)
         showZipCodePanel()
     end if
 end sub
 
 sub showZipCodePanel()
-    trackScreenView("/settings/livetv/location_check_results/enter_zip/")
+    params = {}
+    if m.currentStation <> invalid then
+        params["stationCode"] = m.currentStation.title
+    end if
+    trackScreenView("/settings/livetv/location_check_results/enter_zip/", params)
 
     m.content.removeChild(m.signedIn)
     m.signedIn.visible = false
@@ -253,6 +284,9 @@ sub onZipCodeEntered(nodeEvent as object)
     zipCode = m.zipCode.pin
     params = {}
     params["zipCode"] = zipCode
+    if m.currentStation <> invalid then
+        params["stationCode"] = m.currentStation.title
+    end if
     trackScreenAction("trackLocationOverrideEnterZip", params)
 
     if not isNullOrEmpty(zipCode) and zipCode.len() = 5 then
@@ -285,7 +319,10 @@ sub onOverrideStationsLoaded(nodeEvent as object)
             if m.overrideStage = 1 then
                 params = {}
                 params["zipCode"] = task.zipCode
-                trackScreenView("/settings/livetv/location_check_results/")
+                if m.currentStation <> invalid then
+                    params["stationCode"] = m.currentStation.title
+                end if
+                trackScreenView("/settings/livetv/location_check_results/", params)
 
                 m.localStationLabel.text = m.accountStationsHeader
                 m.checkLocationLabel.text = m.accountStationsText
@@ -297,7 +334,10 @@ sub onOverrideStationsLoaded(nodeEvent as object)
             else
                 params = {}
                 params["zipCode"] = task.zipCode
-                trackScreenView("/settings/livetv/location_check_results/enter_zip/confirmation/")
+                if m.currentStation <> invalid then
+                    params["stationCode"] = m.currentStation.title
+                end if
+                trackScreenView("/settings/livetv/location_check_results/enter_zip/confirmation/", params)
 
                 m.localStationLabel.text = m.zipStationsHeader
                 m.checkLocationLabel.text = m.zipStationsText
@@ -347,8 +387,6 @@ function read(params = {} as object) as boolean
     if createObject("roDeviceInfo").isAudioGuideEnabled() then
         if m.signedOut.visible then
             m.tts.say(m.signedOut.text)
-        else if m.unavailable.visible then
-            m.tts.say(m.unavailable.text)
         else
             m.tts.say("Available local stations")
             for i = 0 to m.stations.getChildCount() - 1

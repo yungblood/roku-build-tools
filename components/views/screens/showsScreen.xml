@@ -12,7 +12,7 @@
             id="groups"
             translation="[100,135]"
             layoutDirection="vert"
-            itemSpacings="[30]">
+            itemSpacings="[20]">
         </LabelButtonGroup>
         
         <MarkupGrid

@@ -19,8 +19,9 @@ sub init()
     m.video.observeFieldScoped("state", "onVideoStateChanged")
     m.video.observeFieldScoped("trickPlayBarVisibilityHint", "onOverlayVisibilityHint")
     
-    if getGlobalField("extremeMemoryManagement") = true then
-        ' limit the video resolution on low-end devices
+   ' if getGlobalField("extremeMemoryManagement") = true then
+    if getModel().mid(0, 2).toInt() <= 35 then
+         ' limit the video resolution on low-end devices
         m.video.maxVideoDecodeResolution = [1280, 720]
     end if
 
@@ -99,7 +100,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
                 else
                     m.top.close = true
                     return true
-                end if
+                end if 
             end if
         else
             'm.inAd - send key to brightline
@@ -217,9 +218,20 @@ sub onVideoStateChanged()
             showErrorDialog(m.video.errorMsg)
         else if state = "buffering" then
             hideSpinner()
-            m.overlay.visible = false
-            m.video.enableTrickPlay = false
+            ' HACK: The Roku firmware automatically moves the video state to buffering
+            '       when the user switches audio tracks, even if the player is paused,
+            '       so we check for an audio track change to determine whether this is
+            '       a valid buffer after a pause (e.g., ffw or rew), or if we need to
+            '       allow the player to resume playback manually
+            if not m.paused or m.video.audioTrack = m.currentAudioTrack then
+                m.video.enableTrickPlay = false
+                m.overlay.visible = false
+            end if
+            m.currentAudioTrack = m.video.audioTrack
         else if state = "paused" then
+            ' Track the current audio track, to detect track changes in buffering
+            m.currentAudioTrack = m.video.audioTrack
+
             m.paused = true
             m.pausedPosition = m.video.position
             sendDWAnalytics({method: "playerPause", params: [m.episode, getPlayerPosition(true), getPlayerPosition()]})
@@ -404,9 +416,20 @@ sub onEpisodeLoaded(nodeEvent as object)
     m.episode = nodeEvent.getData()
     m.top.episode = m.episode
     
-    if m.episode <> invalid and (m.episode.isLive or m.episode.isProtected) then
+'    if m.episode <> invalid and (m.episode.isLive or m.episode.isProtected) then
+'        m.top.useDai = false
+'    end if
+
+'   ---- According to the new DRM Logic on ticket 1031 -------
+    if m.episode <> invalid and m.episode.isLive then
         m.top.useDai = false
     end if
+    user = getGlobalField("user")
+    if user.packageName = "Commercial Free" and m.episode.json.mediaType <> "Promo Full Episode" and (m.episode.json.mediaType = "Full Episode" or m.episode.json.mediaType = "AA Original" or m.episode.json.mediaType = "") then
+            m.top.useDai = false
+    end if
+'   -------------------- end ------------------   
+ 
     if m.top.useDai then
         dai = getGlobalField("dai")
         if dai = invalid then
@@ -779,19 +802,29 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                 config = getGlobalField("config")
                 streamData.apiKey = config.daiKey
                 streamData.videoID = m.episode.id
-    
+                
+                
                 ' Exclude the 5.1 options from "legacy" and select models
                 ' due to macroblocking issues
-                model = getModel().mid (0, 2).toInt()
-                if not config.enable51Audio or model <= 39 or model = 80 then
+'                model = getModel().mid (0, 2).toInt()
+'                if not config.enable51Audio or model <= 39 or model = 80 then
+'                    streamData.contentSourceID = config.daiSourceID
+'                else
+'                    if m.episode.premiumAudioAvailable = true then
+'                        streamData.contentSourceID = config.dai51SourceID
+'                    else
+'                        streamData.contentSourceID = config.daiSourceID
+'                    end if
+'                end if
+
+'               -------------According to ticket 1031-------------
+                if m.episode.isFullEpisode then
                     streamData.contentSourceID = config.daiSourceID
                 else
-                    if m.episode.premiumAudioAvailable = true then
-                        streamData.contentSourceID = config.dai51SourceID
-                    else
-                        streamData.contentSourceID = config.daiSourceID
-                    end if
-                end if
+                    streamData.contentSourceID = config.daiSourceIDClip
+                end if 
+'               ----------------------- end ----------------------
+
     
                 ' Add encoded video specific custom parameters
                 custParams = m.episode.adParams["cust_params_encoded"]
@@ -805,7 +838,6 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                 else
                     custParams = custParams + "%26cpSession%3D0"
                 end if
-    
                 adParams = config.fixedAdParams
                 adParams = adParams + "&vguid=" + m.vguid
                 adParams = adParams + "&ppid=" + m.episode.adParams["ppid_encoded"]
@@ -816,13 +848,7 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                 if user <> invalid then
                     streamData.ppid = user.ppid
                 end if
-    
-                'adding spotX data to dai 
-'                spotXCampaign = asArray(getGlobalField("spotXCampaign"))
-'                if streamData <> invalid then
-'                   streamData.campaign = spotXCampaign.join(",")
-'                end if
-                                 
+          
                 m.episode.resume = resumePosition > 0
                 m.episode.resumePoint = resumePosition
                 m.position = resumePosition
@@ -940,12 +966,12 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                 m.nextTask.episode = m.episode
                 m.nextTask.section = m.top.section
                 m.nextTask.control = "run"
-    
+
                 m.convivaTask = createObject("roSGNode", "ConvivaTask")
                 m.convivaTask.video = m.video
                 m.convivaTask.content = m.episode
                 m.convivaTask.control = "run"
-    
+
                 if m.top.useDai then
                     m.video.content = invalid
                     dai = getGlobalField("dai")

@@ -1,5 +1,5 @@
 {
-    "apiKey":          "c726dde0db942789",
+    "apiKey":          "e6691bcdd058fc7b",
     "apiBaseUrl":      "https://www.cbs.com/apps-api/",
     "codeAuthUrl":     "cbs.com/roku",
     
@@ -40,7 +40,7 @@
     "nielsenAppID":    "PEEF1AF93-F59E-414A-96BE-DCE421E5C92D",
     
     "vmapUrl":         "http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/8264/vaw-can/ott/cbs_roku_app&ciu_szs=300x60,300x250&impl=s&gdfp_req=1&env=vp&output=xml_vmap1&unviewed_position_start=1&url=&description_url=&correlator=ROKU_ADS_TIMESTAMP&scor=ROKU_ADS_TIMESTAMP&cmsid=2289&vid=ROKU_ADS_CONTENT_ID",
-    "fixedAdParams":   "iu=/8264/vaw-can/ott/cbs_roku_app&url=cbs.com&cmsid=20289&dai-sr=1628&dai-excl=codec%3Aec-3",
+    "fixedAdParams":   "iu=/8264/vaw-can/ott/cbs_roku_app&url=cbs.com&cmsid=20289&dai-sr=1628",
     
     "touUrl":          "legalterms.cbsinteractive.com/terms-of-use",
     "privacyUrl":      "legalterms.cbsinteractive.com/privacy",
@@ -59,8 +59,8 @@
     "enable51Audio":   true,
 
     "useDai":          true,
-    "daiSourceID":     "20289",
-    "dai51SourceID":   "2478978",
+    "daiSourceID":     "2497752",
+    "daiSourceIDClip": "20289",
     "daiKey":          "7j3n273bfj7jcnvf22d713a51f",
     "uvpConfigUrl":    "http://can.cbs.com/thunder/player/chromeless/uvp/cbs_roku_app/cbs_roku_app.xml",
 

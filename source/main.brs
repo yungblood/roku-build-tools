@@ -29,7 +29,7 @@ sub runUserInterface(ecp as object)
 
     m.exitApp = false
     while true
-        msg = wait(1000, m.port)
+        msg = wait(0, m.port)
         msgType = type(msg)
         if msgType = "roSGScreenEvent" then
             if msg.isScreenClosed() then return

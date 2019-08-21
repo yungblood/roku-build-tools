@@ -11,6 +11,7 @@ sub onJsonChanged()
         if isNullOrEmpty(m.top.title) then
             m.top.title = json.callSign
         end if
+        m.top.callSign = json.callSign
         m.top.description = json.description
         m.top.closedCaptions = json.supportsClosedCaptions
         m.top.scheduleUrl = json.scheduleUrl

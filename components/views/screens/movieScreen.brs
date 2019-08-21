@@ -111,6 +111,7 @@ sub onMovieChanged()
         
         if m.top.autoPlay then
             m.top.buttonSelected = m.watch.id
+            m.top.autoPlay = false
         end if
         
         if canWatch(movie, m.top) then

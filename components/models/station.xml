@@ -8,6 +8,7 @@
     <interface>
         <field id="json" type="assocarray" onChange="onJsonChanged" />
 
+        <field id="callSign" type="string" />
         <field id="location" type="string" />
         <field id="parentStationID" type="string" />
         <field id="mediaID" type="string" />

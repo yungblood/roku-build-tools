@@ -42,6 +42,11 @@ sub updateContent()
         label.title = "APP VERSION"
         label.value = config.appVersion
         
+        liveTVGroup = m.content.createChild("Group")
+        label = liveTVGroup.createChild("SettingsLabel")
+        label.title = "LIVE TV LOCATION"
+        label.value = "To change location, visit Settings > Live TV"
+        
         deviceGroup = m.content.createChild("Group")
         label = deviceGroup.createChild("SettingsLabel")
         label.title = "DEVICE ID"
@@ -49,7 +54,6 @@ sub updateContent()
         
         ipGroup = m.content.createChild("Group")
         label = ipGroup.createChild("SettingsLabel")
-        label.translation = [500, 0]
         label.title = "IP ADDRESS"
         label.value = config.ipAddress
     end if

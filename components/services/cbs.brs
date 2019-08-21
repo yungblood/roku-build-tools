@@ -391,7 +391,6 @@ sub cbs_populateStream(episode as object)
         end if
         
         episode.videoStream = stream
-        
 
         vmapUrl = m.vmapUrl
         vmapUrl = addQueryString(vmapUrl, "ppid", m.user.ppid)
@@ -1434,13 +1433,18 @@ function cbs_getVideoStreamUrl(id as string, baseUrl = m.selectorUrl as string) 
                     if smil.body <> invalid and smil.body.seq <> invalid then
                         params = []
                         if smil.body.seq.video <> invalid then
-                            src = smil.body.seq.video.src
+                            if isArray(smil.body.seq.video) then
+                                smilVideo = smil.body.seq.video[0]
+                            else
+                                smilVideo = smil.body.seq.video
+                            end if
+                            src = smilVideo.src
                             if not isNullOrEmpty(src) then
                                 url = src
                                 checkHeaders = false
                             end if
                             
-                            params = asArray(smil.body.seq.video.param)
+                            params = asArray(smilVideo.param)
                         else if smil.body.seq.ref <> invalid then
                             params = asArray(smil.body.seq.ref.param)
                         end if
@@ -1469,9 +1473,13 @@ end function
 
 function cbs_getPlayReadyInfo(id as string) as object
     playReady = invalid
-    url = m.apiBaseUrl + "v3.0/roku/irdeto/session.json"
-    url = addQueryString(url, "contentId", id)
     
+    if m.user.status = "ANONYMOUS" then
+        url = m.apiBaseUrl + "v3.0/roku/irdeto/anonymousSession.json"
+    else
+        url = m.apiBaseUrl + "v3.0/roku/irdeto/session.json"
+    end if
+    url = addQueryString(url, "contentId", id)
     response = m.makeRequest(url, "GET")
     if isAssociativeArray(response) and response.success = true then
         playReady = createObject("roSGNode", "DrmSession")

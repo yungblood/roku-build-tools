@@ -32,7 +32,7 @@ sub onAdobeApiResponse(nodeEvent as object)
     end if
 end sub
 
-sub trackScreenView(screenName = m.top.omnitureName as string)
+sub trackScreenView(screenName = m.top.omnitureName as string, additionalParams = {} as object)
     initializeAdobe()
     if screenName <> "" then
         params = {}
@@ -47,6 +47,7 @@ sub trackScreenView(screenName = m.top.omnitureName as string)
             setGlobalField("deeplinkForTracking", "")
         end if
 
+        params.append(additionalParams)
         params.append(m.persistentParams)
 
         trackState(screenName, params)

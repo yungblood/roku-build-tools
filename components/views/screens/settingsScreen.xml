@@ -80,7 +80,7 @@
             <SupportPanel
                 id="supportPanel"
                 visible="false" />
-            <LiveTVPanel
+            <LiveTVPanelELO
                 id="liveTVPanel"
                 visible="false" />
         </Group>
