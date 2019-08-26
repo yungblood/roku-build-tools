@@ -36,9 +36,14 @@ function onKeyEvent(key as string, press as boolean) as boolean
     if press then
         if key = "back" then
             if not goBackInNavigationStack() then
-                dialog = createCbsDialog("", "Are you sure you would like to exit CBS All Access?", ["No", "Yes"])
-                dialog.observeField("buttonSelected", "onExitDialogButtonSelected")
-                setGlobalField("cbsDialog", dialog)
+                menu = m.global.findNode("menu")
+                if menu.isInFocusChain() then
+                    dialog = createCbsDialog("", "Are you sure you would like to exit CBS All Access?", ["No", "Yes"])
+                    dialog.observeField("buttonSelected", "onExitDialogButtonSelected")
+                    setGlobalField("cbsDialog", dialog)
+                else
+                    menu.setFocus(true)
+                end if
             end if
             return true
         else if key = "unknown" then
@@ -61,6 +66,7 @@ end function
 sub onExitDialogButtonSelected(nodeEvent as object)
     dialog = nodeEvent.getRoSGNode()
     button = nodeEvent.getData()
+    m.global.findNode("menu").setFocus(true)
     if button = "Yes" then
         m.top.close = true
     end if
