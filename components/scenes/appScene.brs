@@ -177,7 +177,11 @@ sub onSignedIn(nodeEvent as object)
                 showHomeScreen()
             end if
         else
-            showUpsellScreen()
+            if m.top.deeplink = invalid and m.top.ecp.contentId = invalid and m.top.mediaType = invalid then
+                showUpsellScreen()
+            else
+                showHomeScreen()
+            end if
         end if
         if m.top.deeplink <> invalid then
             openDeepLink(m.top.deeplink)
