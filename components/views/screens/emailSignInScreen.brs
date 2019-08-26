@@ -132,12 +132,12 @@ end sub
 
 sub captureInput(textbox as object)
     if textbox.id = "email" then
-        dialog = createKeyboardDialog("Enter your email address", textbox.text, ["OK"])
+        dialog = createKeyboardDialog("Enter your email address", textbox.text, ["OK","Clear"])
         dialog.id = textbox.id
         dialog.observeField("buttonSelected", "onDialogButtonSelected")
         setGlobalField("cbsDialog", dialog)
     else if textbox.id = "password" then
-        dialog = createKeyboardDialog("Enter your password", textbox.text, ["OK"])
+        dialog = createKeyboardDialog("Enter your password", textbox.text, ["OK","Clear"])
         dialog.keyboard.textEditBox.secureMode = true
         dialog.id = textbox.id
         dialog.observeField("buttonSelected", "onDialogButtonSelected")
@@ -148,12 +148,16 @@ end sub
 sub onDialogButtonSelected(nodeEvent as object)
     dialog = nodeEvent.getRoSGNode()
     textbox = m.top.findNode(dialog.id)
-    if textbox <> invalid then
+    if dialog.buttonSelected = 0 then 'OK
+        if textbox <> invalid then
+            textbox.text = dialog.text
+        end if
+        dialog.close = true
+        advanceToFirstEmptyField(false)
+    else if dialog.buttonSelected = 1 then 'Cancel
+        dialog.text = ""
         textbox.text = dialog.text
     end if
-    dialog.close = true
-
-    advanceToFirstEmptyField(false)
 end sub
 
 sub onUserDataLoaded()
