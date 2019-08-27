@@ -79,6 +79,15 @@ function onKeyEvent(key as string, press as boolean) as boolean
                 'scrollToRow()
                 return true
             end if
+        else if key = "back" then
+            if m.list.hasFocus() then
+                m.marquee.setFocus(true)
+                m.lastFocus = m.marquee
+                scrollList()
+                m.menu.setFocus(true)
+                m.lastFocus = m.menu
+                return true
+            end if
         end if
     end if
     return false
