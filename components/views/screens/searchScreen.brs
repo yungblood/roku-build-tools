@@ -10,6 +10,7 @@ sub init()
     
     m.searchText = m.top.findNode("searchText")
     m.searchText.observeField("text", "onSearchTextChanged")
+    m.searchTask = createObject("roSGNode", "LoadSearchResultsTask")
 
     m.keyboard = m.top.findNode("keyboard")
     m.keyboard.observeField("buttonSelected", "onKeyboardButtonSelected")
@@ -131,6 +132,8 @@ sub onSearchTextChanged()
     if not isNullOrEmpty(m.searchText.text) then
         search(m.searchText.text)
     else
+        m.searchTask.control = "stop"
+        m.searchTask.unObserveField("results")
         m.noResults.visible = false
         m.grid.visible = false
     end if
@@ -150,10 +153,11 @@ end sub
 
 sub search(searchTerm as string)
     if m.searchTask <> invalid then
-        m.searchTask.unobserveField("results")
-        m.searchTask = invalid
+        if m.searchTask.state = "running" then
+            m.searchTask.control = "stop"
+            m.searchTask.unobserveField("results")
+        end if
     end if
-    m.searchTask = createObject("roSGNode", "LoadSearchResultsTask")
     m.searchTask.observeField("results", "onResultsLoaded")
     m.searchTask.searchTerm = searchTerm
     m.searchTask.control = "run"

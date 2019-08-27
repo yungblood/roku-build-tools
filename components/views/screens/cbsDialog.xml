@@ -10,8 +10,20 @@
         <field id="messageColor" type="color" alias="message.color" />
         <field id="messageAlignment" type="color" alias="message.horizAlign" />
         <field id="buttons" type="stringarray" onChange="onButtonsChanged" />
+
+        <field id="tabOrder" type="nodearray" />
+        <field id="tabIndex" type="integer" />
+
         <field id="itemSpacings" type="intarray" alias="controls.itemSpacings" />
         <field id="contentGroup" type="node" />
+        <field id="footerContentGroup" type="node" />
+        <field id="includeTitle" type="boolean" value="true" onChange="onIncludeTitleChanged" />
+        <field id="includeMessage" type="boolean" value="true" onChange="onIncludeMessageChanged" />
+        <field id="includeContentSpacer" type="boolean" value="true" onChange="onIncludeContentSpacerChanged" />
+
+        <field id="buttonWidth" type="integer" value="305" />
+        <field id="buttonHeight" type="integer" value="62" />
+        <field id="buttonLayoutDirection" type="string" alias="buttons.layoutDirection" />
 
         <field id="returnFocus" type="node" />
         
@@ -72,6 +84,8 @@
                     layoutDirection="horiz"
                     itemSpacings="[20]"
                     horizAlignment="center" />
+                <Group
+                    id="footerContent" />
             </LayoutGroup>
         </Rectangle>
     </children>

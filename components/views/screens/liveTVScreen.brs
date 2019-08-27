@@ -273,7 +273,17 @@ sub onStationChanged(nodeEvent as object)
     playChannel(m.station, true)
 end sub
 
-sub playChannel(channel as object, showChannels = false as boolean)
+sub playChannel(channel as object, showChannels = false as boolean, checkParentalControls = true as boolean)
+    user = getGlobalField("user")
+    if checkParentalControls and not isNullOrEmpty(user.parentalControlPin) and user.parentalControlLiveTV then
+        dialog = showPinDialog("Enter your PIN to watch", ["SUBMIT", "CANCEL"], "onPinDialogButtonSelected")
+        dialog.addField("channel", "node", false)
+        dialog.setField("channel", channel)
+        dialog.addField("showChannels", "boolean", false)
+        dialog.setField("showChannels", showChannels)
+        return
+    end if
+
     if m.video.state <> "stopped" then
         m.video.control = "stop"
     end if
@@ -395,6 +405,34 @@ sub playChannel(channel as object, showChannels = false as boolean)
         end if
         loadSchedule()
     end if
+end sub
+
+sub onPinDialogButtonSelected(nodeEvent as object)
+    dialog = nodeEvent.getRoSGNode()
+    button = nodeEvent.getData()
+    if lCase(button) = "cancel" then
+        m.top.close = true
+    else if button = "SUBMIT" then
+        pinPad = dialog.findNode("pinPad")
+        success = true
+        if pinPad <> invalid then
+            user = getGlobalField("user")
+            if user.parentalControlPin <> pinPad.pin then
+                success = false
+                showPinErrorDialog("Login Error", "Invalid PIN entered", ["CLOSE"], "onPinErrorDialogButtonSelected")
+            end if
+        end if
+        if success then
+            playChannel(dialog.channel, dialog.showChannels, false)
+        end if
+    end if
+    dialog.close = true
+end sub
+
+sub onPinErrorDialogButtonSelected(nodeEvent as object)
+    dialog = nodeEvent.getRoSGNode()
+    dialog.close = true
+    m.top.close = true
 end sub
 
 sub onLogoLoaded(nodeEvent as object)
@@ -683,6 +721,7 @@ sub onChannelSelected(nodeEvent as object)
 end sub
 
 sub onStationSelected(nodeEvent as object)
+    m.channelGrid.setFocus(true)
     button = m.stations.getChild(nodeEvent.getData())
     if button <> invalid then
         m.top.station = button.station
@@ -695,7 +734,6 @@ sub onStationSelected(nodeEvent as object)
         m.regTask.section = config.registrySection
         m.regTask.mode = "save"
     end if
-    m.channelGrid.setFocus(true)
 end sub
 
 sub hideOverlay()

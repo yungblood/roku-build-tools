@@ -24,6 +24,8 @@
         <field id="topLevelCategory" type="string" />
         <field id="airDate" type="integer" />
         <field id="airDateString" type="string" />
+
+        <field id="regionalRating" type="string" />
         
         <field id="resume" type="boolean" />
         <field id="resumePoint" type="integer" />
