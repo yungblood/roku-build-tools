@@ -481,7 +481,12 @@ sub onEpisodeLoaded(nodeEvent as object)
             showPinDialog("Enter your PIN to watch", ["SUBMIT", "CANCEL"], "onPinDialogButtonSelected")
         else
             m.video.enableTrickPlay = not m.episode.isLive
-            if m.episode.resumePoint > 0 and (m.episode.resumePoint < m.episode.length * .97) then
+            if m.top.resumePoint > -1 then
+                startPlayback(m.isContinuousPlay, m.top.resumePoint, m.isContinuousPlay, m.isForced)
+                ' reset the resume point, so we don't accidentally resume
+                ' on continuous play
+                m.top.resumePoint = -1
+            else if m.episode.resumePoint > 0 and (m.episode.resumePoint < m.episode.length * .97) then
                 hideSpinner()
                 
                 dialog = createCbsDialog("Resume Watching", "Would you like to continue watching from where you left off or start from the beginning?", ["Resume", "Start Over"])

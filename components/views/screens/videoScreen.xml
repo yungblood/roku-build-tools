@@ -9,6 +9,7 @@
         <field id="episodeID" type="string" onChange="onEpisodeIDChanged" alwaysNotify="true" />
         <field id="episode" type="node" />
         <field id="section" type="node" />
+        <field id="resumePoint" type="integer" value="-1" />
         <field id="buttonSelected" type="string" alwaysNotify="true" />
         <field id="additionalContext" type="assocarray" />
     </interface>
