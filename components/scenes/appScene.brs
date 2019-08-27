@@ -45,11 +45,10 @@ function onKeyEvent(key as string, press as boolean) as boolean
                     else
                         menu.setFocus(true)
                     end if
-'                   we can discuss this section - I'm sure Roku would prefer for back from the main screen to offer to exit the app but that is a design flow change
- '               else
- '                       dialog = createCbsDialog("", "Are you sure you would like to exit CBS All Access?", ["No", "Yes"])
- '                       dialog.observeField("buttonSelected", "onExitDialogButtonSelected")
- '                       setGlobalField("cbsDialog", dialog)
+                else
+                        dialog = createCbsDialog("", "Are you sure you would like to exit CBS All Access?", ["No", "Yes"])
+                        dialog.observeField("buttonSelected", "onExitDialogButtonSelected")
+                        setGlobalField("cbsDialog", dialog)
                 end if
             end if
             return true
