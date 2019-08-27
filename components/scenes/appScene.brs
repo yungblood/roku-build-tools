@@ -147,7 +147,7 @@ sub onSignedIn(nodeEvent as object)
                 if upsellItem.subtype() = "Episode" then
                     showVideoScreen(upsellItem.id, upsellItem.getParent(), m.upsellSource)
                 else
-                    showVideoScreen(upsellItem.id, invalid, m.upsellSource, false)
+                    showVideoScreen(upsellItem.id, invalid, m.upsellSource, -1, false)
                 end if
             else
                 if isAuthenticated(m.top) and not isSubscriber(m.top) then
@@ -831,7 +831,7 @@ sub showUvpVideoScreen(episodeID as string, section = invalid as object, source 
     addToNavigationStack(screen)
 end sub
 
-sub showVideoScreen(episodeID as string, section = invalid as object, source = invalid as object, useDai = true as boolean)
+sub showVideoScreen(episodeID as string, section = invalid as object, source = invalid as object, resumePoint = -1 as integer, useDai = true as boolean)
     config = getGlobalField("config")
     if config.enableGeoBlock and config.currentCountryCode <> config.appCountryCode and not config.geoBlocked then
         dialog = createCbsDialog("", "Due to licensing restrictions, video is not available outside your country.", ["CLOSE"])
@@ -844,6 +844,7 @@ sub showVideoScreen(episodeID as string, section = invalid as object, source = i
     screen.observeField("buttonSelected", "onButtonSelected")
     screen.useDai = useDai and config.useDai
     screen.episodeID = episodeID
+    screen.resumePoint = resumePoint
     screen.section = section
     if source <> invalid then
         screen.omnitureData = source.omnitureData
@@ -1167,11 +1168,11 @@ sub onButtonSelected(nodeEvent as object)
         toggleFavorite(source.showID, m.top)
     else if buttonID = "liveTV" then
         showLiveTVScreen()
-    else if buttonID = "watch" then
+    else if buttonID = "watch" or buttonID = "resume" then
         if source.hasField("episode") and source.episode <> invalid then
             episode = source.episode
             if canWatch(episode, m.top) then
-                showVideoScreen(episode.ID, episode.getParent(), source)
+                showVideoScreen(episode.ID, episode.getParent(), source, iif(buttonID = "resume", episode.resumePoint, 0))
             else
                 showUpsellScreen(episode, true)
             end if
@@ -1185,7 +1186,7 @@ sub onButtonSelected(nodeEvent as object)
         else if source.hasField("movie") and source.movie <> invalid then
             movie = source.movie
             if canWatch(movie, m.top) then
-                showVideoScreen(movie.id, movie.getParent(), source)
+                showVideoScreen(movie.id, movie.getParent(), source, iif(buttonID = "resume", movie.resumePoint, 0))
             else
                 showUpsellScreen(movie, true)
             end if

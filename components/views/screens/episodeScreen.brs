@@ -12,6 +12,7 @@ sub init()
     m.episodeDescription = m.top.findNode("episodeDescription")
     m.progressBar = m.top.findNode("progressBar")
     
+    m.resume = m.top.findNode("resume")
     m.watch = m.top.findNode("watch")
     
     m.buttons = m.top.findNode("buttons")
@@ -120,9 +121,16 @@ sub onEpisodeChanged()
             
             ' NOTE: We're checking the refreshed version of the episode here
             if canWatch(m.episode, m.top) then
-                m.watch.text = "WATCH"
+                if m.episode.resumePoint > 0 and (m.episode.resumePoint < m.episode.length * .97) then
+                    m.watch.text = "RESTART"
+                    m.buttons.insertChild(m.resume, 0)
+                else
+                    m.watch.text = "WATCH"
+                    m.buttons.removeChild(m.resume)
+                end if
             else
                 m.watch.text = "SUBSCRIBE TO WATCH"
+                m.buttons.removeChild(m.resume)
             end if
 
             m.buttons.visible = true
