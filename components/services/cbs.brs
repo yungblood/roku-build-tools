@@ -62,6 +62,7 @@ function newCbs() as object
     this.isAuthenticated            = cbs_isAuthenticated
     this.getUser                    = cbs_getUser
     this.signIn                     = cbs_signIn
+    this.setPin                     = cbs_setPin
     this.forgotPassword             = cbs_forgotPassword
     this.signOut                    = cbs_signOut
     this.getActivationCode          = cbs_getActivationCode
@@ -652,6 +653,7 @@ timer = createObject("roTimespan")
     end if
 
     m.setUser(user)
+
     if loadFavorites then
 '        user.favorites.content = m.getFavoriteShows()
 '        user.videoHistory.content = m.getVideoHistory(1, 50)
@@ -678,6 +680,19 @@ function cbs_signIn(username as string, password as string, deviceID as string) 
         return getCookiesForUrl(m.apiBaseUrl)
     end if
     return ""
+end function
+
+function cbs_setPin(pin as string, ratings = [] as object) as boolean
+    url = m.apiBaseUrl + "v2.0/roku/usersettings/parental/control/pin.json"
+    postData = {}
+    postData["pin"] = pin
+    postData["parentalControlLevel"] = ratings.join(",")
+
+    result = m.makeRequest(url, "POST", postData)
+    if isAssociativeArray(result) and result.success = true then
+        return true
+    end if
+    return false
 end function
 
 function cbs_forgotPassword(email as string) as boolean
