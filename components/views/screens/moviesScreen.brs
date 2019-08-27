@@ -52,7 +52,7 @@ end sub
 
 sub onMenuItemSelected(nodeEvent as object)
     selection=nodeEvent.getData()
-    if selection = "movies"
+    if selection = "movies" then
         m.grid.setFocus(true)
         m.lastFocus = m.grid
     else
