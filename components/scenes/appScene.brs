@@ -37,12 +37,19 @@ function onKeyEvent(key as string, press as boolean) as boolean
         if key = "back" then
             if not goBackInNavigationStack() then
                 menu = m.global.findNode("menu")
-                if menu.isInFocusChain() then
-                    dialog = createCbsDialog("", "Are you sure you would like to exit CBS All Access?", ["No", "Yes"])
-                    dialog.observeField("buttonSelected", "onExitDialogButtonSelected")
-                    setGlobalField("cbsDialog", dialog)
-                else
-                    menu.setFocus(true)
+                if menu <> invalid then
+                    if menu.isInFocusChain() then
+                        dialog = createCbsDialog("", "Are you sure you would like to exit CBS All Access?", ["No", "Yes"])
+                        dialog.observeField("buttonSelected", "onExitDialogButtonSelected")
+                        setGlobalField("cbsDialog", dialog)
+                    else
+                        menu.setFocus(true)
+                    end if
+'                   we can discuss this section - I'm sure Roku would prefer for back from the main screen to offer to exit the app but that is a design flow change
+ '               else
+ '                       dialog = createCbsDialog("", "Are you sure you would like to exit CBS All Access?", ["No", "Yes"])
+ '                       dialog.observeField("buttonSelected", "onExitDialogButtonSelected")
+ '                       setGlobalField("cbsDialog", dialog)
                 end if
             end if
             return true
@@ -66,7 +73,8 @@ end function
 sub onExitDialogButtonSelected(nodeEvent as object)
     dialog = nodeEvent.getRoSGNode()
     button = nodeEvent.getData()
-    m.global.findNode("menu").setFocus(true)
+    menu = m.global.findNode("menu")
+    if menu <> invalid then menu.setFocus(true)
     if button = "Yes" then
         m.top.close = true
     end if
@@ -177,7 +185,7 @@ sub onSignedIn(nodeEvent as object)
                 showHomeScreen()
             end if
         else
-            if m.top.deeplink = invalid and m.top.ecp.contentId = invalid and m.top.mediaType = invalid then
+            if m.top.deeplink = invalid and m.top.ecp.mediaType = invalid  then
                 showUpsellScreen()
             else
                 showHomeScreen()
