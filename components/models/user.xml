@@ -34,6 +34,10 @@
         <field id="videoHistory" type="node" />
         <field id="showHistory" type="node" />
         <field id="continueWatching" type="node" />
+
+        <field id="parentalControlPin" type="string" />
+        <field id="parentalControlLiveTV" type="boolean" />
+        <field id="parentalControlRestrictions" type="stringarray" />
         
     </interface>
 </component>

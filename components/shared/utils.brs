@@ -18,7 +18,7 @@ sub hideSpinner(context = m.top as object, ignoreContextVisibility = false as bo
     end if
 end sub
 
-function createCbsDialog(title as string, message as string, buttons = [] as object, autoClose = false as boolean) as object
+function createCbsDialog(title as string, message = "" as string, buttons = [] as object, autoClose = false as boolean) as object
     dialog = createObject("roSGNode", "CbsDialog")
     dialog.title = title
     dialog.message = message
@@ -26,6 +26,87 @@ function createCbsDialog(title as string, message as string, buttons = [] as obj
     dialog.autoClose = autoClose
     return dialog
 end function
+
+function showPinDialog(title as string, buttons as object, callbackFunction as string) as object
+    dialog = createCbsDialog(title)
+    dialog.allowBack = true
+    dialog.buttonWidth = 450
+    dialog.buttonHeight = 73
+    dialog.buttonLayoutDirection = "vert"
+    dialog.buttons = buttons
+    
+    dialog.includeMessage = false
+    dialog.includeContentSpacer = false
+    
+    pinPad = dialog.contentGroup.createChild("Pinpad")
+    pinPad.id = "pinPad"
+    pinPad.pinLength = 4
+    pinPad.secureMode = true
+    
+    font = createObject("roSGNode", "Font")
+    font.uri = "pkg:/fonts/Lato-Bold.ttf"
+    font.size = 28
+    footerLabel = dialog.footerContentGroup.createChild("Label")
+    footerLabel.font = font
+    footerLabel.color = "0xffffffff"
+    footerLabel.width = dialog.buttonWidth
+    footerLabel.horizAlign = "center"
+    footerLabel.text = "Forgot PIN?"
+    
+    font = createObject("roSGNode", "Font")
+    font.uri = "pkg:/fonts/Lato-Regular.ttf"
+    font.size = 28
+    footerLabel = dialog.footerContentGroup.createChild("Label")
+    footerLabel.translation = [0, 35]
+    footerLabel.font = font
+    footerLabel.color = "0xffffff9b"
+    footerLabel.width = dialog.buttonWidth
+    footerLabel.horizAlign = "center"
+    footerLabel.text = "Visit www.cbs.com/PIN"
+    
+    tabOrder = [pinPad]
+    tabOrder.append(dialog.tabOrder)
+    dialog.tabOrder = tabOrder
+    
+    dialog.observeField("buttonSelected", callbackFunction)
+    setGlobalField("cbsDialog", dialog)
+    
+    return dialog
+end function
+
+sub showPinErrorDialog(title as string, message as string, buttons as object, callbackFunction as string)
+    dialog = createCbsDialog(title, message)
+    dialog.allowBack = true
+    dialog.buttonWidth = 450
+    dialog.buttonHeight = 73
+    dialog.buttons = buttons
+
+    dialog.includeContentSpacer = false
+    
+    font = createObject("roSGNode", "Font")
+    font.uri = "pkg:/fonts/Lato-Bold.ttf"
+    font.size = 28
+    footerLabel = dialog.footerContentGroup.createChild("Label")
+    footerLabel.font = font
+    footerLabel.color = "0xffffffff"
+    footerLabel.width = dialog.buttonWidth
+    footerLabel.horizAlign = "center"
+    footerLabel.text = "Forgot PIN?"
+    
+    font = createObject("roSGNode", "Font")
+    font.uri = "pkg:/fonts/Lato-Regular.ttf"
+    font.size = 28
+    footerLabel = dialog.footerContentGroup.createChild("Label")
+    footerLabel.translation = [0, 35]
+    footerLabel.font = font
+    footerLabel.color = "0xffffff9b"
+    footerLabel.width = dialog.buttonWidth
+    footerLabel.horizAlign = "center"
+    footerLabel.text = "Visit www.cbs.com/PIN"
+
+    dialog.observeField("buttonSelected", callbackFunction)
+    setGlobalField("cbsDialog", dialog)
+end sub
 
 sub sendDWAnalytics(params as object)
     analytics = getGlobalField("analytics")

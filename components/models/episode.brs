@@ -31,6 +31,16 @@ sub onJsonChanged()
         m.top.isProtected       = asBoolean(json.isProtected, false)
         m.top.topLevelCategory  = asString(json.topLevelCategory)
         
+        ' retrieve the regional rating for parental control checks
+        ' TODO: this probably needs to be pulled based on the appRegion, but
+        '       for now we just grab the first rating in the array
+        if json.regionalRatings <> invalid then
+            regionalRating = json.regionalRatings[0]
+            if regionalRating <> invalid then
+                m.top.regionalRating = regionalRating.rating
+            end if
+        end if
+        
         m.top.audio_guide_text = m.top.showName + " " + m.top.title
         
         m.top.premiumAudioAvailable = asBoolean(json.premiumAudioAvailable)
