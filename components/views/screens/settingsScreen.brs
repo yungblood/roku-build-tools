@@ -119,7 +119,13 @@ sub onPanelButtonSelected(nodeEvent as object)
 end sub
 
 sub onMenuItemSelected(nodeEvent as object)
-    m.top.menuItemSelected = nodeEvent.getData()
+    selection=nodeEvent.getData()
+    if selection = "settings" then
+        m.settingsButtons.setFocus(true)
+        m.lastFocus = m.settingsButtons
+    else
+        m.top.menuItemSelected = selection
+    end if
 end sub
 
 function focusPanel() as boolean

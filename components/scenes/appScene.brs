@@ -660,40 +660,28 @@ sub onRendezvousSuccess(nodeEvent as object)
 end sub
 
 sub showHomeScreen()
-    if m.navigationStack.isEmpty() Or m.navigationStack.peek().subtype() <> "HomeScreen" then
-        screen = createObject("roSGNode", "HomeScreen")
-        screen.observeField("itemSelected", "onItemSelected")
-        screen.observeField("buttonSelected", "onButtonSelected")
-        screen.observeField("menuItemSelected", "onMenuItemSelected")
-        addToNavigationStack(screen, true, true)
-    else
-        m.navigationStack.peek().findNode("marquee").setFocus(true)
-    end if
+    screen = createObject("roSGNode", "HomeScreen")
+    screen.observeField("itemSelected", "onItemSelected")
+    screen.observeField("buttonSelected", "onButtonSelected")
+    screen.observeField("menuItemSelected", "onMenuItemSelected")
+    addToNavigationStack(screen, true, true)
 end sub
 
 sub showShowsScreen(category = "" as string)
-    if m.navigationStack.isEmpty() Or m.navigationStack.peek().subtype() <> "ShowsScreen" then
-        screen = createObject("roSGNode", "ShowsScreen")
-        screen.category = category
-        screen.observeField("itemSelected", "onItemSelected")
-        screen.observeField("buttonSelected", "onButtonSelected")
-        screen.observeField("menuItemSelected", "onMenuItemSelected")
-        addToNavigationStack(screen, true, true)
-    else
-        m.navigationStack.peek().findNode("groups").setFocus(true)
-    end if
+    screen = createObject("roSGNode", "ShowsScreen")
+    screen.category = category
+    screen.observeField("itemSelected", "onItemSelected")
+    screen.observeField("buttonSelected", "onButtonSelected")
+    screen.observeField("menuItemSelected", "onMenuItemSelected")
+    addToNavigationStack(screen, true, true)
 end sub
 
 sub showMoviesScreen()
-    if m.navigationStack.isEmpty() Or m.navigationStack.peek().subtype() <> "MoviesScreen" then
-        screen = createObject("roSGNode", "MoviesScreen")
-        screen.observeField("itemSelected", "onItemSelected")
-        screen.observeField("buttonSelected", "onButtonSelected")
-        screen.observeField("menuItemSelected", "onMenuItemSelected")
-        addToNavigationStack(screen, true, true)
-    else
-        m.navigationStack.peek().findNode("grid").setFocus(true)
-    end if
+    screen = createObject("roSGNode", "MoviesScreen")
+    screen.observeField("itemSelected", "onItemSelected")
+    screen.observeField("buttonSelected", "onButtonSelected")
+    screen.observeField("menuItemSelected", "onMenuItemSelected")
+    addToNavigationStack(screen, true, true)
 end sub
 
 sub showLiveTVScreen()
@@ -733,26 +721,18 @@ sub showLiveFeedScreen(liveFeed as object, source = invalid as object)
 end sub
 
 sub showSearchScreen()
-    if m.navigationStack.isEmpty() Or m.navigationStack.peek().subtype() <> "SearchScreen" then
-        screen = createObject("roSGNode", "SearchScreen")
-        screen.observeField("itemSelected", "onItemSelected")
-        screen.observeField("menuItemSelected", "onMenuItemSelected")
-        addToNavigationStack(screen, true, true)
-    else
-        m.navigationStack.peek().findNode("keyboard").setFocus(true)
-    end if
+    screen = createObject("roSGNode", "SearchScreen")
+    screen.observeField("itemSelected", "onItemSelected")
+    screen.observeField("menuItemSelected", "onMenuItemSelected")
+    addToNavigationStack(screen, true, true)
 end sub
 
 sub showSettingsScreen()
-    if m.navigationStack.isEmpty() Or m.navigationStack.peek().subtype() <> "SettingsScreen" then
-        screen = createObject("roSGNode", "SettingsScreen")
-        screen.observeField("itemSelected", "onItemSelected")
-        screen.observeField("menuItemSelected", "onMenuItemSelected")
-        screen.observeField("buttonSelected", "onButtonSelected")
-        addToNavigationStack(screen, true, true)
-    else
-        m.navigationStack.peek().findNode("settingsButtons").setFocus(true)
-    end if
+    screen = createObject("roSGNode", "SettingsScreen")
+    screen.observeField("itemSelected", "onItemSelected")
+    screen.observeField("menuItemSelected", "onMenuItemSelected")
+    screen.observeField("buttonSelected", "onButtonSelected")
+    addToNavigationStack(screen, true, true)
 end sub
 
 sub showShowScreen(showID = "" as string, episodeID = "" as string, source = invalid as object, replaceCurrent = false as boolean, autoplay = false as boolean)
@@ -1268,7 +1248,7 @@ end sub
 
 sub onMenuItemSelected(nodeEvent as object)
     menuItem = nodeEvent.getData()
-    if menuItem = "home" then
+    if menuItem = "home" 
         showHomeScreen()
     else if menuItem = "shows" then
         showShowsScreen()

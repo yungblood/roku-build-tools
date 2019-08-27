@@ -133,7 +133,17 @@ sub selectGroup(group as object)
 end sub
 
 sub onMenuItemSelected(nodeEvent as object)
-    m.top.menuItemSelected = nodeEvent.getData()
+    selection=nodeEvent.getData()
+    if selection = "shows" then
+        'only change selection focus area if there is something here
+        'for this screen it's not that critical
+        if m.groups.visible then
+            m.groups.setFocus(true)
+            m.lastFocus = m.groups
+        end if
+    else
+        m.top.menuItemSelected = selection
+    end if
 end sub
 
 sub onItemSelected(nodeEvent as object)

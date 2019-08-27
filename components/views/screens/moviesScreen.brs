@@ -51,7 +51,13 @@ sub onMoviesLoaded(nodeEvent as object)
 end sub
 
 sub onMenuItemSelected(nodeEvent as object)
-    m.top.menuItemSelected = nodeEvent.getData()
+    selection=nodeEvent.getData()
+    if selection = "movies"
+        m.grid.setFocus(true)
+        m.lastFocus = m.grid
+    else
+        m.top.menuItemSelected = selection
+    end if
 end sub
 
 sub onItemFocused(nodeEvent as object)

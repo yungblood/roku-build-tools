@@ -374,7 +374,17 @@ sub onItemSelected(nodeEvent as object)
 end sub
 
 sub onMenuItemSelected(nodeEvent as object)
-    m.top.menuItemSelected = nodeEvent.getData()
+    selection=nodeEvent.getData()
+    if selection = "home" then
+        'only change selection focus area after content is loaded
+        'for users with itchy hyper trigger fingers this will keep focus where it should be
+        if m.top.content <> invalid then
+            m.marquee.setFocus(true)
+            m.lastFocus = m.marquee
+        end if
+    else
+        m.top.menuItemSelected = selection
+    end if
 end sub
 
 sub onMarqueeOpacityChanged()

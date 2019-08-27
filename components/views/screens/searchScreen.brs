@@ -118,7 +118,13 @@ sub onItemSelected(nodeEvent as object)
 end sub
 
 sub onMenuItemSelected(nodeEvent as object)
-    m.top.menuItemSelected = nodeEvent.getData()
+    selection=nodeEvent.getData()
+    if selection = "search" then
+        m.keyboard.setFocus(true)
+        m.lastFocus = m.keyboard
+    else
+        m.top.menuItemSelected = selection
+    end if
 end sub
 
 sub onSearchTextChanged()
