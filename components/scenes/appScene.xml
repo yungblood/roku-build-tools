@@ -65,5 +65,8 @@
             id="dialogTimer"
             repeat="false"
             duration=".25" />
+
+        <linkStatusTask
+            id="linkStatusTask" />
     </children>
 </component>

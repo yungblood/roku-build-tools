@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="linkStatusTask" extends="ApiTask">
+    <script type="text/brightscript" uri="pkg:/components/tasks/linkStatusTask.brs" />
+    <interface>
+        <field id="status" type="boolean" alwaysNotify="true" />
+    </interface>
+</component>
