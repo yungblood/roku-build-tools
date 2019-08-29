@@ -16,10 +16,11 @@ sub init()
     addGlobalField("cbsDialog", "node", false)
     observeGlobalField("cbsDialog", "onDialogChanged")
     
-    m.linkStatus = m.top.findNode("linkStatusTask")
-    m.linkStatus.observeField("status", "onLinkStatusChanged")
-    m.linkStatus.control = "run"
-    m.linkStatus.status = GetLinkStatus()
+    if GetLinkStatus() = false then
+        dialog = createCbsDialog("", "There is a problem connecting to the network." + chr(10) + "Please check your network settings.", ["OK"])
+        dialog.observeField("buttonSelected", "onExitDialogButtonSelected")
+        setGlobalField("cbsDialog", dialog)
+    end if
 
     addGlobalField("showWaitScreen", "boolean", true)
     observeGlobalField("showWaitScreen", "onShowWaitScreen")
@@ -1273,14 +1274,5 @@ sub onMenuItemSelected(nodeEvent as object)
         showSearchScreen()
     else if menuItem = "settings" then
         showSettingsScreen()
-    end if
-end sub
-
-sub onLinkStatusChanged(nodeEvent as object)
-    status=nodeEvent.GetData()
-    if status = false then
-        dialog = createCbsDialog("", "There is a problem connecting to the network." + chr(10) + "Please check your network settings.", ["OK"])
-        dialog.observeField("buttonSelected", "onExitDialogButtonSelected")
-        setGlobalField("cbsDialog", dialog)
     end if
 end sub
