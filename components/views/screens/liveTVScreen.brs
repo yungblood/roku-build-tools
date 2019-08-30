@@ -151,7 +151,6 @@ end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
     if press then
-        resetOverlayTimer()
         if not m.liveTV.visible or m.overlay.visible then
             if key = "down" then
                 if m.menu.isInFocusChain() then
@@ -177,6 +176,13 @@ function onKeyEvent(key as string, press as boolean) as boolean
                     if not m.channelOverlay.visible then
                         showOverlay(not m.scheduleDetails.visible)
                         return true
+                    else
+                        if not m.menu.visible then
+                            showMenu(true)
+                            m.menu.setFocus(true)
+                            resetOverlayTimer(true)
+                            return true
+                        end if
                     end if
                 else
                     showOverlay(false)
@@ -186,13 +192,16 @@ function onKeyEvent(key as string, press as boolean) as boolean
                     showOverlay(false)
                 else
                     showMenu(true)
-                end if
+                    resetOverlayTimer(true)
+            end if
                 return true
             end if
         else
             showNowPlaying()
             return true
         end if
+    else
+        resetOverlayTimer(true)
     end if
     return false
 end function
@@ -737,7 +746,7 @@ sub onStationSelected(nodeEvent as object)
 end sub
 
 sub hideOverlay()
-    if m.overlay.isInFocusChain() or m.nowPlayingOverlay.visible then
+    if m.menu.isInFocusChain() or m.overlay.isInFocusChain() or m.nowPlayingOverlay.visible then
         m.overlay.visible = false
         hideMenu()
         m.video.setFocus(true)
