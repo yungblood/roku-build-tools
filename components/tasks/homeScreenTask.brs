@@ -11,7 +11,7 @@ sub doWork()
 
     user = getGlobalField("user")
     rows = [] 
-    if isSubscriber(m.top) then
+    if isAuthenticated(m.top) then
         rows.push(user.continueWatching)
         rows.push(user.showHistory)
     end if
