@@ -119,6 +119,7 @@ end sub
 sub selectGroup(group as object)
     if group <> invalid then
         m.top.omnitureName = "/shows/" + group.title
+        m.top.omnitureSiteHier = "shows|other|show listings|" + group.title
         trackScreenView()
         trackScreenAction("trackShowFilterSelect", {}, "/shows/filter/" + group.title)
         
