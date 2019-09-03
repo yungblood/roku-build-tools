@@ -184,7 +184,7 @@ sub onSignedIn(nodeEvent as object)
                 showHomeScreen()
             end if
         else
-            if m.top.deeplink = invalid and m.top.ecp.mediaType = invalid  then
+            if m.top.deeplink = invalid and m.top.ecp = invalid  then
                 showUpsellScreen()
             else
                 showHomeScreen()
