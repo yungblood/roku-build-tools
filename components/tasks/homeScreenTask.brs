@@ -12,8 +12,12 @@ sub doWork()
     user = getGlobalField("user")
     rows = [] 
     if isAuthenticated(m.top) then
-        rows.push(user.continueWatching)
-        rows.push(user.showHistory)
+        if user.continueWatching.getChildCount()>0 then
+            rows.push(user.continueWatching)
+        end if
+        if user.showHistory.getChildCount()>0 then
+            rows.push(user.showHistory)
+        end if
     end if
 
     enableR4Y = false
