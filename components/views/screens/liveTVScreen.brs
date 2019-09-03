@@ -244,7 +244,7 @@ sub onMenuItemSelected(nodeEvent as object)
 end sub
 
 sub selectChannel(channel as object, showChannels = false as boolean)
-    if m.channel = invalid or m.channel.id <> channel.id then
+    if m.channel = invalid or m.channel.id <> channel.id or m.video.state = "stopped" then
         if m.video.state <> "stopped" then
             m.video.control = "stop"
         end if
@@ -276,7 +276,7 @@ end sub
 
 sub onStationChanged(nodeEvent as object)
     station = nodeEvent.getData()
-    if m.station = invalid or not m.station.isSameNode(station) then
+    if m.station = invalid or not m.station.isSameNode(station) or m.video.state = "stopped" then
         m.station = station
     end if
     playChannel(m.station, true)
@@ -459,51 +459,66 @@ sub onStreamLoaded(nodeEvent as object)
         m.streamTask.unobserveField("stream")
         m.streamTask = invalid
     end if
-
-    stream = nodeEvent.getData()
-    stream.station = m.station
-    m.video.content = stream
-    resetOverlayTimer(true)
-
-    if m.channel.scheduleType <> "local" or m.station = invalid then
-        m.station = m.channel
-    end if
-    sendDWAnalytics({method: "playerInit", params: [true, m.station.trackingContentID] })
-    sendSparrowAnalytics({method: "playerInit", params: [true] })
-    sendDWAnalytics({method: "playerLiveStart", params: [m.station, getPlayerPosition()] })
-
-    trackVideoLoad(m.station, m.heartbeatContext)
     
-    comscore = getGlobalField("comscore")
-    if comscore = invalid then
-        comscore = createObject("roSGNode", "ComscoreTask")
-        comscore.control = "run"
-        setGlobalField("comscore", comscore)
-    end if
-    if comscore <> invalid then
-        comscore.callFunc("reset", {})
-        if not isNullOrEmpty(m.station.comscoreC2) then
-            comscore.c2 = m.station.comscoreC2
+    task = nodeEvent.getRoSGNode()
+    stream = nodeEvent.getData()
+    
+    if stream = invalid then
+        hideSpinner()
+        if task.error = "CONCURRENT_STREAM_LIMIT" then
+            dialog = createCbsDialog("Concurrent Streams Limit", "You've reached the maximum number of simultaneous video streams for your account. To view this live stream, close the other videos you're watching and try again.", ["OK"])
+            dialog.observeField("buttonSelected", "onErrorDialogClose")
+            setGlobalField("cbsDialog", dialog)
+        else
+            dialog = createCbsDialog("Content Unavailable", "The content you are trying to play is currently unavailable. Please try again later.", ["OK"])
+            dialog.observeField("buttonSelected", "onErrorDialogClose")
+            setGlobalField("cbsDialog", dialog)
         end if
-        if not isNullOrEmpty(m.station.comscoreC3) then
-            comscore.c3 = m.station.comscoreC3
+    else
+        stream.station = m.station
+        m.video.content = stream
+        resetOverlayTimer(true)
+    
+        if m.channel.scheduleType <> "local" or m.station = invalid then
+            m.station = m.channel
         end if
-        if not isNullOrEmpty(m.station.comscoreC4) then
-            comscore.c4 = m.station.comscoreC4
-        end if
-        comscore.content = m.station
-    end if
-
-    startConviva()
-    m.video.control = "play"
-
-    trackVideoStart()
+        sendDWAnalytics({method: "playerInit", params: [true, m.station.trackingContentID] })
+        sendSparrowAnalytics({method: "playerInit", params: [true] })
+        sendDWAnalytics({method: "playerLiveStart", params: [m.station, getPlayerPosition()] })
+    
+        trackVideoLoad(m.station, m.heartbeatContext)
         
-    hideSpinner()
-    if not m.firstLoad then
-        showNowPlaying()
+        comscore = getGlobalField("comscore")
+        if comscore = invalid then
+            comscore = createObject("roSGNode", "ComscoreTask")
+            comscore.control = "run"
+            setGlobalField("comscore", comscore)
+        end if
+        if comscore <> invalid then
+            comscore.callFunc("reset", {})
+            if not isNullOrEmpty(m.station.comscoreC2) then
+                comscore.c2 = m.station.comscoreC2
+            end if
+            if not isNullOrEmpty(m.station.comscoreC3) then
+                comscore.c3 = m.station.comscoreC3
+            end if
+            if not isNullOrEmpty(m.station.comscoreC4) then
+                comscore.c4 = m.station.comscoreC4
+            end if
+            comscore.content = m.station
+        end if
+    
+        startConviva()
+        m.video.control = "play"
+    
+        trackVideoStart()
+            
+        hideSpinner()
+        if not m.firstLoad then
+            showNowPlaying()
+        end if
+        m.firstLoad = false
     end if
-    m.firstLoad = false
 end sub
 
 sub loadSchedule()
