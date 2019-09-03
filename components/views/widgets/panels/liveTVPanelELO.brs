@@ -122,7 +122,7 @@ sub updateContent()
     m.content.removeChild(m.override)
     m.content.removeChild(m.zipOverrides)
     
-    if isAuthenticated(m.top) then
+    if isSubscriber(m.top) then
         showSpinner()
 
         m.loadTask = createObject("roSGNode", "LoadLiveStationsTask")
