@@ -129,7 +129,7 @@ sub onEpisodeChanged()
                     m.buttons.removeChild(m.resume)
                 end if
             else
-                m.watch.text = "SUBSCRIBE TO WATCH"
+                m.watch.text = "SUBSCRIBE"
                 m.buttons.removeChild(m.resume)
             end if
 
