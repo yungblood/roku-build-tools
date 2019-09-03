@@ -16,6 +16,12 @@ sub init()
     addGlobalField("cbsDialog", "node", false)
     observeGlobalField("cbsDialog", "onDialogChanged")
     
+    if GetLinkStatus() = false then
+        dialog = createCbsDialog("", "There is a problem connecting to the network." + chr(10) + "Please check your network settings.", ["OK"])
+        dialog.observeField("buttonSelected", "onExitDialogButtonSelected")
+        setGlobalField("cbsDialog", dialog)
+    end if
+
     addGlobalField("showWaitScreen", "boolean", true)
     observeGlobalField("showWaitScreen", "onShowWaitScreen")
     
@@ -74,7 +80,7 @@ sub onExitDialogButtonSelected(nodeEvent as object)
     button = nodeEvent.getData()
     menu = m.global.findNode("menu")
     if menu <> invalid then menu.setFocus(true)
-    if button = "Yes" then
+    if button = "Yes" or button = "OK" then
         m.top.close = true
     end if
     dialog.close = true
@@ -1270,4 +1276,3 @@ sub onMenuItemSelected(nodeEvent as object)
         showSettingsScreen()
     end if
 end sub
-
