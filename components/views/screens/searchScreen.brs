@@ -55,6 +55,7 @@ end sub
 
 sub onFocusChanged()
     if m.top.hasFocus() then
+        hideSpinner()
         updateKeyboard(true)
         m.keyboard.setFocus(true)
     end if

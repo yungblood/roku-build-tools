@@ -63,6 +63,7 @@ sub onFocusChanged()
         if m.lastFocus <> invalid then
             m.lastFocus.setFocus(true)
         else
+            hideSpinner()
             m.settingsButtons.setFocus(true)
         end if
     end if
