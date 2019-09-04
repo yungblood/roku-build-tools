@@ -11,7 +11,7 @@
     "syncbakSecret":   "8e60ba369c7f46ba9c6b72b0f1548979",
     "syncbakBaseUrl":  "https://cbsservice.aws.syncbak.com",
     
-    "enableGeoBlock":  false,
+    "enableGeoBlock":  true,
     
     "enableTaplytics": true,
     
