@@ -374,7 +374,7 @@ sub onItemSelected(nodeEvent as object)
 end sub
 
 sub onMenuItemSelected(nodeEvent as object)
-    selection=nodeEvent.getData()
+    selection = nodeEvent.getData()
     if selection = "home" then
         'only change selection focus area after content is loaded
         'for users with itchy hyper trigger fingers this will keep focus where it should be

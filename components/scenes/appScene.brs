@@ -748,11 +748,12 @@ sub showSettingsScreen()
     addToNavigationStack(screen, true, true)
 end sub
 
-sub showShowScreen(showID = "" as string, episodeID = "" as string, source = invalid as object, replaceCurrent = false as boolean, autoplay = false as boolean)
+sub showShowScreen(showID = "" as string, episodeID = "" as string, source = invalid as object, replaceCurrent = false as boolean, autoplay = false as boolean, triggerDynamicPlay = false as boolean)
     screen = createObject("roSGNode", "ShowScreen")
     screen.showID = showID
     screen.episodeID = episodeID
     screen.autoplay = autoplay
+    screen.triggerDynamicPlay = triggerDynamicPlay
     if source <> invalid then
         if source.hasField("additionalContext") then
             screen.additionalContext = source.additionalContext
@@ -1238,7 +1239,23 @@ sub onItemSelected(nodeEvent as object)
         else if item.subtype() = "LiveFeed" then
             showLiveFeedScreen(item, source)
         else if item.subtype() = "Show" or item.subtype() = "RelatedShow" or item.subtype() = "ShowGroupItem" then
-            showShowScreen(item.id, "", source)
+            row = item.getParent()
+            if row <> invalid then
+                combine = false
+                config = getGlobalField("config")
+                if config <> invalid and config.enableTaplytics = true then
+                    taplyticsApi = getGlobalComponent("taplytics")
+                    if taplyticsApi <> invalid then
+                        response = taplyticsApi.callFunc("getRunningExperimentsAndVariations")
+                        if response.experiments <> invalid and response.experiments["CW-SYW-AB"] <> invalid then
+                            combine = taplyticsApi.callFunc("getValueForVariable", { name: "combine", default: true })
+                        end if
+                    end if
+                end if
+                showShowScreen(item.id, "", source, false, false, combine and row.subtype() = "ShowHistory")
+            else
+                showShowScreen(item.id, "", source)
+            end if
         else if item.subtype() = "Favorite" then
             showShowScreen(item.showID)
         else if item.subtype() = "SearchResult" then
