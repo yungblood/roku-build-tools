@@ -246,6 +246,7 @@ sub onContentLoaded(nodeEvent as object)
     if task.errorCode = 0 then
         content = nodeEvent.getData()
         if content <> invalid then
+            m.list.showRowLabel=[true]
             m.top.content = content
         end if
     else
