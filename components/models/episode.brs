@@ -28,7 +28,7 @@ sub onJsonChanged()
         m.top.titleSeason       = asString(json.seriesTitle)
         m.top.isFullEpisode     = asBoolean(json.fullEpisode, true)
         m.top.isLive            = asBoolean(json.isLive, false)
-        m.top.isProtected       = true 'asBoolean(json.isProtected, false)
+        m.top.isProtected       = asBoolean(json.isProtected, false)
         m.top.topLevelCategory  = asString(json.topLevelCategory)
         
         ' retrieve the regional rating for parental control checks

@@ -7,11 +7,12 @@ sub doWork()
     api = cbs()
     api.initialize(m.top)
 
-    if api.isOverStreamLimit() then
-        m.top.error = "CONCURRENT_STREAM_LIMIT"
-        m.top.stream = invalid
-        return
-    end if
+'   TODO: 
+'    if api.isOverStreamLimit() then
+'        m.top.error = "CONCURRENT_STREAM_LIMIT"
+'        m.top.stream = invalid
+'        return
+'    end if
     
     stream = invalid
     station = m.top.station
