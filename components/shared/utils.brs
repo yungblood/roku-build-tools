@@ -256,6 +256,10 @@ function parseDeepLink(link as string) as object
     link = link.replace("https://www.cbs.com/", "")
     link = link.replace("cbs://www.cbs.com/", "")
     
+    ' support possible deeplinks with hashes that are missing the leading slash
+    link = link.replace("#", "/#")
+    link = link.replace("//#", "/#")
+
     if link.inStr("/") = 0 then
         link = link.mid(1)
     end if
@@ -278,7 +282,7 @@ function parseDeepLink(link as string) as object
                 params.mediaType = "screen"
                 params.contentID = "shows"
                 if parts[1].inStr("#") = 0 then
-                    params.category = parts[1].mid(1)
+                    params.category = parts[1].mid(1).replace("-", " ")
                 end if
             else if parts.count() = 3 then
                 ' /shows/the-good-fight/
