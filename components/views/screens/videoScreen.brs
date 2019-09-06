@@ -103,7 +103,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
                 end if 
             end if
         else
-            if key = "OK" or key = "play" then
+            if key = "play" then
                 if m.video.state="playing" then
                     m.video.control="pause"
                 else if m.video.state="paused" then
