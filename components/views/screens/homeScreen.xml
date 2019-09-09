@@ -40,6 +40,7 @@
             rowLabelFont="dictionary:rowTitleFont"
             rowLabelColor="0xffffffff"
             focusBitmapUri="pkg:/images/frame_grid.9.png"
+            drawFocusFeedback="false"
             vertFocusAnimationStyle="fixedFocus" />
 
 <!--         <FocusGroup -->
