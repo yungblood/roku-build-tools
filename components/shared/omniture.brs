@@ -20,6 +20,11 @@ sub initializeAdobe()
         m.persistentParams["adDeviceId"] = getAdvertisingID()
         m.persistentParams["userRegId"] = user.id
         m.persistentParams["&&products"] = user.trackingProduct
+        if user.status="ANONYMOUS" then
+            m.persistentParams["userType"]="ANON"
+        else
+            m.persistentParams["userType"]=user.status
+        end if
     end if
 end sub
 
