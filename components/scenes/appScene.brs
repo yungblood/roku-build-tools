@@ -1241,14 +1241,14 @@ sub onItemSelected(nodeEvent as object)
         else if item.subtype() = "Show" or item.subtype() = "RelatedShow" or item.subtype() = "ShowGroupItem" then
             row = item.getParent()
             if row <> invalid then
-                combine = false
+                combine = true
                 config = getGlobalField("config")
                 if config <> invalid and config.enableTaplytics = true then
                     taplyticsApi = getGlobalComponent("taplytics")
                     if taplyticsApi <> invalid then
                         response = taplyticsApi.callFunc("getRunningExperimentsAndVariations")
-                        if response.experiments <> invalid and response.experiments["CW-SYW-AB"] <> invalid then
-                            combine = taplyticsApi.callFunc("getValueForVariable", { name: "combine", default: true })
+                        if response.experiments <> invalid and response.experiments["SYW-CW Combo Test"] <> invalid then
+                            combine = taplyticsApi.callFunc("getValueForVariable", { name: "syw_cw_combination", default: combine })
                         end if
                     end if
                 end if
