@@ -486,6 +486,7 @@ sub onCreateAccountSuccessDialogClose(nodeEvent as object)
     if dialog <> invalid then
         dialog.close = true
     end if
+    clearNavigationStack()
     reinit()
 end sub
 
