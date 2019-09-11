@@ -203,7 +203,7 @@ sub onContentReady()
         if not m.top.close then
             m.video.control = "play"
         end if
-    clearMetadata()
+    m.firstPlay = true
     end if
 end sub
 
@@ -298,6 +298,10 @@ m.loadingText.visible = false
             end if
 m.loadingText.visible = false
         else if state = "playing" then
+            if m.firstPlay then
+                clearMetadata()
+                m.firstPlay = false
+            end if
             hideSpinner()
             if m.paused then
                 if m.video.position < m.pausedPosition or m.video.position > m.pausedPosition + 1 then
