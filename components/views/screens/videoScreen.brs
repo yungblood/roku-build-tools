@@ -17,8 +17,10 @@ sub init()
     m.video.observeFieldScoped("content", "onContentReady")
     m.video.observeFieldScoped("position", "onPositionChanged")
     m.video.observeFieldScoped("state", "onVideoStateChanged")
-    m.video.observeFieldScoped("trickPlayBarVisibilityHint", "onOverlayVisibilityHint")
-    
+    'this causes the flickering of the overlay on replay button press, so commented out as we will not be using this
+    'm.video.observeFieldScoped("trickPlayBarVisibilityHint", "onOverlayVisibilityHint")
+    m.firstPlay = true 'flag to ensure we are only clearing the meta data once
+
    ' if getGlobalField("extremeMemoryManagement") = true then
     if getModel().mid(0, 2).toInt() <= 35 then
          ' limit the video resolution on low-end devices
@@ -86,34 +88,60 @@ function onKeyEvent(key as string, press as boolean) as boolean
     ?"videoScreen.onKeyEvent", key, press, m.inAd
     if press then
         if not m.inAd then
-            if key = "OK" or key = "play" then
-                if not m.endCard.visible then
-                    m.overlay.visible = true
-                    m.overlayTimer.control = "start"
-                    return true
-                end if
-            else if key = "back" then
+            if key = "back" then
                 if m.overlay.visible then
                     m.overlay.visible = false
                     m.overlayTimer.control = "stop"
-                    return true
                 else
                     m.top.close = true
-                    return true
                 end if 
+                return true
             end if
         else
+            'm.inAd - send key to brightline
+            brightline = getGlobalField("brightline")
+            if brightline <> invalid then
+                brightline.BLKeyPress = key
+            end if
             if key = "play" then
                 if m.video.state = "playing" then
                     m.video.control = "pause"
                 else if m.video.state = "paused" then
                     m.video.control = "resume"
                 end if
+                return true
             end if
-            'm.inAd - send key to brightline
-            brightline = getGlobalField("brightline")
-            if brightline <> invalid then
-                brightline.BLKeyPress = key
+        end if
+    else
+        if not m.inAd then
+            if not m.endCard.visible then
+                if key = "OK" then
+                    if m.video.state = "paused" then
+                        m.overlay.visible = false
+                        m.overlayTimer.control = "stop"
+                    end if
+                    if m.video.state = "playing" then
+                        if m.overlay.visible = false then
+                            m.overlay.visible = true
+                        else
+                            m.overlay.visible = false
+                        end if
+                    end if
+                    return true
+                else if key = "play" then    
+                    if m.video.state = "paused" then
+                        m.overlay.visible = true
+                        m.overlayTimer.control = "start"
+                    else if m.video.state = "playing" then
+                        m.overlay.visible = false
+                        m.overlayTimer.control = "stop"
+                    end if
+                    return true
+                else if key = "right" or key = "left" or key = "fastforward" or key = "rewind" then
+                    m.overlay.visible = true
+                    m.overlayTimer.control = "stop"
+                    return true
+                end if
             end if
         end if
     end if
@@ -179,29 +207,30 @@ sub onVideoComplete()
 end sub
 
 sub onOverlayVisibilityHint()
-    if m.video <> invalid then
-        m.overlay.visible = (m.video.trickPlayBarVisibilityHint or m.video.state = "paused")
-        if m.overlay.visible then
-            ' HACK: Find the labels with the current content metadata and hide them
-            for i = 0 to m.video.getChildCount() - 1
-                child = m.video.getChild(i)
-                for j = 0 to child.getChildCount() - 1
-                    control = child.getChild(j)
-                    if control.subtype() = "Label" then
-                        if control.text = m.episode.title then
-                            control.text = ""
-                        else if control.text = m.episode.titleSeason then
-                            control.text = ""
-                        end if
-                    end if
-                next
-            next
-        end if
-    end if
+    m.overlay.visible = (m.video.trickPlayBarVisibilityHint or m.video.state = "paused")
+end sub
+
+sub clearMetadata()
+    ' HACK: Find the labels with the current content metadata and hide them
+    for i = 0 to m.video.getChildCount() - 1
+        child = m.video.getChild(i)
+        for j = 0 to child.getChildCount() - 1
+            control = child.getChild(j)
+            if control.subtype() = "Label" then
+                if control.text = m.episode.title then
+                    control.text = ""
+                else if control.text = m.episode.titleSeason then
+                    control.text = ""
+                end if
+            end if
+        next
+    next
+    m.firstPlay= false
 end sub
 
 sub onOverlayTimerFired()
     m.overlay.visible = false
+    m.overlayTimer.control = "stop"
 end sub
 
 sub onBifVisibleChanged()
@@ -252,6 +281,7 @@ sub onVideoStateChanged()
             end if
         else if state = "playing" then
             hideSpinner()
+            if m.firstPlay then clearMetadata()
             if m.paused then
                 if m.video.position < m.pausedPosition or m.video.position > m.pausedPosition + 1 then
                     if m.video.position > m.pausedPosition then

@@ -112,7 +112,7 @@
             repeat="false" />
         <Timer
             id="overlayTimer"
-            duration="10"
+            duration="4"
             repeat="false" />
         <Timer
             id="timeoutTimer"
