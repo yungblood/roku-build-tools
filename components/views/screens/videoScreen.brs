@@ -89,15 +89,15 @@ sub init()
 'stop
 
     'just in case roku decides to rearrange items in the core video component later, we are doing a quick search for what we need through available children
-    found = false 'using this to exit second loop
+    found = false 'using this to exit parent loop
     tempMainCount = m.video.getChildCount()-1
     'we will do this in revers order for speed, as the clock is currently within the last child
     'all children of components within the children of video do NOT have IDs in the firmware, so
     'since we have to check each type to find it, we will not be able to use removeChild(id)
     'so we will use removeChildIndex since we have the index if it is found
     for i = tempMainCount to 0 step - 1
-        tempSecondaryCount = m.video.getChild(i).getChildCount()-1
-        for j = tempSecondaryCount to 0 step -1
+        tempSecondaryCount = m.video.getChild(i).getChildCount() - 1
+        for j = tempSecondaryCount to 0 step - 1
             if m.video.getChild(i).getChild(j).subType() = "Clock" then
                 found = true
                 m.video.getChild(i).removeChildIndex(j)
