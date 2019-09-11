@@ -86,7 +86,7 @@ sub init()
     m.timedOut = false
     
     m.idleTimeout = asInteger(config.playback_timeout_bblf, config.liveTimeout)
-stop
+'stop
 
     'just in case roku decides to rearrange items in the core video component later, we are doing a quick search for what we need through available children
     found = false 'using this to exit second loop
