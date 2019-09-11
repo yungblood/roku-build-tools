@@ -43,6 +43,11 @@
             id="video"
             notificationInterval="1" />
             
+		<Label
+			id="loadingtext"
+			color="0xF0F0F0"
+			text="Loading"/>
+		
         <Label
             id="adCounterShadow"
             translation="[97,71]"
@@ -112,7 +117,7 @@
             repeat="false" />
         <Timer
             id="overlayTimer"
-            duration="4"
+            duration="10"
             repeat="false" />
         <Timer
             id="timeoutTimer"

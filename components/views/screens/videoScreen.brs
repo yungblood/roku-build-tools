@@ -19,7 +19,11 @@ sub init()
     m.video.observeFieldScoped("state", "onVideoStateChanged")
     'this causes the flickering of the overlay on replay button press, so commented out as we will not be using this
     'm.video.observeFieldScoped("trickPlayBarVisibilityHint", "onOverlayVisibilityHint")
-    m.firstPlay = true 'flag to ensure we are only clearing the meta data once
+	m.loadingText=m.top.findNode("loadingtext")
+	m.loadingText.Visible=FALSE
+	exrect=m.loadingText.boundingRect()
+	centerx=(1920-exrect.width)/2
+	m.loadingText.translation=[centerx,860]
 
    ' if getGlobalField("extremeMemoryManagement") = true then
     if getModel().mid(0, 2).toInt() <= 35 then
@@ -116,22 +120,31 @@ function onKeyEvent(key as string, press as boolean) as boolean
         if not m.inAd then
             if not m.endCard.visible then
                 if key = "OK" then
-                    if m.video.state = "paused" then
-                        m.overlay.visible = false
-                        m.overlayTimer.control = "stop"
-                    end if
                     if m.video.state = "playing" then
                         if m.overlay.visible = false then
                             m.overlay.visible = true
+                        'this is the only place I think this would be ever be started if we wanted the overlay to be hidden by the timer
+                        'if it is started then we need to stop it in all the other places below.
+                            m.overlayTimer.control = "start"
                         else
                             m.overlay.visible = false
+                            m.overlayTimer.control = "stop"
                         end if
                     end if
+                    'uncomment this section if we want the overlay to be able to be toggled by the customer while the video is paused
+                    'if m.video.state = "paused" then
+                    '    if m.overlay.visible = false then
+                    '        m.overlay.visible = true
+                    '    else
+                    '        m.overlay.visible = false
+                    '        m.overlayTimer.control = "stop"
+                    '    end if
+                    'end if
                     return true
                 else if key = "play" then    
-                    if m.video.state = "paused" then
+                    if m.video.state ="paused" then
                         m.overlay.visible = true
-                        m.overlayTimer.control = "start"
+                        m.overlayTimer.control = "stop"
                     else if m.video.state = "playing" then
                         m.overlay.visible = false
                         m.overlayTimer.control = "stop"
@@ -141,6 +154,8 @@ function onKeyEvent(key as string, press as boolean) as boolean
                     m.overlay.visible = true
                     m.overlayTimer.control = "stop"
                     return true
+                else if key = "replay" then
+                    m.loadingText.visible = true
                 end if
             end if
         end if
@@ -188,6 +203,7 @@ sub onContentReady()
         if not m.top.close then
             m.video.control = "play"
         end if
+    clearMetadata()
     end if
 end sub
 
@@ -225,7 +241,6 @@ sub clearMetadata()
             end if
         next
     next
-    m.firstPlay= false
 end sub
 
 sub onOverlayTimerFired()
@@ -250,7 +265,9 @@ sub onVideoStateChanged()
             else
                 m.errorDialog.setFocus(true)
             end if
+m.loadingText.visible = false
         else if state = "error" then
+m.loadingText.visible = false
             showErrorDialog(m.video.errorMsg)
         else if state = "buffering" then
             hideSpinner()
@@ -279,9 +296,9 @@ sub onVideoStateChanged()
             if comscore <> invalid then
                 comscore.videoEnd = true
             end if
+m.loadingText.visible = false
         else if state = "playing" then
             hideSpinner()
-            if m.firstPlay then clearMetadata()
             if m.paused then
                 if m.video.position < m.pausedPosition or m.video.position > m.pausedPosition + 1 then
                     if m.video.position > m.pausedPosition then
@@ -303,6 +320,7 @@ sub onVideoStateChanged()
                 comscore.videoStart = true
             end if
             m.paused = false
+m.loadingText.visible = false
         else if state = "stopped" then
             if m.episode <> invalid then
                 if m.episode.isLive then
@@ -328,6 +346,7 @@ sub onVideoStateChanged()
             end if
             trackVideoComplete()
             trackVideoUnload()
+m.loadingText.visible = false
         end if
     end if
 end sub
