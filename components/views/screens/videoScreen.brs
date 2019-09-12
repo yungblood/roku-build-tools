@@ -169,17 +169,6 @@ function onKeyEvent(key as string, press as boolean) as boolean
                         end if
                         return true
                     end if
-                    'uncomment this section if we want the overlay to be able to be toggled by the customer while the video is paused
-                    'if m.video.state = "paused" then
-                    '    fixFirmRectOpacity(0)
-                    '    if m.overlay.visible = false then
-                    '        m.overlay.visible = true
-                    '    else
-                    '        m.overlay.visible = false
-                    '        m.overlayTimer.control = "stop"
-                    '    end if
-                    '    return true
-                    'end if
                 else if key = "play" then    
                     if m.video.state ="paused" then
                         m.overlay.visible = true
@@ -199,7 +188,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
                     if m.video.state = "buffering" then
                         'the retrieving bar visiblility of the 1st child is what this keys off of, so let's hope roku doesn't change that
                         if m.video.bufferingbar.visible=false and m.video.retrievingbar.getChild(1).visible=false then
-                            fixFirmRectOpacity(0)
+                            fixFirmRectOpacity(1)
                             m.replayGroup.visible = true
                             return true
                         end if
