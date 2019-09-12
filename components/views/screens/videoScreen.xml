@@ -48,8 +48,8 @@
             visible="false">
             <Rectangle
                 id="replayShading"
-                translation="[0, 813]"
-                color="#000000"
+                translation="[0,813]"
+                color="0x000000ee"
                 width="1920"
                 height="267" />
             <Label
