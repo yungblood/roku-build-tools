@@ -160,9 +160,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
                     if m.video.state = "buffering" then
                         'the retrieving bar visiblility of the 1st child is what this keys off of, so let's hope roku doesn't change that
                         if m.video.bufferingbar.visible = false and m.video.retrievingbar.getChild(1).visible = false then
-                            'this is required twiddling of states for the firmware to display what we need properly the first time replay is pressed
-                            m.firmRect.opacity = 0
-                            m.firmRect.opacity = 1
+                            fixFirmRectOpacity(0)
                             m.replayGroup.visible = true
                             return true
                         end if
