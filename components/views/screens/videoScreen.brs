@@ -297,7 +297,6 @@ sub onVideoStateChanged()
             if not m.paused or m.video.audioTrack = m.currentAudioTrack then
                 m.video.enableTrickPlay = false
                 m.overlay.visible = false
-                m.replayGroup.visible = false
             end if
             m.currentAudioTrack = m.video.audioTrack
         else if state = "paused" then
