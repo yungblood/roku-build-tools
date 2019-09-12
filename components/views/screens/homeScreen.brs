@@ -218,15 +218,19 @@ sub updateContent()
             end if
         end if
     
-        if user.continueWatching.getChildCount() = 0 and not user.continueWatching.firstLoad then
-            if user.continueWatching.isSameNode(rows[0]) then
-                rows.delete(0)
-                update = true
-            end if
-        else
-            if not user.continueWatching.isSameNode(rows[0]) then
-                rows.unshift(user.continueWatching)
-                update = true
+        ' If showHistory is in recentlyWatched mode, we don't show the
+        ' continue watching carousel
+        if user.showHistory.mode <> "recentlyWatched" then
+            if user.continueWatching.getChildCount() = 0 and not user.continueWatching.firstLoad then
+                if user.continueWatching.isSameNode(rows[0]) then
+                    rows.delete(0)
+                    update = true
+                end if
+            else
+                if not user.continueWatching.isSameNode(rows[0]) then
+                    rows.unshift(user.continueWatching)
+                    update = true
+                end if
             end if
         end if
         if update then

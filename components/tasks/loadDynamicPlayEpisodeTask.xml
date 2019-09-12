@@ -2,6 +2,7 @@
 <component name="LoadDynamicPlayEpisodeTask" extends="ApiTask">
     <script type="text/brightscript" uri="pkg:/components/tasks/loadDynamicPlayEpisodeTask.brs" />
     <interface>
+        <field id="showID" type="string" />
         <field id="show" type="node" />
         <field id="episode" type="node" alwaysNotify="true" />
     </interface>

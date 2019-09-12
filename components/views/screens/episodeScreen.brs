@@ -37,17 +37,34 @@ sub onVisibleChanged()
     end if
 end sub
 
-sub onEpisodeIDChanged()
-    showSpinner()
-    m.loadTask = createObject("roSGNode", "LoadEpisodeTask")
-    m.loadTask.observeField("episode", "onEpisodeLoaded")
-    m.loadTask.episodeID = m.top.episodeID
-    m.loadTask.control = "run"
+sub onShowIDChanged(nodeEvent as object)
+    showID = nodeEvent.getData()
+    if not isNullOrEmpty(showID) then
+        showSpinner()
+        m.loadTask = createObject("roSGNode", "LoadDynamicPlayEpisodeTask")
+        m.loadTask.observeField("episode", "onEpisodeLoaded")
+        m.loadTask.showID = showID
+        m.loadTask.control = "run"
+    end if
+end sub
+
+sub onEpisodeIDChanged(nodeEvent as object)
+    episodeID = nodeEvent.getData()
+    if not isNullOrEmpty(episodeID) then
+        showSpinner()
+        m.loadTask = createObject("roSGNode", "LoadEpisodeTask")
+        m.loadTask.observeField("episode", "onEpisodeLoaded")
+        m.loadTask.episodeID = episodeID
+        m.loadTask.control = "run"
+    end if
 end sub
 
 sub onEpisodeLoaded(nodeEvent as object)
-    episode = nodeEvent.getData()
     task = nodeEvent.getRoSGNode()
+    episode = nodeEvent.getData()
+    if episode.subtype() = "DynamicPlayEpisode" then
+        episode = episode.episode
+    end if
     if episode <> invalid then
         m.top.episode = episode
     else if task.errorCode > 0 then

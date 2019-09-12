@@ -94,17 +94,17 @@ sub onJsonChanged()
             m.top.hdPosterUrl = json.thumbnail
         end if
                 
-'        if json.thumbnailSheetSet <> invalid then
-'            for each set in asArray(json.thumbnailSheetSet)
-'                if isAssociativeArray(set) then
-'                    if asInteger(set.width) = 320 then
-'                        m.top.hdBifUrl = asString(set.url)
-'                    else if asInteger(set.width) = 240 then
-'                        m.top.sdBifUrl = asString(set.url)
-'                    end if
-'                end if
-'            next
-'        end if
+        if json.thumbnailSheetSet <> invalid then
+            for each set in asArray(json.thumbnailSheetSet)
+                if isAssociativeArray(set) then
+                    if asInteger(set.width) = 320 then
+                        m.top.hdBifUrl = asString(set.url)
+                    else if asInteger(set.width) = 240 then
+                        m.top.sdBifUrl = asString(set.url)
+                    end if
+                end if
+            next
+        end if
 
         m.top.liveStreamingUrl = json.liveStreamingUrl
     end if

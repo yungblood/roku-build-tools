@@ -6,7 +6,6 @@ sub doWork()
     api = cbs()
     api.initialize(m.top)
 
-    user = getGlobalField("user")
-    episode = api.getDynamicPlayEpisode(m.top.show, user.videoHistory)
+    episode = api.getDynamicPlayEpisode(m.top.showID)
     m.top.episode = episode
 end sub

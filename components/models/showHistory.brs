@@ -8,6 +8,15 @@ sub update()
     m.updateTask.control = "run"
 end sub
 
+sub onModeChanged(nodeEvent as object)
+    mode = nodeEvent.getData()
+    if mode = "recentlyWatched" then
+        m.top.title = "Recently Watched"
+    else
+        m.top.title = "Shows You Watch"
+    end if
+end sub
+
 sub onShowHistoryLoaded(nodeEvent as Object)
 '    task = nodeEvent.getRoSGNode()
 '    m.top.title = "Shows You Watch (" + task.sortOrder + ")"

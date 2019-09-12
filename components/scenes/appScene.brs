@@ -771,7 +771,7 @@ sub showShowInfoScreen(showID as string)
     addToNavigationStack(screen)
 end sub
 
-sub showEpisodeScreen(episode as object, episodeID = "" as string, autoPlay = false as boolean, source = invalid as object, replaceCurrent = false as boolean)
+sub showEpisodeScreen(episode as object, episodeID = "" as string, showID = "" as string, autoPlay = false as boolean, source = invalid as object, replaceCurrent = false as boolean)
     screen = createObject("roSGNode", "EpisodeScreen")
     if source <> invalid then
         screen.omnitureName = source.omnitureName
@@ -794,6 +794,8 @@ sub showEpisodeScreen(episode as object, episodeID = "" as string, autoPlay = fa
     else
         screen.episodeID = episodeID
     end if
+    screen.showID = showID
+
     'screen.observeField("itemSelected", "onItemSelected")
     screen.observeField("buttonSelected", "onButtonSelected")
     addToNavigationStack(screen, true, replaceCurrent)
@@ -902,10 +904,10 @@ function openDeepLink(params as object, item = invalid as object) as boolean
                 return true
             end if
         else if params.mediaType = "episode" or params.mediaType = "short-form" then
-            showEpisodeScreen(invalid, params.contentID, true)
+            showEpisodeScreen(invalid, params.contentID, "", true)
             return true
         else if params.mediaType = "episodedetails" then
-            showEpisodeScreen(invalid, params.contentID, false)
+            showEpisodeScreen(invalid, params.contentID)
             return true
         else if params.mediaType = "movie" then
             showMovieScreen(invalid, params.contentID, true)
@@ -1232,7 +1234,7 @@ sub onItemSelected(nodeEvent as object)
         end if
 
         if item.subtype() = "Episode" then
-            showEpisodeScreen(item, "", false, source, false)
+            showEpisodeScreen(item, "", "", false, source, false)
         else if item.subtype() = "LiveTVChannel" then
             setGlobalField("lastLiveChannel", item.scheduleType)
             showLiveTVScreen()
@@ -1240,19 +1242,10 @@ sub onItemSelected(nodeEvent as object)
             showLiveFeedScreen(item, source)
         else if item.subtype() = "Show" or item.subtype() = "RelatedShow" or item.subtype() = "ShowGroupItem" then
             row = item.getParent()
-            if row <> invalid then
-                combine = true
-                config = getGlobalField("config")
-                if config <> invalid and config.enableTaplytics = true then
-                    taplyticsApi = getGlobalComponent("taplytics")
-                    if taplyticsApi <> invalid then
-                        response = taplyticsApi.callFunc("getRunningExperimentsAndVariations")
-                        if response.experiments <> invalid and response.experiments["SYW-CW Combo Test"] <> invalid then
-                            combine = taplyticsApi.callFunc("getValueForVariable", { name: "syw_cw_combination", default: combine })
-                        end if
-                    end if
-                end if
-                showShowScreen(item.id, "", source, false, false, combine and row.subtype() = "ShowHistory")
+            if row <> invalid and row.subtype() = "ShowHistory" and row.mode = "recentlyWatched" then
+                ' In recently watched mode, we link directly to the dynamic play
+                ' episode details screen
+                showEpisodeScreen(invalid, "", item.id)
             else
                 showShowScreen(item.id, "", source)
             end if
