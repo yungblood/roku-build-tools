@@ -19,11 +19,13 @@ sub init()
     m.video.observeFieldScoped("state", "onVideoStateChanged")
     'this causes the flickering of the overlay on replay button press, so commented out as we will not be using this
     'm.video.observeFieldScoped("trickPlayBarVisibilityHint", "onOverlayVisibilityHint")
-	m.loadingText=m.top.findNode("loadingtext")
-	m.loadingText.Visible=FALSE
-	exrect=m.loadingText.boundingRect()
-	centerx=(1920-exrect.width)/2
-	m.loadingText.translation=[centerx,860]
+
+	m.replayGroup = m.top.findNode("replayGroup")
+    'child 0 is poster, child 1 is text
+    'we are going to utilize this as a group item, so these operations will be done once in case the text is changed later in the xml
+	exrect = m.replayGroup.GetChild(1).boundingRect()
+	centerx = (1920 - exrect.width) / 2
+	m.replayGroup.GetChild(1).translation = [centerx, 860]
 
    ' if getGlobalField("extremeMemoryManagement") = true then
     if getModel().mid(0, 2).toInt() <= 35 then
@@ -86,10 +88,10 @@ sub init()
     m.timedOut = false
     
     m.idleTimeout = asInteger(config.playback_timeout_bblf, config.liveTimeout)
-'stop
 
     'just in case roku decides to rearrange items in the core video component later, we are doing a quick search for what we need through available children
     found = false 'using this to exit parent loop
+    m.firmRectFound = false 'flag so we don't need to keep checking if it exists
     tempMainCount = m.video.getChildCount()-1
     'we will do this in revers order for speed, as the clock is currently within the last child
     'all children of components within the children of video do NOT have IDs in the firmware, so
@@ -101,6 +103,17 @@ sub init()
             if m.video.getChild(i).getChild(j).subType() = "Clock" then
                 found = true
                 m.video.getChild(i).removeChildIndex(j)
+                if tempSecondaryCount > 2 then 'needs to be at least 3 before we removed the clock, as the rectangle we want is the 2nd right now in the list
+                    for k = 0 to (tempSecondaryCount-1)
+                        'first poster in the same grandson of video node is offending black rectangle - we want to get a reference to this, edit it, and modify during execution of the app for the Loading Text for replay button
+                        if m.video.getChild(i).getChild(k).subType() = "Poster" then
+                            'grab reference to the firmware rectangle
+                            m.firmRectFound = true
+                            m.firmRect = m.video.getChild(i).getChild(k)
+                            exit for
+                        end if
+                    next
+                end if
                 exit for
             end if
         next
@@ -132,10 +145,11 @@ function onKeyEvent(key as string, press as boolean) as boolean
             if key = "play" then
                 if m.video.state = "playing" then
                     m.video.control = "pause"
+                    return true 'only return true if we did something with the key based on the if
                 else if m.video.state = "paused" then
                     m.video.control = "resume"
+                    return true 'only return true if we did something with the key based on the if
                 end if
-                return true
             end if
         end if
     else
@@ -143,6 +157,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
             if not m.endCard.visible then
                 if key = "OK" then
                     if m.video.state = "playing" then
+                        fixFirmRectOpacity(0)
                         if m.overlay.visible = false then
                             m.overlay.visible = true
                         'this is the only place I think this would be ever be started if we wanted the overlay to be hidden by the timer
@@ -152,38 +167,53 @@ function onKeyEvent(key as string, press as boolean) as boolean
                             m.overlay.visible = false
                             m.overlayTimer.control = "stop"
                         end if
+                        return true
                     end if
                     'uncomment this section if we want the overlay to be able to be toggled by the customer while the video is paused
                     'if m.video.state = "paused" then
+                    '    fixFirmRectOpacity(0)
                     '    if m.overlay.visible = false then
                     '        m.overlay.visible = true
                     '    else
                     '        m.overlay.visible = false
                     '        m.overlayTimer.control = "stop"
                     '    end if
+                    '    return true
                     'end if
-                    return true
                 else if key = "play" then    
                     if m.video.state ="paused" then
                         m.overlay.visible = true
                         m.overlayTimer.control = "stop"
+                        return true
                     else if m.video.state = "playing" then
                         m.overlay.visible = false
                         m.overlayTimer.control = "stop"
+                        return true
                     end if
-                    return true
                 else if key = "right" or key = "left" or key = "fastforward" or key = "rewind" then
+                    fixFirmRectOpacity(1)
                     m.overlay.visible = true
                     m.overlayTimer.control = "stop"
                     return true
                 else if key = "replay" then
-                    m.loadingText.visible = true
+                    fixFirmRectOpacity(0)
+                    m.replayGroup.visible = true
+                    return true
                 end if
             end if
         end if
     end if
     return false
 end function
+
+sub fixFirmRectOpacity(desiredOpacity As integer)
+    if m.firmRectFound then
+        'this is intended to eliminate flicker, if we don't need to change the value then don't change the value
+        if m.firmRect.opacity <> desiredOpacity then
+            m.firmRect.opacity = desiredOpacity
+        end if
+    end if
+end sub
 
 sub onClosed()
     m.video.control = "stop"
@@ -287,9 +317,9 @@ sub onVideoStateChanged()
             else
                 m.errorDialog.setFocus(true)
             end if
-m.loadingText.visible = false
+            m.replayGroup.visible = false
         else if state = "error" then
-m.loadingText.visible = false
+            m.replayGroup.visible = false
             showErrorDialog(m.video.errorMsg)
         else if state = "buffering" then
             hideSpinner()
@@ -301,6 +331,7 @@ m.loadingText.visible = false
             if not m.paused or m.video.audioTrack = m.currentAudioTrack then
                 m.video.enableTrickPlay = false
                 m.overlay.visible = false
+                m.replayGroup.visible = false
             end if
             m.currentAudioTrack = m.video.audioTrack
         else if state = "paused" then
@@ -318,12 +349,14 @@ m.loadingText.visible = false
             if comscore <> invalid then
                 comscore.videoEnd = true
             end if
-m.loadingText.visible = false
+            m.replayGroup.visible = false
+            fixFirmRectOpacity(1)
         else if state = "playing" then
             if m.firstPlay then
                 clearMetadata()
                 m.firstPlay = false
             end if
+            fixFirmRectOpacity(0)
             hideSpinner()
             if m.paused then
                 if m.video.position < m.pausedPosition or m.video.position > m.pausedPosition + 1 then
@@ -346,7 +379,7 @@ m.loadingText.visible = false
                 comscore.videoStart = true
             end if
             m.paused = false
-m.loadingText.visible = false
+            m.replayGroup.visible = false
         else if state = "stopped" then
             if m.episode <> invalid then
                 if m.episode.isLive then
@@ -372,7 +405,7 @@ m.loadingText.visible = false
             end if
             trackVideoComplete()
             trackVideoUnload()
-m.loadingText.visible = false
+            m.replayGroup.visible = false
         end if
     end if
 end sub

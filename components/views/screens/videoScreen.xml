@@ -42,12 +42,22 @@
         <Video
             id="video"
             notificationInterval="1" />
-            
-		<Label
-			id="loadingtext"
-			color="0xF0F0F0"
-			text="Loading"/>
-		
+
+        <Group
+            id="replayGroup"
+            visible="false">
+		    <Rectangle
+			    id="replayShading"
+                translation="[0, 813]"
+                color="#000000"
+                width="1920"
+                height="267" />
+		    <Label
+			    id="replayText"
+			    color="0xF0F0F0"
+			    text="Loading"/>
+        </Group>
+
         <Label
             id="adCounterShadow"
             translation="[97,71]"
