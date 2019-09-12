@@ -46,16 +46,16 @@
         <Group
             id="replayGroup"
             visible="false">
-		    <Rectangle
-			    id="replayShading"
+            <Rectangle
+                id="replayShading"
                 translation="[0, 813]"
                 color="#000000"
                 width="1920"
                 height="267" />
-		    <Label
-			    id="replayText"
-			    color="0xF0F0F0"
-			    text="Loading"/>
+            <Label
+                id="replayText"
+                color="0xF0F0F0"
+                text="Loading"/>
         </Group>
 
         <Label
