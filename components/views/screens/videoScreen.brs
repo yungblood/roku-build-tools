@@ -152,10 +152,12 @@ function onKeyEvent(key as string, press as boolean) as boolean
                         return true
                     end if
                 else if key = "right" or key = "left" or key = "fastforward" or key = "rewind" then
-                    fixFirmRectOpacity(1)
-                    m.overlay.visible = true
-                    m.overlayTimer.control = "stop"
-                    return true
+                    if m.video.state <> "buffering" and m.video.state <> "none" then
+                        fixFirmRectOpacity(1)
+                        m.overlay.visible = true
+                        m.overlayTimer.control = "stop"
+                        return true
+                    end if
                 else if key = "replay" then
                     if m.video.state = "buffering" then
                         'the retrieving bar visiblility of the 1st child is what this keys off of, so let's hope roku doesn't change that
@@ -317,6 +319,9 @@ sub onVideoStateChanged()
             m.replayGroup.visible = false
             fixFirmRectOpacity(1)
         else if state = "playing" then
+            if m.firstPlay = invalid then
+                m.firstPlay = true
+            end if
             if m.firstPlay then
                 clearMetadata()
                 m.firstPlay = false
