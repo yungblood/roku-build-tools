@@ -89,38 +89,10 @@ sub init()
     
     m.idleTimeout = asInteger(config.playback_timeout_bblf, config.liveTimeout)
 
-    'just in case roku decides to rearrange items in the core video component later, we are doing a quick search for what we need through available children
-    found = false 'using this to exit parent loop
-    m.firmRectFound = false 'flag so we don't need to keep checking if it exists
-    tempMainCount = m.video.getChildCount()-1
-    'we will do this in revers order for speed, as the clock is currently within the last child
-    'all children of components within the children of video do NOT have IDs in the firmware, so
-    'since we have to check each type to find it, we will not be able to use removeChild(id)
-    'so we will use removeChildIndex since we have the index if it is found
-    for i = tempMainCount to 0 step - 1
-        tempSecondaryCount = m.video.getChild(i).getChildCount() - 1
-        for j = tempSecondaryCount to 0 step - 1
-            if m.video.getChild(i).getChild(j).subType() = "Clock" then
-                found = true
-                m.video.getChild(i).removeChildIndex(j)
-                if tempSecondaryCount > 2 then 'needs to be at least 3 before we removed the clock, as the rectangle we want is the 2nd right now in the list
-                    for k = 0 to (tempSecondaryCount-1)
-                        'first poster in the same grandson of video node is offending black rectangle - we want to get a reference to this, edit it, and modify during execution of the app for the Loading Text for replay button
-                        if m.video.getChild(i).getChild(k).subType() = "Poster" then
-                            'grab reference to the firmware rectangle
-                            m.firmRectFound = true
-                            m.firmRect = m.video.getChild(i).getChild(k)
-                            exit for
-                        end if
-                    next
-                end if
-                exit for
-            end if
-        next
-        if found = true then
-            exit for
-        end if
-    next
+    'destroy the clock
+    m.video.getChild(1).removeChildIndex(9)
+    'grab reference to the firmware rectangle
+    m.firmRect = m.video.getChild(1).getChild(1)
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
@@ -145,10 +117,10 @@ function onKeyEvent(key as string, press as boolean) as boolean
             if key = "play" then
                 if m.video.state = "playing" then
                     m.video.control = "pause"
-                    return true 'only return true if we did something with the key based on the if
+                    return true
                 else if m.video.state = "paused" then
                     m.video.control = "resume"
-                    return true 'only return true if we did something with the key based on the if
+                    return true
                 end if
             end if
         end if
@@ -187,8 +159,10 @@ function onKeyEvent(key as string, press as boolean) as boolean
                 else if key = "replay" then
                     if m.video.state = "buffering" then
                         'the retrieving bar visiblility of the 1st child is what this keys off of, so let's hope roku doesn't change that
-                        if m.video.bufferingbar.visible=false and m.video.retrievingbar.getChild(1).visible=false then
-                            fixFirmRectOpacity(1)
+                        if m.video.bufferingbar.visible = false and m.video.retrievingbar.getChild(1).visible = false then
+                            'this is required twiddling of states for the firmware to display what we need properly the first time replay is pressed
+                            m.firmRect.opacity = 0
+                            m.firmRect.opacity = 1
                             m.replayGroup.visible = true
                             return true
                         end if
@@ -201,7 +175,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
 end function
 
 sub fixFirmRectOpacity(desiredOpacity As integer)
-    if m.firmRectFound then
+    if m.firmRect <> invalid then
         'this is intended to eliminate flicker, if we don't need to change the value then don't change the value
         if m.firmRect.opacity <> desiredOpacity then
             m.firmRect.opacity = desiredOpacity
