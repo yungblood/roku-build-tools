@@ -45,6 +45,7 @@ end sub
 function onKeyEvent(key as string, press as boolean) as boolean
     if m.fakeButton.hasFocus()
         'We must eat the keypress here in this case
+        'otherwise the roku store component could crash the app
         return true
     end if
     if press then
