@@ -388,8 +388,6 @@ sub signUp(productCode as string)
     screen.observeField("accountDetails", "onAccountDetailsCollected")
     screen.productCode = productCode
     addToNavigationStack(screen)
-    'replace above line with this when fix for signup screen is completed
-    'addToNavigationStack(screen, false)
 end sub
 
 sub onAccountDetailsCollected(nodeEvent as object)
