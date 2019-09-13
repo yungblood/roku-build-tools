@@ -122,7 +122,9 @@ sub onSignedIn(nodeEvent as object)
     setGlobalField("localStation", task.localStation)
     setGlobalField("localStationLatitude", task.localStationLatitude)
     setGlobalField("localStationLongitude", task.localStationLongitude)
-    setGlobalField("lastLiveChannel", task.lastLiveChannel)
+    if isNullOrEmpty(getGlobalField("lastLiveChannel")) then
+        setGlobalField("lastLiveChannel", task.lastLiveChannel)
+    end if
     setGlobalField("user", task.user)
 
     user = getGlobalField("user")
@@ -1219,7 +1221,6 @@ end sub
 sub onItemSelected(nodeEvent as object)
     source = nodeEvent.getRoSGNode()
     item = nodeEvent.getData()
-    ?"onItemSelected()", item.title
     if item <> invalid then
         if source <> invalid then
             ' set the source field to invalid, so we don't get further updates
