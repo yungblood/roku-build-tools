@@ -25,20 +25,28 @@ sub init()
     m.store.observeField("userData", "onUserDataLoaded")
 
     trackRMFEvent("ACN")
-    
+    m.fakeButton = m.top.findNode("fakeButton")
+    m.allowBackKey = false
+
     m.persistedData = {}
     loadPersistedData()
-
-    m.top.setFocus(true)
 end sub
 
 sub onFocusChanged()
     if m.top.hasFocus() then
-        m.form.setFocus(true)
+        if  m.allowBackKey = false then
+            m.fakeButton.setFocus(true)
+        else
+            m.form.setFocus(true)
+        end if
     end if
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
+    if m.fakeButton.hasFocus()
+        'We must eat the keypress here in this case
+        return true
+    end if
     if press then
         if key = "down" then
             if m.form.isInFocusChain() then
@@ -334,12 +342,15 @@ function formatBirthDate(birthDate as string) as string
 end function
 
 sub loadUserData()
+    showSpinner()
     m.store.requestedUserData = "firstname,lastname,email,zip"
     m.store.command = "getUserData"
 end sub
 
 sub onUserDataLoaded(nodeEvent as object)
     userData = nodeEvent.getData()
+    hideSpinner()
+    m.allowBackKey = true
     if userData = invalid then
         if m.noShareDialog = invalid then
             m.noShareDialog = createCbsDialog("Information Needed", "In order to subscribe to the CBS All Access channel, you are required to share your Roku information. If you need to update your information, please visit Roku.com, then come back to CBS All Access and try again.", ["OK"])
@@ -357,6 +368,7 @@ sub onUserDataLoaded(nodeEvent as object)
         m.persistedData[m.email.id] = m.email.text
         m.persistedData[m.zipCode.id] = m.zipCode.text
         
+        m.form.setFocus(true)
         advanceToFirstEmptyField(false)
     end if
 end sub
@@ -384,6 +396,8 @@ sub onPersistedDataLoaded(nodeEvent as object)
             m.persistedData[key] = data[key]
         next
         advanceToFirstEmptyField(false)
+        m.allowBackKey = true
+        m.form.setFocus(true)
     end if
 end sub
 
