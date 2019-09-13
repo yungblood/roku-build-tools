@@ -833,7 +833,6 @@ sub showVideoScreen(episodeID as string, section = invalid as object, source = i
         setGlobalField("cbsDialog", dialog)
         return
     end if
-
     screen = createObject("roSGNode", "VideoScreen")
     screen.observeField("buttonSelected", "onButtonSelected")
     screen.useDai = useDai and config.useDai
@@ -1162,11 +1161,11 @@ sub onButtonSelected(nodeEvent as object)
         toggleFavorite(source.showID, m.top)
     else if buttonID = "liveTV" then
         showLiveTVScreen()
-    else if buttonID = "watch" or buttonID = "resume" then
+    else if buttonID = "watch" or buttonID = "resume" or buttonID = "autoplay" then
         if source.hasField("episode") and source.episode <> invalid then
             episode = source.episode
             if canWatch(episode, m.top) then
-                showVideoScreen(episode.ID, episode.getParent(), source, iif(buttonID = "resume", episode.resumePoint, 0))
+                showVideoScreen(episode.ID, episode.getParent(), source, iif(buttonID = "autoplay", -1, iif(buttonID = "resume", episode.resumePoint, 0)))
             else
                 showUpsellScreen(episode, true)
             end if
@@ -1180,7 +1179,7 @@ sub onButtonSelected(nodeEvent as object)
         else if source.hasField("movie") and source.movie <> invalid then
             movie = source.movie
             if canWatch(movie, m.top) then
-                showVideoScreen(movie.id, movie.getParent(), source, iif(buttonID = "resume", movie.resumePoint, 0))
+                showVideoScreen(movie.id, movie.getParent(), source, iif(buttonID = "autoplay", -1, iif(buttonID = "resume", movie.resumePoint, 0)))
             else
                 showUpsellScreen(movie, true)
             end if

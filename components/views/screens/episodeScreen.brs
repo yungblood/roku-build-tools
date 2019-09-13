@@ -138,7 +138,7 @@ sub onEpisodeChanged()
             m.buttons.setFocus(true)
             
             if m.top.autoPlay then
-                m.top.buttonSelected = m.watch.id
+                m.top.buttonSelected = "autoplay"
                 m.top.autoPlay = false
             else
                 if createObject("roDeviceInfo").isAudioGuideEnabled() then
