@@ -29,11 +29,11 @@ sub init()
 
     addGlobalField("storeDisplayed", "boolean", true)
     observeGlobalField("storeDisplayed", "onStoreDisplayed")
-    m.allowKey=true
+    m.allowBackKey = true
 end sub
 
 sub onStoreDisplayed(nodeEvent as object)
-    m.allowKey=not nodeEvent.getData()
+    m.allowBackKey=not nodeEvent.getData()
 end sub
 
 sub reinit(params = {} as object)
@@ -49,7 +49,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
     ?"appScene.onKeyEvent", key, press
     if press then
         if key = "back" then
-            if not m.allowKey then
+            if not m.allowBackKey then
                 print "***** Key Lockout is Active, so keypress eaten"
                 return true
             end if
@@ -388,6 +388,8 @@ sub signUp(productCode as string)
     screen.observeField("accountDetails", "onAccountDetailsCollected")
     screen.productCode = productCode
     addToNavigationStack(screen)
+    'replace above line with this when fix for signup screen is completed
+    'addToNavigationStack(screen, false)
 end sub
 
 sub onAccountDetailsCollected(nodeEvent as object)
@@ -668,7 +670,7 @@ sub showEmailSignInScreen()
     screen = createObject("roSGNode", "EmailSignInScreen")
     screen.observeField("buttonSelected", "onButtonSelected")
     screen.observeField("success", "onSignedIn")
-    addToNavigationStack(screen)
+    addToNavigationStack(screen, false)
 end sub
 
 sub showRendezvousScreen()
