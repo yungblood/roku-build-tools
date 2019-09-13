@@ -42,7 +42,22 @@
         <Video
             id="video"
             notificationInterval="1" />
-            
+
+        <Group
+            id="replayGroup"
+            visible="false">
+            <Rectangle
+                id="replayShading"
+                translation="[0,813]"
+                color="0x000000ee"
+                width="1920"
+                height="267" />
+            <Label
+                id="replayText"
+                color="0xF0F0F0"
+                text="Loading"/>
+        </Group>
+
         <Label
             id="adCounterShadow"
             translation="[97,71]"
@@ -112,7 +127,7 @@
             repeat="false" />
         <Timer
             id="overlayTimer"
-            duration="10"
+            duration="5"
             repeat="false" />
         <Timer
             id="timeoutTimer"
