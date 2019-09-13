@@ -8,6 +8,10 @@ sub init()
     m.form.observeField("buttonSelected", "onControlSelected")
     
     m.store = m.top.findNode("store")
+    'Set KEY LOCKOUT FLAG for appScene main scenegraph thread
+    'This is to track that the channel store is set to run a request
+    SetGlobalField("storeDisplayed",true)
+    showSpinner()
     m.store.observeField("userData", "onUserDataLoaded")
     m.store.requestedUserData = "email"
     m.store.command = "getUserData"
@@ -166,7 +170,11 @@ sub onUserDataLoaded()
         m.email.text = userData.email
         advanceToFirstEmptyField(false)
     end if
-    m.top.setFocus(true)
+    'we will set this later in execution
+    'SetGlobalField("storeDisplayed",false)
+    SetGlobalField("storeDisplayed",false)
+    hideSpinner()
+    m.form.setFocus(true)
 end sub
 
 function validateData() as boolean
