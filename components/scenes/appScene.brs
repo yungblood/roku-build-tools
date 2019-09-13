@@ -109,7 +109,7 @@ sub onSignedIn(nodeEvent as object)
     setGlobalField("localStation", task.localStation)
     setGlobalField("localStationLatitude", task.localStationLatitude)
     setGlobalField("localStationLongitude", task.localStationLongitude)
-    if(isNullOrEmpty(getGlobalField("lastLiveChannel")))
+    if isNullOrEmpty(getGlobalField("lastLiveChannel")) then
         setGlobalField("lastLiveChannel", task.lastLiveChannel)
     end if
     setGlobalField("user", task.user)
