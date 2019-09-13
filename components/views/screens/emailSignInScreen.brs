@@ -6,7 +6,7 @@ sub init()
     
     m.form = m.top.findNode("form")
     m.form.observeField("buttonSelected", "onControlSelected")
-    
+
     m.store = m.top.findNode("store")
     'Set KEY LOCKOUT FLAG for appScene main scenegraph thread
     'This is to track that the channel store is set to run a request
@@ -16,13 +16,9 @@ sub init()
     m.store.requestedUserData = "email"
     m.store.command = "getUserData"
 
-    m.top.setFocus(true)
 end sub
 
 sub onFocusChanged()
-    if m.top.hasFocus() then
-        m.form.setFocus(true)
-    end if
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
