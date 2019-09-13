@@ -27,13 +27,8 @@ sub init()
     
     m.navigationStack = []
 
-    addGlobalField("storeDisplayed", "boolean", true)
     observeGlobalField("storeDisplayed", "onStoreDisplayed")
     m.allowBackKey = true
-end sub
-
-sub onStoreDisplayed(nodeEvent as object)
-    m.allowBackKey=not nodeEvent.getData()
 end sub
 
 sub reinit(params = {} as object)
