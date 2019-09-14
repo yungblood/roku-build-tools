@@ -240,7 +240,7 @@
             </LayoutGroup>
         </LayoutGroup>
 
-        <button
+        <Button
              id="fakeButton"
              visible="false" />
 
