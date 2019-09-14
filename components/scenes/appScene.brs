@@ -31,6 +31,10 @@ sub init()
     m.allowBackKey = true
 end sub
 
+sub onStoreDisplayed(nodeEvent as object)
+    m.allowKey = not nodeEvent.getData()
+end sub
+
 sub reinit(params = {} as object)
     m.initTask = createObject("roSGNode", "InitializationTask")
     m.initTask.observeField("initialized", "onInitialized")
