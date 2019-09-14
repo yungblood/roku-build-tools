@@ -32,7 +32,7 @@ sub init()
 end sub
 
 sub onStoreDisplayed(nodeEvent as object)
-    m.allowKey = not nodeEvent.getData()
+    m.allowBackKey = not nodeEvent.getData()
 end sub
 
 sub reinit(params = {} as object)
