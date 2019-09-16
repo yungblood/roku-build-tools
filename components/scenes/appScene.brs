@@ -12,12 +12,6 @@ sub init()
 
     m.dialogTimer = m.top.findNode("dialogTimer")
     m.dialogTimer.observeField("fire", "onDialogTimerFired")
-    
-    if GetLinkStatus() = false then
-        dialog = createCbsDialog("", "There is a problem connecting to the network." + chr(10) + "Please check your network settings.", ["OK"])
-        dialog.observeField("buttonSelected", "onExitDialogButtonSelected")
-        setGlobalField("cbsDialog", dialog)
-    end if
 
     addGlobalField("cbsDialog", "node", false)
     observeGlobalField("cbsDialog", "onDialogChanged")
@@ -30,6 +24,12 @@ sub init()
     m.allowBackKey = true
 
     m.navigationStack = []
+    
+    if GetLinkStatus() = false then
+        dialog = createCbsDialog("", "There is a problem connecting to the network." + chr(10) + "Please check your network settings.", ["OK"])
+        dialog.observeField("buttonSelected", "onExitDialogButtonSelected")
+        setGlobalField("cbsDialog", dialog)
+    end if
 end sub
 
 sub onStoreDisplayed(nodeEvent as object)
