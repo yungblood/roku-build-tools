@@ -572,3 +572,12 @@ end sub
 sub onCallbackTaskResponse(nodeEvent as object)
     m.callbackTask = invalid
 end sub
+
+function getShowFromCache(showID as string) as object
+    showCache = getGlobalField("showCache")
+    if showCache <> invalid then
+        return showCache[showID]
+    end if
+    return invalid
+end function
+

@@ -24,6 +24,7 @@
         <field id="topLevelCategory" type="string" />
         <field id="airDate" type="integer" />
         <field id="airDateString" type="string" />
+        <field id="airDateIso" type="string" />
 
         <field id="regionalRating" type="string" />
         

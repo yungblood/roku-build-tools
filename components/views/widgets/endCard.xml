@@ -15,6 +15,7 @@
         
         <field id="countdown" type="integer" onChange="onCountdownChanged" />
         <field id="continuousPlayInfo" type="node" onChange="onContinuousPlayInfoChanged" />
+        <field id="omnitureParams" type="assocarray" />
     </interface>
     <children>
         <Font

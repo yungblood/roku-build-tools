@@ -36,8 +36,7 @@ end sub
 sub updateMetadata()
     content = m.top.itemContent
     if content <> invalid and m.poster.width > 0 and m.poster.height > 0 then
-        showCache = getGlobalField("showCache")
-        show = showCache[content.showID]
+        show = getShowFromCache(content.showID)
         if show <> invalid then
             m.title.text = uCase(show.title)
             m.poster.uri = getImageUrl(show.myCbsImageUrl, m.poster.width)

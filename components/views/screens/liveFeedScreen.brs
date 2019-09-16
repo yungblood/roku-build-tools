@@ -42,8 +42,7 @@ sub onLiveFeedChanged()
                 showID = section.showID
             end if
         end if
-        showCache = getGlobalField("showCache")
-        show = showCache[showID]
+        show = getShowFromCache(showID)
         if show = invalid then
             m.buttons.removeChild(m.showButton)
         else
