@@ -12,9 +12,6 @@ sub init()
 
     m.dialogTimer = m.top.findNode("dialogTimer")
     m.dialogTimer.observeField("fire", "onDialogTimerFired")
-
-    addGlobalField("cbsDialog", "node", false)
-    observeGlobalField("cbsDialog", "onDialogChanged")
     
     if GetLinkStatus() = false then
         dialog = createCbsDialog("", "There is a problem connecting to the network." + chr(10) + "Please check your network settings.", ["OK"])
@@ -22,13 +19,17 @@ sub init()
         setGlobalField("cbsDialog", dialog)
     end if
 
+    addGlobalField("cbsDialog", "node", false)
+    observeGlobalField("cbsDialog", "onDialogChanged")
+
     addGlobalField("showWaitScreen", "boolean", true)
     observeGlobalField("showWaitScreen", "onShowWaitScreen")
     
-    m.navigationStack = []
-
+    addGlobalField("storeDisplayed", "boolean", true)
     observeGlobalField("storeDisplayed", "onStoreDisplayed")
     m.allowBackKey = true
+
+    m.navigationStack = []
 end sub
 
 sub onStoreDisplayed(nodeEvent as object)
@@ -65,9 +66,9 @@ function onKeyEvent(key as string, press as boolean) as boolean
                         menu.setFocus(true)
                     end if
                 else
-                        dialog = createCbsDialog("", "Are you sure you would like to exit CBS All Access?", ["No", "Yes"])
-                        dialog.observeField("buttonSelected", "onExitDialogButtonSelected")
-                        setGlobalField("cbsDialog", dialog)
+                    dialog = createCbsDialog("", "Are you sure you would like to exit CBS All Access?", ["No", "Yes"])
+                    dialog.observeField("buttonSelected", "onExitDialogButtonSelected")
+                    setGlobalField("cbsDialog", dialog)
                 end if
             end if
             return true

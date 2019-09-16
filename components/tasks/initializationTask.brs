@@ -16,7 +16,6 @@ sub doWork()
     addGlobalField("deeplinkForTracking", "string", false)
     addGlobalField("correlator", "string", false)
     addGlobalField("spotXCampaign", "stringarray", false)
-    addGlobalField("storeDisplayed", "boolean", true)
 
     config = getGlobalField("config")
     api = cbs()

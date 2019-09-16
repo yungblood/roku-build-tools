@@ -22,7 +22,6 @@
         <field id="ecp" type="assocarray" />
         <field id="deeplink" type="assocarray" onChange="onDeeplinkChanged" alwaysNotify="true" />
         <field id="close" type="boolean" alwaysNotify="true" />
-        <field id="storeDisplayed" type="boolean" alwaysNotify="true" />
 
         <function name="reinit" />
         <function name="showLoading" />
