@@ -46,12 +46,14 @@ end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
     ?"appScene.onKeyEvent", key, press
+    if key = "back" then
+        if not m.allowBackKey then
+            print "***** Key Lockout is Active, so keypress eaten"
+            return true
+        end if
+    end if
     if press then
         if key = "back" then
-            if not m.allowBackKey then
-                print "***** Key Lockout is Active, so keypress eaten"
-                return true
-            end if
             if not goBackInNavigationStack() then
                 menu = m.global.findNode("menu")
                 if menu <> invalid then

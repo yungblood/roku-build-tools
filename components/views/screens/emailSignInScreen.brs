@@ -21,6 +21,7 @@ end sub
 sub onFocusChanged()
     if m.top.hasFocus() then
         m.form.setFocus(true)
+        SetGlobalField("storeDisplayed", true)
     end if
 end sub
 
