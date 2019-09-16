@@ -240,6 +240,10 @@
             </LayoutGroup>
         </LayoutGroup>
 
+        <Button
+             id="fakeButton"
+             visible="false" />
+
         <ChannelStore
             id="store" />
     </children>

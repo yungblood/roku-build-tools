@@ -26,6 +26,13 @@ sub init()
     observeGlobalField("showWaitScreen", "onShowWaitScreen")
     
     m.navigationStack = []
+
+    observeGlobalField("storeDisplayed", "onStoreDisplayed")
+    m.allowBackKey = true
+end sub
+
+sub onStoreDisplayed(nodeEvent as object)
+    m.allowBackKey = not nodeEvent.getData()
 end sub
 
 sub reinit(params = {} as object)
@@ -41,6 +48,10 @@ function onKeyEvent(key as string, press as boolean) as boolean
     ?"appScene.onKeyEvent", key, press
     if press then
         if key = "back" then
+            if not m.allowBackKey then
+                print "***** Key Lockout is Active, so keypress eaten"
+                return true
+            end if
             if not goBackInNavigationStack() then
                 menu = m.global.findNode("menu")
                 if menu <> invalid then
@@ -658,7 +669,7 @@ sub showEmailSignInScreen()
     screen = createObject("roSGNode", "EmailSignInScreen")
     screen.observeField("buttonSelected", "onButtonSelected")
     screen.observeField("success", "onSignedIn")
-    addToNavigationStack(screen)
+    addToNavigationStack(screen, false)
 end sub
 
 sub showRendezvousScreen()
