@@ -11,11 +11,14 @@ sub init()
     m.movieDescription = m.top.findNode("movieDescription")
     m.progressBar = m.top.findNode("progressBar")
     
-    m.buttons = m.top.findNode("buttons")
-    m.buttons.observeField("buttonSelected", "onButtonSelected")
-    
+    m.resume = m.top.findNode("resume")
     m.watch = m.top.findNode("watch")
     m.trailer = m.top.findNode("trailer")
+
+    m.buttons = m.top.findNode("buttons")
+    m.buttons.observeField("buttonSelected", "onButtonSelected")
+
+    m.tts = createObject("roTextToSpeech")
 
     m.top.setFocus(true)
 end sub
@@ -65,7 +68,7 @@ sub refreshMovieState()
 end sub
 
 sub onMovieRefreshed(nodeEvent as object)
-    ' We can't update the episode itself here, because it
+    ' We can't update the movie itself here, because it
     ' will trigger the itemSelected event in the appScene,
     ' as it registers as a change
     movie = nodeEvent.getData()
@@ -84,43 +87,64 @@ sub onMovieChanged()
     hideSpinner()
     movie = m.top.movie
     if movie <> invalid then
-        pageName = "/movies/" + lCase(movie.title)
-        m.top.omnitureName = pageName
-        m.top.omnitureSiteHier = "movies|" + lCase(movie.title)
-        trackScreenView()
-
-        m.movieTitle.text = movie.title
-        m.movieSubtitle.text = movie.subtitle
-        m.movieDescription.text = movie.description
-
-        m.poster.uri = getImageUrl(movie.thumbnailUrl, m.poster.width)
-
-        if movie.resumePoint > 0 then
-            m.progressBar.visible = true
-            m.progressBar.maxValue = movie.length
-            m.progressBar.value = movie.resumePoint
+        if m.movie = invalid then
+            ' We need to refresh the movie information
+            refreshMovieState()
         else
-            m.progressBar.visible = false
+            pageName = "/movies/" + lCase(movie.title)
+            m.top.omnitureName = pageName
+            m.top.omnitureSiteHier = "movies|" + lCase(movie.title)
+            trackScreenView()
+    
+            m.movieTitle.text = movie.title
+            m.movieSubtitle.text = movie.subtitle
+            m.movieDescription.text = movie.description
+    
+            m.poster.uri = getImageUrl(movie.thumbnailUrl, m.poster.width)
+    
+            if movie.resumePoint > 0 then
+                m.progressBar.visible = true
+                m.progressBar.maxValue = movie.length
+                m.progressBar.value = movie.resumePoint
+            else
+                m.progressBar.visible = false
+            end if
+    
+            m.background.uri = getImageUrl(movie.thumbnailUrl, m.background.width)
+            
+            if movie.trailer = invalid then
+                m.buttons.removeChild(m.trailer)
+            end if
+            
+            ' NOTE: We're checking the refreshed version of the movie here
+            if canWatch(m.movie, m.top) then
+                if m.movie.resumePoint > 0 and (m.movie.resumePoint < m.movie.length * .97) then
+                    m.watch.text = "RESTART"
+                    m.buttons.insertChild(m.resume, 0)
+                else
+                    m.watch.text = "WATCH"
+                    m.buttons.removeChild(m.resume)
+                end if
+            else
+                m.watch.text = "SUBSCRIBE"
+                m.buttons.removeChild(m.resume)
+            end if
+    
+            m.buttons.visible = true
+            m.buttons.setFocus(false)
+            m.buttons.setFocus(true)
+    
+            if m.top.autoPlay then
+                m.top.buttonSelected = "autoplay"
+                m.top.autoPlay = false
+            else
+                if createObject("roDeviceInfo").isAudioGuideEnabled() then
+                    m.tts.say(m.movieTitle.text)
+                    m.tts.say(m.movieSubtitle.text)
+                    m.tts.say(m.movieDescription.text)
+                end if
+            end if
         end if
-
-        m.background.uri = getImageUrl(movie.thumbnailUrl, m.background.width)
-        
-        if movie.trailer = invalid then
-            m.buttons.removeChild(m.trailer)
-        end if
-        
-        if m.top.autoPlay then
-            m.top.buttonSelected = m.watch.id
-            m.top.autoPlay = false
-        end if
-        
-        if canWatch(movie, m.top) then
-            m.watch.text = "WATCH"
-        else
-            m.watch.text = "SUBSCRIBE TO WATCH"
-        end if
-
-        m.buttons.visible = true
     else        
         dialog = createCbsDialog("Content Unavailable", "The content you are trying to play is currently unavailable. Please try again later.", ["OK"])
         dialog.observeField("buttonSelected", "onUnavailableDialogClosed")

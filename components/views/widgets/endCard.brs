@@ -59,12 +59,16 @@ function onKeyEvent(key as string, press as boolean) as boolean
     return false
 end function
 
-sub onContinuousPlayInfoChanged()
+sub onContinuousPlayInfoChanged(nodeEvent as object)
+    omnitureParams = {}
     m.top.buttonFocused = invalid
-    cpInfo = m.top.continuousPlayInfo
+    cpInfo = nodeEvent.getData()
     if cpInfo.episode <> invalid then
         episode = cpInfo.episode
         if episode <> invalid then
+            omnitureParams["eventEndCardView"] = "1"
+            omnitureParams["endCardType"] = "single"
+            omnitureParams["endCardContentList"] = episode.title
             if canWatch(episode, m.top) then
                 m.selector.visible = false
                 m.autoplay.visible = true
@@ -75,8 +79,7 @@ sub onContinuousPlayInfoChanged()
                 viewport.height = m.autoplayZoom.height - 8
                 m.top.viewport = viewport
     
-                showCache = getGlobalField("showCache")
-                show = showCache[episode.showID]
+                show = getShowFromCache(episode.showID)
                 if show <> invalid then
                     m.background.uri = getImageUrl(show.heroImageUrl, m.background.width)
                 else
@@ -119,25 +122,30 @@ sub onContinuousPlayInfoChanged()
         viewport.height = m.selectorZoom.height - 8
         m.top.viewport = viewport
 
-'        showCache = getGlobalField("showCache")
-'        show = showCache[cpInfo.showID]
-'        if show <> invalid then
-'            m.background.uri = getImageUrl(show.heroImageUrl, m.background.width)
-'        else
-'            m.background.uri = ""
-'        end if
-        
+        contentList = ""
         m.selectorButtons.removeChildrenIndex(m.selectorButtons.getChildCount(), 0)
-        for each video in cpInfo.videos
+        for i = 0 to cpInfo.videos.count()
+            video = cpInfo.videos[i]
             button = m.selectorButtons.createChild("RecommendationTile")
             button.itemContent = video
+            button.index = i
+            
+            if not isNullOrEmpty(contentList) then
+                contentList = contentList + "|"
+            end if
+            contentList = contentList + video.title
             
             ' We shouldn't display more than 3 recommendations
             if m.selectorButtons.getChildCount() >= 3 then
                 exit for
             end if
         next
+
+        omnitureParams["eventEndCardView"] = "1"
+        omnitureParams["endCardType"] = "multi"
+        omnitureParams["endCardContentList"] = contentList
     end if
+    m.top.omnitureParams = omnitureParams
 end sub
 
 sub onCountdownChanged()
@@ -168,8 +176,7 @@ sub onSelectorButtonFocused(nodeEvent as object)
         m.top.buttonFocused = button
         content = button.itemContent
         if content.subtype() = "Episode" then
-            showCache = getGlobalField("showCache")
-            show = showCache[content.showID]
+            show = getShowFromCache(content.showID)
             if show <> invalid then
                 m.background.uri = getImageUrl(show.heroImageUrl, m.background.width)
             else

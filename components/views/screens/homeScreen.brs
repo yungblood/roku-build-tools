@@ -62,9 +62,12 @@ function onKeyEvent(key as string, press as boolean) as boolean
                 return true
             else if m.marquee.isInFocusChain() then
                 m.list.setFocus(true)
+                m.list.jumpToRowItem = [0, 0]
                 m.lastFocus = m.list
                 scrollList()
-                'scrollToRow(true)
+                if m.list.drawFocusFeedback = false then
+                    m.list.drawFocusFeedback = true
+                end if
                 return true
             end if
         else if key = "up" then
@@ -250,6 +253,7 @@ sub onContentLoaded(nodeEvent as object)
     if task.errorCode = 0 then
         content = nodeEvent.getData()
         if content <> invalid then
+            m.list.showRowLabel=[true]
             m.top.content = content
         end if
     else

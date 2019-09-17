@@ -10,6 +10,7 @@
     <interface>
         <field id="itemContent" type="node" onChange="onContentChanged" />
         <field id="countdown" type="integer" onChange="onCountdownChanged" />
+        <field id="index" type="integer" />
     </interface>
     <children>
         <Font

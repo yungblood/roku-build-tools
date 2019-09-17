@@ -34,12 +34,13 @@
             itemComponentName="GridTile"
             itemSize="[1920,298]"
             itemSpacing="[0,40]"
-            showRowLabel="[true]"
+            showRowLabel="[false]"
             rowItemSpacing="[[30,0]]"
             numRows="3"
             rowLabelFont="dictionary:rowTitleFont"
             rowLabelColor="0xffffffff"
             focusBitmapUri="pkg:/images/frame_grid.9.png"
+            drawFocusFeedback="false"
             vertFocusAnimationStyle="fixedFocus" />
 
 <!--         <FocusGroup -->

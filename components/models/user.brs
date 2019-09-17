@@ -38,7 +38,7 @@ sub onJsonChanged()
         
         ' TODO: We're settting pin to an empty string for now, until
         '       we're ready to enable parental controls
-        m.top.parentalControlPin = "" 'json.parentalControlPIN
+        m.top.parentalControlPin = json.parentalControlPIN
         m.top.parentalControlLiveTV = (json.parentalControlLivetvPinEnabled = true)
         if not isNullOrEmpty(json.parentalControlRestrictions) then
             m.top.parentalControlRestrictions = asString(json.parentalControlRestrictions).split(",")

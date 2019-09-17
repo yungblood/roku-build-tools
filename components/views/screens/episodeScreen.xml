@@ -97,7 +97,7 @@
             id="buttons"
             translation="[991,691]"
             layoutDirection="horiz"
-            itemSpacings="[16]"
+            itemSpacings="[12]"
             visible="false">
             <LabelButton
                 id="resume"

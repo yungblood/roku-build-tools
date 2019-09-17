@@ -64,6 +64,7 @@ sub onJsonChanged()
         
         airDate                 = dateFromISO8601String(asString(json["_airDateISO"]))
         m.top.airDate           = airDate.asSeconds()
+        m.top.airDateIso        = asString(json["_airDateISO"])
         
         ' We can't use roDateTime.asDateString("short-date") here, because it truncates 2000-2009 down to a single digit
         m.top.airDateString     = asString(airDate.getMonth()) + "/" + asString(airDate.getDayOfMonth()) + "/" + asString(airDate.getYear()).mid(2)

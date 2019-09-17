@@ -31,6 +31,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
                 return true
             end if
         else if key = "back" then
+            m.top.buttonSelected = "ok"
             return true
         end if
     end if

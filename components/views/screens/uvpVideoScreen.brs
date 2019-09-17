@@ -293,8 +293,7 @@ sub onNextEpisodeLoaded(nodeEvent as object)
     m.nextEpisode = nextEpisode
     if m.nextEpisode <> invalid then
         m.episode.skipPostroll = true
-        showCache = getGlobalField("showCache")
-        show = showCache[m.nextEpisode.showID]
+        show = getShowFromCache(m.nextEpisode.showID)
         if show <> invalid then
             m.endCardBackground.uri = getImageUrl(show.heroImageUrl, m.endCardBackground.width)
         else
@@ -506,8 +505,7 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                     end if
                 end if
                 if showID <> invalid then
-                    showCache = getGlobalField("showCache")
-                    show = showCache[showID]
+                    show = getShowFromCache(showID)
                     if show <> invalid then
                         m.showTitle.text = uCase(show.title)
                     end if

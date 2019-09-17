@@ -83,13 +83,24 @@
             id="buttons"
             translation="[991,691]"
             layoutDirection="horiz"
-            itemSpacings="[24]"
+            itemSpacings="[12]"
             visible="false">
             <LabelButton
-                id="watch"
-                width="305"
+                id="resume"
+                width="260"
                 height="62"
-                text="WATCH"
+                text="RESUME"
+                textColor="0xffffff99"
+                focusedTextColor="0xffffffff"
+                backgroundUri="pkg:/images/frame_generic.9.png"
+                focusedBackgroundUri="pkg:/images/button_focus.9.png"
+                font="dictionary:buttonFont"
+                processKeyEvents="false" />
+            <LabelButton
+                id="watch"
+                width="260"
+                height="62"
+                text=""
                 textColor="0xffffff99"
                 focusedTextColor="0xffffffff"
                 backgroundUri="pkg:/images/frame_generic.9.png"
@@ -98,7 +109,7 @@
                 processKeyEvents="false" />
             <LabelButton
                 id="trailer"
-                width="305"
+                width="260"
                 height="62"
                 text="PREVIEW TRAILER"
                 textColor="0xffffff99"

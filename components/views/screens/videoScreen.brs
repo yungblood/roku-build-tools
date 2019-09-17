@@ -17,8 +17,16 @@ sub init()
     m.video.observeFieldScoped("content", "onContentReady")
     m.video.observeFieldScoped("position", "onPositionChanged")
     m.video.observeFieldScoped("state", "onVideoStateChanged")
-    m.video.observeFieldScoped("trickPlayBarVisibilityHint", "onOverlayVisibilityHint")
-    
+    'this causes the flickering of the overlay on replay button press, so commented out as we will not be using this
+    'm.video.observeFieldScoped("trickPlayBarVisibilityHint", "onOverlayVisibilityHint")
+
+	m.replayGroup = m.top.findNode("replayGroup")
+    'child 0 is poster, child 1 is text
+    'we are going to utilize this as a group item, so these operations will be done once in case the text is changed later in the xml
+	exrect = m.replayGroup.GetChild(1).boundingRect()
+	centerx = (1920 - exrect.width) / 2
+	m.replayGroup.GetChild(1).translation = [centerx, 860]
+
    ' if getGlobalField("extremeMemoryManagement") = true then
     if getModel().mid(0, 2).toInt() <= 35 then
          ' limit the video resolution on low-end devices
@@ -80,27 +88,25 @@ sub init()
     m.timedOut = false
     
     m.idleTimeout = asInteger(config.playback_timeout_bblf, config.liveTimeout)
+
+    'destroy the clock
+    m.video.getChild(1).removeChildIndex(9)
+    'grab reference to the firmware rectangle
+    m.firmRect = m.video.getChild(1).getChild(1)
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
     ?"videoScreen.onKeyEvent", key, press, m.inAd
     if press then
         if not m.inAd then
-            if key = "OK" or key = "play" then
-                if not m.endCard.visible then
-                    m.overlay.visible = true
-                    m.overlayTimer.control = "start"
-                    return true
-                end if
-            else if key = "back" then
+            if key = "back" then
                 if m.overlay.visible then
                     m.overlay.visible = false
                     m.overlayTimer.control = "stop"
-                    return true
                 else
                     m.top.close = true
-                    return true
                 end if 
+                return true
             end if
         else
             'm.inAd - send key to brightline
@@ -108,10 +114,74 @@ function onKeyEvent(key as string, press as boolean) as boolean
             if brightline <> invalid then
                 brightline.BLKeyPress = key
             end if
+            if key = "play" then
+                if m.video.state = "playing" then
+                    m.video.control = "pause"
+                    return true
+                else if m.video.state = "paused" then
+                    m.video.control = "resume"
+                    return true
+                end if
+            end if
+        end if
+    else
+        if not m.inAd then
+            if not m.endCard.visible then
+                if key = "OK" then
+                    if m.video.state = "playing" then
+                        fixFirmRectOpacity(0)
+                        if m.overlay.visible = false then
+                            m.overlay.visible = true
+                        'this is the only place I think this would be ever be started if we wanted the overlay to be hidden by the timer
+                        'if it is started then we need to stop it in all the other places below.
+                            m.overlayTimer.control = "start"
+                        else
+                            m.overlay.visible = false
+                            m.overlayTimer.control = "stop"
+                        end if
+                        return true
+                    end if
+                else if key = "play" then    
+                    if m.video.state ="paused" then
+                        m.overlay.visible = true
+                        m.overlayTimer.control = "stop"
+                        return true
+                    else if m.video.state = "playing" then
+                        m.overlay.visible = false
+                        m.overlayTimer.control = "stop"
+                        return true
+                    end if
+                else if key = "right" or key = "left" or key = "fastforward" or key = "rewind" then
+                    if m.video.state <> "buffering" and m.video.state <> "none" then
+                        fixFirmRectOpacity(1)
+                        m.overlay.visible = true
+                        m.overlayTimer.control = "stop"
+                        return true
+                    end if
+                else if key = "replay" then
+                    if m.video.state = "buffering" then
+                        'the retrieving bar visiblility of the 1st child is what this keys off of, so let's hope roku doesn't change that
+                        if m.video.bufferingbar.visible = false and m.video.retrievingbar.getChild(1).visible = false then
+                            fixFirmRectOpacity(0)
+                            m.replayGroup.visible = true
+                            return true
+                        end if
+                    end if
+                end if
+            end if
         end if
     end if
     return false
 end function
+
+sub fixFirmRectOpacity(desiredOpacity As integer)
+    if m.firmRect <> invalid then
+        'this is intended to eliminate flicker, if we don't need to change the value then don't change the value
+        if m.firmRect.opacity <> desiredOpacity then
+            m.firmRect.opacity = desiredOpacity
+        end if
+    end if
+end sub
 
 sub onClosed()
     m.video.control = "stop"
@@ -153,6 +223,7 @@ sub onContentReady()
         if not m.top.close then
             m.video.control = "play"
         end if
+    m.firstPlay = true
     end if
 end sub
 
@@ -172,29 +243,29 @@ sub onVideoComplete()
 end sub
 
 sub onOverlayVisibilityHint()
-    if m.video <> invalid then
-        m.overlay.visible = (m.video.trickPlayBarVisibilityHint or m.video.state = "paused")
-        if m.overlay.visible then
-            ' HACK: Find the labels with the current content metadata and hide them
-            for i = 0 to m.video.getChildCount() - 1
-                child = m.video.getChild(i)
-                for j = 0 to child.getChildCount() - 1
-                    control = child.getChild(j)
-                    if control.subtype() = "Label" then
-                        if control.text = m.episode.title then
-                            control.text = ""
-                        else if control.text = m.episode.titleSeason then
-                            control.text = ""
-                        end if
-                    end if
-                next
-            next
-        end if
-    end if
+    m.overlay.visible = (m.video.trickPlayBarVisibilityHint or m.video.state = "paused")
+end sub
+
+sub clearMetadata()
+    ' HACK: Find the labels with the current content metadata and hide them
+    for i = 0 to m.video.getChildCount() - 1
+        child = m.video.getChild(i)
+        for j = 0 to child.getChildCount() - 1
+            control = child.getChild(j)
+            if control.subtype() = "Label" then
+                if control.text = m.episode.title then
+                    control.text = ""
+                else if control.text = m.episode.titleSeason then
+                    control.text = ""
+                end if
+            end if
+        next
+    next
 end sub
 
 sub onOverlayTimerFired()
     m.overlay.visible = false
+    m.overlayTimer.control = "stop"
 end sub
 
 sub onBifVisibleChanged()
@@ -214,7 +285,9 @@ sub onVideoStateChanged()
             else
                 m.errorDialog.setFocus(true)
             end if
+            m.replayGroup.visible = false
         else if state = "error" then
+            m.replayGroup.visible = false
             showErrorDialog(m.video.errorMsg)
         else if state = "buffering" then
             hideSpinner()
@@ -243,7 +316,17 @@ sub onVideoStateChanged()
             if comscore <> invalid then
                 comscore.videoEnd = true
             end if
+            m.replayGroup.visible = false
+            fixFirmRectOpacity(1)
         else if state = "playing" then
+            if m.firstPlay = invalid then
+                m.firstPlay = true
+            end if
+            if m.firstPlay then
+                clearMetadata()
+                m.firstPlay = false
+            end if
+            fixFirmRectOpacity(0)
             hideSpinner()
             if m.paused then
                 if m.video.position < m.pausedPosition or m.video.position > m.pausedPosition + 1 then
@@ -266,6 +349,7 @@ sub onVideoStateChanged()
                 comscore.videoStart = true
             end if
             m.paused = false
+            m.replayGroup.visible = false
         else if state = "stopped" then
             if m.episode <> invalid then
                 if m.episode.isLive then
@@ -291,6 +375,7 @@ sub onVideoStateChanged()
             end if
             trackVideoComplete()
             trackVideoUnload()
+            m.replayGroup.visible = false
         end if
     end if
 end sub
@@ -590,36 +675,43 @@ sub onNextEpisodeLoaded(nodeEvent as object)
 end sub
 
 sub onEndCardButtonSelected(nodeEvent as object)
+'    omnitureParams = {}
+'    omnitureParams.append(m.omnitureParams)
+'    omnitureParams["podType"] = "end card ui"
+'    omnitureParams["podSection"] = "video"
+
     omnitureParams = {}
-    omnitureParams.append(m.omnitureParams)
-    omnitureParams["podType"] = "end card ui"
-    omnitureParams["podSection"] = "video"
+    omnitureParams.append(m.endCard.omnitureParams)
+    omnitureParams["endCardCountdownTime"] = asString(m.endCard.countdown)
 
     button = nodeEvent.getData()
     if button <> invalid then
         if button.id.inStr("Zoom") > 0 then
             setVideoToFullScreen(true)
-            
-            omnitureParams["podText"] = "credits"
-            trackScreenAction("trackPodSelect", omnitureParams, m.top.omnitureName, m.top.omniturePageType)
+            omnitureParams["eventEndCardCreditsSelect"] = "1"
+            trackScreenAction("trackEndCardSelectCredits", omnitureParams)
+'            omnitureParams["podText"] = "credits"
+'            trackScreenAction("trackPodSelect", omnitureParams, m.top.omnitureName, m.top.omniturePageType)
         else
             if m.cpInfo <> invalid then
                 if m.cpInfo.episode <> invalid then
                     m.nextEpisode = m.cpInfo.episode
-                    omnitureParams["mediaWatchNextType"] = "single_next-ep"
+                    m.watchNextType = "single_next-ep"
                 else
                     m.nextEpisode = button.itemContent.video
-                    omnitureParams["mediaWatchNextType"] = button.itemContent.watchNextType
+                    m.watchNextType = button.itemContent.watchNextType
+                    omnitureParams["endCardContentPosition"] = asString(button.index + 1)
                 end if
-                omnitureParams["podText"] = "upnext|play"
-                omnitureParams["podTitle"] = m.nextEpisode.title
-                omnitureParams["showId"] = m.nextEpisode.showID
-                omnitureParams["showName"] = m.nextEpisode.showName
-                omnitureParams["showEpisodeId"] = m.nextEpisode.id
-                omnitureParams["showEpisodeTitle"] = m.nextEpisode.showName + " - " + m.nextEpisode.title
-                trackScreenAction("trackPodSelect", omnitureParams, m.top.omnitureName, m.top.omniturePageType)
-                
-                m.watchNextType = omnitureParams["mediaWatchNextType"]
+                omnitureParams["endCardContentSelection"] = m.nextEpisode.title
+                trackScreenAction("trackEndCardSelect", omnitureParams)
+'                omnitureParams["mediaWatchNextType"] = m.watchNextType
+'                omnitureParams["podText"] = "upnext|play"
+'                omnitureParams["podTitle"] = m.nextEpisode.title
+'                omnitureParams["showId"] = m.nextEpisode.showID
+'                omnitureParams["showName"] = m.nextEpisode.showName
+'                omnitureParams["showEpisodeId"] = m.nextEpisode.id
+'                omnitureParams["showEpisodeTitle"] = m.nextEpisode.showName + " - " + m.nextEpisode.title
+'                trackScreenAction("trackPodSelect", omnitureParams, m.top.omnitureName, m.top.omniturePageType)
             end if
             playNext(true)
         end if
@@ -926,12 +1018,17 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                 m.omnitureParams = {}
                 m.omnitureParams["showEpisodeTitle"] = m.episode.title
                 m.heartbeatContext["showEpisodeTitle"] = m.episode.title
+                m.endCardOmnitureParams = {}
+                m.endCardOmnitureParams["showSeriesId"] = m.episode.showID
+                m.endCardOmnitureParams["showEpisodeLabel"] = m.episode.title
                 if m.episode.showName <> "" then
                     m.omnitureParams["showEpisodeTitle"] = m.episode.showName + " - " + m.omnitureParams["showEpisodeTitle"]
                     m.heartbeatContext["showEpisodeTitle"] = m.episode.showName + " - " + m.omnitureParams["showEpisodeTitle"]
+                    m.endCardOmnitureParams["showSeriesTitle"] = m.episode.showName
                 end if
                 m.omnitureParams["showEpisodeId"] = m.episode.id
                 m.heartbeatContext["showEpisodeId"] = m.episode.id
+                m.endCardOmnitureParams["showEpisodeId"] = m.episode.id
                 if m.episode.subtype() = "Movie" then
                     m.omnitureParams.v38 = "vod:movies"
                     m.heartbeatContext["mediaContentType"] = "vod:movies"
@@ -960,6 +1057,13 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
     
                 m.omnitureParams.v24 = m.vguid
                 m.omnitureParams.p24 = m.vguid
+
+                m.endCardOmnitureParams["showGenre"] = asString(m.episode.topLevelCategory)
+                ' Unsure how to retrieve this, so commenting out for now
+                ' m.endCardOmnitureParams["showDaypart"] = ""
+                m.endCardOmnitureParams["showSeasonNumber"] = asString(m.episode.seasonNumber)
+                m.endCardOmnitureParams["showEpisodeNumber"] = asString(m.episode.episodeNumber)
+                m.endCardOmnitureParams["showAirDate"] = asString(m.episode.airDateIso)
                 
                 if m.top.additionalContext <> invalid then
                     m.omnitureParams.append(m.top.additionalContext)
@@ -987,8 +1091,7 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                         end if
                     end if
                     if showID <> invalid then
-                        showCache = getGlobalField("showCache")
-                        show = showCache[showID]
+                        show = getShowFromCache(showID)
                         if show <> invalid then
                             m.showTitle.text = uCase(show.title)
                         end if
@@ -1125,6 +1228,12 @@ sub updateEndCard()
                 m.video.width = m.endCard.viewport.width
                 m.video.height = m.endCard.viewport.height
                 m.endCard.setFocus(true)
+                
+                omnitureParams = {}
+                omnitureParams.append(m.endCardOmnitureParams)
+                omnitureParams.append(m.endCard.omnitureParams)
+                omnitureParams["endCardCountdownTime"] = asString(remaining)
+                trackScreenAction("trackEndCardView", omnitureParams)
             end if
             if remaining > 0 then
                 m.endCard.countdown = remaining

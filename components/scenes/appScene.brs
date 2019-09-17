@@ -15,17 +15,25 @@ sub init()
 
     addGlobalField("cbsDialog", "node", false)
     observeGlobalField("cbsDialog", "onDialogChanged")
+
+    addGlobalField("showWaitScreen", "boolean", true)
+    observeGlobalField("showWaitScreen", "onShowWaitScreen")
+    
+    addGlobalField("storeDisplayed", "boolean", true)
+    observeGlobalField("storeDisplayed", "onStoreDisplayed")
+    m.allowBackKey = true
+
+    m.navigationStack = []
     
     if GetLinkStatus() = false then
         dialog = createCbsDialog("", "There is a problem connecting to the network." + chr(10) + "Please check your network settings.", ["OK"])
         dialog.observeField("buttonSelected", "onExitDialogButtonSelected")
         setGlobalField("cbsDialog", dialog)
     end if
+end sub
 
-    addGlobalField("showWaitScreen", "boolean", true)
-    observeGlobalField("showWaitScreen", "onShowWaitScreen")
-    
-    m.navigationStack = []
+sub onStoreDisplayed(nodeEvent as object)
+    m.allowBackKey = not nodeEvent.getData()
 end sub
 
 sub reinit(params = {} as object)
@@ -39,6 +47,12 @@ end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
     ?"appScene.onKeyEvent", key, press
+    if key = "back" then
+        if not m.allowBackKey then
+            print "***** Key Lockout is Active, so keypress eaten"
+            return true
+        end if
+    end if
     if press then
         if key = "back" then
             if not goBackInNavigationStack() then
@@ -52,9 +66,9 @@ function onKeyEvent(key as string, press as boolean) as boolean
                         menu.setFocus(true)
                     end if
                 else
-                        dialog = createCbsDialog("", "Are you sure you would like to exit CBS All Access?", ["No", "Yes"])
-                        dialog.observeField("buttonSelected", "onExitDialogButtonSelected")
-                        setGlobalField("cbsDialog", dialog)
+                    dialog = createCbsDialog("", "Are you sure you would like to exit CBS All Access?", ["No", "Yes"])
+                    dialog.observeField("buttonSelected", "onExitDialogButtonSelected")
+                    setGlobalField("cbsDialog", dialog)
                 end if
             end if
             return true
@@ -122,7 +136,9 @@ sub onSignedIn(nodeEvent as object)
     setGlobalField("localStation", task.localStation)
     setGlobalField("localStationLatitude", task.localStationLatitude)
     setGlobalField("localStationLongitude", task.localStationLongitude)
-    setGlobalField("lastLiveChannel", task.lastLiveChannel)
+    if isNullOrEmpty(getGlobalField("lastLiveChannel")) then
+        setGlobalField("lastLiveChannel", task.lastLiveChannel)
+    end if
     setGlobalField("user", task.user)
 
     user = getGlobalField("user")
@@ -486,6 +502,7 @@ sub onCreateAccountSuccessDialogClose(nodeEvent as object)
     if dialog <> invalid then
         dialog.close = true
     end if
+    clearNavigationStack()
     reinit()
 end sub
 
@@ -655,7 +672,7 @@ sub showEmailSignInScreen()
     screen = createObject("roSGNode", "EmailSignInScreen")
     screen.observeField("buttonSelected", "onButtonSelected")
     screen.observeField("success", "onSignedIn")
-    addToNavigationStack(screen)
+    addToNavigationStack(screen, false)
 end sub
 
 sub showRendezvousScreen()
@@ -835,7 +852,6 @@ sub showVideoScreen(episodeID as string, section = invalid as object, source = i
         setGlobalField("cbsDialog", dialog)
         return
     end if
-
     screen = createObject("roSGNode", "VideoScreen")
     screen.observeField("buttonSelected", "onButtonSelected")
     screen.useDai = useDai and config.useDai
@@ -1164,11 +1180,11 @@ sub onButtonSelected(nodeEvent as object)
         toggleFavorite(source.showID, m.top)
     else if buttonID = "liveTV" then
         showLiveTVScreen()
-    else if buttonID = "watch" or buttonID = "resume" then
+    else if buttonID = "watch" or buttonID = "resume" or buttonID = "autoplay" then
         if source.hasField("episode") and source.episode <> invalid then
             episode = source.episode
             if canWatch(episode, m.top) then
-                showVideoScreen(episode.ID, episode.getParent(), source, iif(buttonID = "resume", episode.resumePoint, 0))
+                showVideoScreen(episode.ID, episode.getParent(), source, iif(buttonID = "autoplay", -1, iif(buttonID = "resume", episode.resumePoint, 0)))
             else
                 showUpsellScreen(episode, true)
             end if
@@ -1182,7 +1198,7 @@ sub onButtonSelected(nodeEvent as object)
         else if source.hasField("movie") and source.movie <> invalid then
             movie = source.movie
             if canWatch(movie, m.top) then
-                showVideoScreen(movie.id, movie.getParent(), source, iif(buttonID = "resume", movie.resumePoint, 0))
+                showVideoScreen(movie.id, movie.getParent(), source, iif(buttonID = "autoplay", -1, iif(buttonID = "resume", movie.resumePoint, 0)))
             else
                 showUpsellScreen(movie, true)
             end if
@@ -1222,7 +1238,6 @@ end sub
 sub onItemSelected(nodeEvent as object)
     source = nodeEvent.getRoSGNode()
     item = nodeEvent.getData()
-    ?"onItemSelected()", item.title
     if item <> invalid then
         if source <> invalid then
             ' set the source field to invalid, so we don't get further updates

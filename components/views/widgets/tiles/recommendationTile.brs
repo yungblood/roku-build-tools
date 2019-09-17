@@ -25,8 +25,7 @@ sub onContentChanged()
                 m.title.text = m.content.title
                 m.subtitle.text = (m.content.seasonString + " " + m.content.episodeString).trim()
 
-                showCache = getGlobalField("showCache")
-                show = showCache[m.content.showID]
+                show = getShowFromCache(m.content.showID)
                 if show <> invalid then
                     m.poster.uri = getImageUrl(show.myCbsImageUrl, m.poster.width)
                 else
