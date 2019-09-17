@@ -675,36 +675,43 @@ sub onNextEpisodeLoaded(nodeEvent as object)
 end sub
 
 sub onEndCardButtonSelected(nodeEvent as object)
+'    omnitureParams = {}
+'    omnitureParams.append(m.omnitureParams)
+'    omnitureParams["podType"] = "end card ui"
+'    omnitureParams["podSection"] = "video"
+
     omnitureParams = {}
-    omnitureParams.append(m.omnitureParams)
-    omnitureParams["podType"] = "end card ui"
-    omnitureParams["podSection"] = "video"
+    omnitureParams.append(m.endCard.omnitureParams)
+    omnitureParams["endCardCountdownTime"] = asString(m.endCard.countdown)
 
     button = nodeEvent.getData()
     if button <> invalid then
         if button.id.inStr("Zoom") > 0 then
             setVideoToFullScreen(true)
-            
-            omnitureParams["podText"] = "credits"
-            trackScreenAction("trackPodSelect", omnitureParams, m.top.omnitureName, m.top.omniturePageType)
+            omnitureParams["eventEndCardCreditsSelect"] = "1"
+            trackScreenAction("trackEndCardSelectCredits", omnitureParams)
+'            omnitureParams["podText"] = "credits"
+'            trackScreenAction("trackPodSelect", omnitureParams, m.top.omnitureName, m.top.omniturePageType)
         else
             if m.cpInfo <> invalid then
                 if m.cpInfo.episode <> invalid then
                     m.nextEpisode = m.cpInfo.episode
-                    omnitureParams["mediaWatchNextType"] = "single_next-ep"
+                    m.watchNextType = "single_next-ep"
                 else
                     m.nextEpisode = button.itemContent.video
-                    omnitureParams["mediaWatchNextType"] = button.itemContent.watchNextType
+                    m.watchNextType = button.itemContent.watchNextType
+                    omnitureParams["endCardContentPosition"] = asString(button.index + 1)
                 end if
-                omnitureParams["podText"] = "upnext|play"
-                omnitureParams["podTitle"] = m.nextEpisode.title
-                omnitureParams["showId"] = m.nextEpisode.showID
-                omnitureParams["showName"] = m.nextEpisode.showName
-                omnitureParams["showEpisodeId"] = m.nextEpisode.id
-                omnitureParams["showEpisodeTitle"] = m.nextEpisode.showName + " - " + m.nextEpisode.title
-                trackScreenAction("trackPodSelect", omnitureParams, m.top.omnitureName, m.top.omniturePageType)
-                
-                m.watchNextType = omnitureParams["mediaWatchNextType"]
+                omnitureParams["endCardContentSelection"] = m.nextEpisode.title
+                trackScreenAction("trackEndCardSelect", omnitureParams)
+'                omnitureParams["mediaWatchNextType"] = m.watchNextType
+'                omnitureParams["podText"] = "upnext|play"
+'                omnitureParams["podTitle"] = m.nextEpisode.title
+'                omnitureParams["showId"] = m.nextEpisode.showID
+'                omnitureParams["showName"] = m.nextEpisode.showName
+'                omnitureParams["showEpisodeId"] = m.nextEpisode.id
+'                omnitureParams["showEpisodeTitle"] = m.nextEpisode.showName + " - " + m.nextEpisode.title
+'                trackScreenAction("trackPodSelect", omnitureParams, m.top.omnitureName, m.top.omniturePageType)
             end if
             playNext(true)
         end if
@@ -1011,12 +1018,17 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                 m.omnitureParams = {}
                 m.omnitureParams["showEpisodeTitle"] = m.episode.title
                 m.heartbeatContext["showEpisodeTitle"] = m.episode.title
+                m.endCardOmnitureParams = {}
+                m.endCardOmnitureParams["showSeriesId"] = m.episode.showID
+                m.endCardOmnitureParams["showEpisodeLabel"] = m.episode.title
                 if m.episode.showName <> "" then
                     m.omnitureParams["showEpisodeTitle"] = m.episode.showName + " - " + m.omnitureParams["showEpisodeTitle"]
                     m.heartbeatContext["showEpisodeTitle"] = m.episode.showName + " - " + m.omnitureParams["showEpisodeTitle"]
+                    m.endCardOmnitureParams["showSeriesTitle"] = m.episode.showName
                 end if
                 m.omnitureParams["showEpisodeId"] = m.episode.id
                 m.heartbeatContext["showEpisodeId"] = m.episode.id
+                m.endCardOmnitureParams["showEpisodeId"] = m.episode.id
                 if m.episode.subtype() = "Movie" then
                     m.omnitureParams.v38 = "vod:movies"
                     m.heartbeatContext["mediaContentType"] = "vod:movies"
@@ -1045,6 +1057,13 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
     
                 m.omnitureParams.v24 = m.vguid
                 m.omnitureParams.p24 = m.vguid
+
+                m.endCardOmnitureParams["showGenre"] = asString(m.episode.topLevelCategory)
+                ' Unsure how to retrieve this, so commenting out for now
+                ' m.endCardOmnitureParams["showDaypart"] = ""
+                m.endCardOmnitureParams["showSeasonNumber"] = asString(m.episode.seasonNumber)
+                m.endCardOmnitureParams["showEpisodeNumber"] = asString(m.episode.episodeNumber)
+                m.endCardOmnitureParams["showAirDate"] = asString(m.episode.airDateIso)
                 
                 if m.top.additionalContext <> invalid then
                     m.omnitureParams.append(m.top.additionalContext)
@@ -1072,8 +1091,7 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                         end if
                     end if
                     if showID <> invalid then
-                        showCache = getGlobalField("showCache")
-                        show = showCache[showID]
+                        show = getShowFromCache(showID)
                         if show <> invalid then
                             m.showTitle.text = uCase(show.title)
                         end if
@@ -1210,6 +1228,12 @@ sub updateEndCard()
                 m.video.width = m.endCard.viewport.width
                 m.video.height = m.endCard.viewport.height
                 m.endCard.setFocus(true)
+                
+                omnitureParams = {}
+                omnitureParams.append(m.endCardOmnitureParams)
+                omnitureParams.append(m.endCard.omnitureParams)
+                omnitureParams["endCardCountdownTime"] = asString(remaining)
+                trackScreenAction("trackEndCardView", omnitureParams)
             end if
             if remaining > 0 then
                 m.endCard.countdown = remaining

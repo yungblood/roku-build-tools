@@ -113,8 +113,7 @@ sub onEpisodeChanged()
                 m.progressBar.visible = false
             end if
             
-            showCache = getGlobalField("showCache")
-            show = showCache[episode.showID]
+            show = getShowFromCache(episode.showID)
             if show <> invalid then
                 m.background.uri = getImageUrl(show.heroImageUrl, m.background.width)
             end if
