@@ -670,8 +670,8 @@ end sub
 
 sub showEmailSignInScreen()
     'prevent stacking these screens on top of each other
-    previousscreen = m.navigationStack.peek()
-    if previousscreen.subtype() <> "EmailSignInScreen" then
+    previousScreen = m.navigationStack.peek()
+    if previousScreen.subtype() <> "EmailSignInScreen" then
         screen = createObject("roSGNode", "EmailSignInScreen")
         screen.observeField("buttonSelected", "onButtonSelected")
         screen.observeField("success", "onSignedIn")
