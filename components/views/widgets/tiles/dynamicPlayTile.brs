@@ -61,7 +61,7 @@ sub onShowChanged()
         m.show = m.top.show
         m.loadTask = createObject("roSGNode", "loadDynamicPlayEpisodeTask")
         m.loadTask.observeField("episode", "onEpisodeLoaded")
-        m.loadTask.show = m.show
+        m.loadTask.showID = m.show.id
         m.loadTask.control = "run"
     end if
 end sub

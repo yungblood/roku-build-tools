@@ -11,11 +11,8 @@ sub doWork()
 
     user = getGlobalField("user")
     rows = [] 
-    if isAuthenticated(m.top) then
-        rows.push(user.continueWatching)
-        rows.push(user.showHistory)
-    end if
 
+    combineSYW = true
     enableR4Y = false
     model = "Model1"
     config = getGlobalField("config")
@@ -23,11 +20,26 @@ sub doWork()
         taplyticsApi = getGlobalComponent("taplytics")
         if taplyticsApi <> invalid then
             response = taplyticsApi.callFunc("getRunningExperimentsAndVariations")
-            if response.experiments <> invalid and response.experiments["Recommended + Trending"] <> invalid then
-                ' The R4Y experiment is running, get the model(s)
-                model = taplyticsApi.callFunc("getValueForVariable", { name: "recommendationcarousel", default: model })
-                enableR4Y = true
+            if response.experiments <> invalid then
+                if response.experiments["SYW-CW Combo Test"] <> invalid then
+                    combineSYW = taplyticsApi.callFunc("getValueForVariable", { name: "syw_cw_combination", default: combine })
+                end if
+                if response.experiments["Recommended + Trending"] <> invalid then
+                    ' The R4Y experiment is running, get the model(s)
+                    model = taplyticsApi.callFunc("getValueForVariable", { name: "recommendationcarousel", default: model })
+                    enableR4Y = true
+                end if
             end if
+        end if
+    end if
+    
+    if isAuthenticated(m.top) then
+        if combineSYW then
+            user.showHistory.mode = "recentlyWatched"
+            rows.push(user.showHistory)
+        else
+            rows.push(user.continueWatching)
+            rows.push(user.showHistory)
         end if
     end if
 

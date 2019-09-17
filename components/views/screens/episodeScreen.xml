@@ -5,6 +5,7 @@
     <interface>
         <field id="episodeID" type="string" onChange="onEpisodeIDChanged" alwaysNotify="true" />
         <field id="episode" type="node" onChange="onEpisodeChanged" alwaysNotify="true" />
+        <field id="showID" type="string" onChange="onShowIDChanged" alwaysNotify="true" />
         <field id="autoPlay" type="boolean" />
         <field id="buttonSelected" type="string" alwaysNotify="true" />
         <field id="trackingRow" type="node" />

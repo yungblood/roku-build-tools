@@ -7,6 +7,7 @@
         <field id="show" type="node" onChange="onShowChanged" alwaysNotify="true" />
         <field id="episodeID" type="string" onChange="onEpisodeIDChanged" alwaysNotify="true" />
         <field id="autoplay" type="boolean" />
+        <field id="triggerDynamicPlay" type="boolean" />
 
         <field id="itemSelected" type="node" alwaysNotify="true" />
         <field id="buttonSelected" type="string" alwaysNotify="true" />
@@ -46,11 +47,11 @@
             focusBitmapUri="pkg:/images/frame_grid.9.png"
             vertFocusAnimationStyle="fixedFocus" />
         
-<!--         <FocusGroup -->
-<!--             id="list" -->
-<!--             translation="[0,482]" -->
-<!--             advanceKey="down" -->
-<!--             reverseKey="up" /> -->
+        <Rectangle
+            id="loadMask"
+            width="1920"
+            height="1080"
+            color="0x000000ff" />
 
         <Animation
             id="scrollAnimation"

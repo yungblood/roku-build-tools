@@ -221,15 +221,19 @@ sub updateContent()
             end if
         end if
     
-        if user.continueWatching.getChildCount() = 0 and not user.continueWatching.firstLoad then
-            if user.continueWatching.isSameNode(rows[0]) then
-                rows.delete(0)
-                update = true
-            end if
-        else
-            if not user.continueWatching.isSameNode(rows[0]) then
-                rows.unshift(user.continueWatching)
-                update = true
+        ' If showHistory is in recentlyWatched mode, we don't show the
+        ' continue watching carousel
+        if user.showHistory.mode <> "recentlyWatched" then
+            if user.continueWatching.getChildCount() = 0 and not user.continueWatching.firstLoad then
+                if user.continueWatching.isSameNode(rows[0]) then
+                    rows.delete(0)
+                    update = true
+                end if
+            else
+                if not user.continueWatching.isSameNode(rows[0]) then
+                    rows.unshift(user.continueWatching)
+                    update = true
+                end if
             end if
         end if
         if update then
@@ -378,7 +382,7 @@ sub onItemSelected(nodeEvent as object)
 end sub
 
 sub onMenuItemSelected(nodeEvent as object)
-    selection=nodeEvent.getData()
+    selection = nodeEvent.getData()
     if selection = "home" then
         'only change selection focus area after content is loaded
         'for users with itchy hyper trigger fingers this will keep focus where it should be

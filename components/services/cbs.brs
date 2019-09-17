@@ -1048,13 +1048,13 @@ function cbs_getShowAvailableSeasons(showID as string) as object
     return seasons
 end function
 
-function cbs_getDynamicPlayEpisode(show as object, history = invalid as object) as object
+function cbs_getDynamicPlayEpisode(showID as string) as object
     episode = invalid
     dynamicPlay = createObject("roSGNode", "DynamicPlayEpisode")
     if m.user.status = "SUBSCRIBER" then
-        url = m.apiBaseUrl + "v3.0/roku/dynamicplay/show/"+ show.id +".json"
+        url = m.apiBaseUrl + "v3.0/roku/dynamicplay/show/"+ showID +".json"
     else
-        url = m.apiBaseUrl + "v3.0/roku/dynamicplay/show/"+ show.id +"/nonsub.json"
+        url = m.apiBaseUrl + "v3.0/roku/dynamicplay/show/"+ showID +"/nonsub.json"
     end if
     response = m.makeRequest(url, "GET")
     if response <> invalid and response.success = true then
@@ -1074,53 +1074,6 @@ function cbs_getDynamicPlayEpisode(show as object, history = invalid as object) 
             return dynamicPlay
          end if 
     end if
-    
-'    if history <> invalid and episode = invalid then
-'        for i = 0 to history.getChildCount() - 1
-'            item = history.getChild(i)
-'            if item.showID = show.id then
-'                episode = item
-'                exit for
-'            end if
-'        next
-'    end if
-'    if episode <> invalid then
-'        if episode.resumePoint < (episode.length * .97)  then
-'            dynamicPlay.title = "Continue watching"
-'        else
-'            episode = m.getNextEpisode(episode.id, show.id)
-'            if episode <> invalid then
-'                dynamicPlay.title = "Watch next"
-'            end if
-'        end if
-'    end if
-'    if episode = invalid then
-'        for each section in show.sections
-'            if section.subtype() = "Section" then
-'                videos = m.getSectionVideos(section.id, section.excludeShow, section.params, 0, 1)
-'                if videos.count() > 0 then
-'                    episode = videos[0]
-'                    if episode.subtype() <> "LiveFeed" then
-'                        exit for
-'                    end if
-'                end if
-'            end if
-'        next
-'        if episode <> invalid then
-'            if episode.isFullEpisode then
-'                if show.isClassic then
-'                    dynamicPlay.title = "Watch first episode"
-'                else
-'                    dynamicPlay.title = "Watch latest episode"
-'                end if
-'            else
-'                dynamicPlay.title = "Watch"
-'            end if
-'        end if
-'    end if
-'    if m.user.status = "ANONYMOUS" and episode.isFullEpisode then
-'        dynamicPlay.title = "SUBSCRIBE TO WATCH"
-'    end if
     if episode <> invalid then
         dynamicPlay.episode = episode
         return dynamicPlay

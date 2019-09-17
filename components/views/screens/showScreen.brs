@@ -16,6 +16,9 @@ sub init()
     m.list.observeField("itemFocused", "onRowFocused")
     m.list.observeField("rowItemFocused", "onRowItemFocused")
     m.list.observeField("rowItemSelected", "onRowItemSelected")
+    
+    ' Used to hide the partial content load, in the event of a deep link into dynamic play
+    m.loadMask = m.top.findNode("loadMask")
 
     m.fadeOutAnimation = m.top.findNode("fadeOutAnimation")
     m.fadeInAnimation = m.top.findNode("fadeInAnimation")
@@ -64,6 +67,8 @@ sub onVisibleChanged()
             m.dynamicPlay.setFocus(true)
             scrollList()
             m.firstShow = false
+        else
+            m.loadMask.visible = false
         end if
     else
         m.dynamicPlay.vilynxControl = "stop"
@@ -186,6 +191,7 @@ sub onFocusTimerFired()
         ?"JUMPING TO: ", [m.focusRow, m.focusItem]
         m.list.jumpToRowItem = [m.focusRow, m.focusItem]
         if m.top.autoplay then
+            m.top.autoplay = false
             row = m.list.content.getChild(m.focusRow)
             if row <> invalid then
                 selectItem(row, m.focusItem)
@@ -226,6 +232,11 @@ end sub
 
 sub onDynamicPlayLoaded()
     hideSpinner()
+    m.loadMask.visible = false
+    if m.top.triggerDynamicPlay then
+        m.top.triggerDynamicPlay = false
+        processButtonSelection("dynamicPlay")
+    end if
 end sub
 
 sub scrollList(forceScroll = false as boolean)
@@ -300,6 +311,10 @@ end sub
 sub onButtonSelected(nodeEvent as object)
     row = nodeEvent.getRoSGNode()
     button = nodeEvent.getData()
+    processButtonSelection(button, row)
+end sub
+
+sub processButtonSelection(button as string, row = invalid as object)
     if button = "dynamicPlay" then
         if m.dynamicPlay.episode <> invalid then
             omnitureData = getOmnitureData(m.show, 0, lCase(m.dynamicPlay.episode.title), "marquee|top")
