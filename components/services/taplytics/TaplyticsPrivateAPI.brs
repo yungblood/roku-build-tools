@@ -1,3 +1,11 @@
+'Moved this code out of the While loop in Line 567, replaced in the invalid event (timeout)
+'        if method = "POST"
+'           m.connection.AsyncPostFromString(requestBody)
+'        else
+'          m.connection.AsyncGetToString()
+'        end if
+
+
 function init()
   m.TAP_SDK_VERSION = "1.1.0"
   m.top.id = "tap"
@@ -561,7 +569,7 @@ function Taplytics() as Object
         else
           m.connection.AsyncGetToString()
         end if
-        
+
         while retryCountdown% > 0
           event = wait(timeout, m.httpPort)
           if type(event) = "roUrlEvent"
