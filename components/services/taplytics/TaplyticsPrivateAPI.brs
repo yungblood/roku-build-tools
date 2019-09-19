@@ -556,12 +556,13 @@ function Taplytics() as Object
         if m._top.enablePrint then print "send url : [" + url + "]"
         if m._top.enablePrint then print "send body : " + requestBody
 
+        if method = "POST"
+           m.connection.AsyncPostFromString(requestBody)
+        else
+          m.connection.AsyncGetToString()
+        end if
+        
         while retryCountdown% > 0
-          if method = "POST"
-             m.connection.AsyncPostFromString(requestBody)
-          else
-            m.connection.AsyncGetToString()
-          end if
           event = wait(timeout, m.httpPort)
           if type(event) = "roUrlEvent"
             print "[tap-analytics] Request success"
@@ -572,6 +573,13 @@ function Taplytics() as Object
             m.connection.AsyncCancel()
             ' reset the connection after a timeout
             m.connection = _createConnection(m.httpPort)
+            if method = "POST"
+               m.connection.AsyncPostFromString(requestBody)
+            else
+              m.connection.AsyncGetToString()
+            end if
+          else if type(event) = "roSGNodeEvent"
+            print "[tap-analytics] roSGNode port event"
           else
             print "[tap-analytics] Request unknown port event"
           end if
