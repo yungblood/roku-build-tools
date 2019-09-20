@@ -155,7 +155,7 @@ pipeline {
                 sh 'ls $SCRIPTS_ROOT/roku'
                 sh 'ls'
                 sh 'mkdir exclude'
-                sh 'ln -s $SCRIPTS_ROOT/roku exclude'
+                sh 'ln -s $SCRIPTS_ROOT/roku/. exclude'
                 sh 'ln -s $SCRIPTS_ROOT/roku/Makefiles/Makefile .'
                 sh 'make install'
                 
