@@ -124,19 +124,15 @@ sub onContinuousPlayInfoChanged(nodeEvent as object)
 
         contentList = ""
         m.selectorButtons.removeChildrenIndex(m.selectorButtons.getChildCount(), 0)
-        for i = 0 to cpInfo.videos.count()
+        for i = 0 to cpInfo.videos.count() - 1
             video = cpInfo.videos[i]
             if video <> invalid then
                 button = m.selectorButtons.createChild("RecommendationTile")
                 button.itemContent = video
                 button.index = i
-            end if
-            if not isNullOrEmpty(contentList) then
-                contentList = contentList + "|"
-            end if
-            'ticket hotfix for if endcard videos is empty
-            'cropped up when recommended/episodes for late late show with james corden were removed
-            if video <> invalid then
+                if not isNullOrEmpty(contentList) then
+                    contentList = contentList + "|"
+                end if
                 contentList = contentList + video.title
             end if
             
