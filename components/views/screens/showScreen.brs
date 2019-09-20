@@ -41,8 +41,12 @@ function onKeyEvent(key as string, press as boolean) as boolean
         if key = "down" then
             if m.dynamicPlay.isInFocusChain() then
                 m.list.setFocus(true)
+                m.list.jumpToRowItem = [0, 0]
                 m.lastFocus = m.list
                 scrollList()
+                if m.list.drawFocusFeedback = false then
+                    m.list.drawFocusFeedback = true
+                end if
             end if
             return true
         else if key = "up" then
