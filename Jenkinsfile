@@ -17,6 +17,8 @@ def environmentMap = [
         "default" : [
             "REPO" : "allaccess-domestic",
             "ROLE" : "api-web",
+            "ROKU_DEV" : "10.16.181.8",
+            "ROKU_PASS" : "1234",
         ],
         "dev" : [
             "BUILD_ENV" : "stage-us-gcp",
@@ -151,6 +153,10 @@ pipeline {
             steps {
                 sh 'echo "Test roku build"'
                 sh 'ls $SCRIPTS_ROOT/roku'
+                sh 'ls'
+                sh 'ln -s $SCRIPTS_ROOT/roku/. exclude'
+                sh 'ln -s $SCRIPTS_ROOT/roku/Makefiles/Makefile .'
+                sh 'make install'
                 
             }
         }
