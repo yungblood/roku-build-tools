@@ -149,7 +149,7 @@ pipeline {
         }
         stage('build') {
             steps {
-                sh 'Test roku build'
+                sh 'echo "Test roku build"'
                 sh 'ls $SCRIPTS_ROOT/roku'
                 
             }
