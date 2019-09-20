@@ -22,7 +22,7 @@ sub doWork()
             response = taplyticsApi.callFunc("getRunningExperimentsAndVariations")
             if response.experiments <> invalid then
                 if response.experiments["SYW-CW Combo Test"] <> invalid then
-                    combineSYW = taplyticsApi.callFunc("getValueForVariable", { name: "syw_cw_combination", default: combine })
+                    combineSYW = taplyticsApi.callFunc("getValueForVariable", { name: "syw_cw_combination", default: combineSYW })
                 end if
                 if response.experiments["Recommended + Trending"] <> invalid then
                     ' The R4Y experiment is running, get the model(s)
