@@ -126,10 +126,11 @@ sub onContinuousPlayInfoChanged(nodeEvent as object)
         m.selectorButtons.removeChildrenIndex(m.selectorButtons.getChildCount(), 0)
         for i = 0 to cpInfo.videos.count()
             video = cpInfo.videos[i]
-            button = m.selectorButtons.createChild("RecommendationTile")
-            button.itemContent = video
-            button.index = i
-            
+            if video <> invalid then
+                button = m.selectorButtons.createChild("RecommendationTile")
+                button.itemContent = video
+                button.index = i
+            end if
             if not isNullOrEmpty(contentList) then
                 contentList = contentList + "|"
             end if
