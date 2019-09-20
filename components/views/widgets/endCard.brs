@@ -133,7 +133,11 @@ sub onContinuousPlayInfoChanged(nodeEvent as object)
             if not isNullOrEmpty(contentList) then
                 contentList = contentList + "|"
             end if
-            contentList = contentList + video.title
+            'ticket hotfix for if endcard videos is empty
+            'cropped up when recommended/episodes for late late show with james corden were removed
+            if video <> invalid then
+                contentList = contentList + video.title
+            end if
             
             ' We shouldn't display more than 3 recommendations
             if m.selectorButtons.getChildCount() >= 3 then
