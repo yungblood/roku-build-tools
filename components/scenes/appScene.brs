@@ -669,10 +669,14 @@ sub showSignInScreen()
 end sub
 
 sub showEmailSignInScreen()
-    screen = createObject("roSGNode", "EmailSignInScreen")
-    screen.observeField("buttonSelected", "onButtonSelected")
-    screen.observeField("success", "onSignedIn")
-    addToNavigationStack(screen, false)
+    'prevent stacking these screens on top of each other
+    previousScreen = m.navigationStack.peek()
+    if previousScreen.subtype() <> "EmailSignInScreen" then
+        screen = createObject("roSGNode", "EmailSignInScreen")
+        screen.observeField("buttonSelected", "onButtonSelected")
+        screen.observeField("success", "onSignedIn")
+        addToNavigationStack(screen, false)
+    end if
 end sub
 
 sub showRendezvousScreen()
