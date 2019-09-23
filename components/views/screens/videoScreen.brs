@@ -17,7 +17,6 @@ sub init()
     m.video.observeFieldScoped("content", "onContentReady")
     m.video.observeFieldScoped("position", "onPositionChanged")
     m.video.observeFieldScoped("state", "onVideoStateChanged")
-    'this causes the flickering of the overlay on replay button press, so commented out as we will not be using this
     m.video.observeFieldScoped("trickPlayBarVisibilityHint", "onOverlayVisibilityHint")
     m.trickPlayVisible = false
 
@@ -221,7 +220,6 @@ end sub
 
 sub onOverlayVisibilityHint()
     m.trickPlayVisible = m.video.trickPlayBarVisibilityHint
-    'm.overlay.visible = (m.video.trickPlayBarVisibilityHint or m.video.state = "paused")
 end sub
 
 sub clearMetadata()
