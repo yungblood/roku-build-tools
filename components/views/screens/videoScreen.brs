@@ -270,6 +270,7 @@ sub onVideoStateChanged()
         else if state = "buffering" then
             m.overlay.visible = false
             m.overlayTimer.control = "stop"
+            m.smoothingTimer.control = "stop"
             hideSpinner()
             ' HACK: The Roku firmware automatically moves the video state to buffering
             '       when the user switches audio tracks, even if the player is paused,
@@ -278,9 +279,6 @@ sub onVideoStateChanged()
             '       allow the player to resume playback manually
             if not m.paused or m.video.audioTrack = m.currentAudioTrack then
                 m.video.enableTrickPlay = false
-                m.overlay.visible = false
-                m.overlayTimer.control = "stop"
-                m.smoothingTimer.control = "stop"
             end if
             m.currentAudioTrack = m.video.audioTrack
         else if state = "paused" then
