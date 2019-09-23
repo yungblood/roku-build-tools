@@ -18,7 +18,8 @@ sub init()
     m.video.observeFieldScoped("position", "onPositionChanged")
     m.video.observeFieldScoped("state", "onVideoStateChanged")
     'this causes the flickering of the overlay on replay button press, so commented out as we will not be using this
-    'm.video.observeFieldScoped("trickPlayBarVisibilityHint", "onOverlayVisibilityHint")
+    m.video.observeFieldScoped("trickPlayBarVisibilityHint", "onOverlayVisibilityHint")
+    m.trickPlayVisible = false
 
 	m.replayGroup = m.top.findNode("replayGroup")
     'child 0 is poster, child 1 is text
@@ -72,6 +73,9 @@ sub init()
     m.timeoutTimer = m.top.findNode("timeoutTimer")
     m.timeoutTimer.observeField("fire", "onTimeoutTimerFired")
     
+    m.smoothingTimer = m.top.findNode("smoothingTimer")
+    m.smoothingTimer.observeField("fire", "onSmoothingTimerFired")
+
     m.pauseTimer = createObject("roTimespan")
     m.paused = false
     m.pausedPosition = 0
@@ -84,7 +88,8 @@ sub init()
     m.overrideEndCard = false
     m.isContinuousPlay = false
     m.isForced = false
-    
+    m.firstPlay = true
+
     m.timedOut = false
     
     m.idleTimeout = asInteger(config.playback_timeout_bblf, config.liveTimeout)
@@ -126,46 +131,20 @@ function onKeyEvent(key as string, press as boolean) as boolean
         end if
     else
         if not m.inAd then
-            if not m.endCard.visible then
-                if key = "OK" then
-                    if m.video.state = "playing" then
-                        fixFirmRectOpacity(0)
-                        if m.overlay.visible = false then
-                            m.overlay.visible = true
-                        'this is the only place I think this would be ever be started if we wanted the overlay to be hidden by the timer
-                        'if it is started then we need to stop it in all the other places below.
-                            m.overlayTimer.control = "start"
-                        else
-                            m.overlay.visible = false
-                            m.overlayTimer.control = "stop"
-                        end if
-                        return true
-                    end if
-                else if key = "play" then    
-                    if m.video.state ="paused" then
-                        m.overlay.visible = true
-                        m.overlayTimer.control = "stop"
-                        return true
-                    else if m.video.state = "playing" then
+            if key = "replay" then
+                'if m.video.state = "playing" or m.video.state = "paused" then
+                if m.trickPlayVisible and m.video.state <> "paused" then m.replayGroup.visible = true
+                'end if
+            end if
+            if key = "OK" then
+                'manual control of overlay display so make sure we disable timer for this
+                if m.video.state = "playing" then
+                    if m.overlay.visible then
                         m.overlay.visible = false
                         m.overlayTimer.control = "stop"
-                        return true
-                    end if
-                else if key = "right" or key = "left" or key = "fastforward" or key = "rewind" then
-                    if m.video.state <> "buffering" and m.video.state <> "none" then
-                        fixFirmRectOpacity(1)
+                    else
                         m.overlay.visible = true
                         m.overlayTimer.control = "stop"
-                        return true
-                    end if
-                else if key = "replay" then
-                    if m.video.state = "buffering" then
-                        'the retrieving bar visiblility of the 1st child is what this keys off of, so let's hope roku doesn't change that
-                        if m.video.bufferingbar.visible = false and m.video.retrievingbar.getChild(1).visible = false then
-                            fixFirmRectOpacity(0)
-                            m.replayGroup.visible = true
-                            return true
-                        end if
                     end if
                 end if
             end if
@@ -243,7 +222,8 @@ sub onVideoComplete()
 end sub
 
 sub onOverlayVisibilityHint()
-    m.overlay.visible = (m.video.trickPlayBarVisibilityHint or m.video.state = "paused")
+    m.trickPlayVisible = m.video.trickPlayBarVisibilityHint
+    'm.overlay.visible = (m.video.trickPlayBarVisibilityHint or m.video.state = "paused")
 end sub
 
 sub clearMetadata()
@@ -285,11 +265,15 @@ sub onVideoStateChanged()
             else
                 m.errorDialog.setFocus(true)
             end if
+            m.overlay.visible = false
+            m.overlayTimer.control = "stop"
             m.replayGroup.visible = false
         else if state = "error" then
             m.replayGroup.visible = false
             showErrorDialog(m.video.errorMsg)
         else if state = "buffering" then
+m.overlay.visible = false
+m.overlayTimer.control = "stop"
             hideSpinner()
             ' HACK: The Roku firmware automatically moves the video state to buffering
             '       when the user switches audio tracks, even if the player is paused,
@@ -299,11 +283,16 @@ sub onVideoStateChanged()
             if not m.paused or m.video.audioTrack = m.currentAudioTrack then
                 m.video.enableTrickPlay = false
                 m.overlay.visible = false
+                m.overlayTimer.control = "stop"
+                m.smoothingTimer.control = "stop"
             end if
             m.currentAudioTrack = m.video.audioTrack
         else if state = "paused" then
             ' Track the current audio track, to detect track changes in buffering
             m.currentAudioTrack = m.video.audioTrack
+            'this will remove flickers of less than 100ms but also introduce a short delay before display of 100ms
+            m.smoothingTimer.control = "stop"
+            m.smoothingTimer.control = "start"
 
             m.paused = true
             m.pausedPosition = m.video.position
@@ -319,9 +308,6 @@ sub onVideoStateChanged()
             m.replayGroup.visible = false
             fixFirmRectOpacity(1)
         else if state = "playing" then
-            if m.firstPlay = invalid then
-                m.firstPlay = true
-            end if
             if m.firstPlay then
                 clearMetadata()
                 m.firstPlay = false
@@ -350,6 +336,9 @@ sub onVideoStateChanged()
             end if
             m.paused = false
             m.replayGroup.visible = false
+m.overlay.visible = false
+m.overlayTimer.control = "stop"
+m.smoothingTimer.control = "stop"
         else if state = "stopped" then
             if m.episode <> invalid then
                 if m.episode.isLive then
@@ -462,12 +451,18 @@ sub onTimeoutTimerFired()
     m.top.close = true
 end sub
 
+sub onSmoothingTimerFired()
+    m.smoothingTimer.control = "stop"
+    m.overlay.visible = true
+end sub
+
 sub onEpisodeIDChanged()
     showSpinner(m.top, true)
 
     m.nextEpisode = invalid
     m.cpInfo = invalid
     m.overlay.visible = false
+    m.overlayTimer.control = "stop"
     m.endCard.visible = false
     m.video.bifDisplay.visible = false
     m.video.trickPlayBar.visible = false
@@ -734,6 +729,8 @@ end sub
 sub onAdPodReady()
 ?"==== onAdPodReady ===="
     m.inAd = true
+    m.overlay.visible = false
+    m.overlayTimer.control = "stop"
     if m.video.state = "playing" or m.video.state = "finished" then
         m.resumePoint = m.video.position
         if m.video.state = "finished" then
@@ -805,6 +802,8 @@ sub onAdStart(nodeEvent as object)
     end if
     
     m.inAd = true
+    m.overlay.visible = false
+m.overlayTimer.control = "stop"
     if m.convivaTask <> invalid then
         m.convivaTask.adStart = true
     end if

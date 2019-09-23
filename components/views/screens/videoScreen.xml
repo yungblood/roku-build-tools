@@ -127,11 +127,15 @@
             repeat="false" />
         <Timer
             id="overlayTimer"
-            duration="5"
+            duration="4"
             repeat="false" />
         <Timer
             id="timeoutTimer"
             duration="300"
+            repeat="false" />
+        <Timer
+            id="smoothingTimer"
+            duration=".1"
             repeat="false" />
     </children>
 </component>
