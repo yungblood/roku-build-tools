@@ -143,7 +143,8 @@ end sub
 
 sub onResultsLoaded()
     m.grid.content = m.searchTask.results
-    if m.searchTask.results = invalid or m.searchTask.results.getChildCount() = 0 then        m.grid.visible = false
+    if m.searchTask.results = invalid or m.searchTask.results.getChildCount() = 0 then
+        m.grid.visible = false
         m.noResults.visible = (m.searchText.text.len() > 0)
     else
         m.grid.visible = true
