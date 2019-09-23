@@ -132,9 +132,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
     else
         if not m.inAd then
             if key = "replay" then
-                'if m.video.state = "playing" or m.video.state = "paused" then
                 if m.trickPlayVisible and m.video.state <> "paused" then m.replayGroup.visible = true
-                'end if
             end if
             if key = "OK" then
                 'manual control of overlay display so make sure we disable timer for this
@@ -202,7 +200,7 @@ sub onContentReady()
         if not m.top.close then
             m.video.control = "play"
         end if
-    m.firstPlay = true
+        m.firstPlay = true
     end if
 end sub
 
@@ -272,8 +270,8 @@ sub onVideoStateChanged()
             m.replayGroup.visible = false
             showErrorDialog(m.video.errorMsg)
         else if state = "buffering" then
-m.overlay.visible = false
-m.overlayTimer.control = "stop"
+            m.overlay.visible = false
+            m.overlayTimer.control = "stop"
             hideSpinner()
             ' HACK: The Roku firmware automatically moves the video state to buffering
             '       when the user switches audio tracks, even if the player is paused,
@@ -336,9 +334,9 @@ m.overlayTimer.control = "stop"
             end if
             m.paused = false
             m.replayGroup.visible = false
-m.overlay.visible = false
-m.overlayTimer.control = "stop"
-m.smoothingTimer.control = "stop"
+            m.overlay.visible = false
+            m.overlayTimer.control = "stop"
+            m.smoothingTimer.control = "stop"
         else if state = "stopped" then
             if m.episode <> invalid then
                 if m.episode.isLive then
@@ -365,6 +363,9 @@ m.smoothingTimer.control = "stop"
             trackVideoComplete()
             trackVideoUnload()
             m.replayGroup.visible = false
+            m.overlay.visible = false
+            m.overlayTimer.control = "stop"
+            m.smoothingTimer.control = "stop"
         end if
     end if
 end sub
