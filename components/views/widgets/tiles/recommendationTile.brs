@@ -9,6 +9,7 @@ sub init()
     
     m.countdown = m.top.findNode("countdown")
     m.countdownLabel = m.top.findNode("countdownLabel")
+    m.countdown.visible = isSubscriber(m.top)
 end sub
 
 sub onFocusChanged()
@@ -49,8 +50,10 @@ end sub
 
 sub onCountdownChanged()
     'if m.content.subtype() <> "Episode" or canWatch(m.content, m.top) then
-        m.countdownLabel.text = m.top.countdown.toStr()
-        m.countdown.visible = m.top.isInFocusChain()
+        if isSubscriber(m.top) then
+            m.countdownLabel.text = m.top.countdown.toStr()
+            m.countdown.visible = m.top.isInFocusChain()
+        end if
     'else
     '    m.countdown.visible = false
     'end if

@@ -800,7 +800,7 @@ sub onAdStart(nodeEvent as object)
     
     m.inAd = true
     m.overlay.visible = false
-m.overlayTimer.control = "stop"
+    m.overlayTimer.control = "stop"
     if m.convivaTask <> invalid then
         m.convivaTask.adStart = true
     end if
@@ -1186,7 +1186,12 @@ function playNext(forced = false as boolean) as boolean
     if m.nextEpisode = invalid and m.cpInfo <> invalid then
         if m.cpInfo.episode <> invalid then
             m.nextEpisode = m.cpInfo.episode
-            m.watchNextType = "single_next-ep"
+            'ucase probably isn't required, but if 'free' or any combination of case ever shows up in the value then it'll be valid for the check here
+            if not isSubscriber(m.top) and UCASE(m.nextEpisode.subscriptionLevel) <> "FREE" then
+                return false
+            else
+                m.watchNextType = "single_next-ep"
+            end if
         else
             button = m.endCard.buttonFocused
             if button <> invalid then
