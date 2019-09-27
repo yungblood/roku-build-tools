@@ -633,7 +633,6 @@ sub onSubscriptionSuccess(nodeEvent as object)
                     dialog = createCbsDialog("Congratulations!", "Your account has been re-activated!", ["OK"])
                     dialog.observeField("buttonSelected", "onSubscriptionSuccessDialogClose")
                     setGlobalField("cbsDialog", dialog)
-                    SetGlobalField("enableBack", true)
                     return
                 else if task.type = "sub" then
                 end if
