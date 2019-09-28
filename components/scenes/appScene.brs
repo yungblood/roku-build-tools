@@ -19,9 +19,9 @@ sub init()
     addGlobalField("showWaitScreen", "boolean", true)
     observeGlobalField("showWaitScreen", "onShowWaitScreen")
     
-    addGlobalField("storeDisplayed", "boolean", true)
-    observeGlobalField("storeDisplayed", "onStoreDisplayed")
-    m.allowBackKey = true
+    addGlobalField("ignoreBack", "boolean", false)
+    observeGlobalField("ignoreBack", "onIgnoreBack")
+    m.allowBackKey = false
 
     m.navigationStack = []
     
@@ -32,7 +32,7 @@ sub init()
     end if
 end sub
 
-sub onStoreDisplayed(nodeEvent as object)
+sub onIgnoreBack(nodeEvent as object)
     m.allowBackKey = not nodeEvent.getData()
 end sub
 
