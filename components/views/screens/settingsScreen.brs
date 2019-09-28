@@ -66,6 +66,7 @@ sub onFocusChanged()
             hideSpinner()
             m.settingsButtons.setFocus(true)
         end if
+        setGlobalField("ignoreBack",false)
     end if
 end sub
 

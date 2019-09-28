@@ -20,6 +20,7 @@ end function
 sub onFocusChanged()
     if m.top.hasFocus() then
         m.options.setFocus(true)
+        setGlobalField("ignoreBack",false)
     end if
 end sub
 

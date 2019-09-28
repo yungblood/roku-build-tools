@@ -25,6 +25,7 @@ end sub
 sub onFocusChanged()
     if m.top.hasFocus() then
         m.grid.setFocus(true)
+        setGlobalField("ignoreBack",false)
     end if
 end sub
 

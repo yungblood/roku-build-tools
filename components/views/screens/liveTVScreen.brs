@@ -147,6 +147,7 @@ sub onFocusChanged(nodeEvent as object)
             end if
         end if
    end if
+   setGlobalField("ignoreBack",false)
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean

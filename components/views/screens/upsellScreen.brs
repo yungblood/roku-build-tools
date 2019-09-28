@@ -25,6 +25,7 @@ sub onFocusChanged()
     if m.top.hasFocus() and m.top.upsellInfo <> invalid then
         m.buttons.setFocus(true)
     end if
+    setGlobalField("ignoreBack",false)
 end sub
 
 sub onUpsellTypeChanged()

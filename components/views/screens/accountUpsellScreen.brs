@@ -49,6 +49,7 @@ end function
 sub onFocusChanged()
     if m.top.hasFocus() then
         resetFocus()
+        setGlobalField("ignoreBack",false)
     end if
 end sub
 
