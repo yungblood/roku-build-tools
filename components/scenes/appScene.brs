@@ -600,11 +600,12 @@ sub onSubscriptionSuccess(nodeEvent as object)
                 end if
                 params["&&products"] = join([params["purchaseCategory"], params["purchaseProduct"], params["purchaseQuantity"], params["purchasePrice"]], ";")
                 trackScreenAction("trackDowngrade", params, screenName, pageType, ["event108"], siteHier)
-            else if task.type = "exsub" then
-                dialog = createCbsDialog("Congratulations!", "Your account has been re-activated!", ["OK"])
-                dialog.observeField("buttonSelected", "onSubscriptionSuccessDialogClose")
-                setGlobalField("cbsDialog", dialog)
-                return
+            'this is not hit when live
+            'else if task.type = "exsub" then
+            '    dialog = createCbsDialog("Congratulations!", "Your account has been re-activated!", ["OK"])
+            '    dialog.observeField("buttonSelected", "onSubscriptionSuccessDialogClose")
+            '    setGlobalField("cbsDialog", dialog)
+            '    return
             else if task.type = "sub" then
             end if
 
@@ -627,6 +628,12 @@ sub onSubscriptionSuccess(nodeEvent as object)
                     pageType = "billing_failure"
                     siteHier = "upsell|payment|fail"
                     trackScreenAction("trackDowngrade", params, screenName, pageType, [], siteHier)
+                else if task.type = "exsub" then
+                    'for this case the task.success is not set, but the error is empty, so this is a success message
+                    dialog = createCbsDialog("Congratulations!", "Your account has been re-activated!", ["OK"])
+                    dialog.observeField("buttonSelected", "onSubscriptionSuccessDialogClose")
+                    setGlobalField("cbsDialog", dialog)
+                    return
                 else if task.type = "sub" then
                 end if
 
@@ -644,14 +651,13 @@ end sub
 
 sub onSubscriptionSuccessDialogClose(nodeEvent as object)
     setGlobalField("showWaitScreen", true)
-
-    clearNavigationStack("AccountUpsellScreen")
-    goBackInNavigationStack()
     dialog = nodeEvent.getRoSGNode()
     if dialog <> invalid then
         dialog.close = true
     end if
-    signIn()
+    clearNavigationStack("AccountUpsellScreen")
+    goBackInNavigationStack()
+    reinit()
 end sub
 
 sub onSubscriptionFailDialogClose(nodeEvent as object)
