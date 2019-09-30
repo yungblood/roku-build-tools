@@ -10,7 +10,7 @@ sub init()
     m.store = m.top.findNode("store")
     'Set KEY LOCKOUT FLAG for appScene main scenegraph thread
     'This is to track that the channel store is set to run a request
-    SetGlobalField("storeDisplayed", true)
+    SetGlobalField("ignoreBack", true)
     showSpinner()
     m.store.observeField("userData", "onUserDataLoaded")
     m.store.requestedUserData = "email"
@@ -168,7 +168,7 @@ sub onUserDataLoaded()
         m.email.text = userData.email
         advanceToFirstEmptyField(false)
     end if
-    SetGlobalField("storeDisplayed", false)
+    SetGlobalField("ignoreBack", false)
     hideSpinner()
     m.form.setFocus(true)
 end sub

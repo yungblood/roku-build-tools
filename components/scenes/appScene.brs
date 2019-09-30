@@ -19,9 +19,9 @@ sub init()
     addGlobalField("showWaitScreen", "boolean", true)
     observeGlobalField("showWaitScreen", "onShowWaitScreen")
     
-    addGlobalField("storeDisplayed", "boolean", true)
-    observeGlobalField("storeDisplayed", "onStoreDisplayed")
-    m.allowBackKey = true
+    addGlobalField("ignoreBack", "boolean", true)
+    observeGlobalField("ignoreBack", "onIgnoreBack")
+    m.allowBackKey = false
 
     m.navigationStack = []
     
@@ -32,7 +32,7 @@ sub init()
     end if
 end sub
 
-sub onStoreDisplayed(nodeEvent as object)
+sub onIgnoreBack(nodeEvent as object)
     m.allowBackKey = not nodeEvent.getData()
 end sub
 
@@ -633,6 +633,7 @@ sub onSubscriptionSuccess(nodeEvent as object)
                     dialog = createCbsDialog("Congratulations!", "Your account has been re-activated!", ["OK"])
                     dialog.observeField("buttonSelected", "onSubscriptionSuccessDialogClose")
                     setGlobalField("cbsDialog", dialog)
+                    SetGlobalField("ignoreBack", true)
                     return
                 else if task.type = "sub" then
                 end if
@@ -678,6 +679,7 @@ sub showEmailSignInScreen()
     'prevent stacking these screens on top of each other
     previousScreen = m.navigationStack.peek()
     if previousScreen.subtype() <> "EmailSignInScreen" then
+        SetGlobalField("ignoreBack", true)
         screen = createObject("roSGNode", "EmailSignInScreen")
         screen.observeField("buttonSelected", "onButtonSelected")
         screen.observeField("success", "onSignedIn")

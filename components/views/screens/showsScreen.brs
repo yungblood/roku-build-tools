@@ -26,6 +26,7 @@ sub onFocusChanged()
         else
             m.lastFocus.setFocus(true)
         end if
+        setGlobalField("ignoreBack",false)
     end if
     if m.top.isInFocusChain() then
         if m.groups.isInFocusChain() then

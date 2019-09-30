@@ -17,6 +17,7 @@ sub init()
     m.tts = createObject("roTextToSpeech")
 
     m.top.setFocus(true)
+    setGlobalField("ignoreBack",false)
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean

@@ -58,6 +58,7 @@ sub onFocusChanged()
         hideSpinner()
         updateKeyboard(true)
         m.keyboard.setFocus(true)
+        setGlobalField("ignoreBack",false)
     end if
 end sub
 

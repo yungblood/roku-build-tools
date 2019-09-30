@@ -36,6 +36,7 @@ end sub
 sub onFocusChanged()
     if m.top.hasFocus() then
         m.lastFocus.setFocus(true)
+        setGlobalField("ignoreBack",false)
     end if
 end sub
 

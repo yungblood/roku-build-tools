@@ -110,6 +110,7 @@ sub onFocusChanged()
         if m.video <> invalid then
             m.video.setFocus(true)
         end if
+        setGlobalField("ignoreBack",false)
     end if
 end sub
 

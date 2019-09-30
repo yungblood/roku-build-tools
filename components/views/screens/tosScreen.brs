@@ -41,6 +41,7 @@ end function
 sub onFocusChanged()
     if m.top.hasFocus() then
         m.buttons.setFocus(true)
+        setGlobalField("ignoreBack",false)
     end if
 end sub
 
