@@ -82,7 +82,7 @@
             numColumns="4"
             numRows="2"
             vertFocusAnimationStyle="fixedFocus"
-            focusBitmapUri="pkg:/images/frame_grid2.9.png"
+            focusBitmapUri="pkg:/images/frame_grid_$$RES$$.9.png"
             visible="false" />
         
         <TopMenu

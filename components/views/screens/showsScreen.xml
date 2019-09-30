@@ -24,7 +24,7 @@
             numColumns="5"
             numRows="2"
             vertFocusAnimationStyle="fixedFocus"
-            focusBitmapUri="pkg:/images/frame_grid2.9.png" />
+            focusBitmapUri="pkg:/images/frame_grid_$$RES$$.9.png" />
         
         <TopMenu
             id="menu"
