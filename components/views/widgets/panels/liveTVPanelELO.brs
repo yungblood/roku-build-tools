@@ -388,17 +388,15 @@ function read(params = {} as object) as boolean
         if m.signedOut.visible then
             m.tts.say(m.signedOut.text)
         else
-            m.tts.say("Available local stations")
-            for i = 0 to m.stations.getChildCount() - 1
-                button = m.stations.getChild(i)
-                station = button.station
-                if station <> invalid then
-                    m.tts.say(station.title)
-                    if button.selected then
-                        m.tts.say("Currently Selected")
+            if m.stations <> invalid then
+                m.tts.say("Your local station is")
+                for i = 0 to m.stations.getChildCount() - 1
+                    station = m.stations.getChild(i)
+                    if station <> invalid then
+                        m.tts.say(station.description)
                     end if
-                end if
-            next
+                next
+            end if
         end if
     end if
 end function

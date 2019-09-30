@@ -62,10 +62,10 @@ end sub
 sub onEpisodeLoaded(nodeEvent as object)
     task = nodeEvent.getRoSGNode()
     episode = nodeEvent.getData()
-    if episode.subtype() = "DynamicPlayEpisode" then
-        episode = episode.episode
-    end if
     if episode <> invalid then
+        if episode.subtype() = "DynamicPlayEpisode" then
+            episode = episode.episode
+        end if
         m.top.episode = episode
     else if task.errorCode > 0 then
         showApiError(true)

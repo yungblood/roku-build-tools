@@ -31,6 +31,7 @@ sub doWork()
         convivaTags["contentId"]    = content.mediaID
         convivaTags["contentType"]  = "Live"
         convivaTags["isAd"]         = "false"
+        convivaTags["isEpisode"]    = "false"
         convivaTags["episodeTitle"] = content.convivaTrackingTitle
         convivaTags["drm"]          = "false"
         convivaTags["drmType"]      = "none"

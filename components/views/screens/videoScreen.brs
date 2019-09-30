@@ -930,7 +930,6 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                 streamData = m.episode.videoStream
                 m.vguid = createObject("roDeviceInfo").getRandomUuid()
                 
-                config = getGlobalField("config")
                 streamData.apiKey = config.daiKey
                 streamData.videoID = m.episode.id
                 
