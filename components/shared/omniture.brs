@@ -89,20 +89,23 @@ function getOmnitureData(row as object, index as integer, podText = "" as string
 
     data["podText"] = podText
     item = invalid
-    if row.subtype() = "Show" or row.subtype() = "RelatedShow" or row.subtype() = "ShowGroupItem" or row.subtype() = "SearchResults" then
-        if index = -1 then
-            item = row
+    if row <> invalid then
+        if row.subtype() = "Show" or row.subtype() = "RelatedShow" or row.subtype() = "ShowGroupItem" or row.subtype() = "SearchResults" then
+            if index = -1 then
+                item = row
+            else
+                item = row.dynamicPlayEpisode
+            end if
+        else if row.content <> invalid and isSGNode(row.content) then
+            data["podSection"] = row.content.title
+            item = row.content.getChild(index)
         else
-            item = row.dynamicPlayEpisode
+            data["podSection"] = row.title
+            item = row.getChild(index)
         end if
-    else if row.content <> invalid and isSGNode(row.content) then
-        data["podSection"] = row.content.title
-        item = row.content.getChild(index)
-    else
-        data["podSection"] = row.title
-        item = row.getChild(index)
     end if
-
+    if index = invalid then index = -1
+    
     data["podPosition"] = index
     if item <> invalid then
         data["podTitle"] = asString(item.title)
