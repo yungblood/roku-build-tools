@@ -104,7 +104,7 @@ function getOmnitureData(row as object, index as integer, podText = "" as string
             item = row.getChild(index)
         end if
     end if
-    if index = invalid then index = -1
+    if index = invalid then index = 0
     
     data["podPosition"] = index
     if item <> invalid then
