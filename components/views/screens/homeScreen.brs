@@ -180,6 +180,14 @@ sub loadContent(content as object)
         config.geoBlocked = true
     end if
 
+    contextData = {}
+    contextData["deviceId"] = "<deviceId>" 'YB-Figure out what data to send
+    contextData["connectedState"] = "<connectedState>" 'YB-Figure out what data to send
+    contextData["pageType"] = "front_door"
+    contextData["pageViewGuid"] = "<pageViewGuid>" 'YB-Figure out what data to send
+    contextData["screenName"] = "/"
+    trackScreenAction("HomeScreenLoad", contextData, contextData["screenName"])
+
     hideSpinner()
 end sub
 

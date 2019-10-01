@@ -4,14 +4,17 @@ sub initializeAdobe()
         m.adobe = ADBMobile().getADBMobileConnectorInstance(adobe)
         m.adobeConstants = m.adobe.sceneGraphConstants()
         adobe.observeField(m.adobeConstants.API_RESPONSE, "onAdobeApiResponse")
+        deviceInfo = CreateObject("roDeviceInfo")
 
         config = getGlobalField("config")
         user = getGlobalField("user")
         m.persistentParams = {}
         m.persistentParams["siteCode"] = "CBS"
-        m.persistentParams["siteEdition"] = "us"
+        'm.persistentParams["siteEdition"] = "us" 'YB-
+        m.persistentParams["siteEdition"] = GetCurrentLocale()
         m.persistentParams["siteType"] = "roku tv ott|" + lCase(getModel())
-        m.persistentParams["brandPlatformId"] = "cbscom_ott_roku"
+        'm.persistentParams["brandPlatformId"] = "cbscom_ott_roku" 'YB-
+        m.persistentParams["brandPlatformId"] = "cbs" + lcase(deviceInfo.GetUserCountryCode()) + "_ott_roku"
         m.persistentParams["sitePrimaryRsid"] = config.omnitureEvar5
         m.persistentParams["userStatus"] = user.trackingStatus
         m.persistentParams["mediaPartnerId"] = "cbs_roku_app"
@@ -70,7 +73,10 @@ sub trackScreenAction(actionName as string, params = {} as object, screenName = 
     end if
     allParams.append(m.persistentParams)
     allParams.append(params)
-
+? "YB-"
+? "params:", params
+? "allParams:", allParams
+? "m.persistentParams:", m.persistentParams
     trackAction(actionName, allParams, events)
 end sub
 
