@@ -37,7 +37,7 @@ sub updateResumePoint()
                 m.progressBar = createObject("roSGNode", "ProgressBar")
                 m.progressBar.id = "progressBar"
                 m.progressBar.width = m.top.width - 36
-                m.progressBar.height = 4
+                m.progressBar.height = 8
                 m.progressBar.backgroundColor = "0xffffff33"
                 m.progressBar.barColor = "0x0092f3ff"
             end if
@@ -45,6 +45,11 @@ sub updateResumePoint()
             m.metadata.appendChild(m.progressBar)
             m.progressBar.maxValue = m.episode.length
             m.progressBar.value = m.episode.resumePoint
+            if m.progressBar.value / m.progressBar.maxValue > .05 then
+                m.progressBar.visible = true
+            else
+                m.progressBar.visible = false
+            end if
         else
             if m.progressBar <> invalid then
                 m.metadata.removeChild(m.progressBar)

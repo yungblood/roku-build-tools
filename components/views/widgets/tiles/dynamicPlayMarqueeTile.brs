@@ -80,7 +80,11 @@ sub onEpisodeLoaded(nodeEvent as object)
             m.metadata.insertChild(m.progress, 5)
             m.progressBar.maxValue = episode.length
             m.progressBar.value = episode.resumePoint
-            m.progressBar.visible = true
+            if m.progressBar.value / m.progressBar.maxValue > .05 then
+                m.progressBar.visible = true
+            else
+                m.progressBar.visible = false
+            end if
             resumeTime = int((episode.resumePoint / 60) + .5)
             actualTime = (episode.length \ 60)
             timeIndicator = resumeTime.toStr() + " of " + actualTime.toStr() + " min"

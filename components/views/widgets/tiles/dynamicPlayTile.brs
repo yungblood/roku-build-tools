@@ -80,11 +80,15 @@ sub onEpisodeLoaded(nodeEvent as object)
         m.description.text = episode.description
      
 'or if watch history exists leave progress bar at 100%
-        if episode.resumePoint <> invalid and episode.resumePoint > 0 then
+        if episode.resumePoint <> invalid and episode.resumePoint > 0  then
             m.metadata.appendChild(m.progressBar)
             m.progressBar.maxValue = episode.length
             m.progressBar.value = episode.resumePoint
-            m.progressBar.visible = true
+            if m.progressBar.value / m.progressBar.maxValue > .05 then
+                m.progressBar.visible = true
+            else
+                m.progressBar.visible = false
+            end if
         else
             m.metadata.removeChild(m.progressBar)
         end if
