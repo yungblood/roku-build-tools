@@ -103,6 +103,7 @@ sub onMovieChanged()
     
             m.poster.uri = getImageUrl(movie.thumbnailUrl, m.poster.width)
     
+'or if watch history exists leave progress bar at 100%
             if movie.resumePoint > 0 then
                 m.progressBar.visible = true
                 m.progressBar.maxValue = movie.length

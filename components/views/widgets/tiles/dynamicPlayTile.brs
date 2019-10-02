@@ -79,6 +79,7 @@ sub onEpisodeLoaded(nodeEvent as object)
         m.episodeNumber.text = episode.seasonString + " " + episode.episodeString
         m.description.text = episode.description
      
+'or if watch history exists leave progress bar at 100%
         if episode.resumePoint <> invalid and episode.resumePoint > 0 then
             m.metadata.appendChild(m.progressBar)
             m.progressBar.maxValue = episode.length

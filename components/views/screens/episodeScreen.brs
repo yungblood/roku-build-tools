@@ -122,7 +122,8 @@ sub onEpisodeChanged()
             subtitle = subtitle + " | " + episode.airDateString
             m.episodeSubtitle.text = subtitle
             m.poster.uri = getImageUrl(episode.thumbnailUrl, m.poster.width)
-            
+ 
+ 'or if watch history exists leave progress bar at 100%
             if episode.resumePoint > 0 then
                 m.progressBar.visible = true
                 m.progressBar.maxValue = episode.length

@@ -47,7 +47,7 @@ sub onValueChanged()
         if x < 0 then
             x = 0
         else if x - m.thumb.width > m.bar.width then
-            x = m.bar.wdith - m.thumb.width
+            x = m.bar.width - m.thumb.width
         end if
         y = ((m.top.height - m.thumb.height) / 2)
         m.thumb.translation = [x, y]
