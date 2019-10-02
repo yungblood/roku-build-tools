@@ -276,22 +276,53 @@
             id="liveTVSelection"
             visible="false">
             <LayoutGroup
-                translation="[102,400]"
+                translation="[102,333]"
                 layoutDirection="vert"
-                itemSpacings="[40]">
+                itemSpacings="[52]">
                 <Label
-                    text="Watch LIVE TV"
+                    text="Select Your Local Station"
                     color="0xffffffff">
                     <Font
                         role="font"
-                        size="60"
+                        size="62"
                         uri="pkg:/fonts/Lato-Regular.ttf" />
+                </Label>
+                <Label
+                    width="600"
+                    text="You can change this at any time by visiting Settings > Live TV."
+                    color="0xc3c3c3ff"
+                    wrap="true"
+                    lineSpacing="0">
+                    <Font
+                        role="font"
+                        size="40"
+                        uri="pkg:/fonts/Lato-Regular.ttf" />
+                </Label>
+            </LayoutGroup>
+            <Group
+                translation="[0,692]"
+                visible="true">
+                <Poster
+                    translation="[0,-200]"
+                    width="1920"
+                    height="810"
+                    uri="pkg:/images/overlay_livetv_bottom_480.png" />
+                <Label
+                    translation="[100,23]"
+                    text="Channels"
+                    color="0xffffffff"
+                    vertAlign="top">
+                   <Font
+                       role="font"
+                       size="32"
+                       uri="pkg:/fonts/Lato-Regular.ttf" />
                 </Label>
                 <LabelButtonGroup
                     id="stations"
+                    translation="[100,73]"
                     layoutDirection="horiz"
-                    itemSpacings="[20]" />
-            </LayoutGroup>
+                    itemSpacings="[61]" />
+            </Group>
         </Group>
         <LayoutGroup
             id="concurrent"

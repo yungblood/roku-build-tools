@@ -8,10 +8,25 @@
     <children>
         <LayoutGroup
             id="group"
+            layoutDirection="vert"
             horizAlignment="center"
-            vertAlignment="center">
+            vertAlignment="center"
+            itemSpacings="[20]">
             <Poster
-                id="logo" />
+                id="logo"
+                height="72"
+                loadDisplayMode="scaleToFit" />
+            <Label
+                id="title"
+                horizAlign="center"
+                color="0xffffffff"
+                wrap="false"
+                text="">
+                <Font
+                    role="font"
+                    size="28"
+                    uri="pkg:/fonts/Lato-Regular.ttf" />
+            </Label>
         </LayoutGroup>
         <Poster
             id="frame"
