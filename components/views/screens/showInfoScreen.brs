@@ -15,13 +15,14 @@ sub onFocusChanged()
     if m.top.hasFocus() then
         m.description.setFocus(true)
         setGlobalField("ignoreBack",false)
+        hideSpinner()
     end if
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
     ?"ShowInfoScreen.onKeyEvent: ";key,press
     if press then
-        if key = "options" then
+        if key = "options" or key = "OK" then
             m.top.close = true
             return true
         end if

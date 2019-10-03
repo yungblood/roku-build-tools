@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component name="ShowInfoScreen" extends="BaseScreen">
     <script type="text/brightscript" uri="pkg:/components/views/screens/showInfoScreen.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
     <interface>
         <field id="showID" type="string" onChange="onShowIDChanged" />
         <field id="show" type="node" onChange="onShowChanged" />
