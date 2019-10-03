@@ -32,7 +32,7 @@
             translation="[279,180]"
             width="587"
             height="740"
-            loadDisplayMode="scaleToZoom" />
+            loadDisplayMode="scaleToFit" />
             
         <Rectangle
             id="descriptionRect"
