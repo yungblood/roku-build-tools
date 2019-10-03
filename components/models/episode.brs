@@ -44,6 +44,8 @@ sub onJsonChanged()
         m.top.audio_guide_text = m.top.showName + " " + m.top.title
         
         m.top.premiumAudioAvailable = asBoolean(json.premiumAudioAvailable)
+        
+        m.top.assetType = asString(json.assetType)
 
         if asInteger(m.top.seasonNumber) > 0 then
             m.top.seasonString = "S" + asString(m.top.seasonNumber)

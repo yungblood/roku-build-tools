@@ -245,7 +245,6 @@ sub setupVideoPlayer()
             streamData.url = streamInfo.manifest
             streamData.streamFormat = streamInfo.format
             streamData.streamDetails = streamInfo
-
             if streamInfo.subtitles <> invalid then
                 for each subtitle in streamInfo.subtitles
                     if lCase(subtitle.language) = "en" and subtitle.ttml <> invalid then
