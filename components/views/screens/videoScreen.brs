@@ -142,6 +142,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
                     else
                         m.overlay.visible = true
                         m.overlayTimer.control = "stop"
+                        m.overlayTimer.control = "start"
                     end if
                 end if
             end if
