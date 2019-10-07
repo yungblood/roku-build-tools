@@ -20,9 +20,11 @@ sub initializeAdobe()
         m.persistentParams["mediaPartnerId"] = "cbs_roku_app"
         m.persistentParams["mediaDistNetwork"] = "can"
         m.persistentParams["mediaDeviceId"] = getPersistedDeviceID()
+        m.persistentParams["deviceId"] = getPersistedDeviceID() 'YB-
         m.persistentParams["adDeviceId"] = getAdvertisingID()
         m.persistentParams["userRegId"] = user.id
         m.persistentParams["&&products"] = user.trackingProduct
+        m.persistentParams["connectedState"]   = iif(getEthernetInterface() = "eth0", "ethernet", "wifi") 'YB-Figure out what data to send
         if user.status="ANONYMOUS" then
             m.persistentParams["userType"]="ANON"
         else
@@ -223,9 +225,14 @@ sub trackVideoError(errorMessage as string, errorCode as object)
     m.adobe.mediaTrackError(errorMessage, asString(errorCode))
 end sub
 
-sub trackState(screenName as string, params as object)
+sub trackState(screenName = m.top.omnitureName as string, params as object, pageType = m.top.omniturePageType as string)
     initializeAdobe()
-    m.adobe.trackState(screenName, params)
+    allParams = {}
+    allParams["screenName"] = screenName
+    allParams["pageType"] = pageType
+    allParams.append(m.persistentParams)
+    allParams.append(params)
+    m.adobe.trackState(screenName, allParams)
 end sub
 
 sub trackAction(actionName as string, params as object, events = [] as object)

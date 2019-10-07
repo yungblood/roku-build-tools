@@ -180,13 +180,9 @@ sub loadContent(content as object)
         config.geoBlocked = true
     end if
 
-    omnitureData = getOmnitureData(m.list, -1, "front_door")
-    'omnitureData["deviceId"] = "<deviceId>" 'YB-Figure out what data to send
-    'omnitureData["connectedState"] = "<connectedState>" 'YB-Figure out what data to send
+    omnitureData = {}
     'omnitureData["pageViewGuid"] = "<pageViewGuid>" 'YB-Figure out what data to send
-    omnitureData["pageType"] = "front_door"
-    omnitureData["screenName"] = "/"
-    trackState(omnitureData["screenName"], omnitureData)
+    trackState(m.top.omnitureName, omnitureData)
 
     hideSpinner()
 end sub
