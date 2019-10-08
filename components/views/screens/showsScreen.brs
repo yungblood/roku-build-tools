@@ -98,6 +98,9 @@ sub onGroupsLoaded(nodeEvent as object)
         showApiError(true)
     end if
     
+    ' Fire launch complete beacon (Roku cert requirement)
+    ' Only fired by the scene if this is a deeplink
+    setGlobalField("launchComplete", true)
     hideSpinner()
 end sub
 

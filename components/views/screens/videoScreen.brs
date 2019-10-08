@@ -304,6 +304,10 @@ sub onVideoStateChanged()
             m.replayGroup.visible = false
             fixFirmRectOpacity(1)
         else if state = "playing" then
+            ' Fire launch complete beacon (Roku cert requirement)
+            ' Only fired by the scene if this is a deeplink
+            setGlobalField("launchComplete", true)
+
             if m.firstPlay then
                 clearMetadata()
                 m.firstPlay = false

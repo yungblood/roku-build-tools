@@ -38,6 +38,9 @@ sub onFocusChanged()
         m.lastFocus.setFocus(true)
         setGlobalField("ignoreBack",false)
     end if
+    if m.list.hasFocus() and m.list.drawFocusFeeback <> true then
+        m.list.drawFocusFeedback = true
+    end if
 end sub
 
 sub onVisibleChanged()
@@ -66,9 +69,6 @@ function onKeyEvent(key as string, press as boolean) as boolean
                 m.list.jumpToRowItem = [0, 0]
                 m.lastFocus = m.list
                 scrollList()
-                if m.list.drawFocusFeedback = false then
-                    m.list.drawFocusFeedback = true
-                end if
                 return true
             end if
         else if key = "up" then
@@ -179,6 +179,9 @@ sub loadContent(content as object)
         
         config.geoBlocked = true
     end if
+
+    ' Fire launch complete beacon (Roku cert requirement)
+    setGlobalField("launchComplete", true)
 
     hideSpinner()
 end sub

@@ -35,6 +35,9 @@ sub onFocusChanged()
         m.lastFocus.setFocus(true)
         setGlobalField("ignoreBack",false)
     end if
+    if m.list.hasFocus() and m.list.drawFocusFeeback <> true then
+        m.list.drawFocusFeedback = true
+    end if
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
@@ -45,9 +48,6 @@ function onKeyEvent(key as string, press as boolean) as boolean
                 m.list.jumpToRowItem = [0, 0]
                 m.lastFocus = m.list
                 scrollList()
-                if m.list.drawFocusFeedback = false then
-                    m.list.drawFocusFeedback = true
-                end if
             end if
             return true
         else if key = "up" then
@@ -103,6 +103,9 @@ sub onShowChanged()
                 ' HACK: Find the row for the deep-linked episode
                 if not isNullOrEmpty(m.focusSeason) and row.title = ("Season " + m.focusSeason) then
                     m.focusRow = i
+                    ' assume the episode number matches the necessary load index
+                    ' to ensure the correct page loads
+                    row.loadIndex = m.focusEpisodeNumber
                     row.observeField("change", "onEpisodesLoaded")
                 end if
 
@@ -163,6 +166,7 @@ sub onEpisodeLoaded(nodeEvent as object)
     if episode <> invalid then
         m.focusSeason = episode.seasonNumber
         m.focusEpisode = episode.id
+        m.focusEpisodeNumber = asInteger(episode.episodeNumber)
         m.top.showID = episode.showID
     else
         m.top.close = true

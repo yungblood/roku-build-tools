@@ -98,6 +98,10 @@ sub onStationsLoaded(nodeEvent as object)
     m.channelGrid.content = channels
 
     m.liveStations = stations
+
+    ' Fire launch complete beacon (Roku cert requirement)
+    ' Only fired by the scene if this is a deeplink
+    setGlobalField("launchComplete", true)
     hideSpinner()
 
     ' force a refresh
