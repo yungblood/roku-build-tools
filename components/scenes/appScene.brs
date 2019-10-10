@@ -866,7 +866,7 @@ end sub
 
 sub showVideoScreen(episodeID as string, section = invalid as object, source = invalid as object, resumePoint = -1 as integer, useDai = true as boolean)
     config = getGlobalField("config")
-    if config.enableGeoBlock and config.currentCountryCode <> config.appCountryCode and not config.geoBlocked then
+    if config.enableGeoBlock and not arrayContains(config.appCountryCode.split(","), config.currentCountryCode) and not config.geoBlocked then
         dialog = createCbsDialog("", "Due to licensing restrictions, video is not available outside your country.", ["CLOSE"])
         dialog.observeField("buttonSelected", "onLicensingDialogClosed")
         setGlobalField("cbsDialog", dialog)

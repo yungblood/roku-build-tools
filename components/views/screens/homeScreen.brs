@@ -172,7 +172,7 @@ sub loadContent(content as object)
     m.list.rowHeights = rowHeights
     m.list.content = content
 
-    if config.enableGeoBlock and config.currentCountryCode <> config.appCountryCode and not config.geoBlocked then
+    if config.enableGeoBlock and not arrayContains(config.appCountryCode.split(","), config.currentCountryCode) and not config.geoBlocked then
         dialog = createCbsDialog("", "Due to licensing restrictions, video is not available outside your country.", ["CLOSE"])
         dialog.observeField("buttonSelected", "onLicensingDialogClosed")
         setGlobalField("cbsDialog", dialog)
