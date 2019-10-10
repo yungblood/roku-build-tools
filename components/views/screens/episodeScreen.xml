@@ -56,7 +56,7 @@
             backgroundColor="0xffffff33"
             barColor="0x0092f3ff"
             width="792"
-            height="4"
+            height="8"
             visible="false" />
             
         <Label
