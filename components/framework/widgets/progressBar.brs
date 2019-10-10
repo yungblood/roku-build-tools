@@ -32,6 +32,9 @@ sub onValueChanged()
     if range > 0 then
         progress = value / range
     end if
+    if progress > 1 then
+        progress = 1
+    end if
     m.barRect.width = (m.top.width - (2 * m.top.padding)) * progress
     m.bar.width = (m.top.width - (2 * m.top.padding)) * progress
     m.barRect.visible = progress > 0
