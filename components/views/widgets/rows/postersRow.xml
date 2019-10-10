@@ -24,7 +24,7 @@
                 itemSpacings="[10]" />
             <Poster
                 id="focusFrame"
-                uri="pkg:/images/frame_grid.9.png"
+                uri="pkg:/images/frame_grid_$$RES$$.9.png"
                 width="409"
                 height="614"
                 visible="false" />
