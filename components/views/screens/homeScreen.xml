@@ -39,7 +39,7 @@
             numRows="3"
             rowLabelFont="dictionary:rowTitleFont"
             rowLabelColor="0xffffffff"
-            focusBitmapUri="pkg:/images/frame_grid.9.png"
+            focusBitmapUri="pkg:/images/frame_grid_$$RES$$.9.png"
             drawFocusFeedback="false"
             vertFocusAnimationStyle="fixedFocus" />
 

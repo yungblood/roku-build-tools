@@ -103,7 +103,7 @@
                 <ProgressBar
                     id="progressBar"
                     width="735"
-                    height="4"
+                    height="8"
                     backgroundColor="0xffffff80"
                     barColor="0x0092f3ff"
                     visible="false" />

@@ -59,7 +59,7 @@
                     backgroundColor="0xffffff33"
                     barColor="0x0092f3ff"
                     width="382"
-                    height="4"
+                    height="8"
                     visible="false" />
             </LayoutGroup>
             <Poster
