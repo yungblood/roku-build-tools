@@ -105,9 +105,12 @@ sub onMovieChanged()
     
 'or if watch history exists leave progress bar at 100%
             if movie.resumePoint > 0 and movie.resumePoint / movie.length > .05 then
-                m.progressBar.visible = true
                 m.progressBar.maxValue = movie.length
                 m.progressBar.value = movie.resumePoint
+                if m.progressBar.value / m.progressBar.maxValue > .97 then
+                    m.progressBar.value = 1
+                end if
+                m.progressBar.visible = true
             else
                 m.progressBar.visible = false
             end if

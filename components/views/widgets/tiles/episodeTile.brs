@@ -45,6 +45,9 @@ sub updateResumePoint()
             m.metadata.appendChild(m.progressBar)
             m.progressBar.maxValue = m.episode.length
             m.progressBar.value = m.episode.resumePoint
+            if m.progressBar.value / m.progressBar.maxValue > .97 then
+                m.progressBar.value = 1
+            end if
             if m.progressBar.value / m.progressBar.maxValue > .05 then
                 m.progressBar.visible = true
             else

@@ -80,6 +80,9 @@ sub onEpisodeLoaded(nodeEvent as object)
             m.metadata.insertChild(m.progress, 5)
             m.progressBar.maxValue = episode.length
             m.progressBar.value = episode.resumePoint
+            if m.progressBar.value / m.progressBar.maxValue > .97 then
+                m.progressBar.value = 1
+            end if
             if m.progressBar.value / m.progressBar.maxValue > .05 then
                 m.progressBar.visible = true
             else
