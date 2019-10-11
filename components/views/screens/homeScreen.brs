@@ -1,6 +1,7 @@
 sub init()
     m.top.omnitureName = "/"
     m.top.omniturePageType = "front_door"
+    m.top.omniturePageViewGuid = createObject("roDeviceInfo").getRandomUuid()
 
     m.top.observeField("focusedChild", "onFocusChanged")
     m.top.observeField("visible", "onVisibleChanged")
@@ -181,7 +182,7 @@ sub loadContent(content as object)
     end if
 
     omnitureData = {}
-    'omnitureData["pageViewGuid"] = "<pageViewGuid>" 'YB-Figure out what data to send
+    omnitureData["pageViewGuid"] = m.top.omniturePageViewGuid
     trackState(m.top.omnitureName, omnitureData)
 
     hideSpinner()
