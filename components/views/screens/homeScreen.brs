@@ -1,7 +1,6 @@
 sub init()
     m.top.omnitureName = "/"
     m.top.omniturePageType = "front_door"
-    m.top.omniturePageViewGuid = createObject("roDeviceInfo").getRandomUuid()
 
     m.top.observeField("focusedChild", "onFocusChanged")
     m.top.observeField("visible", "onVisibleChanged")
@@ -180,10 +179,6 @@ sub loadContent(content as object)
         
         config.geoBlocked = true
     end if
-
-    omnitureData = {}
-    omnitureData["pageViewGuid"] = m.top.omniturePageViewGuid
-    trackState(m.top.omnitureName, omnitureData)
 
     hideSpinner()
 end sub
