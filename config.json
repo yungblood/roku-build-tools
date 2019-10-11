@@ -5,7 +5,7 @@
     
     "appRegion":       "us",
     "appName":         "Roku",
-    "appCountryCode":  "us",
+    "appCountryCode":  "us,guam",
     
     "syncbakKey":      "50d49a504117416c818d04f12b387c4c",
     "syncbakSecret":   "8e60ba369c7f46ba9c6b72b0f1548979",

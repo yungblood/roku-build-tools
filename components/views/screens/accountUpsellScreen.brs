@@ -212,6 +212,9 @@ sub onUpsellInfoLoaded(nodeEvent as object)
     end if
     resetFocus()
     
+    ' Fire launch complete beacon (Roku cert requirement)
+    ' Only fired by the scene if this is a deeplink
+    setGlobalField("launchComplete", true)
     hideSpinner()
     
     options = m.top.options

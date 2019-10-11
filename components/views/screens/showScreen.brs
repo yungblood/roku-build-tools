@@ -28,6 +28,7 @@ sub init()
     m.firstShow = true
     m.focusSeason = ""
     m.lastFocus = m.dynamicPlay
+    m.scrollListRunning = false
 end sub
 
 sub onFocusChanged()
@@ -35,25 +36,27 @@ sub onFocusChanged()
         m.lastFocus.setFocus(true)
         setGlobalField("ignoreBack",false)
     end if
+    if m.list.hasFocus() and m.list.drawFocusFeeback <> true then
+        m.list.drawFocusFeedback = true
+    end if
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
     if press then
-        if key = "down" then
+        if key = "down" and not m.scrollListRunning then
             if m.dynamicPlay.isInFocusChain() then
                 m.list.setFocus(true)
                 m.list.jumpToRowItem = [0, 0]
                 m.lastFocus = m.list
+                m.scrollListRunning = true
                 scrollList()
-                if m.list.drawFocusFeedback = false then
-                    m.list.drawFocusFeedback = true
-                end if
             end if
             return true
-        else if key = "up" then
+        else if key = "up" and not m.scrollListRunning then
             if m.list.isInFocusChain() then
                 m.dynamicPlay.setFocus(true)
                 m.lastFocus = m.dynamicPlay
+                m.scrollListRunning = true
                 scrollList()
             end if
         else if key = "OK" then
@@ -70,6 +73,7 @@ sub onVisibleChanged()
         end if
         if m.firstShow then
             m.dynamicPlay.setFocus(true)
+            m.scrollListRunning = true
             scrollList()
             m.firstShow = false
         else
@@ -103,6 +107,9 @@ sub onShowChanged()
                 ' HACK: Find the row for the deep-linked episode
                 if not isNullOrEmpty(m.focusSeason) and row.title = ("Season " + m.focusSeason) then
                     m.focusRow = i
+                    ' assume the episode number matches the necessary load index
+                    ' to ensure the correct page loads
+                    row.loadIndex = m.focusEpisodeNumber
                     row.observeField("change", "onEpisodesLoaded")
                 end if
 
@@ -127,6 +134,7 @@ sub onShowChanged()
                 m.list.jumpToItem = m.focusRow
                 m.lastFocus = m.list
                 m.list.setFocus(true)
+                m.scrollListRunning = true
                 scrollList(true)
             end if
         else
@@ -163,6 +171,7 @@ sub onEpisodeLoaded(nodeEvent as object)
     if episode <> invalid then
         m.focusSeason = episode.seasonNumber
         m.focusEpisode = episode.id
+        m.focusEpisodeNumber = asInteger(episode.episodeNumber)
         m.top.showID = episode.showID
     else
         m.top.close = true
@@ -264,8 +273,10 @@ sub onHeroOpacityChanged(nodeEvent as object)
     opacity = nodeEvent.getData()
     if opacity = 1 then
         m.dynamicPlay.vilynxControl = "pause"
+        m.scrollListRunning = false
     else if opacity = 0 then
         m.dynamicPlay.vilynxControl = "resume"
+        m.scrollListRunning = false
     end if
 end sub
 

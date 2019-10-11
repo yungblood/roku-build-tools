@@ -23,6 +23,10 @@ sub init()
     observeGlobalField("ignoreBack", "onIgnoreBack")
     m.allowBackKey = false
 
+    addGlobalField("launchComplete", "boolean", true)
+    observeGlobalField("launchComplete", "onLaunchComplete")
+    m.launchBeaconFired = false
+
     m.navigationStack = []
     
     if GetLinkStatus() = false then
@@ -100,6 +104,13 @@ sub onExitDialogButtonSelected(nodeEvent as object)
     dialog.close = true
 end sub
 
+sub onLaunchComplete(nodeEvent as object)
+    if not m.launchBeaconFired then
+        m.top.signalBeacon("AppLaunchComplete")
+        m.launchBeaconFired = true
+    end if
+end sub
+
 sub onInitialized(nodeEvent as object)
     m.initTask = invalid
 
@@ -145,8 +156,8 @@ sub onSignedIn(nodeEvent as object)
     user.favorites.update = true
     user.videoHistory.update = true
 
-    ' Notify Roku that we're an authenticated user
     if isAuthenticated(m.top) then
+        ' Notify Roku that we're an authenticated user
         trackRMFEvent("Roku_Authenticated")
         
         adobe = getGlobalField("adobe")
@@ -159,7 +170,7 @@ sub onSignedIn(nodeEvent as object)
         m.taplytics.callFunc("setUserAttributes", { user_id: user.id, plan: user.trackingProduct })
     end if
 
-    clearNavigationStack()
+    clearNavigationStack("UpsellScreen", true)
     
     dialog = getGlobalField("dialog")
     if dialog <> invalid then
@@ -611,8 +622,7 @@ sub onSubscriptionSuccess(nodeEvent as object)
 
             trackRMFEvent("USC")
 
-            clearNavigationStack("AccountUpsellScreen")
-            goBackInNavigationStack()
+            clearNavigationStack("AccountUpsellScreen", true)
             reinit()
         else
             if isNullOrEmpty(task.error) then
@@ -656,8 +666,7 @@ sub onSubscriptionSuccessDialogClose(nodeEvent as object)
     if dialog <> invalid then
         dialog.close = true
     end if
-    clearNavigationStack("AccountUpsellScreen")
-    goBackInNavigationStack()
+    clearNavigationStack("AccountUpsellScreen", true)
     reinit()
 end sub
 
@@ -696,7 +705,6 @@ end sub
 sub onRendezvousSuccess(nodeEvent as object)
     success = nodeEvent.getData()
     if success = true then
-        clearNavigationStack()
         signIn()
     end if
 end sub
@@ -858,7 +866,7 @@ end sub
 
 sub showVideoScreen(episodeID as string, section = invalid as object, source = invalid as object, resumePoint = -1 as integer, useDai = true as boolean)
     config = getGlobalField("config")
-    if config.enableGeoBlock and config.currentCountryCode <> config.appCountryCode and not config.geoBlocked then
+    if config.enableGeoBlock and not arrayContains(config.appCountryCode.split(","), config.currentCountryCode) and not config.geoBlocked then
         dialog = createCbsDialog("", "Due to licensing restrictions, video is not available outside your country.", ["CLOSE"])
         dialog.observeField("buttonSelected", "onLicensingDialogClosed")
         setGlobalField("cbsDialog", dialog)
@@ -1042,11 +1050,14 @@ sub onDialogTimerFired()
     end if
 end sub
 
-sub clearNavigationStack(targetScreen = "" as string)
+sub clearNavigationStack(targetScreen = "" as string, closeTarget = false as boolean)
     screen = invalid
     while goBackInNavigationStack(false)
         screen = m.navigationStack.peek()
         if screen <> invalid and screen.subtype() = targetScreen then
+            if closeTarget then
+                goBackInNavigationStack(false)
+            end if
             exit while
         end if
     end while

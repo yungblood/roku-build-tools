@@ -7,6 +7,7 @@
     <script type="text/brightscript" uri="pkg:/components/services/adobe/adbmobile.brs" />
     <script type="text/brightscript" uri="pkg:/components/framework/utilities/dialogs.brs" />
 
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/arrays.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/debug.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/device.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />

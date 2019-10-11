@@ -41,6 +41,8 @@
         <field id="videoStream" type="node" />
         <field id="premiumAudioAvailable" type="boolean" />
 
+        <field id="assetType" type="string" />
+
         <field id="seasonString" type="string" />
         <field id="episodeString" type="string" />
         <field id="durationString" type="string" />

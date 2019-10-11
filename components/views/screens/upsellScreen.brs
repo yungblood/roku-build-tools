@@ -94,6 +94,10 @@ sub onUpsellInfoLoaded(nodeEvent as object)
         end if
     end if
 
+    ' Fire launch complete beacon (Roku cert requirement)
+    ' Only fired by the scene if appropriate
+    setGlobalField("launchComplete", true)
+
     hideSpinner()
     m.loadTask = invalid
 end sub

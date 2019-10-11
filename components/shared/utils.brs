@@ -244,6 +244,26 @@ function isAvailable(episode as object) as boolean
     return episode.status = "AVAILABLE" or episode.status = "DELAYED" or episode.status = "PREMIUM"
 end function
 
+function isRestricted(episode as object, user = invalid as object) as boolean
+    if user = invalid then
+        user = getGlobalField("user")
+    end if
+    if user <> invalid then
+        if not isNullOrEmpty(user.parentalControlPin) then
+            if m.episode.isLive and user.parentalControlLiveTV then
+                return true
+            else if not isNullOrEmpty(m.episode.regionalRating) then
+                ' Normalize the rating so we match underscores as well as dashes
+                normalizedRating = m.episode.regionalRating.replace("-", "_")
+                if not arrayContains(user.parentalControlRestrictions, m.episode.regionalRating) and not arrayContains(user.parentalControlRestrictions, normalizedRating) then
+                    return true
+                end if
+            end if
+        end if
+    end if
+    return false
+end function
+
 function canWatch(episode as object, context as object, postSignIn = false as boolean) as boolean
     if episode.status = "AVAILABLE" or (postSignIn and isSubscriber(context)) then
         return isSubscriber(context) or episode.subscriptionLevel = "FREE"

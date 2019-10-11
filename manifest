@@ -1,15 +1,12 @@
 title=CBS All Access
-subtitle=Watch Full Seasons of Your Shows. Anytime, Anywhere.
 dial_title=CBS All Access
 
 major_version=2
 minor_version=19
-build_version=20190930
+build_version=20191008
 
 mm_icon_focus_fhd=pkg:/storeassets/channelstore_fhd.png
-mm_icon_side_fhd=pkg:/storeassets/channelstore_fhd.png
 mm_icon_focus_hd=pkg:/storeassets/channelstore_hd.png
-mm_icon_side_hd=pkg:/storeassets/channelstore_hd.png
 
 splash_screen_sd=pkg:/images/splash_fhd.png
 splash_screen_hd=pkg:/images/splash_fhd.png

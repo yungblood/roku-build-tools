@@ -38,6 +38,9 @@ sub onFocusChanged()
         m.lastFocus.setFocus(true)
         setGlobalField("ignoreBack",false)
     end if
+    if m.list.hasFocus() and m.list.drawFocusFeeback <> true then
+        m.list.drawFocusFeedback = true
+    end if
 end sub
 
 sub onVisibleChanged()
@@ -66,9 +69,6 @@ function onKeyEvent(key as string, press as boolean) as boolean
                 m.list.jumpToRowItem = [0, 0]
                 m.lastFocus = m.list
                 scrollList()
-                if m.list.drawFocusFeedback = false then
-                    m.list.drawFocusFeedback = true
-                end if
                 return true
             end if
         else if key = "up" then
@@ -172,13 +172,16 @@ sub loadContent(content as object)
     m.list.rowHeights = rowHeights
     m.list.content = content
 
-    if config.enableGeoBlock and config.currentCountryCode <> config.appCountryCode and not config.geoBlocked then
+    if config.enableGeoBlock and not arrayContains(config.appCountryCode.split(","), config.currentCountryCode) and not config.geoBlocked then
         dialog = createCbsDialog("", "Due to licensing restrictions, video is not available outside your country.", ["CLOSE"])
         dialog.observeField("buttonSelected", "onLicensingDialogClosed")
         setGlobalField("cbsDialog", dialog)
         
         config.geoBlocked = true
     end if
+
+    ' Fire launch complete beacon (Roku cert requirement)
+    setGlobalField("launchComplete", true)
 
     hideSpinner()
 end sub

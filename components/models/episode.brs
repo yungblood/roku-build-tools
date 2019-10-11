@@ -32,10 +32,16 @@ sub onJsonChanged()
         m.top.topLevelCategory  = asString(json.topLevelCategory)
         
         ' retrieve the regional rating for parental control checks
-        ' TODO: this probably needs to be pulled based on the appRegion, but
-        '       for now we just grab the first rating in the array
+        config = getGlobalField("config")
         if json.regionalRatings <> invalid then
+            ' Grab the first one, in case we can't find a matching region
             regionalRating = json.regionalRatings[0]
+            for each rating in json.regionalRatings
+                if lCase(rating.region) = lCase(config.appRegion) then
+                    regionalRating = rating
+                    exit for
+                end if
+            next
             if regionalRating <> invalid then
                 m.top.regionalRating = regionalRating.rating
             end if
@@ -44,6 +50,8 @@ sub onJsonChanged()
         m.top.audio_guide_text = m.top.showName + " " + m.top.title
         
         m.top.premiumAudioAvailable = asBoolean(json.premiumAudioAvailable)
+        
+        m.top.assetType = asString(json.assetType)
 
         if asInteger(m.top.seasonNumber) > 0 then
             m.top.seasonString = "S" + asString(m.top.seasonNumber)

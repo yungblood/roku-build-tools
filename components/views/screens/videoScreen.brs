@@ -142,6 +142,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
                     else
                         m.overlay.visible = true
                         m.overlayTimer.control = "stop"
+                        m.overlayTimer.control = "start"
                     end if
                 end if
             end if
@@ -303,6 +304,10 @@ sub onVideoStateChanged()
             m.replayGroup.visible = false
             fixFirmRectOpacity(1)
         else if state = "playing" then
+            ' Fire launch complete beacon (Roku cert requirement)
+            ' Only fired by the scene if this is a deeplink
+            setGlobalField("launchComplete", true)
+
             if m.firstPlay then
                 clearMetadata()
                 m.firstPlay = false
@@ -554,35 +559,11 @@ sub onEpisodeLoaded(nodeEvent as object)
             end if
         end if
 
-        if not isNullOrEmpty(user.parentalControlPin) and not isNullOrEmpty(m.episode.regionalRating) and not arrayContains(user.parentalControlRestrictions, m.episode.regionalRating) then
+        if isRestricted(m.episode, user) then
             hideSpinner()
             showPinDialog("Enter your PIN to watch", ["SUBMIT", "CANCEL"], "onPinDialogButtonSelected")
         else
-            m.video.enableTrickPlay = not m.episode.isLive
-            if m.top.resumePoint > -1 then
-                startPlayback(m.isContinuousPlay, m.top.resumePoint, m.isContinuousPlay, m.isForced)
-                ' reset the resume point, so we don't accidentally resume
-                ' on continuous play
-                m.top.resumePoint = -1
-            else if m.episode.resumePoint > 0 and (m.episode.resumePoint < m.episode.length * .97) then
-                hideSpinner()
-                
-                dialog = createCbsDialog("Resume Watching", "Would you like to continue watching from where you left off or start from the beginning?", ["Resume", "Start Over"])
-                dialog.messageAlignment = "left"
-                dialog.allowBack = true
-                dialog.observeField("buttonSelected", "onResumeDialogButtonSelected")
-                setGlobalField("cbsDialog", dialog)
-                
-                omnitureData = m.top.omnitureData
-                if omnitureData = invalid then
-                    omnitureData = {}
-                end if
-                omnitureData["podType"] = "overlay"
-                omnitureData["podText"] = "resume watching"
-                trackScreenAction("trackPodSelect", omnitureData)
-            else
-                startPlayback(m.isContinuousPlay, 0, m.isContinuousPlay, m.isForced)
-            end if
+            resumePlayback()
         end if
     end if
 end sub
@@ -603,7 +584,7 @@ sub onPinDialogButtonSelected(nodeEvent as object)
             end if
         end if
         if success then
-            startPlayback(m.isContinuousPlay, 0, m.isContinuousPlay, m.isForced)
+            resumePlayback()
         end if
     end if
     dialog.close = true
@@ -917,6 +898,34 @@ function getPlayerPosition(includeAds = false as boolean) as integer
     end if
     return m.video.position
 end function
+
+sub resumePlayback()
+    m.video.enableTrickPlay = not m.episode.isLive
+    if m.top.resumePoint > -1 then
+        startPlayback(m.isContinuousPlay, m.top.resumePoint, m.isContinuousPlay, m.isForced)
+        ' reset the resume point, so we don't accidentally resume
+        ' on continuous play
+        m.top.resumePoint = -1
+    else if m.episode.resumePoint > 0 and (m.episode.resumePoint < m.episode.length * .97) then
+        hideSpinner()
+        
+        dialog = createCbsDialog("Resume Watching", "Would you like to continue watching from where you left off or start from the beginning?", ["Resume", "Start Over"])
+        dialog.messageAlignment = "left"
+        dialog.allowBack = true
+        dialog.observeField("buttonSelected", "onResumeDialogButtonSelected")
+        setGlobalField("cbsDialog", dialog)
+        
+        omnitureData = m.top.omnitureData
+        if omnitureData = invalid then
+            omnitureData = {}
+        end if
+        omnitureData["podType"] = "overlay"
+        omnitureData["podText"] = "resume watching"
+        trackScreenAction("trackPodSelect", omnitureData)
+    else
+        startPlayback(m.isContinuousPlay, 0, m.isContinuousPlay, m.isForced)
+    end if
+end sub
 
 sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer, isContinuousPlay = false as boolean, forced = false as boolean)
 ?"---- START PLAYBACK ----"

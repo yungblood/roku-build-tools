@@ -24,17 +24,17 @@ sub init()
     
     m.accountStationsHeader = "Based on your account information, your local station is:"
     m.accountStationsMultipleHeader = "Based on your account information, your local stations are:"
-    m.accountStationsText = "If this is correct, select the station and then hit 'OK' on your remote to return to live TV." + chr(10) + chr(10) + "Still not the right station? Let's try one more time."
-    m.accountStationsMultipleText = "If this is correct, select your preferred station, then hit 'OK' on your remote to return to live TV." + chr(10) + chr(10) + "Still not the right station? Let's try one more time."
+    m.accountStationsText = "If this is correct, select the station and then hit 'OK' on your remote to return to live TV." + chr(10) + chr(10) + "Still not the right station? Let's try one more time. After that, the Check Location feature will be locked."
+    m.accountStationsMultipleText = "If this is correct, select your preferred station, then hit 'OK' on your remote to return to live TV." + chr(10) + chr(10) + "Still not the right station? Let's try one more time. After that, the Check Location feature will be locked."
     m.accountStationsUnavailableText = "We're sorry, but live TV is currently not supported in your area.  To make sure we have your correct location, select the button below."
     
-    m.zipStationsHeader = "Thank you for entering your ZIP Code."
-    m.zipStationsMultipleHeader = "Thank you for entering your ZIP Code."
+    m.zipStationsHeader = "Thank you. The Check Location feature is now locked."
+    m.zipStationsMultipleHeader = "Thank you. The Check Location feature is now locked."
     m.zipStationsText = "If this is correct, select the station and then hit 'OK' on your remote to return to live TV." + chr(10) + chr(10) + m.eloUnavailableText
     m.zipStationsMultipleText = "If this is correct, select your preferred station, then hit 'OK' on your remote to return to live TV." + chr(10) + chr(10) + m.eloUnavailableText
     m.zipStationsUnavailableText = "We're sorry, but live TV is currently not supported in your area." + chr(10) + chr(10) + m.eloUnavailableText
 
-    m.zipEntryStationsText = "If that's correct, just select LIVE TV from the main menu and start streaming!" + chr(10) + chr(10) + "If that isn't correct, enter your current ZIP code and we'll try to reset your location."
+    m.zipEntryStationsText = "If that's correct, just select LIVE TV from the main menu and start streaming!" + chr(10) + chr(10) + "Otherwise, to proceed with your final location check, enter your current ZIP code." + chr(10) + chr(10) + "WARNING! After this, the Check Location feature will be locked."
     m.zipEntryStationsUnavailableText = "We're sorry, but live TV is currently not supported in your area." + chr(10) + chr(10) + "To make sure we have your correct location, enter your current ZIP code and we'll try to reset your location."
 
     m.zipOverrideInfo = m.top.findNode("zipOverrideInfo")

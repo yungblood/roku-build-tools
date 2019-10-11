@@ -370,9 +370,8 @@ sub cbs_populateStream(episode as object)
         stream = createObject("roSGNode", "VideoStream")
         stream.title = episode.title
         stream.titleSeason = episode.titleSeason
-        if episode.isProtected then
+        if episode.isProtected or episode.assetType = "DASH_CENC_PRECON" then
             playReady = m.getPlayReadyInfo(episode.id)
-            'episode.url = m.getVideoStreamUrl(episode.pid, m.dashSelectorUrl)
             stream.streamFormat = "dash"
             stream.encodingType = "PlayReadyLicenseAcquisitionUrl"
             stream.encodingKey = playReady.url

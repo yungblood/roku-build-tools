@@ -47,6 +47,10 @@ function onKeyEvent(key as string, press as boolean) as boolean
 end function
 
 sub onMoviesLoaded(nodeEvent as object)
+    ' Fire launch complete beacon (Roku cert requirement)
+    ' Only fired by the scene if this is a deeplink
+    setGlobalField("launchComplete", true)
+
     hideSpinner()
     m.movies.unobserveField("change")
 end sub
