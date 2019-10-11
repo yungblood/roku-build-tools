@@ -94,6 +94,8 @@ function newCbs() as object
     this.getAffiliate               = cbs_getAffiliate
     this.getLiveChannels            = cbs_getLiveChannels
     
+    this.getTestVariants            = cbs_getTestVariants
+    
     this.search                     = cbs_search
     
     this.getFavoriteShows           = cbs_getFavoriteShows
@@ -1199,6 +1201,15 @@ function cbs_getLiveChannels() as object
         next
     end if
     return channels
+end function
+
+function cbs_getTestVariants(tests = [] as object) as object
+    url = m.apiBaseUrl + "v3.0/roku/user/variants.json"
+    url = addQueryString(url, "clientUserGuid", m.user.id)
+    url = addQueryString(url, "variantTestName", asArray(tests).join(","))
+
+    response = m.makeRequest(url, "GET")
+    return response
 end function
 
 'function cbs_search(term as String, expandDetails = false as boolean, startIndex = 0 as integer, count = 100 as integer) as object

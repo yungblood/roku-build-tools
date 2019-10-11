@@ -136,6 +136,8 @@ sub doWork()
     
     user = api.getUser(true)
     m.top.user = user
+    
+    tests = api.getTestVariants("recommended_trending_roku")
 
     m.top.signedIn = (user.status <> "ANONYMOUS")
 end sub
