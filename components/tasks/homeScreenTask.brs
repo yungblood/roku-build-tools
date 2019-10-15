@@ -6,16 +6,14 @@ sub doWork()
     api = cbs()
     api.initialize(m.top)
 
+    user = getGlobalField("user")
+    config = getGlobalField("config")
+
+    rows = [] 
     content = {}
     content.marquee = api.getMarquee()
 
-    user = getGlobalField("user")
-    rows = [] 
-
     combineSYW = true
-    enableR4Y = false
-    model = "Model1"
-    config = getGlobalField("config")
     if config <> invalid and config.enableTaplytics = true then
         taplyticsApi = getGlobalComponent("taplytics")
         if taplyticsApi <> invalid then
@@ -24,13 +22,17 @@ sub doWork()
                 if response.experiments["SYW-CW Combo Test"] <> invalid then
                     combineSYW = taplyticsApi.callFunc("getValueForVariable", { name: "syw_cw_combination", default: combineSYW })
                 end if
-                if response.experiments["Recommended + Trending"] <> invalid then
-                    ' The R4Y experiment is running, get the model(s)
-                    model = taplyticsApi.callFunc("getValueForVariable", { name: "recommendationcarousel", default: model })
-                    enableR4Y = true
-                end if
             end if
         end if
+    end if
+
+    enableR4Y = false
+    model = "Model1"
+    experiment = getChildByID("recommended_trending_roku", user.experiments)
+    if experiment <> invalid then
+        ' The R4Y experiment is running, get the model(s)
+        model = experiment.variant
+        enableR4Y = true
     end if
     
     if isAuthenticated(m.top) then

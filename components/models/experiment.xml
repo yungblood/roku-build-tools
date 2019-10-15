@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="Experiment" extends="ContentNode">
+    <script type="text/brightscript" uri="pkg:/components/models/experiment.brs" />
+    <interface>
+        <field id="json" type="assocarray" onChange="onJsonChanged" />
+
+        <field id="variant" type="string" />
+    </interface>
+</component>
