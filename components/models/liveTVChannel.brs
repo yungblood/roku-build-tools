@@ -31,13 +31,13 @@ sub onJsonChanged(nodeEvent as object)
                 if m.top.type = "syncbak" then
                     m.top.scheduleType = "local"
                 else
-                    m.top.streamingUrl = content.liveStreamingUrl
+                    m.top.streamUrl = content.liveStreamingUrl
                 end if
             end if
             
             if json.is_fallback_enabled = true then
                 m.top.isFallback = true
-                m.top.streamingUrl = json.fallback_url
+                m.top.streamUrl = json.fallback_url
                 m.top.contentID = json.fallback_ref_id
                 m.top.trackingContentID = json.fallback_ref_id
                 m.top.scheduleType = json.fallback_schedule_type

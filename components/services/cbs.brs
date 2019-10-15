@@ -1208,8 +1208,15 @@ function cbs_getTestVariants(tests = [] as object) as object
     url = addQueryString(url, "clientUserGuid", m.user.id)
     url = addQueryString(url, "variantTestName", asArray(tests).join(","))
 
-    response = m.makeRequest(url, "GET")
-    return response
+    experiments = createObject("roSGNode", "ContentNode")
+    response = m.makeRequest(url, "POST")
+    if isAssociativeArray(response) and response.success = true then
+        for each item in asArray(response.experiments)
+            experiment = experiments.createChild("Experiment")
+            experiment.json = item
+        next
+    end if
+    return experiments
 end function
 
 'function cbs_search(term as String, expandDetails = false as boolean, startIndex = 0 as integer, count = 100 as integer) as object
