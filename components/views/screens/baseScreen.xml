@@ -19,6 +19,7 @@
         <field id="omnitureName" type="string" />
         <field id="omniturePageType" type="string" />
         <field id="omnitureSiteHier" type="string" />
+        <field id="omniturePageViewGuid" type="string" />
         <field id="omnitureData" type="assocarray" />
 
         <field id="close" type="boolean" alwaysNotify="true" />

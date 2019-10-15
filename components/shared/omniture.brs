@@ -4,22 +4,25 @@ sub initializeAdobe()
         m.adobe = ADBMobile().getADBMobileConnectorInstance(adobe)
         m.adobeConstants = m.adobe.sceneGraphConstants()
         adobe.observeField(m.adobeConstants.API_RESPONSE, "onAdobeApiResponse")
+        deviceInfo = CreateObject("roDeviceInfo")
 
         config = getGlobalField("config")
         user = getGlobalField("user")
         m.persistentParams = {}
         m.persistentParams["siteCode"] = "CBS"
-        m.persistentParams["siteEdition"] = "us"
+        m.persistentParams["siteEdition"] = GetCurrentLocale()
         m.persistentParams["siteType"] = "roku tv ott|" + lCase(getModel())
-        m.persistentParams["brandPlatformId"] = "cbscom_ott_roku"
+        m.persistentParams["brandPlatformId"] = "cbs" + lcase(deviceInfo.GetUserCountryCode()) + "_ott_roku"
         m.persistentParams["sitePrimaryRsid"] = config.omnitureEvar5
         m.persistentParams["userStatus"] = user.trackingStatus
         m.persistentParams["mediaPartnerId"] = "cbs_roku_app"
         m.persistentParams["mediaDistNetwork"] = "can"
         m.persistentParams["mediaDeviceId"] = getPersistedDeviceID()
+        m.persistentParams["deviceId"] = getPersistedDeviceID()
         m.persistentParams["adDeviceId"] = getAdvertisingID()
         m.persistentParams["userRegId"] = user.id
         m.persistentParams["&&products"] = user.trackingProduct
+        m.persistentParams["connectedState"]   = iif(getEthernetInterface() = "eth0", "ethernet", "wifi")
         if user.status="ANONYMOUS" then
             m.persistentParams["userType"]="ANON"
         else
@@ -44,6 +47,7 @@ sub trackScreenView(screenName = m.top.omnitureName as string, additionalParams 
         params["screenName"] = screenName
         params["pageType"] = m.top.omniturePageType
         params["siteHier"] = m.top.omnitureSiteHier
+        params["pageViewGuid"] = m.top.omniturePageViewGuid
         deeplink = getGlobalField("deeplinkForTracking")
         if not isNullOrEmpty("deeplinkForTracking") then
             params["refSource"] = deeplink
@@ -70,7 +74,6 @@ sub trackScreenAction(actionName as string, params = {} as object, screenName = 
     end if
     allParams.append(m.persistentParams)
     allParams.append(params)
-
     trackAction(actionName, allParams, events)
 end sub
 
