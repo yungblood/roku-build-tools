@@ -94,7 +94,7 @@ function newCbs() as object
     this.getAffiliate               = cbs_getAffiliate
     this.getLiveChannels            = cbs_getLiveChannels
     
-    this.getTestVariants            = cbs_getTestVariants
+    this.getExperiments             = cbs_getExperiments
     
     this.search                     = cbs_search
     
@@ -1203,10 +1203,10 @@ function cbs_getLiveChannels() as object
     return channels
 end function
 
-function cbs_getTestVariants(tests = [] as object) as object
+function cbs_getExperiments(experimentNames = [] as object) as object
     url = m.apiBaseUrl + "v3.0/roku/user/variants.json"
     url = addQueryString(url, "clientUserGuid", m.user.id)
-    url = addQueryString(url, "variantTestName", asArray(tests).join(","))
+    url = addQueryString(url, "variantTestName", asArray(experimentNames).join(","))
 
     experiments = createObject("roSGNode", "ContentNode")
     response = m.makeRequest(url, "POST")

@@ -101,7 +101,7 @@ sub doWork()
     m.top.lastLiveChannel = getRegistryValue("liveTVChannel", "", api.registrySection)
     
     user = api.getUser(true)
-    user.experiments = api.getTestVariants("recommended_trending_roku")
+    user.experiments = api.getExperiments("recommended_trending_roku")
     m.top.user = user
     
     m.top.signedIn = (user.status <> "ANONYMOUS")
