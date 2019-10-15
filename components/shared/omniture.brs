@@ -223,14 +223,9 @@ sub trackVideoError(errorMessage as string, errorCode as object)
     m.adobe.mediaTrackError(errorMessage, asString(errorCode))
 end sub
 
-sub trackState(screenName = m.top.omnitureName as string, params = {} as object, pageType = m.top.omniturePageType as string)
+sub trackState(screenName as string, params as object)
     initializeAdobe()
-    allParams = {}
-    allParams["screenName"] = screenName
-    allParams["pageType"] = pageType
-    allParams.append(m.persistentParams)
-    allParams.append(params)
-    m.adobe.trackState(screenName, allParams)
+    m.adobe.trackState(screenName, params)
 end sub
 
 sub trackAction(actionName as string, params as object, events = [] as object)
