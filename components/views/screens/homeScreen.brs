@@ -304,14 +304,9 @@ sub onRowItemSelected(nodeEvent as object)
         index = indices[1]
         item = row.getChild(index)
         if item <> invalid then
-            omnitureData = getOmnitureData(row, index, iif(isSubscriber(m.top), "pay", "free"))
-            omnitureData["pageType"] = "front_door"
-            omnitureData["screenName"] = "/"
-            trackScreenAction("trackPodSelect", omnitureData)
+            trackScreenAction("trackPodSelect", getOmnitureData(row, index, iif(isSubscriber(m.top), "pay", "free")))
             if item.subtype() = "Episode" or item.subtype() = "Movie" then
                 omnitureData = getOmnitureData(row, index, "more info", "overlay")
-                omnitureData["pageType"] = "front_door"
-                omnitureData["screenName"] = "/"
                 m.top.additionalContext = {}
                 m.top.omnitureData = omnitureData
                 trackScreenAction("trackPodSelect", omnitureData)
@@ -321,8 +316,6 @@ sub onRowItemSelected(nodeEvent as object)
                 event = "trackContinueWatching"
                 sectionName = "continue watching"
                 omnitureData = getOmnitureData(row, index, sectionName, "resume")
-                omnitureData["pageType"] = "front_door"
-                omnitureData["screenName"] = "/"
                 if item.hasNewEpisodes = true then
                     omnitureData["episodeBadge"] = "true"
                     omnitureData["episodeBadgeLabel"] = "new"
@@ -381,14 +374,9 @@ sub onItemSelected(nodeEvent as object)
         index = nodeEvent.getData()
         item = row.content.getChild(index)
         if item <> invalid then
-            omnitureData = getOmnitureData(row, index, iif(isSubscriber(m.top), "pay", "free"))
-            omnitureData["pageType"] = "front_door"
-            omnitureData["screenName"] = "/"
-            trackScreenAction("trackPodSelect", omnitureData)
+            trackScreenAction("trackPodSelect", getOmnitureData(row, index, iif(isSubscriber(m.top), "pay", "free")))
             if item.subtype() = "Episode" or item.subtype() = "Movie" then
                 omnitureData = getOmnitureData(row, index, "more info", "overlay")
-                omnitureData["pageType"] = "front_door"
-                omnitureData["screenName"] = "/"
                 m.top.omnitureData = omnitureData
                 trackScreenAction("trackPodSelect", omnitureData)
             end if
