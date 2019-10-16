@@ -169,9 +169,13 @@ end sub
 sub onEpisodeLoaded(nodeEvent as object)
     episode = nodeEvent.getData()
     if episode <> invalid then
-        m.focusSeason = episode.seasonNumber
-        m.focusEpisode = episode.id
-        m.focusEpisodeNumber = asInteger(episode.episodeNumber)
+        ' If we're triggering dynamic play, then we don't want to set
+        ' focus to the deep-linked episode ID
+        if not m.top.triggerDynamicPlay then
+            m.focusSeason = episode.seasonNumber
+            m.focusEpisode = episode.id
+            m.focusEpisodeNumber = asInteger(episode.episodeNumber)
+        end if
         m.top.showID = episode.showID
     else
         m.top.close = true
