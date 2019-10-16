@@ -646,6 +646,12 @@ sub onSubscriptionSuccess(nodeEvent as object)
                     SetGlobalField("ignoreBack", true)
                     return
                 else if task.type = "sub" then
+                    'for this case the task.success is not set, but the error is empty, so this is a success message
+                    dialog = createCbsDialog("Congratulations!", "Your account has been updated!", ["OK"])
+                    dialog.observeField("buttonSelected", "onSubscriptionSuccessDialogClose")
+                    setGlobalField("cbsDialog", dialog)
+                    SetGlobalField("ignoreBack", true)
+                    return
                 end if
 
                 dialog = createCbsDialog("Error", "An error occurred when switching your CBS All Access plan. Please contact customer support for assistance at " + config.supportPhone + ".", ["OK"])
