@@ -10,6 +10,7 @@
     
     <interface>
         <field id="show" type="node" onChange="onShowChanged" />
+        <field id="autoplay" type="boolean" value="true" />
         <field id="update" type="boolean" onChange="updateContent" alwaysNotify="true" />
         <field id="episode" type="node" />
         <field id="contentLoaded" type="boolean" alwaysNotify="true" />
