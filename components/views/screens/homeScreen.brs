@@ -172,6 +172,9 @@ sub loadContent(content as object)
     m.list.rowHeights = rowHeights
     m.list.content = content
 
+    ' Fire launch complete beacon (Roku cert requirement)
+    setGlobalField("launchComplete", true)
+
     if config.enableGeoBlock and not arrayContains(config.appCountryCode.split(","), config.currentCountryCode) and not config.geoBlocked then
         dialog = createCbsDialog("", "Due to licensing restrictions, video is not available outside your country.", ["CLOSE"])
         dialog.observeField("buttonSelected", "onLicensingDialogClosed")
@@ -179,9 +182,6 @@ sub loadContent(content as object)
         
         config.geoBlocked = true
     end if
-
-    ' Fire launch complete beacon (Roku cert requirement)
-    setGlobalField("launchComplete", true)
 
     hideSpinner()
 end sub
