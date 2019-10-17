@@ -9,7 +9,7 @@ sub initializeAdobe()
         config = getGlobalField("config")
         user = getGlobalField("user")
         m.persistentParams = {}
-        m.persistentParams["siteCode"] = "CBS"
+        m.persistentParams["siteCode"] = "cbscom"
         m.persistentParams["siteEdition"] = GetCurrentLocale()
         m.persistentParams["siteType"] = "roku tv ott|" + lCase(getModel())
         m.persistentParams["brandPlatformId"] = "cbs" + lcase(deviceInfo.GetUserCountryCode()) + "_ott_roku"
@@ -17,8 +17,8 @@ sub initializeAdobe()
         m.persistentParams["userStatus"] = user.trackingStatus
         m.persistentParams["mediaPartnerId"] = "cbs_roku_app"
         m.persistentParams["mediaDistNetwork"] = "can"
-        m.persistentParams["mediaDeviceId"] = getPersistedDeviceID()
         m.persistentParams["deviceId"] = getPersistedDeviceID()
+        m.persistentParams["mediaDeviceId"] = m.persistentParams["deviceId"]
         m.persistentParams["adDeviceId"] = getAdvertisingID()
         m.persistentParams["userRegId"] = user.id
         m.persistentParams["&&products"] = user.trackingProduct
