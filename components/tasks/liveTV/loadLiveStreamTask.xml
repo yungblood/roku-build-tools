@@ -7,5 +7,7 @@
         <field id="stream" type="node" alwaysNotify="true"/>
         <field id="error" type="string" />
         <field id="schedule" type="nodearray" />
+
+        <field id="refreshParentalControls" type="boolean" />
     </interface>
 </component>

@@ -10,5 +10,7 @@
         <field id="nextEpisode" type="node" alwaysNotify="true" />
         <field id="populateStream" type="boolean" />
         <field id="loadNextEpisode" type="boolean" />
+
+        <field id="refreshParentalControls" type="boolean" />
     </interface>
 </component>

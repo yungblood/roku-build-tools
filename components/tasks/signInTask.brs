@@ -100,7 +100,7 @@ sub doWork()
     m.top.localStationLongitude = getRegistryValue("liveTVLongitude", 0.0, api.registrySection)
     m.top.lastLiveChannel = getRegistryValue("liveTVChannel", "", api.registrySection)
     
-    user = api.getUser(true)
+    user = api.getUser()
     user.experiments = api.getExperiments("recommended_trending_roku")
     m.top.user = user
     

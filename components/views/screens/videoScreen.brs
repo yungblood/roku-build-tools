@@ -474,6 +474,7 @@ sub onEpisodeIDChanged()
     m.loadTask = createObject("roSGNode", "LoadEpisodeTask")
     m.loadTask.observeField("episode", "onEpisodeLoaded")
     m.loadTask.episodeID = m.top.episodeID
+    m.loadTask.refreshParentalControls = true
     m.loadTask.populateStream = true
     m.loadTask.control = "run"
 end sub
@@ -561,7 +562,7 @@ sub onEpisodeLoaded(nodeEvent as object)
 
         if isRestricted(m.episode, user) then
             hideSpinner()
-            showPinDialog("Enter your PIN to watch", ["SUBMIT", "CANCEL"], "onPinDialogButtonSelected")
+            showPinDialog("Enter your PIN to watch", ["SUBMIT", "CANCEL"], "onPinDialogButtonSelected", m.omnitureParams)
         else
             resumePlayback()
         end if
@@ -569,18 +570,27 @@ sub onEpisodeLoaded(nodeEvent as object)
 end sub
 
 sub onPinDialogButtonSelected(nodeEvent as object)
+    params = {}
+    params.append(m.omnitureParams)
+
     dialog = nodeEvent.getRoSGNode()
     button = nodeEvent.getData()
     if lCase(button) = "cancel" then
+        params["parentalControlsCancel"] = "1"
+        trackScreenAction("trackparentalControlsCancel", params)
+
         m.top.close = true
     else if button = "SUBMIT" then
+        params["parentalControlsEnterPinOk"] = "1"
+        trackScreenAction("trackparentalControlsEnterPinOk", params)
+
         pinPad = dialog.findNode("pinPad")
         success = true
         if pinPad <> invalid then
             user = getGlobalField("user")
             if user.parentalControlPin <> pinPad.pin then
                 success = false
-                showPinErrorDialog("Login Error", "Invalid PIN entered", ["CLOSE"], "onPinErrorDialogButtonSelected")
+                showPinErrorDialog("Login Error", "Invalid PIN entered", ["CLOSE"], "onPinErrorDialogButtonSelected", m.omnitureParams)
             end if
         end if
         if success then
@@ -907,21 +917,22 @@ sub resumePlayback()
         ' on continuous play
         m.top.resumePoint = -1
     else if m.episode.resumePoint > 0 and (m.episode.resumePoint < m.episode.length * .97) then
-        hideSpinner()
-        
-        dialog = createCbsDialog("Resume Watching", "Would you like to continue watching from where you left off or start from the beginning?", ["Resume", "Start Over"])
-        dialog.messageAlignment = "left"
-        dialog.allowBack = true
-        dialog.observeField("buttonSelected", "onResumeDialogButtonSelected")
-        setGlobalField("cbsDialog", dialog)
-        
-        omnitureData = m.top.omnitureData
-        if omnitureData = invalid then
-            omnitureData = {}
-        end if
-        omnitureData["podType"] = "overlay"
-        omnitureData["podText"] = "resume watching"
-        trackScreenAction("trackPodSelect", omnitureData)
+        startPlayback(m.isContinuousPlay, m.episode.resumePoint, m.isContinuousPlay, m.isForced)
+'        hideSpinner()
+'        
+'        dialog = createCbsDialog("Resume Watching", "Would you like to continue watching from where you left off or start from the beginning?", ["Resume", "Start Over"])
+'        dialog.messageAlignment = "left"
+'        dialog.allowBack = true
+'        dialog.observeField("buttonSelected", "onResumeDialogButtonSelected")
+'        setGlobalField("cbsDialog", dialog)
+'        
+'        omnitureData = m.top.omnitureData
+'        if omnitureData = invalid then
+'            omnitureData = {}
+'        end if
+'        omnitureData["podType"] = "overlay"
+'        omnitureData["podText"] = "resume watching"
+'        trackScreenAction("trackPodSelect", omnitureData)
     else
         startPlayback(m.isContinuousPlay, 0, m.isContinuousPlay, m.isForced)
     end if
