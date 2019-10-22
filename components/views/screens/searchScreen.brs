@@ -147,7 +147,9 @@ sub onResultsLoaded()
     if m.searchTask.results = invalid or m.searchTask.results.getChildCount() = 0 then
         m.grid.visible = false
         m.noResults.visible = (m.searchText.text.len() > 0)
-        trackScreenAction("trackNoSearchResult", getOmnitureData(m.grid.content, 0))
+        if not isNullOrEmpty(m.searchText.text) then
+            trackScreenAction("trackNoSearchResult", getOmnitureData(m.grid.content, 0))
+        end if
     else
         m.grid.visible = true
         m.noResults.visible = false
