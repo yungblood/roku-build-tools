@@ -641,31 +641,16 @@ function cbs_isAuthenticated() as boolean
     return false
 end function
 
-function cbs_getUser(loadFavorites = false as boolean) as object
-timer = createObject("roTimespan")
+function cbs_getUser() as object
     url = m.apiBaseUrl + "v3.0/roku/login/status.json"
 
     user = createObject("roSGNode", "User")
     result = m.makeRequest(url, "GET")
-
     if isAssociativeArray(result) and result.isLoggedIn = true then
         user.json = result
         user.eligibleProducts = m.getEligibility()
     end if
-
     m.setUser(user)
-
-    if loadFavorites then
-'        user.favorites.content = m.getFavoriteShows()
-'        user.videoHistory.content = m.getVideoHistory(1, 50)
-'        user.continueWatching.content = m.getContinueWatching()
-'        
-'        pageSize = 50
-'        if getModel().mid(0, 2) = "37" then
-'            pageSize = 25
-'        end if
-'        user.showHistory.content = m.getShowHistory("recency", 1, pageSize)
-    end if
     return user
 end function
 
@@ -1377,7 +1362,6 @@ function cbs_getContinueWatching(page = 1 as integer, count = 20 as integer) as 
     end if
     return episodes
 end function
-
 
 function cbs_getResumePoint(contentID as String) as integer
     if m.isAuthenticated() then

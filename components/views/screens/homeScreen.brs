@@ -98,6 +98,9 @@ function onKeyEvent(key as string, press as boolean) as boolean
 end function
 
 sub onUserChanged(nodeEvent as object)
+    ' Roku is a little overzealous with node field observations
+    ' when individual fields of the node are changed, so we check
+    ' to ensure we actually have a new user object
     user = nodeEvent.getData()
     if m.user = invalid or not m.user.isSameNode(user) then
         m.user = user

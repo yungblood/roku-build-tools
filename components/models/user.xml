@@ -40,5 +40,7 @@
         <field id="parentalControlRestrictions" type="stringarray" />
 
         <field id="experiments" type="node" />
+
+        <field id="omnitureParams" type="assocarray" />
     </interface>
 </component>

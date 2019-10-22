@@ -100,9 +100,29 @@ sub doWork()
     m.top.localStationLongitude = getRegistryValue("liveTVLongitude", 0.0, api.registrySection)
     m.top.lastLiveChannel = getRegistryValue("liveTVChannel", "", api.registrySection)
     
-    user = api.getUser(true)
-    user.experiments = api.getExperiments("recommended_trending_roku")
-    m.top.user = user
+    user = api.getUser()
     
+    experimentNames = ["recommended_trending_roku"]
+    experiments = api.getExperiments(experimentNames.join(","))
+    user.experiments = experiments
+    
+    ' Build the optimizely adobe string, and store it on the user,
+    ' so we don't have to calculate it every time
+    optimizely = ""
+    for i = 0 to experiments.getChildCount() - 1
+        experiment = experiments.getChild(i)
+        if experiment <> invalid then
+            if not isNullOrEmpty(optimizely) then
+                optimizely = optimizely + "|"
+            end if
+            optimizely = optimizely + experiment.id + experiment.variant
+        end if
+    next
+    omnitureParams = {}
+    omnitureParams.append(user.omnitureParams)
+    omnitureParams["optimizelyExp"] = optimizely
+    user.omnitureParams = omnitureParams
+
+    m.top.user = user
     m.top.signedIn = (user.status <> "ANONYMOUS")
 end sub
