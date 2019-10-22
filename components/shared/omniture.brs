@@ -22,11 +22,13 @@ sub initializeAdobe()
         m.persistentParams["userRegId"] = user.id
         m.persistentParams["&&products"] = user.trackingProduct
         m.persistentParams["connectedState"]   = iif(getEthernetInterface() = "eth0", "ethernet", "wifi")
-        if user.status="ANONYMOUS" then
-            m.persistentParams["userType"]="ANON"
+        if isAuthenticated(user) then
+            m.persistentParams["userType"] = user.status
         else
-            m.persistentParams["userType"]=user.status
+            m.persistentParams["userType"] = "ANON"
         end if
+        
+        m.persistentParams.append(user.omnitureParams)
     end if
 end sub
 
