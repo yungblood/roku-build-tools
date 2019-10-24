@@ -119,12 +119,12 @@ function onKeyEvent(key as string, press as boolean) as boolean
                 brightline.BLKeyPress = key
             end if
             if key = "play" then
-                if m.video.state = "playing" then
-                    m.video.control = "pause"
-                    return true
-                else if m.video.state = "paused" then
-                    m.video.control = "resume"
-                    return true
+                if m.video.enableUI then
+                    if m.video.state = "playing" then
+                        m.video.control = "pause"
+                    else if m.video.state = "paused" then
+                        m.video.control = "resume"
+                    end if
                 end if
             end if
         end if
@@ -221,7 +221,11 @@ sub onVideoComplete()
 end sub
 
 sub onOverlayVisibilityHint()
-    m.trickPlayVisible = m.video.trickPlayBarVisibilityHint
+    if m.inAd then
+        m.trickPlayVisible = false
+    else
+        m.trickPlayVisible = m.video.trickPlayBarVisibilityHint
+    end if
 end sub
 
 sub clearMetadata()
@@ -456,7 +460,9 @@ end sub
 
 sub onSmoothingTimerFired()
     m.smoothingTimer.control = "stop"
-    m.overlay.visible = true
+    if not m.inAd then
+        m.overlay.visible = true
+    end if
 end sub
 
 sub onEpisodeIDChanged()
