@@ -44,6 +44,8 @@ sub onShowIDChanged(nodeEvent as object)
         showSpinner()
         m.loadTask = createObject("roSGNode", "LoadDynamicPlayEpisodeTask")
         m.loadTask.observeField("episode", "onEpisodeLoaded")
+        ' Enable fallback, in case there is no dynamic play episode for this show
+        m.loadTask.enableFallback = true
         m.loadTask.showID = showID
         m.loadTask.control = "run"
     end if
@@ -68,7 +70,7 @@ sub onEpisodeLoaded(nodeEvent as object)
             episode = episode.episode
         end if
         m.top.episode = episode
-    else if task.errorCode > 0 then
+    else if task.hasField("errorCode") and task.errorCode > 0 then
         showApiError(true)
     else
         m.top.close = true

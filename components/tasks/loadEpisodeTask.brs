@@ -5,7 +5,7 @@ end sub
 sub doWork()
     api = cbs()
     api.initialize(m.top)
-    
+
     if m.top.refreshParentalControls then
         ' We're refreshing the user to capture any parental control changes
         user = getGlobalField("user")

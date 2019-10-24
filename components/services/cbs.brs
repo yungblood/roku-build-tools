@@ -118,7 +118,7 @@ function newCbs() as object
     this.generateAccessToken        = cbs_generateAccessToken
     this.makeRequest                = cbs_makeRequest
     
-    setLogLevel(1)
+    setLogLevel(0)
 
     return this
 end function
@@ -1044,7 +1044,6 @@ function cbs_getDynamicPlayEpisode(showID as string) as object
     end if
     response = m.makeRequest(url, "GET")
     if response <> invalid and response.success = true then
-
          if response.dynamicVideoModel <> invalid then
             if response.dynamicVideoModel.model <> invalid then
                 episode = createObject("roSGNode", "Episode")
@@ -1060,6 +1059,7 @@ function cbs_getDynamicPlayEpisode(showID as string) as object
             return dynamicPlay
          end if 
     end if
+
     if episode <> invalid then
         dynamicPlay.episode = episode
         return dynamicPlay

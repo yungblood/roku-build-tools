@@ -29,12 +29,12 @@ sub doWork()
     enableR4Y = false
     model = "Model1"
     experiment = getChildByID("recommended_trending_roku", user.experiments)
-    if experiment <> invalid then
+    if experiment <> invalid and experiment.enabled then
         ' The R4Y experiment is running, get the model(s)
         model = experiment.variant
         enableR4Y = true
     end if
-    
+
     if isAuthenticated(m.top) then
         if combineSYW then
             user.showHistory.mode = "recentlyWatched"
