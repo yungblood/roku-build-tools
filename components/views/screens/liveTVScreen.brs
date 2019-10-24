@@ -228,6 +228,13 @@ sub onScheduleItemFocused(nodeEvent as object)
 end sub
 
 sub onScheduleItemSelected(nodeEvent as object)
+    channel = m.channel.scheduleType
+    if(channel = "local") channel = "cbs-ent-local"
+    omnitureParams.liveTVChannel = channel
+    omnitureParams.v99 = channel
+    
+    trackScreenAction("trackLiveTvSchedule", omnitureParams, m.top.omnitureName, m.top.omniturePageType)
+    
     'if m.scheduleDetails.visible then
         showOverlay(false, false)
     'else
@@ -356,8 +363,8 @@ sub playChannel(channel as object, showChannels = false as boolean)
             next
         end if
     
-        m.top.omnitureName = "/livetv"
-        m.top.omniturePageType = "livetv_stream"
+        m.top.omnitureName = "/live-tv/"
+        m.top.omniturePageType = "live-tv"
         trackScreenView()
     '
         m.heartbeatContext = {}
