@@ -460,7 +460,9 @@ end sub
 
 sub onSmoothingTimerFired()
     m.smoothingTimer.control = "stop"
-    m.overlay.visible = true
+    if not m.inAd then
+        m.overlay.visible = true
+    end if
 end sub
 
 sub onEpisodeIDChanged()
