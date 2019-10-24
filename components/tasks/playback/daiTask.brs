@@ -372,7 +372,7 @@ sub onAdStart(ad as object)
                     brightline.ad = {adPods: [ad], videoNode : m.top.video, rsgNode : view}
                     brightline.loadAd = "true"
                     
-                else if apiframework = "innovid" and model > 36 then
+                else if apiframework = "innovid" and model > 35 then
                     m.video.enableUI = false
                     ad.adURL = ad.companions[i].url
                     ad.streamFormat = "iroll"

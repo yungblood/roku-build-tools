@@ -121,10 +121,8 @@ function onKeyEvent(key as string, press as boolean) as boolean
             if key = "play" then
                 if m.video.state = "playing" then
                     m.video.control = "pause"
-                    return true
                 else if m.video.state = "paused" then
                     m.video.control = "resume"
-                    return true
                 end if
             end if
         end if
@@ -221,7 +219,11 @@ sub onVideoComplete()
 end sub
 
 sub onOverlayVisibilityHint()
-    m.trickPlayVisible = m.video.trickPlayBarVisibilityHint
+    if m.inAd then
+        m.trickPlayVisible = false
+    else
+        m.trickPlayVisible = m.video.trickPlayBarVisibilityHint
+    end if
 end sub
 
 sub clearMetadata()
