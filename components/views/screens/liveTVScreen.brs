@@ -228,12 +228,7 @@ sub onScheduleItemFocused(nodeEvent as object)
 end sub
 
 sub onScheduleItemSelected(nodeEvent as object)
-    channel = m.channel.scheduleType
-    if(channel = "local") channel = "cbs-ent-local"
-    omnitureParams.liveTVChannel = channel
-    omnitureParams.v99 = channel
-    
-    trackScreenAction("trackLiveTvSchedule", omnitureParams, m.top.omnitureName, m.top.omniturePageType)
+    trackScreenAction("trackLiveTvSchedule", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType)
     
     'if m.scheduleDetails.visible then
         showOverlay(false, false)
@@ -403,6 +398,13 @@ sub playChannel(channel as object, showChannels = false as boolean)
             m.heartbeatContext["mediaSvodContentType"] = iif(channel.subscriptionLevel = "FREE", "free", "paid")
             m.omnitureParams.pev2 = "video"
             m.omnitureParams.pev3 = "video"
+            
+            m.omnitureParams["liveTVChannel"] = channel.scheduleType
+            m.omnitureParams.v99 = channel.scheduleType
+            if channel.scheduleType = "local" then
+                m.omnitureParams["liveTVChannel"] = "cbs-ent-local"
+                m.omnitureParams.v99 = "cbs-ent-local"
+            end if
         end if
 
         m.streamTask = createObject("roSGNode", "LoadLiveStreamTask")
