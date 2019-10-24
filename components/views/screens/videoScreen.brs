@@ -119,10 +119,12 @@ function onKeyEvent(key as string, press as boolean) as boolean
                 brightline.BLKeyPress = key
             end if
             if key = "play" then
-                if m.video.state = "playing" then
-                    m.video.control = "pause"
-                else if m.video.state = "paused" then
-                    m.video.control = "resume"
+                if m.video.enableUI then
+                    if m.video.state = "playing" then
+                        m.video.control = "pause"
+                    else if m.video.state = "paused" then
+                        m.video.control = "resume"
+                    end if
                 end if
             end if
         end if
