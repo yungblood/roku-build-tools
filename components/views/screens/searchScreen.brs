@@ -119,7 +119,11 @@ sub onItemSelected(nodeEvent as object)
         selected = nodeEvent.getData()
         item = list.content.getChild(selected)
         if item <> invalid then
-            trackScreenAction("trackSearchResult", getOmnitureData(m.grid.content, selected))
+            omnitureData = getOmnitureData(m.grid.content, selected)
+            omnitureData.append(m.top.omnitureData)
+            omnitureData.searchEventComplete = 1
+            omnitureData.e49 = 1
+            trackScreenAction("trackSearchResult", omnitureData)
             m.top.itemSelected = item
         end if
     end if
@@ -144,7 +148,10 @@ sub onSearchTextChanged()
         m.noResults.visible = false
         m.grid.visible = false
     end if
-    m.top.omnitureName = "/search/" + lcase(m.searchText.text)
+    m.top.omnitureData = {
+        searchTerm: lcase(m.searchText.text)
+        v41: lcase(m.searchText.text)
+    }
 end sub
 
 sub onResultsLoaded()
@@ -154,7 +161,9 @@ sub onResultsLoaded()
         m.noResults.visible = (m.searchText.text.len() > 0)
         m.searchTask.unobserveField("results")
         if not isNullOrEmpty(m.searchText.text) then
-            trackScreenAction("trackNoSearchResult", getOmnitureData(m.grid.content, 0))
+            omnitureData = getOmnitureData(m.grid.content, 0)
+            omnitureData.Append(m.top.omnitureData)
+            trackScreenAction("trackNoSearchResult", omnitureData)
         end if
     else
         m.grid.visible = true
