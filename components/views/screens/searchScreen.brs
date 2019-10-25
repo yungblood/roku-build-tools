@@ -3,6 +3,11 @@ sub init()
     m.top.omniturePageType = "search"
     m.top.omnitureSiteHier = "search"
 
+    m.top.omnitureData = {
+        searchEventStart: 1
+        e48: 1
+    }
+
     m.top.observeField("focusedChild", "onFocusChanged")
 
     m.menu = m.top.findNode("menu")
