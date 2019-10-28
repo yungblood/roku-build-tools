@@ -7,10 +7,10 @@ end sub
 
 sub onScreenVisibleChanged()
     if m.top.visible and not m.visible then
-        if m.top.omnitureData = invalid then
-            m.top.omnitureData = {}
+        if m.top.omnitureStateData = invalid then
+            m.top.omnitureStateData = {}
         end if
-        trackScreenView(m.top.omnitureName, m.top.omnitureData)
+        trackScreenView(m.top.omnitureName, m.top.omnitureStateData)
     end if
     m.visible = m.top.visible
 end sub

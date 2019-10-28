@@ -3,7 +3,7 @@ sub init()
     m.top.omniturePageType = "search"
     m.top.omnitureSiteHier = "search"
 
-    m.top.omnitureData = {
+    m.top.omnitureStateData = {
         searchEventStart: 1
         e48: 1
     }

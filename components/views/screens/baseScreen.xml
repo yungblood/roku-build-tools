@@ -21,6 +21,7 @@
         <field id="omnitureSiteHier" type="string" />
         <field id="omniturePageViewGuid" type="string" />
         <field id="omnitureData" type="assocarray" />
+        <field id="omnitureStateData" type="assocarray" />
 
         <field id="close" type="boolean" alwaysNotify="true" />
     </interface>
