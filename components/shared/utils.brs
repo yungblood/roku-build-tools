@@ -241,12 +241,14 @@ sub toggleFavorite(showID as string, context as object)
 end sub
 
 function getChildByID(id as string, parent as object) as object
-    for i = 0 to parent.getChildCount() - 1
-        child = parent.getChild(i)
-        if child.id = id then
-            return child
-        end if
-    next
+    if parent <> invalid and not isNullOrEmpty(id) then
+        for i = 0 to parent.getChildCount() - 1
+            child = parent.getChild(i)
+            if child.id = id then
+                return child
+            end if
+        next
+    end if
     return invalid
 end function
 
