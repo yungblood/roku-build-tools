@@ -379,8 +379,13 @@ sub cbs_populateStream(episode as object)
             stream.encodingKey = playReady.url
             stream.url = m.getVideoStreamUrl(episode.pid, m.dashSelectorUrl)
         else
-            stream.url = m.getVideoStreamUrl(episode.pid)
-            stream.streamFormat = "hls"
+            if ucase(episode.assetType.left(4))="DASH" then
+                stream.streamFormat = "dash"
+                 stream.url = m.getVideoStreamUrl(episode.pid, m.dashSelectorUrl)
+            else
+                stream.url = m.getVideoStreamUrl(episode.pid)
+                stream.streamFormat = "hls"
+            end if
         end if
         stream.switchingStrategy = "full-adaptation"
         stream.subtitleConfig    = episode.subtitleConfig
@@ -393,7 +398,8 @@ sub cbs_populateStream(episode as object)
         end if
         
         episode.videoStream = stream
-
+        print stream
+        
         vmapUrl = m.vmapUrl
         vmapUrl = addQueryString(vmapUrl, "ppid", m.user.ppid)
         customParams = asString(m.user.adStatus) ' "sb=14" ' 
