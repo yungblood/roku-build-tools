@@ -978,7 +978,11 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                 if m.episode.isFullEpisode then
                     streamData.contentSourceID = config.daiSourceID
                 else
-                    streamData.contentSourceID = config.daiSourceIDClip
+                    if streamData.streamFormat = "hls" then
+                        streamData.contentSourceID = config.daiSourceIDClip
+                    else
+                        streamData.contentSourceID = config.daiSourceID
+                    end if
                 end if 
 '               ----------------------- end ----------------------
 
