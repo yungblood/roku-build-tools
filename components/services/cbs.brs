@@ -94,6 +94,8 @@ function newCbs() as object
     this.getAffiliate               = cbs_getAffiliate
     this.getLiveChannels            = cbs_getLiveChannels
     
+    this.getExperiments             = cbs_getExperiments
+    
     this.search                     = cbs_search
     
     this.getFavoriteShows           = cbs_getFavoriteShows
@@ -116,7 +118,7 @@ function newCbs() as object
     this.generateAccessToken        = cbs_generateAccessToken
     this.makeRequest                = cbs_makeRequest
     
-    setLogLevel(1)
+    setLogLevel(0)
 
     return this
 end function
@@ -639,31 +641,16 @@ function cbs_isAuthenticated() as boolean
     return false
 end function
 
-function cbs_getUser(loadFavorites = false as boolean) as object
-timer = createObject("roTimespan")
+function cbs_getUser() as object
     url = m.apiBaseUrl + "v3.0/roku/login/status.json"
 
     user = createObject("roSGNode", "User")
     result = m.makeRequest(url, "GET")
-
     if isAssociativeArray(result) and result.isLoggedIn = true then
         user.json = result
         user.eligibleProducts = m.getEligibility()
     end if
-
     m.setUser(user)
-
-    if loadFavorites then
-'        user.favorites.content = m.getFavoriteShows()
-'        user.videoHistory.content = m.getVideoHistory(1, 50)
-'        user.continueWatching.content = m.getContinueWatching()
-'        
-'        pageSize = 50
-'        if getModel().mid(0, 2) = "37" then
-'            pageSize = 25
-'        end if
-'        user.showHistory.content = m.getShowHistory("recency", 1, pageSize)
-    end if
     return user
 end function
 
@@ -1057,7 +1044,6 @@ function cbs_getDynamicPlayEpisode(showID as string) as object
     end if
     response = m.makeRequest(url, "GET")
     if response <> invalid and response.success = true then
-
          if response.dynamicVideoModel <> invalid then
             if response.dynamicVideoModel.model <> invalid then
                 episode = createObject("roSGNode", "Episode")
@@ -1073,6 +1059,7 @@ function cbs_getDynamicPlayEpisode(showID as string) as object
             return dynamicPlay
          end if 
     end if
+
     if episode <> invalid then
         dynamicPlay.episode = episode
         return dynamicPlay
@@ -1199,6 +1186,22 @@ function cbs_getLiveChannels() as object
         next
     end if
     return channels
+end function
+
+function cbs_getExperiments(experimentNames = [] as object) as object
+    url = m.apiBaseUrl + "v3.0/roku/user/variants.json"
+    url = addQueryString(url, "clientUserGuid", m.user.id)
+    url = addQueryString(url, "variantTestName", asArray(experimentNames).join(","))
+
+    experiments = createObject("roSGNode", "ContentNode")
+    response = m.makeRequest(url, "POST")
+    if isAssociativeArray(response) and response.success = true then
+        for each item in asArray(response.experiments)
+            experiment = experiments.createChild("Experiment")
+            experiment.json = item
+        next
+    end if
+    return experiments
 end function
 
 'function cbs_search(term as String, expandDetails = false as boolean, startIndex = 0 as integer, count = 100 as integer) as object
@@ -1359,7 +1362,6 @@ function cbs_getContinueWatching(page = 1 as integer, count = 20 as integer) as 
     end if
     return episodes
 end function
-
 
 function cbs_getResumePoint(contentID as String) as integer
     if m.isAuthenticated() then

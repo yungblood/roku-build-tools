@@ -27,7 +27,12 @@ function createCbsDialog(title as string, message = "" as string, buttons = [] a
     return dialog
 end function
 
-function showPinDialog(title as string, buttons as object, callbackFunction as string) as object
+function showPinDialog(title as string, buttons as object, callbackFunction as string, omnitureParams = {} as object) as object
+    params = {}
+    params.append(omnitureParams)
+    params["parentalControlsPromptView"] = "1"
+    trackScreenAction("trackparentalControlsPromptView", params)
+    
     dialog = createCbsDialog(title)
     dialog.allowBack = true
     dialog.buttonWidth = 450
@@ -74,7 +79,12 @@ function showPinDialog(title as string, buttons as object, callbackFunction as s
     return dialog
 end function
 
-sub showPinErrorDialog(title as string, message as string, buttons as object, callbackFunction as string)
+sub showPinErrorDialog(title as string, message as string, buttons as object, callbackFunction as string, omnitureParams = {} as object)
+    params = {}
+    params.append(omnitureParams)
+    params["parentalControlsEnterPinFailed"] = "1"
+    trackScreenAction("trackparentalControlsEnterPinFailed", params)
+
     dialog = createCbsDialog(title, message)
     dialog.allowBack = true
     dialog.buttonWidth = 450
@@ -231,12 +241,14 @@ sub toggleFavorite(showID as string, context as object)
 end sub
 
 function getChildByID(id as string, parent as object) as object
-    for i = 0 to parent.getChildCount() - 1
-        child = parent.getChild(i)
-        if child.id = id then
-            return child
-        end if
-    next
+    if parent <> invalid and not isNullOrEmpty(id) then
+        for i = 0 to parent.getChildCount() - 1
+            child = parent.getChild(i)
+            if child.id = id then
+                return child
+            end if
+        next
+    end if
     return invalid
 end function
 

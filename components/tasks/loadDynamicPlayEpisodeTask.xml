@@ -4,6 +4,9 @@
     <interface>
         <field id="showID" type="string" />
         <field id="show" type="node" />
+
+        <field id="enableFallback" type="boolean" />
+
         <field id="episode" type="node" alwaysNotify="true" />
     </interface>
 </component>

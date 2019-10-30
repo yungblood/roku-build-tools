@@ -98,6 +98,9 @@ function onKeyEvent(key as string, press as boolean) as boolean
 end function
 
 sub onUserChanged(nodeEvent as object)
+    ' Roku is a little overzealous with node field observations
+    ' when individual fields of the node are changed, so we check
+    ' to ensure we actually have a new user object
     user = nodeEvent.getData()
     if m.user = invalid or not m.user.isSameNode(user) then
         m.user = user
@@ -172,6 +175,9 @@ sub loadContent(content as object)
     m.list.rowHeights = rowHeights
     m.list.content = content
 
+    ' Fire launch complete beacon (Roku cert requirement)
+    setGlobalField("launchComplete", true)
+
     if config.enableGeoBlock and not arrayContains(config.appCountryCode.split(","), config.currentCountryCode) and not config.geoBlocked then
         dialog = createCbsDialog("", "Due to licensing restrictions, video is not available outside your country.", ["CLOSE"])
         dialog.observeField("buttonSelected", "onLicensingDialogClosed")
@@ -179,9 +185,6 @@ sub loadContent(content as object)
         
         config.geoBlocked = true
     end if
-
-    ' Fire launch complete beacon (Roku cert requirement)
-    setGlobalField("launchComplete", true)
 
     hideSpinner()
 end sub

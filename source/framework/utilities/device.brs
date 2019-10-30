@@ -243,6 +243,23 @@ Function GetCountryCode() As String
     Return m.CountryCode
 End Function
 
+' Gets the country code for the user
+Function GetUserCountryCode() As String
+    ' Initialize the country variable
+    If m.UserCountryCode = invalid Then
+        m.CountryCode = invalid
+        deviceInfo = CreateObject("roDeviceInfo")
+        If Not IsRokuOne() Then
+            m.UserCountryCode = deviceInfo.GetUserCountryCode()
+        End If
+        ' If the lookup failed, set the country to US
+        If m.UserCountryCode = invalid Then
+           m.UserCountryCode = "US"
+        End If
+    End If
+    Return m.UserCountryCode
+End Function
+
 Function GetTimeZone() As String
     If m.TimeZone = invalid Then
         m.TimeZone = invalid

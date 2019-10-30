@@ -95,47 +95,34 @@ sub doWork()
         api.setCookies(cookies)
     end if
 
-'    stations = []
-'    if asBoolean(config.syncbak_enabled, true) then
-'        syncbak().initialize(config.syncbakKey, config.syncbakSecret, config.syncbakBaseUrl)
-'        stations = syncbak().getChannels()
-'    else
-'        nationalFeedID = config.live_tv_national_feed_content_id
-'        if not isNullOrEmpty(nationalFeedID) then
-'            nationalFeed = api.getEpisode(nationalFeedID)
-'            if nationalFeed <> invalid then
-'                stations.push(nationalFeed)
-'            end if
-'        end if
-'    end if
-'
-'    liveTVChannels = api.getLiveChannels()
-'    if config.liveTVChannels <> invalid then
-'        for each channel in liveTVChannels
-'            for each override in config.liveTVChannels
-'                if override.id = channel.scheduleType then
-'                    for each field in override.keys()
-'                        if field <> "id" then
-'                            channel.setField(field, override[field])
-'                        end if
-'                    next
-'                    exit for
-'                end if
-'            next
-'        next
-'    end if
-'    channels = createObject("roSGNode", "ContentNode")
-'    channels.appendChildren(liveTVChannels)
-'    setGlobalField("liveTVChannels", channels)
-'
-'    setGlobalField("stations", stations)
     m.top.localStation = getRegistryValue("liveTV", "", api.registrySection)
     m.top.localStationLatitude = getRegistryValue("liveTVLatitude", 0.0, api.registrySection)
     m.top.localStationLongitude = getRegistryValue("liveTVLongitude", 0.0, api.registrySection)
     m.top.lastLiveChannel = getRegistryValue("liveTVChannel", "", api.registrySection)
     
-    user = api.getUser(true)
-    m.top.user = user
+    user = api.getUser()
+    
+    experimentNames = ["recommended_trending_roku"]
+    experiments = api.getExperiments(experimentNames.join(","))
+    user.experiments = experiments
+    
+    ' Build the optimizely adobe string, and store it on the user,
+    ' so we don't have to calculate it every time
+    optimizely = ""
+    for i = 0 to experiments.getChildCount() - 1
+        experiment = experiments.getChild(i)
+        if experiment <> invalid then
+            if not isNullOrEmpty(optimizely) then
+                optimizely = optimizely + "|"
+            end if
+            optimizely = optimizely + experiment.id + experiment.variant
+        end if
+    next
+    omnitureParams = {}
+    omnitureParams.append(user.omnitureParams)
+    omnitureParams["optimizelyExp"] = optimizely
+    user.omnitureParams = omnitureParams
 
+    m.top.user = user
     m.top.signedIn = (user.status <> "ANONYMOUS")
 end sub

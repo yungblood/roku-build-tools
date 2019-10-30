@@ -4,30 +4,31 @@ sub initializeAdobe()
         m.adobe = ADBMobile().getADBMobileConnectorInstance(adobe)
         m.adobeConstants = m.adobe.sceneGraphConstants()
         adobe.observeField(m.adobeConstants.API_RESPONSE, "onAdobeApiResponse")
-        deviceInfo = CreateObject("roDeviceInfo")
 
         config = getGlobalField("config")
         user = getGlobalField("user")
         m.persistentParams = {}
-        m.persistentParams["siteCode"] = "CBS"
-        m.persistentParams["siteEdition"] = GetCurrentLocale()
+        m.persistentParams["siteCode"] = "cbscom"
+        m.persistentParams["siteEdition"] = getCurrentLocale()
         m.persistentParams["siteType"] = "roku tv ott|" + lCase(getModel())
-        m.persistentParams["brandPlatformId"] = "cbs" + lcase(deviceInfo.GetUserCountryCode()) + "_ott_roku"
+        m.persistentParams["brandPlatformId"] = "cbs" + lCase(getUserCountryCode()) + "_ott_roku"
         m.persistentParams["sitePrimaryRsid"] = config.omnitureEvar5
         m.persistentParams["userStatus"] = user.trackingStatus
         m.persistentParams["mediaPartnerId"] = "cbs_roku_app"
         m.persistentParams["mediaDistNetwork"] = "can"
-        m.persistentParams["mediaDeviceId"] = getPersistedDeviceID()
         m.persistentParams["deviceId"] = getPersistedDeviceID()
+        m.persistentParams["mediaDeviceId"] = getPersistedDeviceID()
         m.persistentParams["adDeviceId"] = getAdvertisingID()
         m.persistentParams["userRegId"] = user.id
         m.persistentParams["&&products"] = user.trackingProduct
         m.persistentParams["connectedState"]   = iif(getEthernetInterface() = "eth0", "ethernet", "wifi")
-        if user.status="ANONYMOUS" then
-            m.persistentParams["userType"]="ANON"
+        if isAuthenticated(user) then
+            m.persistentParams["userType"] = user.status
         else
-            m.persistentParams["userType"]=user.status
+            m.persistentParams["userType"] = "ANON"
         end if
+        
+        m.persistentParams.append(user.omnitureParams)
     end if
 end sub
 

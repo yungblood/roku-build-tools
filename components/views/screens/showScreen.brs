@@ -69,6 +69,7 @@ end function
 sub onVisibleChanged()
     if m.top.visible then
         if m.show <> invalid then
+            m.dynamicPlay.autoplay = not m.top.autoplay
             m.dynamicPlay.update = true
         end if
         if m.firstShow then
@@ -93,6 +94,7 @@ sub onShowChanged()
             m.top.omnitureSiteHier = "shows|"+ lCase(m.show.categories.join(",")) + "|" + lCase(m.show.title) + "|"
             trackScreenView()
     
+            m.dynamicPlay.autoplay = not m.top.autoplay
             m.dynamicPlay.show = m.show
 
             rows = m.show.sections
@@ -169,9 +171,13 @@ end sub
 sub onEpisodeLoaded(nodeEvent as object)
     episode = nodeEvent.getData()
     if episode <> invalid then
-        m.focusSeason = episode.seasonNumber
-        m.focusEpisode = episode.id
-        m.focusEpisodeNumber = asInteger(episode.episodeNumber)
+        ' If we're triggering dynamic play, then we don't want to set
+        ' focus to the deep-linked episode ID
+        if not m.top.triggerDynamicPlay then
+            m.focusSeason = episode.seasonNumber
+            m.focusEpisode = episode.id
+            m.focusEpisodeNumber = asInteger(episode.episodeNumber)
+        end if
         m.top.showID = episode.showID
     else
         m.top.close = true

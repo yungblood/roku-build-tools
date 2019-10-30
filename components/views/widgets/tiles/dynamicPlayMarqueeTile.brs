@@ -137,7 +137,7 @@ sub onVilynxVideosLoaded(nodeEvent as object)
 
     if m.top.opacity = 1 and videos <> invalid and videos.count() > 0 and videos[0] <> invalid then
         video = videos[0]
-        if video <> invalid then
+        if video <> invalid and m.top.autoplay then
             startVideoPreview(video.vilynxThumbnail, video.vilynxUrlHigh)
         end if
         m.hero.visible = false

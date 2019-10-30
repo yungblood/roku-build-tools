@@ -81,6 +81,7 @@ sub onVisibleChanged()
 
         m.loadTask = createObject("roSGNode", "LoadLiveStationsTask")
         m.loadTask.observeField("stations", "onStationsLoaded")
+        m.loadTask.refreshParentalControls = true
         m.loadTask.control = "run"
     else
         m.video.control = "stop"
@@ -227,6 +228,8 @@ sub onScheduleItemFocused(nodeEvent as object)
 end sub
 
 sub onScheduleItemSelected(nodeEvent as object)
+    trackScreenAction("trackLiveTvSchedule", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType)
+    
     'if m.scheduleDetails.visible then
         showOverlay(false, false)
     'else
@@ -287,16 +290,8 @@ sub onStationChanged(nodeEvent as object)
     playChannel(m.station, true)
 end sub
 
-sub playChannel(channel as object, showChannels = false as boolean, checkParentalControls = true as boolean)
+sub playChannel(channel as object, showChannels = false as boolean)
     user = getGlobalField("user")
-    if checkParentalControls and not isNullOrEmpty(user.parentalControlPin) and user.parentalControlLiveTV then
-        dialog = showPinDialog("Enter your PIN to watch", ["SUBMIT", "CANCEL"], "onPinDialogButtonSelected")
-        dialog.addField("channel", "node", false)
-        dialog.setField("channel", channel)
-        dialog.addField("showChannels", "boolean", false)
-        dialog.setField("showChannels", showChannels)
-        return
-    end if
 
     if m.video.state <> "stopped" then
         m.video.control = "stop"
@@ -362,14 +357,9 @@ sub playChannel(channel as object, showChannels = false as boolean, checkParenta
                 end if
             next
         end if
-
-        m.streamTask = createObject("roSGNode", "LoadLiveStreamTask")
-        m.streamTask.observeField("stream", "onStreamLoaded")
-        m.streamTask.station = channel
-        m.streamTask.control = "run"
     
-        m.top.omnitureName = "/livetv"
-        m.top.omniturePageType = "livetv_stream"
+        m.top.omnitureName = "/live-tv/"
+        m.top.omniturePageType = "live-tv"
         trackScreenView()
     '
         m.heartbeatContext = {}
@@ -408,8 +398,20 @@ sub playChannel(channel as object, showChannels = false as boolean, checkParenta
             m.heartbeatContext["mediaSvodContentType"] = iif(channel.subscriptionLevel = "FREE", "free", "paid")
             m.omnitureParams.pev2 = "video"
             m.omnitureParams.pev3 = "video"
+            
+            m.omnitureParams["liveTVChannel"] = channel.scheduleType
+            m.omnitureParams.v99 = channel.scheduleType
+            if channel.scheduleType = "local" then
+                m.omnitureParams["liveTVChannel"] = "cbs-ent-local"
+                m.omnitureParams.v99 = "cbs-ent-local"
+            end if
         end if
 
+        m.streamTask = createObject("roSGNode", "LoadLiveStreamTask")
+        m.streamTask.observeField("stream", "onStreamLoaded")
+        m.streamTask.refreshParentalControls = true
+        m.streamTask.station = channel
+        m.streamTask.control = "run"
         'trackScreenAction("trackVideoLoad", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event52"])
 
         if showChannels then
@@ -422,22 +424,31 @@ sub playChannel(channel as object, showChannels = false as boolean, checkParenta
 end sub
 
 sub onPinDialogButtonSelected(nodeEvent as object)
+    params = {}
+    params.append(m.omnitureParams)
+
     dialog = nodeEvent.getRoSGNode()
     button = nodeEvent.getData()
     if lCase(button) = "cancel" then
+        params["parentalControlsCancel"] = "1"
+        trackScreenAction("trackparentalControlsCancel", params)
+
         m.top.close = true
     else if button = "SUBMIT" then
+        params["parentalControlsEnterPinOk"] = "1"
+        trackScreenAction("trackparentalControlsEnterPinOk", params)
+
         pinPad = dialog.findNode("pinPad")
         success = true
         if pinPad <> invalid then
             user = getGlobalField("user")
             if user.parentalControlPin <> pinPad.pin then
                 success = false
-                showPinErrorDialog("Login Error", "Invalid PIN entered", ["CLOSE"], "onPinErrorDialogButtonSelected")
+                showPinErrorDialog("Login Error", "Invalid PIN entered", ["CLOSE"], "onPinErrorDialogButtonSelected", m.omnitureParams)
             end if
         end if
         if success then
-            playChannel(dialog.channel, dialog.showChannels, false)
+            startPlayback(dialog.stream)
         end if
     end if
     dialog.close = true
@@ -481,6 +492,23 @@ sub onStreamLoaded(nodeEvent as object)
         end if
     else
         stream.station = m.station
+        m.stream = stream
+        
+        user = getGlobalField("user")
+        if not isNullOrEmpty(user.parentalControlPin) and user.parentalControlLiveTV then
+            hideSpinner()
+
+            dialog = showPinDialog("Enter your PIN to watch", ["SUBMIT", "CANCEL"], "onPinDialogButtonSelected", m.omnitureParams)
+            dialog.addField("stream", "node", false)
+            dialog.setField("stream", stream)
+            return
+        else
+            startPlayback(stream)
+        end if
+    end if
+end sub
+
+sub startPlayback(stream as object)
         m.video.content = stream
         resetOverlayTimer(true)
     
@@ -523,7 +551,6 @@ sub onStreamLoaded(nodeEvent as object)
             showNowPlaying()
         end if
         m.firstLoad = false
-    end if
 end sub
 
 sub loadSchedule()

@@ -28,7 +28,7 @@ sub doWork()
     spotX().initialize(getPersistedDeviceID(), config.spotXBaseUrl, config.spotXPageUrl)
     campaignValue = spotX().getCampaign()
     setGlobalField("spotXCampaign", campaignValue)
-    
+
     while true
         msg = wait(0, m.port)
         if msg <> invalid then
@@ -50,10 +50,17 @@ sub doWork()
                         exit while
                     end if
                 else if msg.getField() = "user" then
-                    user = msg.getData()
-                    dw().setUserInfo(user.id, user.trackingStatus)
-                    sparrow().setUserID(user.id)
-                    omniture().initialize(config.omnitureSuiteID, user.id, user.trackingStatus, user.trackingProduct, config.omnitureEvar5)
+                    newUser = msg.getData()
+                    ' Roku is a little overzealous with node field observations
+                    ' when individual fields of the node are changed, so we check
+                    ' to ensure we actually have a new user object
+                    if newUser <> invalid and (not newUser.isSameNode(user) or newUser.id <> user.id) then
+                        user = newUser
+
+                        dw().setUserInfo(user.id, user.trackingStatus)
+                        sparrow().setUserID(user.id)
+                        omniture().initialize(config.omnitureSuiteID, user.id, user.trackingStatus, user.trackingProduct, config.omnitureEvar5)
+                    end if
                 end if
             end if
         end if

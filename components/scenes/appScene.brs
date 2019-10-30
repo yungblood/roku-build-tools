@@ -646,6 +646,12 @@ sub onSubscriptionSuccess(nodeEvent as object)
                     SetGlobalField("ignoreBack", true)
                     return
                 else if task.type = "sub" then
+                    'for this case the task.success is not set, but the error is empty, so this is a success message
+                    dialog = createCbsDialog("Congratulations!", "Your account has been updated!", ["OK"])
+                    dialog.observeField("buttonSelected", "onSubscriptionSuccessDialogClose")
+                    setGlobalField("cbsDialog", dialog)
+                    SetGlobalField("ignoreBack", true)
+                    return
                 end if
 
                 dialog = createCbsDialog("Error", "An error occurred when switching your CBS All Access plan. Please contact customer support for assistance at " + config.supportPhone + ".", ["OK"])
@@ -954,7 +960,7 @@ function openDeepLink(params as object, item = invalid as object) as boolean
         else if params.mediaType = "series" or params.mediaType = "special" then
             if not isNullOrEmpty(params.contentID) then
                 if params.mediaType = "series" then
-                    showShowScreen("", params.contentID, invalid, false, true)
+                    showShowScreen("", params.contentID, invalid, false, true, true)
                 else
                     showShowScreen(params.contentID)
                 end if
@@ -1272,7 +1278,13 @@ sub onItemSelected(nodeEvent as object)
         end if
 
         if item.subtype() = "Episode" then
-            showEpisodeScreen(item, "", "", false, source, false)
+            autoplay = false
+            if source <> invalid and source.hasField("autoPlay") then
+                autoplay = (source.autoPlay = true)
+                ' reset the autoplay flag to false to prevent future autoplay
+                source.autoPlay = false
+            end if
+            showEpisodeScreen(item, "", "", autoplay, source, false)
         else if item.subtype() = "LiveTVChannel" then
             setGlobalField("lastLiveChannel", item.scheduleType)
             showLiveTVScreen()

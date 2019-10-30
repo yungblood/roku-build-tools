@@ -6,6 +6,16 @@ sub doWork()
     api = cbs()
     api.initialize(m.top)
 
+    if m.top.refreshParentalControls then
+        ' We're refreshing the user to capture any parental control changes
+        user = getGlobalField("user")
+        refreshedUser = api.getUser()
+        if refreshedUser <> invalid then
+            ' We reset the json directly to avoid user observer callbacks
+            user.json = refreshedUser.json
+        end if
+    end if
+
     if m.top.populateStream then
         if api.isOverStreamLimit() then
             m.top.error = "CONCURRENT_STREAM_LIMIT"
