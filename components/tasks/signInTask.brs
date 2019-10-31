@@ -119,7 +119,9 @@ sub doWork()
         end if
     next
     omnitureParams = {}
-    omnitureParams.append(user.omnitureParams)
+    if user.omnitureParams <> invalid then
+        omnitureParams.append(user.omnitureParams)
+    end if
     omnitureParams["optimizelyExp"] = optimizely
     user.omnitureParams = omnitureParams
 
