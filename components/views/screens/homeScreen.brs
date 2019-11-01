@@ -303,6 +303,7 @@ sub onRowItemFocused(nodeEvent as object)
 end sub
 
 sub onRowItemSelected(nodeEvent as object)
+? "YB-onRowItemSelected"
     indices = nodeEvent.getData()
     row = m.list.content.getChild(indices[0])
     if row <> invalid then
@@ -374,12 +375,24 @@ sub onRowItemSelected(nodeEvent as object)
 end sub
 
 sub onItemSelected(nodeEvent as object)
+? "YB-onItemSelected"
     row = nodeEvent.getRoSGNode()
     if row <> invalid then
         index = nodeEvent.getData()
         item = row.content.getChild(index)
         if item <> invalid then
-            trackScreenAction("trackPodSelect", getOmnitureData(row, index, iif(isSubscriber(m.top), "pay", "free")))
+            link = item.deeplink
+            link = link.replace("http://www.cbs.com/", "")
+            link = link.replace("https://www.cbs.com/", "")
+            link = link.replace("cbs://www.cbs.com/", "")
+            ? "YB-link", link
+            omnitureData = {}
+            omnitureData["rowHeaderTitle"] = "hero"
+            omnitureData["rowHeaderPosition"] = index
+            omnitureData["ctaText"] = item.actionTitle
+            omnitureData["targetType"] = "" 'FIXME: Figure out best way to parse deeplink...
+            omnitureData["targetUrl"] = item.deeplink
+            trackScreenAction("trackHero", omnitureData)
             if item.subtype() = "Episode" or item.subtype() = "Movie" then
                 omnitureData = getOmnitureData(row, index, "more info", "overlay")
                 m.top.omnitureData = omnitureData
@@ -391,6 +404,7 @@ sub onItemSelected(nodeEvent as object)
 end sub
 
 sub onMenuItemSelected(nodeEvent as object)
+? "YB-onMenuItemSelected"
     selection = nodeEvent.getData()
     if selection = "home" then
         'only change selection focus area after content is loaded
