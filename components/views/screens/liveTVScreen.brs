@@ -358,10 +358,6 @@ sub playChannel(channel as object, showChannels = false as boolean)
             next
         end if
     
-        m.top.omnitureName = "/live-tv/"
-        m.top.omniturePageType = "live-tv"
-        trackScreenView()
-    '
         m.heartbeatContext = {}
         m.omnitureParams = {}
         m.heartbeatContext["screenName"] = m.top.omnitureName
@@ -399,12 +395,26 @@ sub playChannel(channel as object, showChannels = false as boolean)
             m.omnitureParams.pev2 = "video"
             m.omnitureParams.pev3 = "video"
             
-            m.omnitureParams["liveTVChannel"] = channel.scheduleType
-            m.omnitureParams.v99 = channel.scheduleType
-            if channel.scheduleType = "local" then
+            if channel.affiliate <> invalid
                 m.omnitureParams["liveTVChannel"] = "cbs-ent-local"
                 m.omnitureParams.v99 = "cbs-ent-local"
+                m.omnitureParams["stationCode"] = channel.affiliate.station
+                m.omnitureParams.v100 = channel.affiliate.station
+            else
+                m.omnitureParams["liveTVChannel"] = channel.scheduleType
+                m.omnitureParams.v99 = channel.scheduleType
+                m.omnitureParams["stationCode"] = ""
+                m.omnitureParams.v100 = ""
             end if
+        end if
+
+        if isNullOrEmpty(m.top.omnitureName) then
+            m.top.omnitureName = "/live-tv/"
+            m.top.omniturePageType = "live-tv"
+            omnitureStateData = {}
+            omnitureStateData["liveTVChannel"] = m.omnitureParams["liveTVChannel"]
+            omnitureStateData["stationCode"] = m.omnitureParams["stationCode"]
+            trackScreenView(m.top.omnitureName, omnitureStateData)
         end if
 
         m.streamTask = createObject("roSGNode", "LoadLiveStreamTask")
@@ -733,9 +743,9 @@ sub selectStation()
     if stations.count() = 0 then
         m.unavailable.visible = true
        
-        m.top.omnitureName = "/livetv/check availability"
-        m.top.omniturePageType = "livetv_unavailable"
-        trackScreenView()
+        'm.top.omnitureName = "/livetv/check availability"
+        'm.top.omniturePageType = "livetv_unavailable"
+        'trackScreenView()
         
         m.top.station = invalid
     else if stations.count() = 1 then
@@ -761,9 +771,9 @@ sub selectStation()
         m.liveTVSelection.visible = true
         m.stations.setFocus(true)
        
-        m.top.omnitureName = "livetv/provider/select"
-        m.top.omniturePageType = "provider_select"
-        trackScreenView()
+        'm.top.omnitureName = "livetv/provider/select"
+        'm.top.omniturePageType = "provider_select"
+        'trackScreenView()
     end if
 end sub
 
