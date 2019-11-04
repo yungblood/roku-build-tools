@@ -11,7 +11,7 @@ sub initializeAdobe()
         m.persistentParams["siteCode"] = "cbscom"
         m.persistentParams["siteEdition"] = getCurrentLocale()
         m.persistentParams["siteType"] = "roku tv ott|" + lCase(getModel())
-        m.persistentParams["brandPlatformId"] = "cbs" + lCase(getUserCountryCode()) + "_ott_roku"
+        m.persistentParams["brandPlatformId"] = "cbscom_ott_roku"
         m.persistentParams["sitePrimaryRsid"] = config.omnitureEvar5
         m.persistentParams["userStatus"] = user.trackingStatus
         m.persistentParams["mediaPartnerId"] = "cbs_roku_app"
