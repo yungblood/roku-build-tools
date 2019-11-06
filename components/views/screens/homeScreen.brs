@@ -303,57 +303,30 @@ sub onRowItemFocused(nodeEvent as object)
 end sub
 
 sub onRowItemSelected(nodeEvent as object)
-'? "YB-onRowItemSelected"
     indices = nodeEvent.getData()
-    '? "YB-indices: ", indices
     row = m.list.content.getChild(indices[0])
     'add 1 to rowPosition because indeces doesn't count the marquee/hero row.
     rowPosition = indices[0] + 1
     if row <> invalid then
         index = indices[1]
-        '? "YB-row:", row
         item = row.getChild(index)
         if item <> invalid then
-            '? "YB-item:", item
-            '? "YB-item.subtype():",item.subtype()
-            '? "YB-item.sections:",item.sections
-            '? "YB-item.json:",item.json
-            if item.json.doesExist("channelStreams") then
-                '? "YB-item.json.channelStreams:",item.json.channelStreams[0]
-                '? "YB-item.json.channelStreams.streamContent:",item.json.channelStreams[0].streamContent
-            end if
-            'omnitureData = {}
-            'omnitureData = getOmnitureData(row, index, iif(isSubscriber(m.top), "pay", "free"))
             omnitureData = getOmnitureDataV2(row, index, rowPosition)
             omnitureData["rowHeaderTitle"] = row.title
-            'if item.subtype() = "Episode" or item.subtype() = "Movie" then
-                'omnitureData = getOmnitureData(row, index, "more info", "overlay")
-                'm.top.additionalContext = {}
-                'm.top.omnitureData = omnitureData
-                'trackScreenAction("trackPodSelect", omnitureData)
-            'end if
             if row.subtype() = "ContinueWatching" or row.subtype() = "ShowHistory" then
-                'additionalContext = {}
                 event = "trackContinueWatching"
-                'sectionName = "continue watching"
                 omnitureData["rowHeaderTitle"] = "continue watching"
-                'omnitureData = getOmnitureData(row, index, sectionName, "resume")
                 if item.hasNewEpisodes = true then
-                    'omnitureData["episodeBadge"] = "true"
-                    'omnitureData["episodeBadgeLabel"] = "new"
+                    omnitureData["episodeBadge"] = "true"
+                    omnitureData["episodeBadgeLabel"] = "new"
                     omnitureData["showBadgeLabel"] = "new"
-                'else
-                    'omnitureData["episodeBadge"] = "false"
+                else
+                    omnitureData["episodeBadge"] = "false"
                 end if
 
-                'additionalContext["mediaResume"] = "true"
-                'additionalContext["mediaResumeSource"] = "continue watching"
                 if row.subtype() = "ShowHistory" then
                     event = "trackShowsYouWatch"
-                    'sectionName = "shows you watch"
                     omnitureData["rowHeaderTitle"] = "shows you watch"
-                    'additionalContext["mediaResumeSource"] = "shows you watch"
-                    'additionalContext["mediaResumeSourceShow"] = item.title
                     
                     config = getGlobalField("config")
                     if config <> invalid and config.enableTaplytics = true then
@@ -362,8 +335,6 @@ sub onRowItemSelected(nodeEvent as object)
                             taplyticsApi.callFunc("logEvent", { eventName: event, eventValue: 1 })
                         end if
                     end if
-                else
-                    'additionalContext["mediaResumeSourceShow"] = item.showName + " - " + item.title
                 end if
                 
                 showList = ""
@@ -380,31 +351,20 @@ sub onRowItemSelected(nodeEvent as object)
                         end if
                     next
                 end if
-                'additionalContext["continueWatchingShowsList"] = showList
-                'omnitureData["continueWatchingShowsList"] = showList
-                'm.top.additionalContext = additionalContext
                 m.top.omnitureData = omnitureData
-
-                'trackScreenAction(event, omnitureData)
             end if
             m.top.itemSelected = item
-            ? "YB-omnitureData:",omnitureData
             trackScreenAction("trackRowHeader", omnitureData)
         end if
     end if
 end sub
 
 sub onItemSelected(nodeEvent as object)
-'? "YB-onItemSelected"
     row = nodeEvent.getRoSGNode()
     if row <> invalid then
         index = nodeEvent.getData()
         item = row.content.getChild(index)
         if item <> invalid then
-            '? "YB-item:", item
-            '? "YB-item.subtype():",item.subtype()
-            '? "YB-item.sections:",item.sections
-            '? "YB-item.json:",item.json
             link = item.deeplink
             link = link.replace("http://www.cbs.com/", "")
             link = link.replace("https://www.cbs.com/", "")
@@ -415,19 +375,12 @@ sub onItemSelected(nodeEvent as object)
             omnitureData["targetType"] = link.split("/")[0]
             omnitureData["targetUrl"] = item.deeplink
             trackScreenAction("trackHero", omnitureData)
-'            ? omnitureData
-'            if item.subtype() = "Episode" or item.subtype() = "Movie" then
-'                omnitureData = getOmnitureData(row, index, "more info", "overlay")
-'                m.top.omnitureData = omnitureData
-'                trackScreenAction("trackPodSelect", omnitureData)
-'            end if
             m.top.itemSelected = item
         end if
     end if
 end sub
 
 sub onMenuItemSelected(nodeEvent as object)
-? "YB-onMenuItemSelected"
     selection = nodeEvent.getData()
     if selection = "home" then
         'only change selection focus area after content is loaded
