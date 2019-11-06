@@ -76,7 +76,6 @@ sub trackScreenAction(actionName as string, params = {} as object, screenName = 
     allParams.append(m.persistentParams)
     allParams.append(params)
     trackAction(actionName, allParams, events)
-    ? "YB-trackAction(";actionName;",";allParams;",";events;")"
 end sub
 
 function getOmnitureDataV2(row as object, index as integer, rowPosition = 0 as integer) as object
