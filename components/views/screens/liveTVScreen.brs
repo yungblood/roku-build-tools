@@ -228,8 +228,6 @@ sub onScheduleItemFocused(nodeEvent as object)
 end sub
 
 sub onScheduleItemSelected(nodeEvent as object)
-    trackScreenAction("trackLiveTvSchedule", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType)
-    
     'if m.scheduleDetails.visible then
         showOverlay(false, false)
     'else
@@ -818,6 +816,7 @@ sub showOverlay(showChannels = false as boolean, resetIndex = true as boolean)
             m.scheduleGrid.jumpToItem = 0
         end if
         m.scheduleGrid.setFocus(true)
+        trackScreenAction("trackLiveTvSchedule", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType)
     end if
 end sub
 
