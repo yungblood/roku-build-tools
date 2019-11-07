@@ -78,6 +78,74 @@ sub trackScreenAction(actionName as string, params = {} as object, screenName = 
     trackAction(actionName, allParams, events)
 end sub
 
+function getOmnitureDataV2(row as object, index as integer, rowPosition = 0 as integer) as object
+    data = {}
+
+    item = invalid
+    if row <> invalid then
+        if row.doesExist("title") then
+            rowTitle = Lcase(row.title)
+            if rowTitle.Instr(0, "daytime") > -1 then
+                data["showDaypart"] = "daytime"
+            else if rowTitle.Instr(0, "originals") > -1 then
+                data["showDaypart"] = "originals"
+            else if rowTitle.Instr(0, "late night") > -1 then
+                data["showDaypart"] = "latenight"
+            end if
+        end if
+        if row.subtype() = "Show" or row.subtype() = "RelatedShow" or row.subtype() = "ShowGroupItem" or row.subtype() = "SearchResults" then
+            if index = -1 then
+                item = row
+            else
+                item = row.dynamicPlayEpisode
+            end if
+        else if row.content <> invalid and isSGNode(row.content) then
+            item = row.content.getChild(index)
+        else
+            item = row.getChild(index)
+        end if
+    end if
+    if index = invalid then index = 0
+    
+    data["rowHeaderPosition"] = asString(rowPosition) + ":" + asString(index)
+    if item <> invalid then
+        if item.subtype() = "Episode" then
+            if not isNullOrEmpty(item.json.primaryCategoryName) then
+                data["showDaypart"] = Lcase(item.json.primaryCategoryName.split("/")[0])
+            end if
+            data["showSeriesId"] = item.showID
+            data["showSeriesTitle"] = item.showName
+            data["showSeasonNumber"] = item.SEASONNUMBER
+            data["showEpisodeNumber"] = item.EPISODENUMBER
+            data["showEpisodeId"] = item.id
+            data["showEpisodeLabel"] = item.title
+            data["showAirDate"] = item.airDateString
+            data["showGenre"] = item.topLevelCategory
+        else if item.subtype() = "LiveFeed" then
+            'TODO: Figure out if anything should be put here... 
+        else if item.subtype() = "Show" or item.subtype() = "RelatedShow" or item.subtype() = "ShowGroupItem" then
+            data["showSeriesId"] = item.id
+            data["showSeriesTitle"] = item.title
+        else if item.subtype() = "SearchResult" then
+            'data["showEpisodeId"] = item.id
+            'data["showEpisodeLabel"] = item.title
+            'TODO: Figure out if anything should be put here... probably "searchTerms" will be from component script. 
+        else if item.subtype() = "LiveTVChannel" then
+            data["liveTvChannel"] = item.title
+            if item.scheduleType = "local" then
+                data["stationCode"] = item.title
+            end if
+        else if item.subtype() = "Movie" then
+            data["movieId"] = asString(item.id)
+            data["movieTitle"] = item.title
+        else if item.subtype() = "MarqueeSlide" then
+            data["showSeriesId"] = item.showID
+            data["showSeriesTitle"] = item.TITLE
+        end if
+    end if
+    return data
+end function
+
 function getOmnitureData(row as object, index as integer, podText = "" as string, podType = "" as string) as object
     'podType|podText|podSection|podPosition|podTitle
     data = {}
