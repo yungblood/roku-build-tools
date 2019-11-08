@@ -32,18 +32,21 @@ def environmentMap = [
             "BUILD_ENV" : "testwww",
             "CONFIG_FILE" : "pkg:/config-staging.json",
             "ANALYTICS_SSL" : "false",
+            "MEDIAHEARTBEAT_SSL" : "false",
         ],
         "qa-prod" : [
             "BUILD_TYPE" : "qa",
             "BUILD_ENV" : "prod",
             "CONFIG_FILE" : "pkg:/config.json",
             "ANALYTICS_SSL" : "true",
+            "MEDIAHEARTBEAT_SSL" : "true",
         ],
         "cert-prod" : [
             "BUILD_TYPE" : "cert",
             "BUILD_ENV" : "prod",
             "CONFIG_FILE" : "pkg:/config.json",
             "ANALYTICS_SSL" : "true",
+            "MEDIAHEARTBEAT_SSL" : "true",
         ],
     ],
     "ca" : [
@@ -62,18 +65,21 @@ def environmentMap = [
             "BUILD_ENV" : "testwww",
             "CONFIG_FILE" : "pkg:/config-staging.json",
             "ANALYTICS_SSL" : "false",
+            "MEDIAHEARTBEAT_SSL" : "false",
         ],
         "qa-prod" : [
             "BUILD_TYPE" : "qa",
             "BUILD_ENV" : "prod",
             "CONFIG_FILE" : "pkg:/config.json",
             "ANALYTICS_SSL" : "true",
+            "MEDIAHEARTBEAT_SSL" : "true",
         ],
         "cert-prod" : [
             "BUILD_TYPE" : "cert",
             "BUILD_ENV" : "prod",
             "CONFIG_FILE" : "pkg:/config.json",
             "ANALYTICS_SSL" : "true",
+            "MEDIAHEARTBEAT_SSL" : "true",
         ],
     ]
 ]
