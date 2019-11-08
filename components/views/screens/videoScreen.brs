@@ -516,7 +516,7 @@ sub onEpisodeLoaded(nodeEvent as object)
     end if
     user = getGlobalField("user")
     if user.packageName = "Commercial Free" and m.episode.json.mediaType <> "Promo Full Episode" and (m.episode.json.mediaType = "Full Episode" or m.episode.json.mediaType = "AA Original" or m.episode.json.mediaType = "") then
-            m.top.useDai = false
+        m.top.useDai = false
     end if
 '   -------------------- end ------------------   
  
@@ -741,12 +741,12 @@ sub onAdPodComplete()
     if m.videoComplete then
         m.top.close = true
     else
-        if m.resumePoint > 0 then
-            m.video.seek = m.resumePoint
-        end if
         if not m.top.close then
             m.video.control = "play"
             m.video.setFocus(true)
+        end if
+        if m.resumePoint > 0 then
+            m.video.seek = m.resumePoint
         end if
     end if
 end sub

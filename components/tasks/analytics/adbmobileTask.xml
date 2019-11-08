@@ -30,5 +30,23 @@
   <script type="text/brightscript" uri="pkg:/components/tasks/analytics/adbmobileTask.brs"/>
   <!-- Replace with correct location if needed -->
   <script type="text/brightscript" uri="pkg:/components/services/adobe/adbmobile.brs"/>
+    <script type="text/brightscript" uri="pkg:/source/framework/components/channelStore.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/application.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/arrays.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/debug.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/device.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/cookies.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/base64.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/bits.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/xml.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/web.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/fileSystem.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/encryption.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/conversion.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/registry.brs" />
 
 </component>

@@ -10,6 +10,7 @@
     <interface>
         <field id="json" type="assocarray" onChange="onJsonChanged" />
         
+        <field id="type" type="string" />
         <field id="watchNextType" type="string" />
         <field id="subtitle" type="string" />
         <field id="callToAction" type="string" />

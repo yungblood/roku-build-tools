@@ -11,5 +11,9 @@
         <field id="productCode" type="string" />
         <field id="vendor" type="string" />
         <field id="vendorProductCode" type="string" />
+
+        <field id="liveDate" type="time" />
+        <field id="createdDate" type="time" />
+        <field id="expires" type="time" />
     </interface>
 </component>
