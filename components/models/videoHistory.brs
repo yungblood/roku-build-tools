@@ -27,6 +27,6 @@ sub onContentChanged(nodeEvent as object)
     for each episode in episodes
         cache[episode.id] = episode.resumePoint
     next
-stop
+
     m.top.cache = cache
 end sub
