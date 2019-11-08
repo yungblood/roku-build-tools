@@ -194,16 +194,6 @@ sub onFocusChanged()
 end sub
 
 sub onContentReady()
-    if m.video.content <> invalid then
-        if m.episode.isLive then
-            'ensure the required live streaming settings are in place
-            m.video.subtitleConfig = { trackName: "eia608/1" }
-            m.video.streamFormat = "hls"
-            m.video.switchingStrategy = "full-adaptation"
-            m.video.playStart = createObject("roDateTime").asSeconds() + 999999
-            m.enableUI = false
-        end if
-    end if
     if m.top.useDai and m.video.content <> invalid then
         if m.video.content.streamDetails <> invalid then
             m.debugInfo.text = "DAI Stream ID: " + m.video.content.streamDetails.streamID
