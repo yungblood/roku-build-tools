@@ -50,7 +50,7 @@ sub onFocusChanged(nodeEvent as object)
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
-    ?"appScene.onKeyEvent", key, press
+    '?"appScene.onKeyEvent", key, press
     if key = "back" then
         if not m.allowBackKey then
             print "***** Key Lockout is Active, so keypress eaten"
@@ -814,7 +814,7 @@ sub showShowInfoScreen(showID as string)
     addToNavigationStack(screen)
 end sub
 
-sub showEpisodeScreen(episode as object, episodeID = "" as string, showID = "" as string, autoPlay = false as boolean, source = invalid as object, replaceCurrent = false as boolean)
+sub showEpisodeScreen(episodeID = "" as string, showID = "" as string, autoPlay = false as boolean, source = invalid as object, replaceCurrent = false as boolean)
     screen = createObject("roSGNode", "EpisodeScreen")
     if source <> invalid then
         screen.omnitureName = source.omnitureName
@@ -832,11 +832,7 @@ sub showEpisodeScreen(episode as object, episodeID = "" as string, showID = "" a
         end if
     end if
     screen.autoPlay = autoPlay
-    if episode <> invalid then
-        screen.episode = episode
-    else
-        screen.episodeID = episodeID
-    end if
+    screen.episodeID = episodeID
     screen.showID = showID
 
     'screen.observeField("itemSelected", "onItemSelected")
@@ -946,10 +942,10 @@ function openDeepLink(params as object, item = invalid as object) as boolean
                 return true
             end if
         else if params.mediaType = "episode" or params.mediaType = "short-form" then
-            showEpisodeScreen(invalid, params.contentID, "", true)
+            showEpisodeScreen(params.contentID, "", true)
             return true
         else if params.mediaType = "episodedetails" then
-            showEpisodeScreen(invalid, params.contentID)
+            showEpisodeScreen(params.contentID)
             return true
         else if params.mediaType = "movie" then
             showMovieScreen(invalid, params.contentID, true)
@@ -1077,7 +1073,7 @@ function goBackInNavigationStack(setFocus = true as boolean) as boolean
     if m.navigationStack.count() > 1 then
         episodeID = ""
         screen = m.navigationStack.pop()
-        if isSGNode(screen) then
+        if screen <> invalid then
             screen.visible = false
             screen.unobserveField("close")
             if screen.subtype().inStr("VideoScreen") >= 0 then
@@ -1098,25 +1094,14 @@ function goBackInNavigationStack(setFocus = true as boolean) as boolean
         end if
         if setFocus then
             screen = m.navigationStack.peek()
-            if isSGNode(screen) then
-                if screen.subtype() = "EpisodeScreen" then
-                    if not isNullOrEmpty(episodeID) then
-                        ' update the episode screen to the last viewed video
-                        screen.episodeID = episodeID
-                    end if
-                end if
-                screen.visible = true
-                screen.setFocus(true)
-            else
-                history = m.navigationStack.pop()
-                if history.screenType = "HomeScreen" then
-                    showHomeScreen()
-                else if history.screenType = "ShowScreen" then
-                    showShowScreen(history.showID)
-                else if history.screenType = "EpisodeScreen" then
-                    showEpisodeScreen(history.episode)
+            if screen.subtype() = "EpisodeScreen" then
+                if not isNullOrEmpty(episodeID) then
+                    ' update the episode screen to the last viewed video
+                    screen.episodeID = episodeID
                 end if
             end if
+            screen.visible = true
+            screen.setFocus(true)
             
             ' close the wait spinner, if open
             hideSpinner()
@@ -1130,35 +1115,14 @@ end function
 sub addToNavigationStack(screen as object, setFocus = true as boolean, replaceCurrent = false as boolean)
     if m.navigationStack.count() > 0 then
         previous = m.navigationStack.peek()
-        if isSGNode(previous) then
+        if previous <> invalid then
             previous.visible = false
         end if
         if replaceCurrent then
             m.navigationStack.pop()
-            if isSGNode(previous) then
+            if previous <> invalid then
                 previous.unobserveField("close")
                 m.screens.removeChild(previous)
-            end if
-        else
-            if isSGNode(previous) and getGlobalField("extremeMemoryManagement") = true then
-                history = {
-                    screenType: previous.subtype()
-                }
-                if history.screenType = "HomeScreen" then
-                else if history.screenType = "ShowScreen" then
-                    history.showID = previous.showID
-                else if history.screenType = "EpisodeScreen" then
-                    history.episode = previous.episode
-                else
-                    history = invalid
-                end if
-                if history <> invalid then
-                    previous.unobserveField("close")
-                    m.screens.removeChild(previous)
-                    m.navigationStack.pop()
-                    m.navigationStack.push(history)
-                    ?runGarbageCollector()
-                end if
             end if
         end if
     end if
@@ -1284,7 +1248,7 @@ sub onItemSelected(nodeEvent as object)
                 ' reset the autoplay flag to false to prevent future autoplay
                 source.autoPlay = false
             end if
-            showEpisodeScreen(item, "", "", autoplay, source, false)
+            showEpisodeScreen(item.id, "", autoplay, source, false)
         else if item.subtype() = "LiveTVChannel" then
             setGlobalField("lastLiveChannel", item.scheduleType)
             showLiveTVScreen()
@@ -1295,7 +1259,7 @@ sub onItemSelected(nodeEvent as object)
             if row <> invalid and row.subtype() = "ShowHistory" and row.mode = "recentlyWatched" then
                 ' In recently watched mode, we link directly to the dynamic play
                 ' episode details screen
-                showEpisodeScreen(invalid, "", item.id)
+                showEpisodeScreen("", item.id)
             else
                 showShowScreen(item.id, "", source)
             end if

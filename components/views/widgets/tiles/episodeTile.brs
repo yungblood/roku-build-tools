@@ -46,7 +46,7 @@ sub updateResumePoint()
             m.progressBar.maxValue = m.episode.length
             m.progressBar.value = m.episode.resumePoint
             if m.progressBar.value / m.progressBar.maxValue > .97 then
-                m.progressBar.value = 1
+                m.progressBar.value = m.progressBar.maxValue
             end if
             if m.progressBar.value / m.progressBar.maxValue > .05 then
                 m.progressBar.visible = true
@@ -120,7 +120,6 @@ sub updatePoster()
                 uri = uri + "?"
             end if
             uri = uri + "cachebuster=" + createObject("roDateTime").asSeconds().toStr()
-?"updatePoster: ";uri
             if m.updateTimer = invalid then
                 m.updateTimer = createObject("roSGNode", "Timer")
                 m.updateTimer.observeField("fire", "updatePoster")

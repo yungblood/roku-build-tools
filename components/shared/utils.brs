@@ -1,6 +1,6 @@
 sub showSpinner(context = m.top as object, ignoreContextVisibility = false as boolean)
     if ignoreContextVisibility or context.visible then
-        debugPrint(context.subtype(), "showSpinner()", 0)
+        debugPrint(context.subtype(), "showSpinner()", 2)
         scene = context.getScene()
         if scene <> invalid then
             scene.callFunc("showLoading")
@@ -10,7 +10,7 @@ end sub
 
 sub hideSpinner(context = m.top as object, ignoreContextVisibility = false as boolean)
     if ignoreContextVisibility or context.visible then
-        debugPrint(context.subtype(), "hideSpinner()", 0)
+        debugPrint(context.subtype(), "hideSpinner()", 2)
         scene = context.getScene()
         if scene <> invalid then
             scene.callFunc("hideLoading")

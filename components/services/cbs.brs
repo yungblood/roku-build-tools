@@ -206,6 +206,12 @@ function cbs_getMovie(movieID as string, populateStream = false as boolean) as o
                         movie.trailer = trailer
                     end if
                     movie.resumePoint = m.getResumePoint(movieID)
+                    ' a resume point of -1 means the video has been fully watched
+                    ' so set the resume point to the full length, so progress bars
+                    ' are correctly shown
+                    if movie.resumePoint = -1 then
+                        movie.resumePoint = movie.length
+                    end if
                     if populateStream then
                         m.populateStream(movie)
                     end if
@@ -237,6 +243,12 @@ function cbs_getEpisode(episodeID as string, populateStream = false as boolean) 
                 end if
                 episode.json = item
                 episode.resumePoint = m.getResumePoint(episodeID)
+                ' a resume point of -1 means the video has been fully watched
+                ' so set the resume point to the full length, so progress bars
+                ' are correctly shown
+                if episode.resumePoint = -1 then
+                    episode.resumePoint = episode.length
+                end if
                 if populateStream then
                     m.populateStream(episode)
                 end if
@@ -1375,7 +1387,13 @@ function cbs_getResumePoint(contentID as String) as integer
         url = addQueryString(url, "contentId", contentID)
         response = m.makeRequest(url, "GET")
         if isAssociativeArray(response) and response.success = true then
-            return asInteger(response.mediaTime) - m.resumeOffset
+            if response.mediaTime = 0 and response.hasWatched = true then
+                return -1
+            end if
+            resumePoint = asInteger(response.mediaTime) - m.resumeOffset
+            if resumePoint < 0 then
+                resumePoint = 0
+            end if
         end if
     end if
     return 0

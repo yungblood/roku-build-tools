@@ -13,7 +13,7 @@ function newSpotX() as object
     this.getCampaign        = spotx_getCampaign
     this.makeRequest        = spotx_makeRequest
     
-    setLogLevel(1)
+    setLogLevel(0)
     
     return this
 end function

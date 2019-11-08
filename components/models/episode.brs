@@ -92,7 +92,7 @@ sub onJsonChanged()
         if json.thumbnailSet <> invalid then
             ' Sort by width (descending)
             json.thumbnailSet.sortBy("width", "r")
-            thumbnails.Append(json.thumbnailSet)
+            thumbnails.append(json.thumbnailSet)
         end if
         
         if thumbnails.count() > 0 then

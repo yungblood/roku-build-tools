@@ -125,7 +125,7 @@ End Function
 
 Function AsInteger(input As Dynamic, defaultValue = 0 As Integer) As Integer
     If input = invalid Then
-        Return 0
+        Return defaultValue
     Else If IsString(input) Then
         Return input.ToInt()
     Else If IsInteger(input) Then
@@ -144,7 +144,7 @@ End Function
 
 Function AsFloat(input As Dynamic, defaultValue = 0.0 As Float) As Float
     If input = invalid Then
-        Return 0.0
+        Return defaultValue
     Else If IsString(input) Then
         Return input.ToFloat()
     Else If IsInteger(input) Then

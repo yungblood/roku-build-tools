@@ -948,7 +948,7 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
 ?"---- START PLAYBACK ----"
     showSpinner()
 
-    ?runGarbageCollector()
+    runGarbageCollector()
     if m.episode <> invalid then
         if canWatch(m.episode, m.top) then
             user = getGlobalField("user")

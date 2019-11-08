@@ -57,7 +57,7 @@ sub onVisibleChanged()
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
-    ?"HomeScreen.onKeyEvent: ";key,press
+    '?"HomeScreen.onKeyEvent: ";key,press
     if press then
         if key = "down" then
             if m.menu.isInFocusChain() then
