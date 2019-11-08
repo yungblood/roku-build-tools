@@ -52,7 +52,4 @@ sub doWork()
             m.top.nextEpisode = invalid
         end if
     end if
-    if episode <> invalid then
-        m.top.Episode = episode
-    end if
 end sub
