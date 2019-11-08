@@ -12,7 +12,8 @@
         <field id="BLKeyPress" type="string" alwaysNotify="true" />
         <field id="inAd" type="boolean" alwaysNotify="true"/>
         <field id="adExited" type="boolean" alwaysNotify="true" value="false" />
-        
+
+        <field id="brightlineDirect" type="node" />
      </interface>
 
 </component>
