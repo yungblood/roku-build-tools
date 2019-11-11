@@ -1382,6 +1382,7 @@ function cbs_getContinueWatching(page = 1 as integer, count = 20 as integer) as 
 end function
 
 function cbs_getResumePoint(contentID as String) as integer
+    resumePoint = 0
     if m.isAuthenticated() then
         url = m.apiBaseUrl + "v3.0/roku/video/streams.json"
         url = addQueryString(url, "contentId", contentID)
@@ -1396,7 +1397,7 @@ function cbs_getResumePoint(contentID as String) as integer
             end if
         end if
     end if
-    return 0
+    return resumePoint
 end function
 
 function cbs_isOverStreamLimit() as boolean
