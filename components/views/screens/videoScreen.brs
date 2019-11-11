@@ -194,6 +194,14 @@ sub onFocusChanged()
 end sub
 
 sub onContentReady()
+'for live content we need to get the correct assetTypes value or leave it out to work
+    if m.episode.isLive then
+        tempUrl=m.video.content.url
+        if tempUrl.right(28) = "&assetTypes=StreamPack%7COTT" then
+            tempUrl=tempUrl.left(len(tempUrl)-28)
+            m.video.content.url=tempUrl
+        end if
+    end if
     if m.top.useDai and m.video.content <> invalid then
         if m.video.content.streamDetails <> invalid then
             m.debugInfo.text = "DAI Stream ID: " + m.video.content.streamDetails.streamID
