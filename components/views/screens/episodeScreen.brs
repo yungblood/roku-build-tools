@@ -1,4 +1,6 @@
 sub init()
+    m.top.omniturePageType = "video_details"
+    
     m.top.observeField("focusedChild", "onFocusChanged")
     m.top.observeField("visible", "onVisibleChanged")
     
@@ -79,6 +81,10 @@ sub onEpisodeChanged(nodeEvent as object)
     hideSpinner()
     episode = nodeEvent.getData()
     if episode <> invalid then
+        pageName = "/shows/" + lCase(episode.showName) + "/video-details/" + lCase(episode.title)
+        m.top.omnitureName = pageName
+        trackScreenView()
+
         m.showTitle.text = episode.showName
         m.episodeTitle.text = episode.title
         m.episodeDescription.text = episode.description
@@ -91,7 +97,7 @@ sub onEpisodeChanged(nodeEvent as object)
         subtitle = subtitle + " | " + episode.airDateString
         m.episodeSubtitle.text = subtitle
         m.poster.uri = getImageUrl(episode.thumbnailUrl, m.poster.width)
- 
+
         ' if watch history exists leave progress bar at 100%
         if episode.resumePoint > 0 then
             m.progressBar.maxValue = episode.length

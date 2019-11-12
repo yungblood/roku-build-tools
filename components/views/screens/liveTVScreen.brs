@@ -443,9 +443,6 @@ sub onPinDialogButtonSelected(nodeEvent as object)
 
         m.top.close = true
     else if button = "SUBMIT" then
-        params["parentalControlsEnterPinOk"] = "1"
-        trackScreenAction("trackparentalControlsEnterPinOk", params)
-
         pinPad = dialog.findNode("pinPad")
         success = true
         if pinPad <> invalid then
@@ -456,6 +453,8 @@ sub onPinDialogButtonSelected(nodeEvent as object)
             end if
         end if
         if success then
+            params["parentalControlsEnterPinOk"] = "1"
+            trackScreenAction("trackparentalControlsEnterPinOk", params)
             startPlayback(dialog.stream)
         end if
     end if

@@ -817,8 +817,6 @@ end sub
 sub showEpisodeScreen(episodeID = "" as string, showID = "" as string, autoPlay = false as boolean, source = invalid as object, replaceCurrent = false as boolean)
     screen = createObject("roSGNode", "EpisodeScreen")
     if source <> invalid then
-        screen.omnitureName = source.omnitureName
-        screen.omniturePageType = source.omniturePageType
         screen.omnitureData = source.omnitureData
         if source.hasField("additionalContext") then
             screen.additionalContext = source.additionalContext
@@ -1145,6 +1143,10 @@ sub onScreenClosed(nodeEvent as object)
     end if
     goBackInNavigationStack()
 end sub
+
+function getPreviousScreen() as object
+    return m.navigationStack[m.navigationStack.count() - 2]
+end function
 
 function getCurrentScreen() as object
     return m.navigationStack.peek()
