@@ -115,7 +115,7 @@ sub doWork()
             if not isNullOrEmpty(optimizely) then
                 optimizely = optimizely + "|"
             end if
-            optimizely = optimizely + experiment.id + experiment.variant
+            optimizely = optimizely + experiment.id + ":" + experiment.variant
         end if
     next
     omnitureParams = {}

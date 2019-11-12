@@ -31,7 +31,7 @@ end sub
 
 sub updateResumePoint()
     if m.episode <> invalid then
-'or if watch history exists leave progress bar at 100%
+        ' if watch history exists leave progress bar at 100%
         if m.episode.resumePoint <> invalid and m.episode.resumePoint > 0 then
             if m.progressBar = invalid then
                 m.progressBar = createObject("roSGNode", "ProgressBar")

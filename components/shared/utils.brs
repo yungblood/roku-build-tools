@@ -613,3 +613,15 @@ function getShowFromCache(showID as string) as object
     return invalid
 end function
 
+sub updateGlobalResumePoint(episodeID as string, resumePoint as integer)
+    user = getGlobalField("user")
+    if user <> invalid then
+        history = user.videoHistory
+        if history <> invalid then
+            cache = {}
+            cache.append(history.cache)
+            cache[episodeID] = resumePoint
+            history.cache = cache
+        end if
+    end if
+end sub

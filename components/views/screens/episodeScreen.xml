@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component name="EpisodeScreen" extends="BaseScreen">
     <script type="text/brightscript" uri="pkg:/components/views/screens/episodeScreen.brs" />
-    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
     <interface>
         <field id="episodeID" type="string" onChange="onEpisodeIDChanged" alwaysNotify="true" />
         <field id="episode" type="node" onChange="onEpisodeChanged" alwaysNotify="true" />

@@ -36,8 +36,7 @@ sub onJsonChanged()
         
         m.top.packageName = getPackageName(json.cbsPackageInfo)
         
-        ' TODO: We're settting pin to an empty string for now, until
-        '       we're ready to enable parental controls
+        ' TODO: Set pin to an empty string to disable parental controls
         m.top.parentalControlPin = json.parentalControlPIN
         m.top.parentalControlLiveTV = (json.parentalControlLivetvPinEnabled = true)
         if not isNullOrEmpty(json.parentalControlRestrictions) then
