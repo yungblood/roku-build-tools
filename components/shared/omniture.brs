@@ -84,8 +84,8 @@ function getOmnitureDataV2(row as object, index as integer, rowPosition = 0 as i
     item = invalid
     if row <> invalid then
         if row.doesExist("title") then
-            rowTitle = Lcase(row.title)
-            if rowTitle.Instr(0, "daytime") > -1 then
+            rowTitle = lCase(row.title)
+            if rowTitle.inStr(0, "daytime") > -1 then
                 data["showDaypart"] = "daytime"
             else if rowTitle.Instr(0, "originals") > -1 then
                 data["showDaypart"] = "originals"
@@ -110,13 +110,13 @@ function getOmnitureDataV2(row as object, index as integer, rowPosition = 0 as i
     data["rowHeaderPosition"] = asString(rowPosition) + ":" + asString(index)
     if item <> invalid then
         if item.subtype() = "Episode" then
-            if not isNullOrEmpty(item.json.primaryCategoryName) then
-                data["showDaypart"] = Lcase(item.json.primaryCategoryName.split("/")[0])
+            if not isNullOrEmpty(item.primaryCategoryName) then
+                data["showDaypart"] = lCase(item.primaryCategoryName.split("/")[0])
             end if
             data["showSeriesId"] = item.showID
             data["showSeriesTitle"] = item.showName
-            data["showSeasonNumber"] = item.SEASONNUMBER
-            data["showEpisodeNumber"] = item.EPISODENUMBER
+            data["showSeasonNumber"] = item.seasonNumber
+            data["showEpisodeNumber"] = item.episodeNumber
             data["showEpisodeId"] = item.id
             data["showEpisodeLabel"] = item.title
             data["showAirDate"] = item.airDateString
@@ -140,7 +140,7 @@ function getOmnitureDataV2(row as object, index as integer, rowPosition = 0 as i
             data["movieTitle"] = item.title
         else if item.subtype() = "MarqueeSlide" then
             data["showSeriesId"] = item.showID
-            data["showSeriesTitle"] = item.TITLE
+            data["showSeriesTitle"] = item.title
         end if
     end if
     return data
@@ -205,7 +205,7 @@ sub trackVideoLoad(video as object, context as object)
     initializeAdobe()
 
     videoType = "vod:fullepisodes"
-    if video.subtype() = "Movie" then
+    if video.subtype() = "Movie" or video.subtype() = "Trailer" then
         videoType = "vod:movies"
     else if video.subtype() = "Station" or video.isLive then
         videoType = "live"

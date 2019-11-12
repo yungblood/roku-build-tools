@@ -10,7 +10,9 @@ sub onScreenVisibleChanged()
         if m.top.omnitureStateData = invalid then
             m.top.omnitureStateData = {}
         end if
-        trackScreenView(m.top.omnitureName, m.top.omnitureStateData)
+        if not isNullOrEmpty(m.top.omnitureName) then
+            trackScreenView(m.top.omnitureName, m.top.omnitureStateData)
+        end if
     end if
     m.visible = m.top.visible
 end sub

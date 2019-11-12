@@ -20,12 +20,12 @@ sub init()
     m.video.observeFieldScoped("trickPlayBarVisibilityHint", "onOverlayVisibilityHint")
     m.trickPlayVisible = false
 
-	m.replayGroup = m.top.findNode("replayGroup")
+    m.replayGroup = m.top.findNode("replayGroup")
     'child 0 is poster, child 1 is text
     'we are going to utilize this as a group item, so these operations will be done once in case the text is changed later in the xml
-	exrect = m.replayGroup.GetChild(1).boundingRect()
-	centerx = (1920 - exrect.width) / 2
-	m.replayGroup.GetChild(1).translation = [centerx, 860]
+    exrect = m.replayGroup.GetChild(1).boundingRect()
+    centerx = (1920 - exrect.width) / 2
+    m.replayGroup.GetChild(1).translation = [centerx, 860]
 
    ' if getGlobalField("extremeMemoryManagement") = true then
     if getModel().mid(0, 2).toInt() <= 35 then
@@ -505,18 +505,18 @@ sub onEpisodeLoaded(nodeEvent as object)
     task = nodeEvent.getRoSGNode()
     m.episode = nodeEvent.getData()
     m.top.episode = m.episode
-    
-'    if m.episode <> invalid and (m.episode.isLive or m.episode.isProtected) then
-'        m.top.useDai = false
-'    end if
 
 '   ---- According to the new DRM Logic on ticket 1031 -------
-    if m.episode <> invalid and m.episode.isLive then
-        m.top.useDai = false
-    end if
     user = getGlobalField("user")
-    if user.packageName = "Commercial Free" and m.episode.json.mediaType <> "Promo Full Episode" and (m.episode.json.mediaType = "Full Episode" or m.episode.json.mediaType = "AA Original" or m.episode.json.mediaType = "") then
-        m.top.useDai = false
+    rafMediaTypes = [
+        "Full Episode"
+        "AA Original"
+        ""
+    ]
+    if m.episode <> invalid then
+        if m.episode.isLive or (user.isAdFree and arrayContains(rafMediaTypes, m.episode.mediaType)) then
+            m.top.useDai = false
+        end if
     end if
 '   -------------------- end ------------------   
  
@@ -541,6 +541,89 @@ sub onEpisodeLoaded(nodeEvent as object)
         brightline = createObject("roSGNode", "BrightlineTask")
         brightline.control = "run"
         setGlobalField("brightline", brightline)    
+    end if
+
+    m.heartbeatContext = {}
+    m.omnitureParams = {}
+    m.endCardOmnitureParams = {}
+
+    m.heartbeatContext["screenName"] = m.top.omnitureName
+    m.heartbeatContext["showId"] = m.episode.showID
+    m.heartbeatcontext["showTitle"] = m.episode.showName
+
+    m.omnitureParams["showEpisodeTitle"] = m.episode.title
+    m.heartbeatContext["showEpisodeTitle"] = m.episode.title
+    m.omnitureParams["showSeriesId"] = m.episode.showID
+    m.endCardOmnitureParams["showSeriesId"] = m.episode.showID
+    m.omnitureParams["showEpisodeLabel"] = m.episode.title
+    m.endCardOmnitureParams["showEpisodeLabel"] = m.episode.title
+    if m.episode.showName <> "" then
+        m.omnitureParams["showEpisodeTitle"] = m.episode.showName + " - " + m.omnitureParams["showEpisodeTitle"]
+        m.heartbeatContext["showEpisodeTitle"] = m.episode.showName + " - " + m.omnitureParams["showEpisodeTitle"]
+        m.omnitureParams["showSeriesTitle"] = m.episode.showName
+        m.endCardOmnitureParams["showSeriesTitle"] = m.episode.showName
+    end if
+    m.omnitureParams["showEpisodeId"] = m.episode.id
+    m.heartbeatContext["showEpisodeId"] = m.episode.id
+    m.endCardOmnitureParams["showEpisodeId"] = m.episode.id
+    if m.episode.subtype() = "Movie" or m.episode.subtype() = "Trailer" then
+        m.omnitureParams.v38 = "vod:movies"
+        m.heartbeatContext["mediaContentType"] = "vod:movies"
+
+        m.heartbeatContext["movieId"] = m.episode.id
+        m.omnitureParams["movieId"] = m.episode.id
+        m.endCardOmnitureParams["movieId"] = m.episode.id
+        m.heartbeatcontext["movieTitle"] = m.episode.title
+        m.omnitureParams["movieTitle"] = m.episode.title
+        m.endCardOmnitureParams["movieTitle"] = m.episode.title
+    else if m.episode.isLive then
+        m.omnitureParams.v38 = "live"
+        m.heartbeatContext["mediaContentType"] = "live"
+    else if m.episode.isFullEpisode then
+        m.omnitureParams.v38 = "vod:fullepisodes"
+        m.heartbeatContext["mediaContentType"] = "vod:fullepisodes"
+    else
+        m.omnitureParams.v38 = "vod:clips"
+        m.heartbeatContext["mediaContentType"] = "vod:clips"
+    end if
+    if not isNullOrEmpty(m.episode.seasonNumber) then
+        m.heartbeatContext["showSeasoNumber"] = m.episode.seasonNumber
+        m.omnitureParams["showSeasonNumber"] = m.episode.seasonNumber
+        m.endCardOmnitureParams["showSeasonNumber"] = m.episode.seasonNumber
+    end if
+    if not isNullOrEmpty(m.episode.episodeNumber) then
+        m.heartbeatContext["showEpisodeNumber"] = m.episode.episodeNumber
+        m.omnitureParams["showEpisodeNumber"] = m.episode.episodeNumber
+        m.endCardOmnitureParams["showEpisodeNumber"] = m.episode.episodeNumber
+    end if
+    if not isNullOrEmpty(m.episode.primaryCategoryName) then
+        m.heartbeatContext["showDaypart"] = lCase(m.episode.primaryCategoryName.split("/")[0])
+        m.omnitureParams["showDaypart"] = lCase(m.episode.primaryCategoryName.split("/")[0])
+        m.endCardOmnitureParams["showDaypart"] = lCase(m.episode.primaryCategoryName.split("/")[0])
+    end if
+
+    m.omnitureParams.v36 = "false"
+    m.omnitureParams.v46 = ""
+    m.omnitureParams.v59 = iif(m.episode.subscriptionLevel = "FREE", "non-svod", "svod")
+    m.heartbeatContext["mediaSvodContentType"] = iif(m.episode.subscriptionLevel = "FREE", "free", "paid")
+    m.omnitureParams["mediaSvodContentType"] = iif(m.episode.subscriptionLevel = "FREE", "free", "paid")
+    m.endCardOmnitureParams["mediaSvodContentType"] = iif(m.episode.subscriptionLevel = "FREE", "free", "paid")
+    m.omnitureParams.pev2 = "video"
+    m.omnitureParams.pev3 = "video"
+
+    m.omnitureParams.v24 = m.vguid
+    m.omnitureParams.p24 = m.vguid
+
+    m.omnitureParams["showGenre"] = m.episode.genre
+    m.endCardOmnitureParams["showGenre"] = m.episode.genre
+    ' Unsure how to retrieve this, so commenting out for now
+    ' m.endCardOmnitureParams["showDaypart"] = ""
+    m.endCardOmnitureParams["showAirDate"] = m.episode.airDateIso
+    
+    if m.top.additionalContext <> invalid then
+        m.omnitureParams.append(m.top.additionalContext)
+        m.heartbeatContext.append(m.top.additionalContext)
+        m.top.additionalContext = {}
     end if
 
     m.top.content = m.episode
@@ -568,7 +651,18 @@ sub onEpisodeLoaded(nodeEvent as object)
 
         if isRestricted(m.episode, user) then
             hideSpinner()
-            showPinDialog("Enter your PIN to watch", ["SUBMIT", "CANCEL"], "onPinDialogButtonSelected", m.omnitureParams)
+            params = {}
+            params.append(m.omnitureParams)
+            scene = m.top.getScene()
+            if scene <> invalid then
+                prevScreen = scene.callFunc("getPreviousScreen")
+                if prevScreen <> invalid then
+                    ' Data is expecting the previous screen name, instead of the video screen,
+                    ' so we grab it and set it here
+                    params["screenName"] = prevScreen.omnitureName
+                end if
+            end if
+            showPinDialog("Enter your PIN to watch", ["SUBMIT", "CANCEL"], "onPinDialogButtonSelected", params)
         else
             resumePlayback()
         end if
@@ -578,6 +672,15 @@ end sub
 sub onPinDialogButtonSelected(nodeEvent as object)
     params = {}
     params.append(m.omnitureParams)
+    scene = m.top.getScene()
+    if scene <> invalid then
+        prevScreen = scene.callFunc("getPreviousScreen")
+        if prevScreen <> invalid then
+            ' Data is expecting the previous screen name, instead of the video screen,
+            ' so we grab it and set it here
+            params["screenName"] = prevScreen.omnitureName
+        end if
+    end if
 
     dialog = nodeEvent.getRoSGNode()
     button = nodeEvent.getData()
@@ -587,19 +690,18 @@ sub onPinDialogButtonSelected(nodeEvent as object)
 
         m.top.close = true
     else if button = "SUBMIT" then
-        params["parentalControlsEnterPinOk"] = "1"
-        trackScreenAction("trackparentalControlsEnterPinOk", params)
-
         pinPad = dialog.findNode("pinPad")
         success = true
         if pinPad <> invalid then
             user = getGlobalField("user")
             if user.parentalControlPin <> pinPad.pin then
                 success = false
-                showPinErrorDialog("Login Error", "Invalid PIN entered", ["CLOSE"], "onPinErrorDialogButtonSelected", m.omnitureParams)
+                showPinErrorDialog("Login Error", "Invalid PIN entered", ["CLOSE"], "onPinErrorDialogButtonSelected", params)
             end if
         end if
         if success then
+            params["parentalControlsEnterPinOk"] = "1"
+            trackScreenAction("trackparentalControlsEnterPinOk", params)
             resumePlayback()
         end if
     end if
@@ -1000,6 +1102,11 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                     custParams = custParams + "%26cpSession%3D0"
                 end if
                 adParams = config.fixedAdParams
+                if lCase(m.episode.genre) = "kids" then
+                    adParams = adParams + "&tfcd=1"
+                else
+                    adParams = adParams + "&tfcd=0"
+                end if
                 adParams = adParams + "&vguid=" + m.vguid
                 adParams = adParams + "&ppid=" + m.episode.adParams["ppid_encoded"]
                 adParams = adParams + "&vid=" + m.episode.id
@@ -1034,67 +1141,6 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                 if comscore <> invalid then
                     comscore.callFunc("reset", {})
                     comscore.content = m.episode
-                end if
-    
-                m.heartbeatContext = {}
-                m.heartbeatContext["screenName"] = m.top.omnitureName
-                m.heartbeatContext["showId"] = m.episode.showID
-                m.heartbeatcontext["showTitle"] = m.episode.showName
-    
-                m.omnitureParams = {}
-                m.omnitureParams["showEpisodeTitle"] = m.episode.title
-                m.heartbeatContext["showEpisodeTitle"] = m.episode.title
-                m.endCardOmnitureParams = {}
-                m.endCardOmnitureParams["showSeriesId"] = m.episode.showID
-                m.endCardOmnitureParams["showEpisodeLabel"] = m.episode.title
-                if m.episode.showName <> "" then
-                    m.omnitureParams["showEpisodeTitle"] = m.episode.showName + " - " + m.omnitureParams["showEpisodeTitle"]
-                    m.heartbeatContext["showEpisodeTitle"] = m.episode.showName + " - " + m.omnitureParams["showEpisodeTitle"]
-                    m.endCardOmnitureParams["showSeriesTitle"] = m.episode.showName
-                end if
-                m.omnitureParams["showEpisodeId"] = m.episode.id
-                m.heartbeatContext["showEpisodeId"] = m.episode.id
-                m.endCardOmnitureParams["showEpisodeId"] = m.episode.id
-                if m.episode.subtype() = "Movie" then
-                    m.omnitureParams.v38 = "vod:movies"
-                    m.heartbeatContext["mediaContentType"] = "vod:movies"
-                else if m.episode.isLive then
-                    m.omnitureParams.v38 = "live"
-                    m.heartbeatContext["mediaContentType"] = "live"
-                else if m.episode.isFullEpisode then
-                    m.omnitureParams.v38 = "vod:fullepisodes"
-                    m.heartbeatContext["mediaContentType"] = "vod:fullepisodes"
-                else
-                    m.omnitureParams.v38 = "vod:clips"
-                    m.heartbeatContext["mediaContentType"] = "vod:clips"
-                end if
-                if not isNullOrEmpty(m.episode.seasonNumber) then
-                    m.heartbeatContext["showSeasoNumber"] = m.episode.seasonNumber
-                end if
-                if not isNullOrEmpty(m.episode.episodeNumber) then
-                    m.heartbeatContext["showEpisodeNumber"] = m.episode.episodeNumber
-                end if
-                m.omnitureParams.v36 = "false"
-                m.omnitureParams.v46 = ""
-                m.omnitureParams.v59 = iif(m.episode.subscriptionLevel = "FREE", "non-svod", "svod")
-                m.heartbeatContext["mediaSvodContentType"] = iif(m.episode.subscriptionLevel = "FREE", "free", "paid")
-                m.omnitureParams.pev2 = "video"
-                m.omnitureParams.pev3 = "video"
-    
-                m.omnitureParams.v24 = m.vguid
-                m.omnitureParams.p24 = m.vguid
-
-                m.endCardOmnitureParams["showGenre"] = asString(m.episode.topLevelCategory)
-                ' Unsure how to retrieve this, so commenting out for now
-                ' m.endCardOmnitureParams["showDaypart"] = ""
-                m.endCardOmnitureParams["showSeasonNumber"] = asString(m.episode.seasonNumber)
-                m.endCardOmnitureParams["showEpisodeNumber"] = asString(m.episode.episodeNumber)
-                m.endCardOmnitureParams["showAirDate"] = asString(m.episode.airDateIso)
-                
-                if m.top.additionalContext <> invalid then
-                    m.omnitureParams.append(m.top.additionalContext)
-                    m.heartbeatContext.append(m.top.additionalContext)
-                    m.top.additionalContext = {}
                 end if
                 
                 m.episode.skipPreroll = skipPreroll

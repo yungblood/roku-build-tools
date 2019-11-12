@@ -238,6 +238,9 @@ function cbs_getEpisode(episodeID as string, populateStream = false as boolean) 
                     episode = createObject("roSGNode", "Movie")
                 else if item.isLive = true then
                     episode = createObject("roSGNode", "LiveFeed")
+                else if item.mediaType = "Clip" and item.seriesTitle = "CBS All Access Movies" then
+                    ' HACK: Not ideal, but best way I can find to distinguish a clip from a trailer
+                    episode = createObject("roSGNode", "Trailer")
                 else
                     episode = createObject("roSGNode", "Episode")
                 end if
@@ -414,6 +417,11 @@ sub cbs_populateStream(episode as object)
         
         vmapUrl = m.vmapUrl
         vmapUrl = addQueryString(vmapUrl, "ppid", m.user.ppid)
+        if lCase(episode.genre) = "kids" then
+            vmapUrl = addQueryString(vmapUrl, "tfcd", 1)
+        else
+            vmapUrl = addQueryString(vmapUrl, "tfcd", 0)
+        end if
         customParams = asString(m.user.adStatus) ' "sb=14" ' 
         cbsU = parseCookies(m.cookies)["CBS_U"]
         if not isNullOrEmpty(cbsU) then

@@ -12,6 +12,7 @@
 
         <field id="pid" type="string" />
         <field id="mediaID" type="string" />
+        <field id="mediaType" type="string" />
         <field id="showID" type="string" />
         <field id="showName" type="string" />
         <field id="nielsenID" type="string" />
@@ -21,7 +22,9 @@
         <field id="isFullEpisode" type="boolean" />
         <field id="isLive" type="boolean" />
         <field id="isProtected" type="boolean" />
+        <field id="genre" type="string" />
         <field id="topLevelCategory" type="string" />
+        <field id="primaryCategoryName" type="string" />
         <field id="airDate" type="integer" />
         <field id="airDateString" type="string" />
         <field id="airDateIso" type="string" />
