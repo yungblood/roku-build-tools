@@ -26,7 +26,6 @@ sub onFocusChanged()
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
-    ?m.top.subtype();".onKeyEvent",key,press
     handled = false
     startTimer = false
     if press then

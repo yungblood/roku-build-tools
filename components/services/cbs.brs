@@ -206,6 +206,12 @@ function cbs_getMovie(movieID as string, populateStream = false as boolean) as o
                         movie.trailer = trailer
                     end if
                     movie.resumePoint = m.getResumePoint(movieID)
+                    ' a resume point of -1 means the video has been fully watched
+                    ' so set the resume point to the full length, so progress bars
+                    ' are correctly shown
+                    if movie.resumePoint = -1 then
+                        movie.resumePoint = movie.length
+                    end if
                     if populateStream then
                         m.populateStream(movie)
                     end if
@@ -232,11 +238,20 @@ function cbs_getEpisode(episodeID as string, populateStream = false as boolean) 
                     episode = createObject("roSGNode", "Movie")
                 else if item.isLive = true then
                     episode = createObject("roSGNode", "LiveFeed")
+                else if item.mediaType = "Clip" and item.seriesTitle = "CBS All Access Movies" then
+                    ' HACK: Not ideal, but best way I can find to distinguish a clip from a trailer
+                    episode = createObject("roSGNode", "Trailer")
                 else
                     episode = createObject("roSGNode", "Episode")
                 end if
                 episode.json = item
                 episode.resumePoint = m.getResumePoint(episodeID)
+                ' a resume point of -1 means the video has been fully watched
+                ' so set the resume point to the full length, so progress bars
+                ' are correctly shown
+                if episode.resumePoint = -1 then
+                    episode.resumePoint = episode.length
+                end if
                 if populateStream then
                     m.populateStream(episode)
                 end if
@@ -383,7 +398,7 @@ sub cbs_populateStream(episode as object)
                 stream.streamFormat = "dash"
                  stream.url = m.getVideoStreamUrl(episode.pid, m.dashSelectorUrl)
             else
-                stream.url = m.getVideoStreamUrl(episode.pid)
+                stream.url = m.getVideoStreamUrl(episode.pid, iif(episode.isLive, m.liveSelectorUrl, m.selectorUrl))
                 stream.streamFormat = "hls"
             end if
         end if
@@ -402,6 +417,11 @@ sub cbs_populateStream(episode as object)
         
         vmapUrl = m.vmapUrl
         vmapUrl = addQueryString(vmapUrl, "ppid", m.user.ppid)
+        if lCase(episode.genre) = "kids" then
+            vmapUrl = addQueryString(vmapUrl, "tfcd", 1)
+        else
+            vmapUrl = addQueryString(vmapUrl, "tfcd", 0)
+        end if
         customParams = asString(m.user.adStatus) ' "sb=14" ' 
         cbsU = parseCookies(m.cookies)["CBS_U"]
         if not isNullOrEmpty(cbsU) then
@@ -1370,15 +1390,22 @@ function cbs_getContinueWatching(page = 1 as integer, count = 20 as integer) as 
 end function
 
 function cbs_getResumePoint(contentID as String) as integer
+    resumePoint = 0
     if m.isAuthenticated() then
         url = m.apiBaseUrl + "v3.0/roku/video/streams.json"
         url = addQueryString(url, "contentId", contentID)
         response = m.makeRequest(url, "GET")
         if isAssociativeArray(response) and response.success = true then
-            return asInteger(response.mediaTime) - m.resumeOffset
+            if response.mediaTime = 0 and response.hasWatched = true then
+                return -1
+            end if
+            resumePoint = asInteger(response.mediaTime) - m.resumeOffset
+            if resumePoint < 0 then
+                resumePoint = 0
+            end if
         end if
     end if
-    return 0
+    return resumePoint
 end function
 
 function cbs_isOverStreamLimit() as boolean

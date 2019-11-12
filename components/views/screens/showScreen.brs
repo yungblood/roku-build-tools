@@ -292,7 +292,7 @@ sub onRowItemFocused(nodeEvent as object)
     itemIndex = indices[1]
     for i = 0 to 4
         row = m.list.content.getChild(rowIndex + i)
-        if row <> invalid then
+        if row <> invalid and row.hasField("loadIndex") then
             if i = 0 then
                 row.loadIndex = itemIndex
             else

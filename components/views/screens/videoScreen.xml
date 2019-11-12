@@ -12,6 +12,10 @@
         <field id="resumePoint" type="integer" value="-1" />
         <field id="buttonSelected" type="string" alwaysNotify="true" />
         <field id="additionalContext" type="assocarray" />
+
+        <!--  SMK: this isn't currently being used, but the code is setting it for some reason, so
+              instead of blindly removing it, I temporarily added the field to prevent the warning -->
+        <field id="content" type="node" />
     </interface>
     <children>
         <Font

@@ -31,7 +31,7 @@
     "server": "cbsinteractive.hb.omtrdc.net",
     "publisher": "10D31225525FF5790A490D4D@AdobeOrg",
     "channel": "CBS Entertainment",
-    "ssl": false,
+    "ssl": true,
     "ovp": "Native Roku Player",
     "sdkVersion": "2.0.0",
     "playerName": "Roku"

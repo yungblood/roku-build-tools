@@ -22,7 +22,7 @@ function newSyncbak() as object
     this.getDeviceData      = syncbak_getDeviceData
     this.makeRequest        = syncbak_makeRequest
     
-    setLogLevel(1)
+    setLogLevel(0)
     
     return this
 end function
@@ -48,7 +48,6 @@ function syncbak_getChannels() as object
 end function
 
 function syncbak_getSchedule(scheduleUrl as string) as object
-    setLogLevel(1)
     response = getUrlToJson(scheduleUrl)
     return parseScheduleJson(response)
 end function

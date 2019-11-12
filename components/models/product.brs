@@ -11,8 +11,8 @@ sub onJsonChanged()
         m.top.vendor = json.billing_vendor
         m.top.vendorProductCode = json.billing_vendor_product_code
         
-        m.top.liveDate = dateFromSeconds(asDouble(json.live_date) / 1000)
-        m.top.createdDate = dateFromSeconds(asDouble(json.created_date) / 1000)
-        m.top.expires = dateFromSeconds(asDouble(json.expires_on) / 1000)
+        m.top.liveDate = asDouble(json.live_date) / 1000
+        m.top.createdDate = asDouble(json.created_date) / 1000
+        m.top.expires = asDouble(json.expires_on) / 1000
     end if
 end sub
