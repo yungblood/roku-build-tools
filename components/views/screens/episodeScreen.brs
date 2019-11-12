@@ -113,6 +113,7 @@ sub onEpisodeChanged(nodeEvent as object)
         else
             m.progressBar.visible = false
         end if
+        updateGlobalResumePoint(episode.id, episode.resumePoint)
 
         show = getShowFromCache(episode.showID)
         if show <> invalid then

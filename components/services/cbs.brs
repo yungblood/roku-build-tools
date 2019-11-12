@@ -422,7 +422,7 @@ sub cbs_populateStream(episode as object)
         else
             vmapUrl = addQueryString(vmapUrl, "tfcd", 0)
         end if
-        customParams = asString(m.user.adStatus) ' "sb=14" ' 
+        customParams = asString(m.user.adStatus) ' "sb=14" '  
         cbsU = parseCookies(m.cookies)["CBS_U"]
         if not isNullOrEmpty(cbsU) then
             ' Convert "ge:1|gr:2" to ge=1&gr=2
