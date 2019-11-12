@@ -32,6 +32,7 @@ def environmentMap = [
             "BUILD_ENV" : "testwww",
             "CONFIG_FILE" : "pkg:/config-staging.json",
             "ANALYTICS_SSL" : "false",
+            "ANALYTICS_SERVER" : "aa.cbsi.com",
             "MEDIAHEARTBEAT_SSL" : "false",
         ],
         "qa-prod" : [
@@ -39,6 +40,7 @@ def environmentMap = [
             "BUILD_ENV" : "prod",
             "CONFIG_FILE" : "pkg:/config.json",
             "ANALYTICS_SSL" : "true",
+            "ANALYTICS_SERVER" : "saa.cbsi.com",
             "MEDIAHEARTBEAT_SSL" : "true",
         ],
         "cert-prod" : [
@@ -46,6 +48,7 @@ def environmentMap = [
             "BUILD_ENV" : "prod",
             "CONFIG_FILE" : "pkg:/config.json",
             "ANALYTICS_SSL" : "true",
+            "ANALYTICS_SERVER" : "saa.cbsi.com",
             "MEDIAHEARTBEAT_SSL" : "true",
         ],
     ],
@@ -63,23 +66,26 @@ def environmentMap = [
         "qa-testwww" : [
             "BUILD_TYPE" : "qa",
             "BUILD_ENV" : "testwww",
-            "CONFIG_FILE" : "pkg:/config-staging.json",
+            "CONFIG_FILE" : "pkg:/config-canada-staging.json",
             "ANALYTICS_SSL" : "false",
+            "ANALYTICS_SERVER" : "om.cbsi.com",
             "MEDIAHEARTBEAT_SSL" : "false",
         ],
         "qa-prod" : [
             "BUILD_TYPE" : "qa",
             "BUILD_ENV" : "prod",
-            "CONFIG_FILE" : "pkg:/config.json",
-            "ANALYTICS_SSL" : "true",
-            "MEDIAHEARTBEAT_SSL" : "true",
+            "CONFIG_FILE" : "pkg:/config-canada.json",
+            "ANALYTICS_SSL" : "false",
+            "ANALYTICS_SERVER" : "om.cbsi.com",
+            "MEDIAHEARTBEAT_SSL" : "false",
         ],
         "cert-prod" : [
             "BUILD_TYPE" : "cert",
             "BUILD_ENV" : "prod",
-            "CONFIG_FILE" : "pkg:/config.json",
-            "ANALYTICS_SSL" : "true",
-            "MEDIAHEARTBEAT_SSL" : "true",
+            "CONFIG_FILE" : "pkg:/config-canada.json",
+            "ANALYTICS_SSL" : "false",
+            "ANALYTICS_SERVER" : "om.cbsi.com",
+            "MEDIAHEARTBEAT_SSL" : "false",
         ],
     ]
 ]
