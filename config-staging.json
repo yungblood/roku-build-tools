@@ -65,6 +65,7 @@
     "uvpConfigUrl":    "http://can.cbs.com/thunder/player/chromeless/uvp/cbs_roku_app/cbs_roku_app_stage.xml",
 
     "dashSelectorUrl": "http://link.theplatform.com/s/dJ5BDC/[PID]?sig=[SIGNATURE]&switch=roku",
+    "liveSelectorUrl": "http://link.theplatform.com/s/dJ5BDC/[PID]?sig=[SIGNATURE]&mbr=true&manifest=m3u&format=redirect",
     "selectorUrl":     "http://link.theplatform.com/s/dJ5BDC/[PID]?sig=[SIGNATURE]&mbr=true&manifest=m3u&format=redirect&assetTypes=StreamPack%7COTT",
     "vilynxOwnerKey":  "5844474da56c8d121101c27f4c277200",
     

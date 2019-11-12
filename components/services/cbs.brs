@@ -395,7 +395,7 @@ sub cbs_populateStream(episode as object)
                 stream.streamFormat = "dash"
                  stream.url = m.getVideoStreamUrl(episode.pid, m.dashSelectorUrl)
             else
-                stream.url = m.getVideoStreamUrl(episode.pid)
+                stream.url = m.getVideoStreamUrl(episode.pid, iif(episode.isLive, m.liveSelectorUrl, m.selectorUrl))
                 stream.streamFormat = "hls"
             end if
         end if
