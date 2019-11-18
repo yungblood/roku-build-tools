@@ -28,7 +28,6 @@ sub init()
     m.firstShow = true
     m.focusSeason = ""
     m.lastFocus = m.dynamicPlay
-    m.scrollListRunning = false
 end sub
 
 sub onFocusChanged()
@@ -43,20 +42,18 @@ end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
     if press then
-        if key = "down" and not m.scrollListRunning then
+        if key = "down" and not isScrolling() then
             if m.dynamicPlay.isInFocusChain() then
                 m.list.setFocus(true)
                 m.list.jumpToRowItem = [0, 0]
                 m.lastFocus = m.list
-                m.scrollListRunning = true
                 scrollList()
             end if
             return true
-        else if key = "up" and not m.scrollListRunning then
+        else if key = "up" and not isScrolling() then
             if m.list.isInFocusChain() then
                 m.dynamicPlay.setFocus(true)
                 m.lastFocus = m.dynamicPlay
-                m.scrollListRunning = true
                 scrollList()
             end if
         else if key = "OK" then
@@ -74,7 +71,6 @@ sub onVisibleChanged()
         end if
         if m.firstShow then
             m.dynamicPlay.setFocus(true)
-            m.scrollListRunning = true
             scrollList()
             m.firstShow = false
         else
@@ -136,7 +132,6 @@ sub onShowChanged()
                 m.list.jumpToItem = m.focusRow
                 m.lastFocus = m.list
                 m.list.setFocus(true)
-                m.scrollListRunning = true
                 scrollList(true)
             end if
         else
@@ -275,14 +270,16 @@ sub scrollList(forceScroll = false as boolean)
     end if
 end sub
 
+function isScrolling() as boolean
+    return m.fadeOutAnimation.state = "running" or m.fadeInAnimation.state = "running"
+end function
+
 sub onHeroOpacityChanged(nodeEvent as object)
     opacity = nodeEvent.getData()
     if opacity = 1 then
         m.dynamicPlay.vilynxControl = "pause"
-        m.scrollListRunning = false
     else if opacity = 0 then
         m.dynamicPlay.vilynxControl = "resume"
-        m.scrollListRunning = false
     end if
 end sub
 
