@@ -230,6 +230,7 @@ end sub
 
 sub trackVideoStart()
     initializeAdobe()
+    ? "YB-trackVideoStart"
     m.adobe.mediaTrackStart()
     m.videoStarted = true
 end sub

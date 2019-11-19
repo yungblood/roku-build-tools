@@ -27,7 +27,7 @@ end sub
 sub initializeRunLoop()
 
     m.adbmobile = ADBMobile()
-    m.adbmobile.setDebugLogging(false)
+    m.adbmobile.setDebugLogging(true)
 
     deviceInfo = createObject("roDeviceInfo")
     if not deviceInfo.isRIDADisabled() then
@@ -37,7 +37,6 @@ sub initializeRunLoop()
 
     while true
         msg = wait(250, m.port)
-        
         if (msg = invalid) then
             m.adbmobile.processMessages()
             m.adbmobile.processMediaMessages()
