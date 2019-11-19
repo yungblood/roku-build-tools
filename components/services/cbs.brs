@@ -387,20 +387,19 @@ sub cbs_populateStream(episode as object)
         stream = createObject("roSGNode", "VideoStream")
         stream.title = episode.title
         stream.titleSeason = episode.titleSeason
-        if episode.isProtected or episode.assetType = "DASH_CENC_PRECON" then
-            playReady = m.getPlayReadyInfo(episode.id)
-            stream.streamFormat = "dash"
-            stream.encodingType = "PlayReadyLicenseAcquisitionUrl"
-            stream.encodingKey = playReady.url
-            stream.url = m.getVideoStreamUrl(episode.pid, m.dashSelectorUrl)
+        if episode.isLive then
+            stream.url = m.getVideoStreamUrl(episode.pid, iif(episode.isLive, m.liveSelectorUrl, m.selectorUrl))
+            stream.streamFormat = "hls"
         else
-            if ucase(episode.assetType.left(4))="DASH" then
+            if episode.isProtected then
+                playReady = m.getPlayReadyInfo(episode.id)
                 stream.streamFormat = "dash"
-                 stream.url = m.getVideoStreamUrl(episode.pid, m.dashSelectorUrl)
+                stream.encodingType = "PlayReadyLicenseAcquisitionUrl"
+                stream.encodingKey = playReady.url
+                stream.url = m.getVideoStreamUrl(episode.pid, m.dashSelectorUrl)
             else
-                stream.url = m.getVideoStreamUrl(episode.pid, iif(episode.isLive, m.liveSelectorUrl, m.selectorUrl))
-                stream.streamFormat = "hls"
-            end if
+                stream.streamFormat = "dash"
+                stream.url = m.getVideoStreamUrl(episode.pid, m.dashSelectorUrl)
         end if
         stream.switchingStrategy = "full-adaptation"
         stream.subtitleConfig    = episode.subtitleConfig
