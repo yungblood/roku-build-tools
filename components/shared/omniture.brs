@@ -219,7 +219,6 @@ sub trackVideoLoad(video as object, context as object)
     m.mediaContext = {}
     m.mediaContext.append(m.persistentParams)
     m.mediaContext.append(context)
-
     m.adobe.mediaTrackLoad(m.mediaInfo, m.mediaContext)
 end sub
 
@@ -230,8 +229,9 @@ end sub
 
 sub trackVideoStart()
     initializeAdobe()
-    ? "YB-trackVideoStart"
     m.adobe.mediaTrackStart()
+    'bugfix-1394 : Force adobe into buffering state to prevent multiple start calls.
+    m.adobe.mediaTrackEvent("MediaBufferStart", invalid, m.heartbeatContext)
     m.videoStarted = true
 end sub
 

@@ -3083,6 +3083,7 @@ Function _adb_mediacontext() As Object
           else if m.isPlaying()
             return _adb_paramsResolver()._media_event_play
           else
+            m.setInBuffering(true)
             return _adb_paramsResolver()._media_event_start
           end if
         End Function,
