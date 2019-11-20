@@ -219,7 +219,7 @@ sub trackVideoLoad(video as object, context as object)
     m.mediaContext = {}
     m.mediaContext.append(m.persistentParams)
     m.mediaContext.append(context)
-    
+
     m.adobe.mediaTrackLoad(m.mediaInfo, m.mediaContext)
 end sub
 
