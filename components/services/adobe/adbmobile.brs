@@ -158,7 +158,6 @@ Function ADBMobile() As Object
         End Function,
 
       mediaTrackStart: Function() As Void
-        ? "YB-mediaTrackStart"
           _adb_media().trackStart()
         End Function,
 
@@ -381,10 +380,10 @@ Function _adb_buildAndSendRequest(data, vars, timestamp)
     if type(key) <> "roString" AND type(key) <> "String"
       _adb_logger().warning("Analytics - Invalid context data key specified, skipping it")
       mutableData.Delete(key)
-    else if key.left(2) = "&&" AND Len(key) > 2
+    elseif key.left(2) = "&&" AND Len(key) > 2
       mutableVars[key.mid(2)] = mutableData[key]
       mutableData.Delete(key)
-    end if
+    endif
   end for
 
   ''' create our query string
@@ -492,11 +491,11 @@ Function _adb_urlEncoder() as Object
 
           if valType = "String" OR valType="roString"
             return "&" + m._urlEncoder.Escape(key) + "=" + m._urlEncoder.Escape(value)
-          else if valType = "roInteger" OR valType = "roInt" OR valType = "Integer"
+          elseif valType = "roInteger" OR valType = "roInt" OR valType = "Integer"
             return "&" + m._urlEncoder.Escape(key) + "=" + m._urlEncoder.Escape(value.ToStr())
-          else if valType = "roFloat" OR valType = "Float" OR valType = "Double"
+          elseif valType = "roFloat" OR valType = "Float" OR valType = "Double"
             return "&" + m._urlEncoder.Escape(key) + "=" + m._urlEncoder.Escape(Str(value).Trim())
-          else if valType = "roBoolean" OR valType = "Boolean"
+          elseif valType = "roBoolean" OR valType = "Boolean"
             if value
               return "&" + m._urlEncoder.Escape(key) + "=" + "true"
             endif
@@ -512,16 +511,16 @@ Function _adb_urlEncoder() as Object
 
           if valType = "String" OR valType="roString"
             return m._urlEncoder.Escape(value)
-          else if valType = "roInteger" OR valType = "roInt" OR valType = "Integer"
+          elseif valType = "roInteger" OR valType = "roInt" OR valType = "Integer"
             return m._urlEncoder.Escape(value.ToStr())
-          else if valType = "roFloat" OR valType = "Float" OR valType = "Double"
+          elseif valType = "roFloat" OR valType = "Float" OR valType = "Double"
             return m._urlEncoder.Escape(Str(value).Trim())
-          else if valType = "roBoolean" OR valType = "Boolean"
+          elseif valType = "roBoolean" OR valType = "Boolean"
             if value
               return "true"
             endif
             return "false"
-          end if
+          endif
 
           return ""
         End Function,
@@ -532,11 +531,11 @@ Function _adb_urlEncoder() as Object
 
           if valType = "String" OR valType="roString"
             return "&" + key + "=" + value
-          else if valType = "roInteger" OR valType = "roInt" OR valType = "Integer"
+          elseif valType = "roInteger" OR valType = "roInt" OR valType = "Integer"
             return "&" + key + "=" + value.ToStr()
-          else if valType = "roFloat" OR valType = "Float" OR valType = "Double"
+          elseif valType = "roFloat" OR valType = "Float" OR valType = "Double"
             return "&" + key + "=" + Str(value).Trim()
-          else if valType = "roBoolean" OR valType = "Boolean"
+          elseif valType = "roBoolean" OR valType = "Boolean"
             if value
               return "&" + key + "=" + "true"
             endif
@@ -958,7 +957,7 @@ Function _adb_audienceManager() As Object
         _sendNextSignal: Function() As Void
             if _adb_config().aamServer <> invalid AND m._queue.count() > 0 AND m._currentHit = invalid
               ''' grab oldest hit in the queue
-              m["_currentHit"] = m._queue.Shift()
+              m.["_currentHit"] = m._queue.Shift()
 
               ''' set url
               url = m._buildSchemaRequest(m._currentHit)
@@ -1063,7 +1062,7 @@ Function _adb_audienceManager() As Object
             if uuid <> invalid
               if ADBMobile().getPrivacyStatus() <> ADBMobile().PRIVACY_STATUS_OPT_OUT or uuid.Len() = 0
                 _adb_persistenceLayer().writeValue("aam_uuid", uuid)
-                m["_uuid"] = uuid
+                m.["_uuid"] = uuid
               endif
             endif
           End Function,
@@ -1241,9 +1240,7 @@ Function _adb_serializeAndSendHeartbeat() As Object
           if m._queue.count() > 0 AND m._currentHit = invalid
             ''' grab oldest hit in the queue
             m["_currentHit"] = m._queue.Shift()
-'            ? "YB-currentHit", m["_currentHit"]
-'            ? "YB-queue", m._queue
-'if m["_currentHit"]["s:event:type"] = "start" then stop 'YB-
+
             ''' set url and send it asynchronously
             url = m._buildHeartbeatUrl(m._currentHit)
             m._sendUrlRequest(false, url)
@@ -1263,18 +1260,6 @@ Function _adb_serializeAndSendHeartbeat() As Object
 
             if (m._http.AsyncGetToString())
               m._logger.debug(retry + "#_sendUrlRequest() - Sent Media Heartbeat Hit (" + url + ")")
-              raw_url = url.DecodeUri()
-              if raw_url.inStr(0, "s:event:type=start") > -1 then
-                  hit_url = raw_url.split("?")[0]
-                  hit_data = raw_url.split("?")[1].split("&")
-                  ? "YB-Sent Media Heartbeat Hit:", hit_url, hit_data
-'                  if raw_url.inStr(0, "mediaDeviceId") > -1 then 
-'                    ? "YB-FullData"
-'                  else
-'                    ? "YB-PartialData"
-'                  end if
-                'stop
-              end if
               if _adb_clockservice().isActive() = true
                 _flushFilterTimer = _adb_clockservice().getTimerHandle(_adb_clockservice().id_flushfilter_timer)
                 _flushFilterTimer.reset()
@@ -2675,20 +2660,8 @@ Function _adb_media() As Object
           if additionalInfo <> invalid
             dictionary.append(additionalInfo)
           end if
-          'NOTE: If we want to kill extra start events getting sent to server, we can do it here.
-'? "YB-dictionary", dictionary
-if m.yb_start = invalid then m.yb_start = 0
-if dictionary["s:event:type"] = "start" then
-    if dictionary.doesExist("s:meta:mediaDeviceId") then
+
           _adb_serializeAndSendHeartbeat().queueRequestsForResponse(dictionary)
-          m.yb_start = m.yb_start + 1
-          if m.yb_start = 2 then stop
-    else
-        ? "YB-Skipped extra start heartbeat"
-    end if
-else
-          _adb_serializeAndSendHeartbeat().queueRequestsForResponse(dictionary)
-end if
 
           if eventType = _adb_paramsResolver()._media_start
             contextData = _adb_paramsResolver().getContextData(_adb_paramsResolver()._media_start)
@@ -2820,7 +2793,7 @@ Function _adb_media_setErrorState(boolval As Boolean)
         _adb_media()._resetTrackingState()
       end if
     end if
-  else if boolval = false
+  elseif boolval = false
     _adb_persistenceLayer().writeValue("media_error_state", "false")
     ' We start tracking with the next trackSessionStart call.
   end if
@@ -3083,7 +3056,6 @@ Function _adb_mediacontext() As Object
           else if m.isPlaying()
             return _adb_paramsResolver()._media_event_play
           else
-            m.setInBuffering(true)
             return _adb_paramsResolver()._media_event_start
           end if
         End Function,
@@ -3432,7 +3404,7 @@ Function _adb_paramsResolver() As Object
               contextData["&&cid.puuid.id"] = _adb_audienceManager().getDpuuid()
             endif
 
-          else if eventName = m._ad_start
+          elseif eventName = m._ad_start
             mediaMetadata = _adb_mediacontext().getMediaContextData()
             adMetadata = _adb_mediacontext().getAdContextData()
             if mediaMetadata <> invalid
@@ -4211,9 +4183,9 @@ Function _adb_message_helper() as Object
       toString: Function(value as Dynamic) as Dynamic
         if m.isString(value)
           return value
-        else if m.isInt(value)
+        elseif m.isInt(value)
           return value.ToStr()
-        else if m.isFloat(value)
+        elseif m.isFloat(value)
           return Str(value).Trim()
         else 
           return invalid
@@ -6523,7 +6495,7 @@ Function _adb_visitor() as Object
               m._ttl = "0"
             endif
 
-          else if m._mid = invalid
+          elseif m._mid = invalid
             m._mid = m._generateLocalMid()
             m._blob = invalid
             m._hint = invalid
