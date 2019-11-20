@@ -230,8 +230,6 @@ end sub
 sub trackVideoStart()
     initializeAdobe()
     m.adobe.mediaTrackStart()
-    'bugfix-1394 : Force adobe into buffering state to prevent multiple start calls.
-    m.adobe.mediaTrackEvent(m.adobe["MEDIA_BUFFER_START"], invalid, m.heartbeatContext)
     m.videoStarted = true
 end sub
 
@@ -277,9 +275,11 @@ end sub
 
 sub trackVideoBufferStart()
     initializeAdobe()
+    m.adobe.mediaTrackEvent(m.adobe["MEDIA_BUFFER_START"], invalid, m.heartbeatContext)
 end sub
 
 sub trackVideoBufferComplete()
+    m.adobe.mediaTrackEvent(m.adobe["MEDIA_BUFFER_COMPLETE"], invalid, m.heartbeatContext)
     initializeAdobe()
 end sub
 
