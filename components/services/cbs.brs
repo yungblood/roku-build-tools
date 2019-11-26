@@ -400,6 +400,7 @@ sub cbs_populateStream(episode as object)
             else
                 stream.streamFormat = "dash"
                 stream.url = m.getVideoStreamUrl(episode.pid, m.dashSelectorUrl)
+            end if
         end if
         stream.switchingStrategy = "full-adaptation"
         stream.subtitleConfig    = episode.subtitleConfig
