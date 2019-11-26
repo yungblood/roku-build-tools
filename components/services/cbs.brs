@@ -397,6 +397,7 @@ sub cbs_populateStream(episode as object)
                 stream.encodingType = "PlayReadyLicenseAcquisitionUrl"
                 stream.encodingKey = playReady.url
                 stream.url = m.getVideoStreamUrl(episode.pid, m.dashSelectorUrl)
+                stream.authorization = "Bearer "+ playReady.json.ls_session
             else
                 stream.streamFormat = "dash"
                 stream.url = m.getVideoStreamUrl(episode.pid, m.dashSelectorUrl)
@@ -1477,9 +1478,9 @@ function cbs_getPlayReadyInfo(id as string) as object
     playReady = invalid
     
     if m.user.status = "ANONYMOUS" then
-        url = m.apiBaseUrl + "v3.0/roku/irdeto/anonymousSession.json"
+        url = m.apiBaseUrl + "v3.0/roku/irdeto-control/anonymous-session-token.json"
     else
-        url = m.apiBaseUrl + "v3.0/roku/irdeto/session.json"
+        url = m.apiBaseUrl + "v3.0/roku/irdeto-control/session-token.json"
     end if
     url = addQueryString(url, "contentId", id)
     response = m.makeRequest(url, "GET")
