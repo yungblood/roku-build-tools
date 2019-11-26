@@ -552,6 +552,8 @@ sub startPlayback(stream as object)
         m.video.control = "play"
     
         trackVideoStart()
+        'bugfix-1394 : Force adobe into buffering state to prevent multiple start calls.
+        trackVideoBufferStart()
             
         hideSpinner()
         if not m.firstLoad then
@@ -598,13 +600,20 @@ sub onBufferingStatusChanged(nodeEvent as object)
 end sub
 
 sub onVideoStateChanged(nodeEvent as object)
+    if m.buffering = invalid then m.buffering = false
     state = nodeEvent.getData()
     ? "*****state: " + state
     comscore = getGlobalField("comscore")
     if state = "buffering" then
         showSpinner()
+        trackVideoBufferStart()
+        m.buffering = true
     else if state = "playing" then
         hideSpinner()
+        if m.buffering then
+            trackVideoBufferComplete()
+            m.buffering = false
+        end if
         if comscore <> invalid then
             comscore.videoStart = true
         end if

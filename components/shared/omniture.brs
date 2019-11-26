@@ -276,9 +276,11 @@ end sub
 
 sub trackVideoBufferStart()
     initializeAdobe()
+    m.adobe.mediaTrackEvent(m.adobe["MEDIA_BUFFER_START"], invalid, m.mediaContext)
 end sub
 
 sub trackVideoBufferComplete()
+    m.adobe.mediaTrackEvent(m.adobe["MEDIA_BUFFER_COMPLETE"], invalid, m.mediaContext)
     initializeAdobe()
 end sub
 
