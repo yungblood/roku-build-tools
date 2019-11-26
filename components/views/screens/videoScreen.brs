@@ -258,6 +258,7 @@ sub onBifTranslationChanged()
 end sub
 
 sub onVideoStateChanged()
+    if m.buffering = invalid then m.buffering = false
     if m.video <> invalid then
         state = LCase(m.video.state)
         ?"VIDEO STATE: ";state
@@ -287,6 +288,8 @@ sub onVideoStateChanged()
                 m.video.enableTrickPlay = false
             end if
             m.currentAudioTrack = m.video.audioTrack
+            trackVideoBufferStart()
+            m.buffering = true
         else if state = "paused" then
             ' Track the current audio track, to detect track changes in buffering
             m.currentAudioTrack = m.video.audioTrack
@@ -318,6 +321,10 @@ sub onVideoStateChanged()
             end if
             fixFirmRectOpacity(0)
             hideSpinner()
+            if m.buffering then
+                trackVideoBufferComplete()
+                m.buffering = false
+            end if
             if m.paused then
                 if m.video.position < m.pausedPosition or m.video.position > m.pausedPosition + 1 then
                     if m.video.position > m.pausedPosition then
@@ -820,6 +827,8 @@ sub onVideoStart()
     'trackScreenAction("trackVideoLoad", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event52"])
     trackVideoLoad(m.episode, m.heartbeatContext)
     trackVideoStart()
+    'bugfix-1394 : Force adobe into buffering state to prevent multiple start calls.
+    trackVideoBufferStart()
     m.watchNextType = ""
 end sub
 
