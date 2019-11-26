@@ -1207,8 +1207,10 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                         dai.video = m.video
                         dai.content = m.episode
                         dai.streamData = streamData
+                        m.video.addHeader("Authorization", m.episode.videoStream.authorization)
                     end if
                 else
+                    m.video.addHeader("Authorization", m.episode.videoStream.authorization)
                     m.video.content = m.episode.videoStream
                     m.rafTask = createObject("roSGNode", "RafTask")
                     m.rafTask.observeField("adPodReady", "onAdPodReady")
