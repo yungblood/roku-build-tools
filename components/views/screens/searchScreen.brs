@@ -149,8 +149,8 @@ sub onMenuItemSelected(nodeEvent as object)
 end sub
 
 sub onSearchTextChanged()
-    if not isNullOrEmpty(m.searchText.text) then
-        m.searchTask.control = "stop"
+    m.searchTask.control = "stop"
+    if not isNullOrEmpty(m.searchText.text.trim()) then
         m.searchTask.searchTerm = m.searchText.text
         m.searchTask.control = "run"
     else
