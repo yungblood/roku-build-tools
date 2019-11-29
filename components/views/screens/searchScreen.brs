@@ -163,7 +163,7 @@ sub onResultsLoaded()
     m.grid.content = m.searchTask.results
     if m.searchTask.results = invalid or m.searchTask.results.getChildCount() = 0 then
         m.grid.visible = false
-        m.noResults.visible = (m.searchText.text.len() > 0)
+        m.noResults.visible = (m.searchText.text.trim().len() > 0)
         if not isNullOrEmpty(m.searchText.text.trim()) then
             omnitureData = getOmnitureData(m.grid.content, 0)
             omnitureData["searchTerm"] = lcase(m.searchText.text)
