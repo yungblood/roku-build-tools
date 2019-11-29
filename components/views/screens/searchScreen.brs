@@ -16,6 +16,7 @@ sub init()
     m.searchText = m.top.findNode("searchText")
     m.searchText.observeField("text", "onSearchTextChanged")
     m.searchTask = createObject("roSGNode", "LoadSearchResultsTask")
+    m.searchTask.observeField("results", "onResultsLoaded")
 
     m.keyboard = m.top.findNode("keyboard")
     m.keyboard.observeField("buttonSelected", "onKeyboardButtonSelected")
@@ -78,6 +79,13 @@ function onKeyEvent(key as string, press as boolean) as boolean
                 if m.grid.visible then
                     m.grid.setFocus(true)
                     return true
+                end if
+            else
+                bottomRowItems = m.grid.content.getChildCount()
+                if bottomRowItems MOD 4 > 0 then
+                    if m.grid.itemFocused < bottomRowItems - bottomRowItems MOD 4 then
+                        m.grid.animateToItem = bottomRowItems - 1
+                    end if
                 end if
             end if
         else if key = "up" then
@@ -142,10 +150,10 @@ end sub
 
 sub onSearchTextChanged()
     if not isNullOrEmpty(m.searchText.text) then
-        search(m.searchText.text)
-    else
         m.searchTask.control = "stop"
-        m.searchTask.unObserveField("results")
+        m.searchTask.searchTerm = m.searchText.text
+        m.searchTask.control = "run"
+    else
         m.noResults.visible = false
         m.grid.visible = false
     end if
@@ -156,8 +164,7 @@ sub onResultsLoaded()
     if m.searchTask.results = invalid or m.searchTask.results.getChildCount() = 0 then
         m.grid.visible = false
         m.noResults.visible = (m.searchText.text.len() > 0)
-        m.searchTask.unobserveField("results")
-        if not isNullOrEmpty(m.searchText.text) then
+        if not isNullOrEmpty(m.searchText.text.trim()) then
             omnitureData = getOmnitureData(m.grid.content, 0)
             omnitureData["searchTerm"] = lcase(m.searchText.text)
             omnitureData.v41 = lcase(m.searchText.text)
@@ -169,14 +176,3 @@ sub onResultsLoaded()
     end if
 end sub
 
-sub search(searchTerm as string)
-    if m.searchTask <> invalid then
-        if m.searchTask.state = "run" then
-            m.searchTask.control = "stop"
-            m.searchTask.unobserveField("results")
-        end if
-    end if
-    m.searchTask.observeField("results", "onResultsLoaded")
-    m.searchTask.searchTerm = searchTerm
-    m.searchTask.control = "run"
-end sub
