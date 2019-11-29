@@ -397,7 +397,7 @@ sub cbs_populateStream(episode as object)
                 stream.encodingType = "PlayReadyLicenseAcquisitionUrl"
                 stream.encodingKey = playReady.url
                 stream.url = m.getVideoStreamUrl(episode.pid, m.dashSelectorUrl)
-                stream.authorization = "Bearer "+ playReady.json.ls_session
+                stream.authorization = "Bearer "+ playReady.ls_session
             else
                 stream.streamFormat = "dash"
                 stream.url = m.getVideoStreamUrl(episode.pid, m.dashSelectorUrl)

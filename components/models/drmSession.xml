@@ -4,6 +4,7 @@
     <interface>
         <field id="json" type="assocarray" onChange="onJsonChanged" />
 
+        <field id="ls_session" type="string" />
         <field id="sessionID" type="string" />
         <field id="ticket" type="string" />
     </interface>
