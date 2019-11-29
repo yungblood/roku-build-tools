@@ -171,7 +171,7 @@ end sub
 
 sub search(searchTerm as string)
     if m.searchTask <> invalid then
-        if m.searchTask.state = "running" then
+        if m.searchTask.state = "run" then
             m.searchTask.control = "stop"
             m.searchTask.unobserveField("results")
         end if
