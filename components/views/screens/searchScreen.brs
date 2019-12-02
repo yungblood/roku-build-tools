@@ -87,6 +87,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
                         m.grid.animateToItem = bottomRowItems - 1
                     end if
                 end if
+                return true
             end if
         else if key = "up" then
             if m.keyboard.isInFocusChain() then
