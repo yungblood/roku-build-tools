@@ -38,6 +38,7 @@ sub onFocusChanged()
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
+print key
     if press then
         if key = "down" then
             if m.menu.isInFocusChain() then
@@ -46,6 +47,16 @@ function onKeyEvent(key as string, press as boolean) as boolean
             else if m.groups.isInFocusChain() then
                 m.grid.setFocus(true)
                 return true
+            else
+                if m.grid.hasFocus() then
+                    bottomRowItems = m.grid.content.getChildCount()
+                    if bottomRowItems MOD m.grid.numColumns > 0 then
+                        if m.grid.itemFocused < bottomRowItems - bottomRowItems MOD m.grid.numColumns then
+                            m.grid.animateToItem = bottomRowItems - 1
+                        end if
+                    end if
+                    return true
+                end if
             end if
         else if key = "up" then
             if m.grid.isInFocusChain() then
