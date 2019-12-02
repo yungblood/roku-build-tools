@@ -82,8 +82,8 @@ function onKeyEvent(key as string, press as boolean) as boolean
                 end if
             else
                 bottomRowItems = m.grid.content.getChildCount()
-                if bottomRowItems MOD 4 > 0 then
-                    if m.grid.itemFocused < bottomRowItems - bottomRowItems MOD 4 then
+                if bottomRowItems MOD m.grid.numColumns > 0 then
+                    if m.grid.itemFocused < bottomRowItems - bottomRowItems MOD m.grid.numColumns then
                         m.grid.animateToItem = bottomRowItems - 1
                     end if
                 end if
