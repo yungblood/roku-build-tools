@@ -40,7 +40,10 @@ function onKeyEvent(key as string, press as boolean) as boolean
                     bottomRowItems = m.grid.content.getChildCount()
                     if bottomRowItems MOD m.grid.numColumns > 0 then
                         if m.grid.itemFocused < bottomRowItems - bottomRowItems MOD m.grid.numColumns then
+                            scrollSpeed = m.grid.scrollSpeed
+                            m.grid.scrollSpeed = 10
                             m.grid.animateToItem = bottomRowItems - 1
+                            m.grid.scrollSpeed = scrollSpeed
                         end if
                     end if
                     return true

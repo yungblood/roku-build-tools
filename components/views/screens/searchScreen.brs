@@ -81,13 +81,18 @@ function onKeyEvent(key as string, press as boolean) as boolean
                     return true
                 end if
             else
-                bottomRowItems = m.grid.content.getChildCount()
-                if bottomRowItems MOD m.grid.numColumns > 0 then
-                    if m.grid.itemFocused < bottomRowItems - bottomRowItems MOD m.grid.numColumns then
-                        m.grid.animateToItem = bottomRowItems - 1
+                if m.grid.hasFocus() then
+                    bottomRowItems = m.grid.content.getChildCount()
+                    if bottomRowItems MOD m.grid.numColumns > 0 then
+                        if m.grid.itemFocused < bottomRowItems - bottomRowItems MOD m.grid.numColumns then
+                            scrollSpeed = m.grid.scrollSpeed
+                            m.grid.scrollSpeed = 10
+                            m.grid.animateToItem = bottomRowItems - 1
+                            m.grid.scrollSpeed = scrollSpeed
+                        end if
                     end if
+                    return true
                 end if
-                return true
             end if
         else if key = "up" then
             if m.keyboard.isInFocusChain() then
