@@ -1,4 +1,19 @@
 sub runUserInterface(ecp as object)
+    if ecp.RunTests = "true" and type(TestRunner) = "Function" then
+        Runner = TestRunner()
+
+        Runner.SetFunctions([
+            TestSuite__Main
+        ])
+
+        Runner.Logger.SetVerbosity(3)
+        Runner.Logger.SetEcho(false)
+        Runner.Logger.SetJUnit(false)
+        Runner.SetFailFast(true)
+        
+        Runner.Run()
+        return
+    end if
     m.port = createObject("roMessagePort")
     m.inputListener = createObject("roInput")
     m.inputListener.setMessagePort(m.port)
