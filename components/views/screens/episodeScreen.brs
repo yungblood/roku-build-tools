@@ -5,9 +5,17 @@ sub init()
     m.top.observeField("visible", "onVisibleChanged")
     
     m.heroImageUrl = ""
+    
+    m.backgroundDarken = m.top.findNode("backgroundDarken")
+    m.backgroundDarken.color = getThemeColor("singularity")
+    
+    m.badges = m.top.findNode("badges")
+    m.airDate = m.top.findNode("airDate")
 
     m.background = m.top.findNode("background")
     m.poster = m.top.findNode("poster")
+    
+    m.metadata = m.top.findNode("metadata")
     m.showTitle = m.top.findNode("showTitle")
     m.episodeTitle = m.top.findNode("episodeTitle")
     m.episodeSubtitle = m.top.findNode("episodeSubtitle")
@@ -22,6 +30,23 @@ sub init()
 
     m.tts = createObject("roTextToSpeech")
 end sub
+
+function onKeyEvent(key as string, press as boolean) as boolean
+    if press then
+        if key = "down" then
+            if m.buttons.isInFocusChain() and m.episodeDescription.focusable then
+                m.episodeDescription.setFocus(true)
+                return true
+            end if
+        else if key = "up" then
+            if m.episodeDescription.isInFocusChain() then
+                m.buttons.setFocus(true)
+                return true
+            end if
+        end if
+    end if
+    return false
+end function
 
 sub onFocusChanged()
     if m.top.hasFocus() then
@@ -86,26 +111,32 @@ sub onEpisodeChanged(nodeEvent as object)
         trackScreenView()
 
         m.showTitle.text = episode.showName
-        m.episodeTitle.text = episode.title
+        m.episodeTitle.text = ((episode.seasonString + " " + episode.episodeString).trim() + " " + episode.title).trim()
         m.episodeDescription.text = episode.description
-
-        subtitle = (episode.seasonString + " " + episode.episodeString).trim()
-        if not isNullOrEmpty(subtitle) then
-            subtitle = subtitle + " | "
+        
+        m.badges.removeChildrenIndex(m.badges.getChildCount(), 0)
+        if not isNullOrEmpty(episode.rating) then
+            rating = m.badges.createChild("EpisodeBadge")
+            rating.text = episode.rating
         end if
-        subtitle = subtitle + episode.durationString + " | " + episode.rating
-        subtitle = subtitle + " | " + episode.airDateString
-        m.episodeSubtitle.text = subtitle
+        if not isNullOrEmpty(episode.durationStringSimple) then
+            length = m.badges.createChild("EpisodeBadge")
+            length.text = episode.durationStringSimple
+        end if
+        m.airDate.text = episode.releaseDate
+        m.badges.appendChild(m.airDate)
+
         m.poster.uri = getImageUrl(episode.thumbnailUrl, m.poster.width)
 
-        ' if watch history exists leave progress bar at 100%
         if episode.resumePoint > 0 then
+            percentage = episode.resumePoint / episode.length
             m.progressBar.maxValue = episode.length
             m.progressBar.value = episode.resumePoint
-            if m.progressBar.value / m.progressBar.maxValue > .97 then
+            if percentage > .97 then
+                ' if watch history exists leave progress bar at 100%
                 m.progressBar.value = m.progressBar.maxValue
             end if
-            if m.progressBar.value / m.progressBar.maxValue > .05 then
+            if percentage > .05 then
                 m.progressBar.visible = true
             else
                 m.progressBar.visible = false
@@ -132,6 +163,12 @@ sub onEpisodeChanged(nodeEvent as object)
             m.watch.text = "SUBSCRIBE"
             m.buttons.removeChild(m.resume)
         end if
+        
+        boundingRect = m.metadata.boundingRect()
+        x = boundingRect.x
+        y = boundingRect.y + boundingRect.height + 55
+        m.episodeDescription.translation = [x, y]
+        m.episodeDescription.height = 908 - y
 
         m.buttons.visible = true
         m.buttons.setFocus(false)
@@ -144,7 +181,6 @@ sub onEpisodeChanged(nodeEvent as object)
             if createObject("roDeviceInfo").isAudioGuideEnabled() then
                 m.tts.say(m.showTitle.text)
                 m.tts.say(m.episodeTitle.text)
-                m.tts.say(m.episodeSubtitle.text)
                 m.tts.say(m.episodeDescription.text)
             end if
         end if

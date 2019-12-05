@@ -6,11 +6,11 @@
     <children>
        <Font
            id="buttonFont"
-           size="30"
-           uri="pkg:/fonts/Lato-Bold.ttf" />
+           size="28"
+           uri="pkg:/fonts/Proxima Nova A Regular.ttf" />
        <Font
            id="focusedButtonFont"
-           size="70"
-           uri="pkg:/fonts/Lato-Regular.ttf" />
+           size="56"
+           uri="pkg:/fonts/Proxima Nova A Semibold.ttf" />
     </children>
 </component>

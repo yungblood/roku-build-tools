@@ -3,9 +3,12 @@ sub init()
 
     m.hero = m.top.findNode("hero")
     m.shade = m.top.findNode("shade")
+    m.shade.color = getThemeColor("galaxy")
 
     m.fadeOutAnimation = m.top.findNode("fadeOutAnimation")
+    m.fadeOutAnimation.observeField("state", "onFadeOutStateChanged")
     m.fadeInAnimation = m.top.findNode("fadeInAnimation")
+    m.fadeInAnimation.observeField("state", "onFadeInStateChanged")
 
     m.videoPreview = m.top.findNode("videoPreview")
     m.videoPreview.observeField("state", "onVideoStateChanged")
@@ -15,6 +18,9 @@ end sub
 sub onControlChanged(nodeEvent as object)
     control = nodeEvent.getData()
     if m.content <> invalid then
+        if control = "play" then
+            m.videoPreview.visible = true
+        end if
         m.videoPreview.control = control
     end if
 end sub
@@ -50,6 +56,13 @@ sub onVideoStateChanged(nodeEvent as object)
     m.top.videoState = state
 end sub
 
+sub onFadeInStateChanged(nodeEvent as object)
+    state = nodeEvent.getData()
+    if state = "stopped" then
+        m.videoPreview.visible = false
+    end if
+end sub
+
 sub onVideoPositionChanged(nodeEvent as object)
     position = nodeEvent.getData()
     if m.hero.opacity = 1 then
@@ -57,7 +70,7 @@ sub onVideoPositionChanged(nodeEvent as object)
     end if
 end sub
 
-sub updateLayout(nodeEvent as object)
+sub updateLayout()
     if m.top.width > 0 and m.top.height > 0 then
         m.shade.width = m.top.width
         m.shade.height = m.top.height

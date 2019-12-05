@@ -7,23 +7,10 @@
         <field id="menuItemSelected" type="string" alwaysNotify="true" />
     </interface>
     <children>
-<!--         <LabelButtonGroup -->
-<!--             id="groups" -->
-<!--             translation="[95,150]" -->
-<!--             layoutDirection="horiz" -->
-<!--             itemSpacings="[53]"> -->
-<!--         </LabelButtonGroup> -->
-        
-        <MarkupGrid
+        <CBSPosterGrid
             id="grid"
-            translation="[95,150]"
-            itemComponentName="PosterTile"
-            itemSize="[266,399]"
-            itemSpacing="[27,30]"
-            numColumns="6"
-            numRows="3"
-            vertFocusAnimationStyle="fixedFocus"
-            focusBitmapUri="pkg:/images/frame_grid_$$RES$$.9.png" />
+            translation="[128,178]"
+            numColumns="6" />
         
         <TopMenu
             id="menu"

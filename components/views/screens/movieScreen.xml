@@ -8,24 +8,7 @@
         <field id="buttonSelected" type="string" alwaysNotify="true" />
     </interface>
     <children>
-        <Font
-            id="movieTitleFont"
-            size="42"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
-        <Font
-            id="movieSubtitleFont"
-            size="24"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
-        <Font
-            id="movieDescriptionFont"
-            size="22"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
-        <Font
-            id="buttonFont"
-            size="24"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
-
-        <Poster
+        <CrossfadePoster
             id="background"
             width="1920"
             height="1080"
@@ -34,90 +17,75 @@
             id="backgroundDarken"
             width="1920"
             height="1080"
-            color="0x000000c0" />
+            opacity="0.8" />
+        <Poster
+            id="backgroundOverlay"
+            translation="[0,678]"
+            width="1920"
+            height="402"
+            uri="pkg:/images/ui/overlay_details_darken.png" />
         <Poster
             id="poster"
-            translation="[118,278]"
-            width="844"
-            height="475"
-            loadDisplayMode="scaleToZoom" />
-        <ProgressBar
-            id="progressBar"
-            translation="[143,726]"
-            backgroundColor="0xffffff33"
-            barColor="0x0092f3ff"
-            width="792"
-            height="8"
-            visible="false" />
+            translation="[980,178]"
+            width="812"
+            height="456"
+            loadDisplayMode="scaleToZoom">
+            <CBSProgressBar
+                id="progressBar"
+                translation="[24,430]"
+                width="764"
+                height="6"
+                visible="false" />
+        </Poster>
             
         <LayoutGroup
-            translation="[991,278]"
+            id="metadata"
+            translation="[128,173]"
             layoutDirection="vert"
-            itemSpacings="[10]">
-            <Label
+            itemSpacings="[22,48]">
+            <CBSLabel
                 id="movieTitle"
-                width="815"
-                color="0xffffffff"
+                width="812"
                 wrap="true"
                 maxLines="2"
-                lineSpacing="0"
-                font="dictionary:movieTitleFont" />
-            <Label
-                id="movieSubtitle"
-                height="24"
-                width="750"
-                color="0xb3b1b0ff"
-                wrap="false"
-                font="dictionary:movieSubtitleFont" />
-            <Label
-                id="movieDescription"
-                height="219"
-                width="750"
-                color="0xffffffff"
-                lineSpacing="-1"
-                wrap="true"
-                maxLines="7"
-                font="dictionary:movieDescriptionFont" />
+                style="mega" />
+            <LayoutGroup
+                id="badges"
+                layoutDirection="horiz"
+                itemSpacings="[16]"
+                vertAlignment="center">
+                <CBSLabel
+                    id="airDate"
+                    style="micro"
+                    opacity=".75" />
+            </LayoutGroup>
+            <LabelButtonGroup
+                id="buttons"
+                translation="[991,691]"
+                layoutDirection="horiz"
+                itemSpacings="[24]"
+                visible="false">
+                <CBSButton
+                    id="resume"
+                    text="RESUME"
+                    processKeyEvents="false" />
+                <CBSButton
+                    id="watch"
+                    text=""
+                    processKeyEvents="false" />
+                <CBSButton
+                    id="trailer"
+                    text="PREVIEW TRAILER"
+                    processKeyEvents="false" />
+            </LabelButtonGroup>
         </LayoutGroup>
-        <LabelButtonGroup
-            id="buttons"
-            translation="[991,691]"
-            layoutDirection="horiz"
-            itemSpacings="[12]"
-            visible="false">
-            <LabelButton
-                id="resume"
-                width="260"
-                height="62"
-                text="RESUME"
-                textColor="0xffffff99"
-                focusedTextColor="0xffffffff"
-                backgroundUri="pkg:/images/frame_generic.9.png"
-                focusedBackgroundUri="pkg:/images/button_focus.9.png"
-                font="dictionary:buttonFont"
-                processKeyEvents="false" />
-            <LabelButton
-                id="watch"
-                width="260"
-                height="62"
-                text=""
-                textColor="0xffffff99"
-                focusedTextColor="0xffffffff"
-                backgroundUri="pkg:/images/frame_generic.9.png"
-                focusedBackgroundUri="pkg:/images/button_focus.9.png"
-                font="dictionary:buttonFont"
-                processKeyEvents="false" />
-            <LabelButton
-                id="trailer"
-                width="260"
-                height="62"
-                text="PREVIEW TRAILER"
-                textColor="0xffffff99"
-                focusedTextColor="0xffffffff"
-                backgroundUri="pkg:/images/frame_generic.9.png"
-                focusedBackgroundUri="pkg:/images/button_focus.9.png"
-                font="dictionary:buttonFont"
-                processKeyEvents="false" />
-        </LabelButtonGroup>
+        <CBSScrollableText
+            id="movieDescription"
+            width="812"
+            height="364"
+            style="deci"
+            weight="regular"
+            scrollLines="4"
+            textOpacity=".75" />
     </children>
 </component>

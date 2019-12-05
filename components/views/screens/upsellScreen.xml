@@ -14,7 +14,7 @@
         <Font
             id="buttonFont"
             size="32"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
+            uri="pkg:/fonts/Proxima Nova A Semibold.ttf" />
 
         <Poster
             id="background"
@@ -35,7 +35,7 @@
             <Font
                 role="font"
                 size="60"
-                uri="pkg:/fonts/Lato-Light.ttf" />
+                uri="pkg:/fonts/Proxima Nova A Regular.ttf" />
         </Label>
         <Label
             id="message2"
@@ -46,7 +46,7 @@
             <Font
                 role="font"
                 size="44"
-                uri="pkg:/fonts/Lato-Bold.ttf" />
+                uri="pkg:/fonts/Proxima Nova A Bold.ttf" />
         </Label>
         <Label
             id="message3"
@@ -57,7 +57,7 @@
             <Font
                 role="font"
                 size="44"
-                uri="pkg:/fonts/Lato-Light.ttf" />
+                uri="pkg:/fonts/Proxima Nova A Regular.ttf" />
         </Label>
 
         <LabelButtonGroup

@@ -25,11 +25,11 @@
         <Font
             id="buttonFont"
             size="32"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
+            uri="pkg:/fonts/Proxima Nova A Semibold.ttf" />
           <Font
               id="focusedButtonFont"
             size="32" 
-              uri="pkg:/fonts/Lato-Regular.ttf" />
+              uri="pkg:/fonts/Proxima Nova A Semibold.ttf" />
         <Label
             translation="[0,100]"
             width="1920"
@@ -38,7 +38,7 @@
             color="0xe5e5e5ff">
               <Font
                   role="font"
-                  uri="pkg:/fonts/Lato-Bold.ttf"
+                  uri="pkg:/fonts/Proxima Nova A Bold.ttf"
                   size="50" />
         </Label>
 
@@ -63,9 +63,9 @@
                 hintTextColor="0x5d5d5dff"
                 focusedHintTextFont="dictionary:focusedButtonFont"
                 focusedHintTextColor="0xa5a5a5ff"
-                backgroundUri="pkg:/images/frame_generic.9.png"
+                backgroundUri="pkg:/images/ui/button_unfocused_$$RES$$.9.png"
                 backgroundColor="0xffffff22"
-                focusedBackgroundUri="pkg:/images/frame_grid.9.png"
+                focusedBackgroundUri="pkg:/images/ui/focus_grid_$$RES$$.9.png"
                 focusedBackgroundColor="0xffffff22"
                 inputMask="^([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6})$"
                 validationError="Please return to the previous screen and enter the email address you used to subscribe to CBS All Access.\n\nForgot your email? Please visit cbs.com/help."
@@ -84,41 +84,27 @@
                 hintTextColor="0x5d5d5dff"
                 focusedHintTextFont="dictionary:focusedButtonFont"
                 focusedHintTextColor="0xa5a5a5ff"
-                backgroundUri="pkg:/images/frame_generic.9.png"
+                backgroundUri="pkg:/images/ui/button_unfocused_$$RES$$.9.png"
                 backgroundColor="0xffffff22"
-                focusedBackgroundUri="pkg:/images/frame_grid.9.png"
+                focusedBackgroundUri="pkg:/images/ui/focus_grid_$$RES$$.9.png"
                 focusedBackgroundColor="0xffffff22"
                 secureMode="true"
                 inputMask="^(.{6,128})$"
                 validationError="Please enter a valid password that is at least 6 characters."
                 processKeyEvents="false" />
     
-            <LabelButton
+            <CBSButton
                 id="signIn"
                 width="700"
-                height="88"
                 text="Sign In"
-                textColor="0xffffffff"
-                focusedTextColor="0xffffffff"
-                backgroundUri="pkg:/images/upsell_button.9.png"
-                focusedBackgroundUri="pkg:/images/upsell_button_focused.9.png"
                 processKeyEvents="false"
-                font="dictionary:buttonFont"
-                focusedFont="dictionary:focusedButtonFont"
                 disabledOpacity=".5"
                 disabled="false" />
-            <LabelButton
+            <CBSButton
                 id="forgotPassword"
                 width="700"
-                height="88"
                 text="Forgot Password?"
-                textColor="0xffffffff"
-                focusedTextColor="0xffffffff"
-                backgroundUri="pkg:/images/upsell_button.9.png"
-                focusedBackgroundUri="pkg:/images/upsell_button_focused.9.png"
                 processKeyEvents="false"
-                font="dictionary:buttonFont"
-                focusedFont="dictionary:focusedButtonFont"
                 disabledOpacity=".5"
                 disabled="false" />
         </LabelButtonGroup>
@@ -130,7 +116,7 @@
             color="0xe5e5e5ff">
             <Font
                 role="font"
-                uri="pkg:/fonts/Lato-Regular.ttf"
+                uri="pkg:/fonts/Proxima Nova A Semibold.ttf"
                 size="30" />
         </Label>
 

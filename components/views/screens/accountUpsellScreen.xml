@@ -15,19 +15,19 @@
         <Font
             id="titleFont"
             size="40"
-            uri="pkg:/fonts/Lato-Bold.ttf" />
+            uri="pkg:/fonts/Proxima Nova A Bold.ttf" />
         <Font
             id="buttonFont"
             size="32"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
+            uri="pkg:/fonts/Proxima Nova A Semibold.ttf" />
         <Font
             id="disclaimerFont"
             size="24"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
+            uri="pkg:/fonts/Proxima Nova A Semibold.ttf" />
         <Font
             id="noButtonsFont"
             size="43"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
+            uri="pkg:/fonts/Proxima Nova A Semibold.ttf" />
             
 <!--         <Poster -->
 <!--             id="background" -->

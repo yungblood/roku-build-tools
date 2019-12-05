@@ -2,6 +2,7 @@
 <component name="EpisodeTile" extends="Group">
     <script type="text/brightscript" uri="pkg:/components/views/widgets/tiles/episodeTile.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/theme.brs" />
 
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
@@ -13,42 +14,41 @@
         <field id="height" type="float" onChange="updateLayout" />
     </interface>
     <children>
-        <Font
-            id="titleFont"
-            size="24"
-            uri="pkg:/fonts/Lato-Bold.ttf" />
-        <Font
-            id="subtitleFont"
-            size="24"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
-        <Poster
+        <FadeInPoster
             id="poster"
+            fadeDuration=".5"
             loadDisplayMode="scaleToZoom" />
-        <Poster
-            id="largeDarken"
-            uri="pkg:/images/large-thumb-darken.png"
-            visible="false" />
-        <Poster
-            id="smallDarken"
-            uri="pkg:/images/small-thumb-darken.png"
-            visible="false" />
         <LayoutGroup
             id="metadata"
-            layoutDirection="vert"
-            vertAlignment="bottom"
-            itemSpacings="[0,10]">
-            <Label
-                id="title"
-                color="0xfefefeff"
-                vertAlign="bottom"
-                wrap="false"
-                font="dictionary:titleFont" />
-            <Label
-                id="subtitle"
-                color="0xfefefeff"
-                vertAlign="bottom"
-                wrap="false"
-                font="dictionary:subtitleFont" />
+            layoutDirection="vert">
+            <LayoutGroup
+                id="titleGroup"
+                layoutDirection="horiz"
+                itemSpacings="[13]">
+                <CBSLabel
+                    id="episodeNumber"
+                    wrap="false"
+                    style="centi"
+                    weight="bold" />
+                <CBSLabel
+                    id="title"
+                    wrap="false"
+                    style="centi" />
+            </LayoutGroup>
+            <LayoutGroup
+                id="subtitleGroup"
+                layoutDirection="horiz"
+                itemSpacings="[8]">
+                <CBSLabel
+                    id="subtitle"
+                    wrap="false"
+                    style="micro"
+                    themeColor="fiftyShadesOfCBS" />
+                <CBSLabel
+                    id="subtitle2"
+                    wrap="false"
+                    style="micro" />
+            </LayoutGroup>
         </LayoutGroup>
     </children>
 </component>

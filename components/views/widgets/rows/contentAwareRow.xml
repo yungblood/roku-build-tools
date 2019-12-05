@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<component name="ContentAwareRow" extends="Group">
-    <script type="text/brightscript" uri="pkg:/components/views/widgets/rows/contentAwareRow.brs" />
-    <interface>
-        <field id="itemContent" type="node" onChange="onContentChanged" />
-        <field id="itemSelected" type="integer" alwaysNotify="true" />
-        <field id="buttonSelected" type="string" alwaysNotify="true" />
-    </interface>
-</component>

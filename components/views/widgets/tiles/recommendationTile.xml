@@ -16,19 +16,19 @@
         <Font
             id="titleFont"
             size="30"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
+            uri="pkg:/fonts/Proxima Nova A Semibold.ttf" />
         <Font
             id="subtitleFont"
             size="27"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
+            uri="pkg:/fonts/Proxima Nova A Semibold.ttf" />
         <Font
             id="buttonFont"
             size="24"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
+            uri="pkg:/fonts/Proxima Nova A Semibold.ttf" />
         <Font
             id="countdownFont"
             size="24"
-            uri="pkg:/fonts/Lato-Light.ttf" />
+            uri="pkg:/fonts/Proxima Nova A Regular.ttf" />
 
         <Poster
             id="poster"

@@ -1,12 +1,13 @@
 sub init()
     m.top.backgroundUri = ""
-    m.top.backgroundColor = "0x000000ff"
+    m.top.backgroundColor = getThemeColor("galaxy") '"0x000000ff"
     m.top.setFocus(true)
     m.top.observeField("focusedChild", "onFocusChanged")
     
     m.screens = m.top.findNode("screens")
     m.dialogs = m.top.findNode("dialogs")
     m.waitRect = m.top.findNode("waitRect")
+    m.waitRect.color = getThemeColor("galaxy")
     m.loading = m.top.findNode("loading")
     m.spinner = m.top.findNode("spinner")
 
@@ -122,6 +123,8 @@ sub onInitialized(nodeEvent as object)
 
     'signUp("PROD1")
     signIn()
+    'showTestScreen()
+    'showTosScreen()
 end sub
 
 sub signIn(username = "" as string, password = "" as string)
@@ -310,7 +313,7 @@ sub downgrade()
 end sub
 
 sub showTestScreen()
-    screen = createObject("roSGNode", "TestScreen")
+    screen = createObject("roSGNode", "TypeScaleScreen")
     addToNavigationStack(screen)
 end sub
 

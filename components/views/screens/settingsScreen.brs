@@ -9,7 +9,7 @@ sub init()
     m.menu.observeField("buttonSelected", "onMenuItemSelected")
     
     m.settingsButtons = m.top.findNode("settingsButtons")
-    m.settingsButtons.observeField("buttonFocused", "onButtonFocused")
+    'm.settingsButtons.observeField("buttonFocused", "onButtonFocused")
     m.settingsButtons.observeField("buttonSelected", "onButtonSelected")
 
     m.panels = m.top.findNode("panels")
@@ -22,9 +22,14 @@ sub init()
     
     m.liveTVPanel = m.top.findNode("liveTVPanel")
     m.liveTVPanel.observeField("buttonSelected", "onPanelButtonSelected")
-    
-    m.buttonTextColor = "0xffffff66"
-    m.focusedButtonTextColor = "0x0092f3ff"
+
+    m.lastPanel = m.accountPanel
+end sub
+
+sub onFocusChanged(nodeEvent as object)
+    if m.top.hasFocus() then
+        focusPanel(m.lastPanel.id, false)
+    end if
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
@@ -40,7 +45,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
             end if
         else if key = "right" then
             if m.settingsButtons.isInFocusChain() then
-                focusPanel()
+                focusPanel(m.lastPanel.id)
                 return true
             end if
         else if key = "up" then
@@ -58,27 +63,10 @@ function onKeyEvent(key as string, press as boolean) as boolean
     return false
 end function
 
-sub onFocusChanged()
-    if m.top.hasFocus() then
-        if m.lastFocus <> invalid then
-            m.lastFocus.setFocus(true)
-        else
-            hideSpinner()
-            m.settingsButtons.setFocus(true)
-        end if
-        setGlobalField("ignoreBack",false)
-    end if
-end sub
-
 sub onButtonFocused()
     if m.lastSetting <> invalid then
-        m.lastSetting.selected = false
+        m.lastSetting.highlighted = false
     end if
-    
-    for i = 0 to m.settingsButtons.getChildCount() - 1
-        button = m.settingsButtons.getChild(i)
-        button.textColor = m.buttonTextColor
-    next
 
     buttons = m.settingsButtons
     setting = buttons.getChild(buttons.buttonFocused)
@@ -105,8 +93,9 @@ sub onReadTimerFired(nodeEvent as object)
     end if
 end sub
 
-sub onButtonSelected()
-    focusPanel()
+sub onButtonSelected(nodeEvent as object)
+    button = m.settingsButtons.getChild(nodeEvent.getData())
+    focusPanel(button.id + "Panel")
 end sub
 
 sub onPanelButtonSelected(nodeEvent as object)
@@ -130,28 +119,38 @@ sub onMenuItemSelected(nodeEvent as object)
     end if
 end sub
 
-function focusPanel() as boolean
-    m.lastFocus = m.top.focusedChild
-    for i = 0 to m.panels.getChildCount() - 1
-        panel = m.panels.getChild(i)
-        if panel.visible then
-            if panel.focusable then
-                currentButton = m.settingsButtons.getChild(m.settingsButtons.buttonFocused)
-                if currentButton <> invalid then
-                    currentButton.textColor = m.focusedButtonTextColor
-                end if
-                panel.setFocus(true)
-
-                params = {}
-                params["podType"] = "settings"
-                params["podText"] = lCase(currentbutton.text)
-                params["podPosition"] = i
-                trackScreenAction("trackPodSelect", params)
-
-                return true
-            end if
-            exit for
+function focusPanel(panelID = "" as string, setFocus = true as boolean) as boolean
+    buttonID = panelID.replace("Panel", "")
+    panel = m.top.findNode(panelID)
+    if panel <> invalid then
+        if m.lastPanel <> invalid and not panel.isSameNode(m.lastPanel) then
+            m.lastPanel.visible = false
         end if
-    next
-    return false
+        panel.visible = true
+        panel.callFunc("read", {})
+        m.lastPanel = panel
+
+        podIndex = 0
+        for i = 0 to m.settingsButtons.getChildCount() - 1
+            button = m.settingsButtons.getChild(i)
+            if button.id = buttonID then
+                button.highlighted = true
+                podIndex = i
+            else
+                button.highlighted = false
+            end if
+        next
+
+        if panel.focusable and setFocus then
+            panel.setFocus(true)
+
+            params = {}
+            params["podType"] = "settings"
+            params["podText"] = lCase(buttonID)
+            params["podPosition"] = podIndex
+            trackScreenAction("trackPodSelect", params)
+        else
+            m.settingsButtons.setFocus(true)
+        end if
+    end if
 end function

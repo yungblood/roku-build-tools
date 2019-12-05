@@ -2,6 +2,7 @@
 <component name="BaseScreen" extends="Group">
     <script type="text/brightscript" uri="pkg:/components/views/screens/baseScreen.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/theme.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/omniture.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/constants.brs" />
     <script type="text/brightscript" uri="pkg:/components/services/adobe/adbmobile.brs" />

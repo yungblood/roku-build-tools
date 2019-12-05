@@ -9,6 +9,7 @@
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/dateTime.brs" />
     <interface>
         <field id="itemContent" type="node" onChange="onContentChanged" />
+        <field id="index" type="integer" />
         <field id="width" type="float" onChange="updateLayout" />
         <field id="height" type="float" onChange="updateLayout" />
     </interface>

@@ -71,15 +71,8 @@ sub onButtonsChanged()
     m.buttons.removeChildrenIndex(m.buttons.getChildCount(), 0)
     buttons = m.top.buttons
     for each buttonText in buttons
-        button = m.buttons.createChild("LabelButton")
+        button = m.buttons.createChild("CBSButton")
         button.text = uCase(buttonText)
-        button.textColor = "0xffffff99"
-        button.focusedTextColor = "0xffffffff"
-        button.width = m.top.buttonWidth
-        button.height = m.top.buttonHeight
-        button.font = m.buttonFont
-        button.backgroundUri = "pkg:/images/frame_generic.9.png"
-        button.focusedBackgroundUri = "pkg:/images/button_focus.9.png"
         button.processKeyEvents = false
     next
 end sub

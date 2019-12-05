@@ -2,6 +2,7 @@
 <component name="LiveTVPanelELO" extends="Group">
     <script type="text/brightscript" uri="pkg:/components/views/widgets/panels/liveTVPanelELO.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/theme.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/omniture.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/constants.brs" />
     <script type="text/brightscript" uri="pkg:/components/services/adobe/adbmobile.brs" />
@@ -25,35 +26,14 @@
         <function name="read" />
     </interface>
     <children>
-        <Font
-            id="labelFont"
-            size="32"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
-        <Font
-            id="labelBoldFont"
-            size="40"
-            uri="pkg:/fonts/Lato-Bold.ttf" />
-        <Font
-            id="buttonFont"
-            size="32"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
-        <Font
-            id="focusedButtonFont"
-            size="32" 
-            uri="pkg:/fonts/Lato-Regular.ttf" />
-
         <LayoutGroup
             id="content"
             layoutDirection="vert"
-            translation="[0,416]"
-            itemSpacings="[0]"
-            vertAlignment="center">
-            <Label
+            itemSpacings="[0]">
+            <CBSLabel
                 id="signedOut"
                 text="You must be signed in to choose a local station"
-                color="0xffffffff"
-                opacity=".75"
-                font="dictionary:labelFont"
+                style="deci"
                 visible="false" />
             <LayoutGroup
                 id="signedIn"
@@ -62,16 +42,13 @@
                 visible="false">
                 <Rectangle
                     color="0x00000000">
-                    <Label
+                    <CBSLabel
                         id="localStationLabel"
                         translation="[20,0]"
                         width="900"
                         text="Your local station is:"
-                        color="0xffffffff"
-                        wrap="true"
-                        lineSpacing="-1"
-                        font="dictionary:labelBoldFont"
-                        opacity=".75" />
+                        style="deca"
+                        wrap="true" />
                 </Rectangle>
                 <MarkupGrid
                     id="channels"
@@ -82,7 +59,7 @@
                     numRows="2"
                     horizFocusAnimationStyle="floatingFocus"
                     vertFocusAnimationStyle="floatingFocus"
-                    focusBitmapBlendColor="0x3e96ef00" />
+                    focusBitmapBlendColor="0x00000000" />
                 <Rectangle
                     color="0x00000000">
                     <LayoutGroup
@@ -90,28 +67,17 @@
                         translation="[20,0]"
                         layoutDirection="vert"
                         itemSpacings="[44]">
-                        <Label
+                        <CBSLabel
                             id="checkLocationLabel"
                             translation="[20,0]"
                             width="900"
                             text=""
                             wrap="true"
-                            lineSpacing="-1"
-                            color="0xffffffff"
-                            font="dictionary:labelFont"
-                            opacity=".75" />
+                            style="deci" />
     
-                        <LabelButton
+                        <CBSButton
                             id="checkLocation"
-                            width="394"
-                            height="73"
-                            text="CHECK LOCATION"
-                            textColor="0xffffffff"
-                            focusedTextColor="0xffffffff"
-                            backgroundUri="pkg:/images/upsell_button.9.png"
-                            focusedBackgroundUri="pkg:/images/upsell_button_focused_noborder.9.png"
-                            font="dictionary:buttonFont"
-                            focusedFont="dictionary:focusedButtonFont" />
+                            text="CHECK LOCATION" />
                     </LayoutGroup>
                 </Rectangle>
             </LayoutGroup>
@@ -122,45 +88,31 @@
                     id="zipOverrideInfo"
                     layoutDirection="vert"
                     itemSpacings="[40]">
-                    <Label
+                    <CBSLabel
                         width="800"
                         text="Your local station is:"
-                        color="0xffffffff"
                         wrap="true"
-                        lineSpacing="-1"
-                        font="dictionary:labelBoldFont"
-                        opacity=".75" />
+                        style="deca" />
                     <LiveTVTile
                         id="liveTVTile"
                         width="800"
                         height="172" />
-                    <Label
+                    <CBSLabel
                         id="currentLocation"
                         width="800"
                         text=""
                         wrap="true"
-                        lineSpacing="-1"
-                        color="0xffffffff"
-                        font="dictionary:labelFont"
-                        opacity=".75" />
+                        style="deci" />
                 </LayoutGroup>
                 <PinPad
                     id="zipCode"
                     translation="[850,0]"
                     pinLength="5"
                     secureMode="false" />
-                <LabelButton
+                <CBSButton
                     id="enter"
                     translation="[956,468]"
-                    width="200"
-                    height="73"
-                    text="ENTER"
-                    textColor="0xffffffff"
-                    focusedTextColor="0xffffffff"
-                    backgroundUri="pkg:/images/upsell_button.9.png"
-                    focusedBackgroundUri="pkg:/images/upsell_button_focused_noborder.9.png"
-                    font="dictionary:buttonFont"
-                    focusedFont="dictionary:focusedButtonFont" />
+                    text="ENTER" />
             </Group>
         </LayoutGroup>
     </children>

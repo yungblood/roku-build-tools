@@ -3,10 +3,15 @@ sub init()
     m.title = m.top.findNode("title")
     m.subtitle = m.top.findNode("subtitle")
     
-    m.largeDarken = m.top.findNode("largeDarken")
-    m.smallDarken = m.top.findNode("smallDarken")
-    
     m.metadata = m.top.findNode("metadata")
+    
+    m.titleGroup = m.top.findNode("titleGroup")
+    m.episodeNumber = m.top.findNode("episodeNumber")
+    m.titleGroup.removeChild(m.episodeNumber)
+
+    m.subtitleGroup = m.top.findNode("subtitleGroup")
+    m.subtitle = m.top.findNode("subtitle")
+    m.subtitle2 = m.top.findNode("subtitle2")
 end sub
 
 sub onContentChanged()
@@ -31,20 +36,20 @@ end sub
 
 sub updateResumePoint()
     if m.episode <> invalid then
-        ' if watch history exists leave progress bar at 100%
         if m.episode.resumePoint <> invalid and m.episode.resumePoint > 0 then
             if m.progressBar = invalid then
-                m.progressBar = createObject("roSGNode", "ProgressBar")
+                m.progressBar = createObject("roSGNode", "CBSProgressBar")
                 m.progressBar.id = "progressBar"
-                m.progressBar.width = m.top.width - 36
-                m.progressBar.height = 8
-                m.progressBar.backgroundColor = "0xffffff33"
-                m.progressBar.barColor = "0x0092f3ff"
-            end if
+                m.progressBar.height = 6
 
-            m.metadata.appendChild(m.progressBar)
+                m.progressBar.width = m.top.width - 24 - 24
+                m.progressbar.translation = [24, m.top.height - m.progressBar.height - 24]
+                m.top.appendChild(m.progressBar)
+            end if
             m.progressBar.maxValue = m.episode.length
             m.progressBar.value = m.episode.resumePoint
+
+            ' if watch history exists leave progress bar at 100%
             if m.progressBar.value / m.progressBar.maxValue > .97 then
                 m.progressBar.value = m.progressBar.maxValue
             end if
@@ -55,7 +60,7 @@ sub updateResumePoint()
             end if
         else
             if m.progressBar <> invalid then
-                m.metadata.removeChild(m.progressBar)
+                m.progressBar.visible = false
             end if
         end if
     end if
@@ -68,14 +73,11 @@ sub updateMetadata()
             m.subtitle.text = m.episode.description
         else
             if m.episode.isFullEpisode then
-                subtitle = m.episode.episodeString
-                if not isNullOrEmpty(subtitle) then
-                    subtitle = subtitle + " | "
-                end if
-                subtitle = subtitle + m.episode.airDateString
-                m.subtitle.text = subtitle
+                m.episodeNumber.text = (m.episode.seasonString + " " + m.episode.episodeString).trim()
+                m.subtitle.text = m.episode.releaseDate
             else
-                m.subtitle.text = "(" + m.episode.durationString + ")"
+                m.subtitle.text = m.episode.durationString
+                m.subtitle2.text = m.episode.showName
             end if
         end if
     end if
@@ -89,22 +91,26 @@ sub updateLayout()
             
             updatePoster()
             
-            m.metadata.translation = [18, m.top.height - 20]
+            m.metadata.translation = [0, m.top.height + 17]
             
-            m.title.width = m.top.width - 36
-            m.subtitle.width = m.top.width - 36
-            
-            if m.progressBar <> invalid then
-                m.progressBar.width = m.top.width - 36
+            if not isNullOrEmpty(m.episodeNumber.text) then
+                m.titleGroup.insertChild(m.episodeNumber, 0)
+                m.title.width = m.top.width - (m.episodeNumber.boundingRect().width + m.titleGroup.itemSpacings[0])
+            else
+                m.titleGroup.removeChild(m.episodeNumber)
+                m.title.width = m.top.width
+            end if
+
+            if m.episode.isFullEpisode and m.episode.subtype() <> "Movie" then
+                m.subtitle.width = m.top.width
+            else
+                m.subtitle2.width = m.top.width - (m.subtitle.boundingRect().width + m.subtitleGroup.itemSpacings[0])
             end if
             
-            m.largeDarken.width = m.top.width
-            m.largeDarken.height = m.top.height
-            m.smallDarken.width = m.top.width
-            m.smallDarken.height = m.top.height
-            
-            m.largeDarken.visible = m.top.width > 500
-            m.smallDarken.visible = not m.largeDarken.visible
+            if m.progressBar <> invalid then
+                m.progressBar.width = m.top.width - 24 - 24
+                m.progressbar.translation = [24, m.top.height - m.progressBar.height - 24]
+            end if
         end if
     end if
 end sub

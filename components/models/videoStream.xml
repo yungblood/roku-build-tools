@@ -7,7 +7,7 @@
         <field id="ppid" type="string" />
         <field id="adTagParameters" type="string" />
         <field id="campaign" type="string" />
-        <field id="authorization" type="string" />
+        <field id="authHeader" type="string" />
 
         <field id="streamDetails" type="assocarray" />
     </interface>

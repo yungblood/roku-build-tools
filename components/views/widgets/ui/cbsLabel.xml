@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="CBSLabel" extends="Label">
+    <script type="text/brightscript" uri="./cbsLabel.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/theme.brs" />
+    <interface>
+        <field id="themeColor" type="string" onChange="onThemeColorChanged" />
+        <field id="style" type="string" onChange="updateFont" />
+        <field id="weight" type="string" onChange="updateFont" />
+    </interface>
+</component>

@@ -24,37 +24,37 @@ sub updateContent()
 '        end if
         if not isNullOrEmpty(config.faqUrl) then
             label = m.content.createChild("SettingsLabel")
-            label.title = "FREQUENTLY ASKED QUESTIONS"
+            label.title = "Frequently Asked Questions"
             label.value = config.faqUrl
         end if
         if not isNullOrEmpty(config.feedbackEmail) then
             label = m.content.createChild("SettingsLabel")
-            label.title = "SEND FEEDBACK"
+            label.title = "Send Feedback"
             label.value = config.feedbackEmail
         end if
         supportGroup = m.content.createChild("Group")
         label = supportGroup.createChild("SettingsLabel")
-        label.title = "CUSTOMER SUPPORT"
+        label.title = "Customer Support"
         label.value = config.supportPhone
-        
-        label = supportGroup.createChild("SettingsLabel")
-        label.translation = [500, 0]
-        label.title = "APP VERSION"
-        label.value = config.appVersion
         
         liveTVGroup = m.content.createChild("Group")
         label = liveTVGroup.createChild("SettingsLabel")
-        label.title = "LIVE TV LOCATION"
+        label.title = "Live TV Location"
         label.value = "To change location, visit Settings > Live TV"
+        
+        versionGroup = m.content.createChild("Group")
+        label = versionGroup.createChild("SettingsLabel")
+        label.title = "App Version"
+        label.value = config.appVersion
         
         deviceGroup = m.content.createChild("Group")
         label = deviceGroup.createChild("SettingsLabel")
-        label.title = "DEVICE ID"
+        label.title = "Device ID"
         label.value = getPersistedDeviceID()
         
         ipGroup = m.content.createChild("Group")
         label = ipGroup.createChild("SettingsLabel")
-        label.title = "IP ADDRESS"
+        label.title = "IP Address"
         label.value = config.ipAddress
     end if
 end sub

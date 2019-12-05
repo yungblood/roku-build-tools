@@ -3,6 +3,7 @@
     <script type="text/brightscript" uri="pkg:/components/scenes/appScene.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/constants.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/theme.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/omniture.brs" />
     <script type="text/brightscript" uri="pkg:/components/services/adobe/adbmobile.brs" />
     <script type="text/brightscript" uri="pkg:/components/framework/utilities/dialogs.brs" />

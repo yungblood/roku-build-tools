@@ -38,9 +38,6 @@ sub onFocusChanged()
         m.lastFocus.setFocus(true)
         setGlobalField("ignoreBack",false)
     end if
-    if m.list.hasFocus() and m.list.drawFocusFeeback <> true then
-        m.list.drawFocusFeedback = true
-    end if
 end sub
 
 sub onVisibleChanged()
@@ -124,8 +121,7 @@ sub loadContent(content as object)
     rows = content.rows
     content = createObject("roSGNode", "ContentNode")
     
-    rowHeights = []
-    rowItemSizes = []
+    rowTypes = []
     for i = 0 to rows.count() - 1
         row = rows[i]
         if row.subtype() = "Section" then
@@ -133,31 +129,26 @@ sub loadContent(content as object)
                 row.loadIndex = 0
             end if
             if row.title.inStr("Movies") >= 0 then
-                rowItemSizes.push([266, 399])
-                rowHeights.push(480)
+                rowTypes.push("portrait")
             else
                 if row.getChild(0).subtype() = "Show" or row.getChild(0).subtype() = "RelatedShow" then
-                    rowItemSizes.push([266, 399])
-                    rowHeights.push(480)
+                    rowTypes.push("portrait")
                 else
-                    rowItemSizes.push([420, 230])
-                    rowHeights.push(298)
+                    rowTypes.push("landscape")
                 end if 
             end if
         else if row.subtype() = "HomeShowGroup" or row.subtype() = "AmlgShowGroup" then
             if row.subtype() = "AmlgShowGroup" then
                 row.loadIndex = 0
             end if
-            rowItemSizes.push([266, 399])
-            rowHeights.push(480)
+            rowTypes.push("portrait")
         else if row.subtype() = "ShowHistory" then
             if m.showHistoryObserved <> true then
                 row.observeField("content", "updateContent")
                 m.showHistoryObserved = true
             end if
             row.update = true
-            rowItemSizes.push([266, 399])
-            rowHeights.push(480)   
+            rowTypes.push("portrait")
         else
             if row.subtype() = "ContinueWatching" then
                 if m.continueWatchingObserved <> true then
@@ -166,13 +157,11 @@ sub loadContent(content as object)
                 end if
                 row.update = true
             end if
-            rowItemSizes.push([420, 230])
-            rowHeights.push(298)
+            rowTypes.push("landscape")
         end if
         content.appendChild(row)
     next
-    m.list.rowItemSize = rowItemSizes
-    m.list.rowHeights = rowHeights
+    m.list.rowTypes = rowTypes
     m.list.content = content
 
     ' Fire launch complete beacon (Roku cert requirement)
@@ -260,7 +249,6 @@ sub onContentLoaded(nodeEvent as object)
     if task.errorCode = 0 then
         content = nodeEvent.getData()
         if content <> invalid then
-            m.list.showRowLabel=[true]
             m.top.content = content
         end if
     else
@@ -270,6 +258,7 @@ end sub
 
 sub scrollList()
     if m.list.isInFocusChain() then
+        m.list.peekVisible = true
         m.scrollInterp.keyValue = [m.list.translation, [0, 46]]
         if m.marquee.visible then
             m.fadeOutAnimation.appendChild(m.scrollAnimation)
@@ -278,6 +267,7 @@ sub scrollList()
             m.scrollAnimation.control = "start"
         end if
     else if m.marquee.isInFocusChain() then
+        m.list.peekVisible = false
         m.scrollInterp.keyValue = [m.list.translation, [0, 862]]
         m.fadeInAnimation.appendChild(m.scrollAnimation)
         m.fadeInAnimation.control = "start"
@@ -306,7 +296,7 @@ sub onRowItemSelected(nodeEvent as object)
     'TODO: Remove old code in this function once confirmed with data. team.
     indices = nodeEvent.getData()
     row = m.list.content.getChild(indices[0])
-    'add 1 to rowPosition because indeces doesn't count the marquee/hero row.
+    'add 1 to rowPosition because indices doesn't count the marquee/hero row.
     rowPosition = indices[0] + 1
     if row <> invalid then
         index = indices[1]

@@ -3,16 +3,8 @@ sub init()
 
     m.navButtons = m.top.findNode("navButtons")
     m.navButtons.observeField("buttonSelected", "onButtonSelected")
-
-    m.home = m.top.findNode("home")
-    m.shows = m.top.findNode("shows")
-    m.liveTV = m.top.findNode("liveTV")
-    m.movies = m.top.findNode("movies")
-    m.search = m.top.findNode("search")
-    m.settings = m.top.findNode("settings")
     
-    m.color = &hffffff66
-    m.focusedColor = &hffffffff
+    m.movies = m.top.findNode("movies")
 
     observeGlobalField("config", "onConfigChanged")
     onConfigChanged()
@@ -42,10 +34,10 @@ sub onFocusedIDChanged()
             if m.top.isInFocusChain() then
                 m.navButtons.jumpToIndex = i
             else
-                button.textColor = m.focusedColor
+                button.highlighted = true
             end if
         else
-            button.textColor = m.color
+            button.highlighted = false
         end if
     next
 end sub

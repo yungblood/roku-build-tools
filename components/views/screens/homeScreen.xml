@@ -9,11 +9,6 @@
         <field id="additionalContext" type="assocarray" />
     </interface>
     <children>
-       <Font
-           id="rowTitleFont"
-           size="43"
-           uri="pkg:/fonts/Lato-Light.ttf" />
-
         <MarqueeRow
             id="marquee"
             visible="false" />
@@ -21,33 +16,10 @@
             id="marqueeTimer"
             duration="5"
             repeat="true" />
-<!--         <ScrollableList -->
-<!--             id="list" -->
-<!--             translation="[0,0]" -->
-<!--             itemComponentName="ContentAwareRow" /> -->
-        
-        <RowList
-            id="list"
-            translation="[0,862]"
-            focusXOffset="[100]"
-            rowLabelOffset="[[98,13]]"
-            itemComponentName="GridTile"
-            itemSize="[1920,298]"
-            itemSpacing="[0,40]"
-            showRowLabel="[false]"
-            rowItemSpacing="[[30,0]]"
-            numRows="3"
-            rowLabelFont="dictionary:rowTitleFont"
-            rowLabelColor="0xffffffff"
-            focusBitmapUri="pkg:/images/frame_grid_$$RES$$.9.png"
-            drawFocusFeedback="false"
-            vertFocusAnimationStyle="fixedFocus" />
 
-<!--         <FocusGroup -->
-<!--             id="list" -->
-<!--             translation="[0,772]" -->
-<!--             advanceKey="down" -->
-<!--             reverseKey="up" /> -->
+        <CBSRowList
+            id="list"
+            translation="[0,851]" />
 
         <TopMenu
             id="menu"

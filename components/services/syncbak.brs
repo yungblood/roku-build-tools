@@ -125,6 +125,7 @@ function syncbak_makeRequest(path as string, params = invalid as object, retryCo
             path = addQueryString(path, param, params[param])
         next
     end if
+    'path = addQueryString(path, "debug", getPersistedDeviceID())
     url = m.baseUrl + path
     
     expiryDate = createObject("roDateTime").asSeconds() + 14400  ' 2 hours

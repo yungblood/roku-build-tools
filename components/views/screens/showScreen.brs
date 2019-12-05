@@ -4,9 +4,11 @@ sub init()
     m.top.observeField("focusedChild", "onFocusChanged")
     m.top.observeField("visible", "onVisibleChanged")
 
+    m.menu = m.top.findNode("menu")
+
     m.heroFadeRect = m.top.findNode("heroFadeRect")
     m.heroFadeRect.observeField("opacity", "onHeroOpacityChanged")
-    m.menu = m.top.findNode("menu")
+    m.heroFadeRect.color = getThemeColor("galaxy")
     
     m.dynamicPlay = m.top.findNode("dynamicPlay")
     m.dynamicPlay.observeField("contentLoaded", "onDynamicPlayLoaded")
@@ -19,6 +21,7 @@ sub init()
     
     ' Used to hide the partial content load, in the event of a deep link into dynamic play
     m.loadMask = m.top.findNode("loadMask")
+    m.loadMask.color = getThemeColor("galaxy")
 
     m.fadeOutAnimation = m.top.findNode("fadeOutAnimation")
     m.fadeInAnimation = m.top.findNode("fadeInAnimation")
@@ -30,10 +33,10 @@ sub init()
     m.lastFocus = m.dynamicPlay
 end sub
 
-sub onFocusChanged()
+sub onFocusChanged(nodeEvent as object)
     if m.top.hasFocus() then
         m.lastFocus.setFocus(true)
-        setGlobalField("ignoreBack",false)
+        setGlobalField("ignoreBack", false)
     end if
     if m.list.hasFocus() and m.list.drawFocusFeeback <> true then
         m.list.drawFocusFeedback = true
@@ -97,8 +100,7 @@ sub onShowChanged()
             content = createObject("roSGNode", "ContentNode")
             
             m.focusRow = -1
-            rowHeights = []
-            rowItemSizes = []
+            rowTypes = []
             for i = 0 to rows.count() - 1
                 row = rows[i]
                 
@@ -115,17 +117,14 @@ sub onShowChanged()
                     if i <= 2 then
                         row.loadIndex = 0
                     end if
-                    rowItemSizes.push([420, 230])
-                    rowHeights.push(298)
+                    rowTypes.push("landscape")
                 end if
                 content.appendChild(row)
             next
             ' Append the related shows row info to the end
-            rowItemSizes.push([266, 400])
-            rowHeights.push(452)
+            rowTypes.push("portrait")
             
-            m.list.rowItemSize = rowItemSizes
-            m.list.rowHeights = rowHeights
+            m.list.rowTypes = rowTypes
             m.list.content = content
             
             if m.focusRow > -1 then
@@ -248,6 +247,7 @@ end sub
 sub onDynamicPlayLoaded()
     hideSpinner()
     m.loadMask.visible = false
+    m.top.setFocus(true)
     if m.top.triggerDynamicPlay then
         m.top.triggerDynamicPlay = false
         processButtonSelection("dynamicPlay")
@@ -256,6 +256,7 @@ end sub
 
 sub scrollList(forceScroll = false as boolean)
     if forceScroll or m.list.isInFocusChain() then
+        m.list.peekVisible = true
         m.scrollInterp.keyValue = [m.list.translation, [0, 46]]
         if m.heroFadeRect.opacity = 0 then
             m.fadeOutAnimation.appendChild(m.scrollAnimation)
@@ -264,7 +265,8 @@ sub scrollList(forceScroll = false as boolean)
             m.scrollAnimation.control = "start"
         end if
     else if m.dynamicPlay.isInFocusChain() then
-        m.scrollInterp.keyValue = [m.list.translation, [0, 867]]
+        m.list.peekVisible = false
+        m.scrollInterp.keyValue = [m.list.translation, [0, 835]]
         m.fadeInAnimation.appendChild(m.scrollAnimation)
         m.fadeInAnimation.control = "start"
     end if

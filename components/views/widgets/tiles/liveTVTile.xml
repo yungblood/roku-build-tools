@@ -17,21 +17,12 @@
         <field id="focusPercent" type="float" onChange="updateFocus"  alias="focusedBackground.opacity" />
     </interface>
     <children>
-        <Font
-            id="callSignFont"
-            size="44"
-            uri="pkg:/fonts/Lato-Bold.ttf" />
-        <Font
-            id="locationFont"
-            size="28"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
-
         <Rectangle
             id="background"
             color="0x212121ff" />
         <Rectangle
             id="focusedBackground"
-            color="0x3e96efff"
+            color="0x0092f3ff"
             opacity="0" />
 
         <LayoutGroup
@@ -44,13 +35,13 @@
                 height="96"
                 loadDisplayMode="scaleToFit" />
         </LayoutGroup>
-        <Label
+        <CBSLabel
             id="callSign"
-            font="dictionary:callSignFont"
+            style="deca"
             vertAlign="bottom" />
-        <Label
+        <CBSLabel
             id="location"
-            font="dictionary:locationFont"
+            style="centi"
             vertAlign="top" />
     </children>
 </component>

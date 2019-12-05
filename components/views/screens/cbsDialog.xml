@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="CbsDialog" extends="Group">
     <script type="text/brightscript" uri="pkg:/components/views/screens/cbsDialog.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/theme.brs" />
     <interface>
         <field id="title" type="string" alias="title.text" />
-        <field id="titleFont" type="node" alias="title.font" />
-        <field id="titleColor" type="color" alias="title.color" />
         <field id="message" type="string" alias="message.text" />
-        <field id="messageFont" type="intarray" alias="message.font" />
         <field id="messageColor" type="color" alias="message.color" />
         <field id="messageAlignment" type="color" alias="message.horizAlign" />
         <field id="buttons" type="stringarray" onChange="onButtonsChanged" />
@@ -34,10 +32,6 @@
         <field id="close" type="boolean" alwaysNotify="true" />
     </interface>
     <children>
-        <Font
-            id="buttonFont"
-            size="24"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
         <Rectangle
             width="1920"
             height="1080"
@@ -46,32 +40,22 @@
                 id="controls"
                 translation="[960,540]"
                 layoutDirection="vert"
-                itemSpacings="[30]"
+                itemSpacings="[24]"
                 horizAlignment="center"
                 vertAlignment="center">
-                <Label
+                <CBSLabel
                     id="title"
                     width="1920"
                     wrap="false"
                     horizAlign="center"
-                    color="0xffffffff">
-                       <Font
-                           role="font"
-                           size="40"
-                           uri="pkg:/fonts/Lato-Regular.ttf" />
-                </Label>
-                <Label
+                    style="deca" />
+                <CBSLabel
                     id="message"
                     width="1250"
-                    lineSpacing="0"
-                    color="0xffffffff"
                     horizAlign="center"
-                    wrap="true">
-                       <Font
-                           role="font"
-                           size="40"
-                           uri="pkg:/fonts/Lato-Light.ttf" />
-                </Label>
+                    wrap="true"
+                    style="deca"
+                    weight="regular" />
                 <Group
                     id="additionalContent" />
                 <Rectangle

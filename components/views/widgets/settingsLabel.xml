@@ -6,27 +6,17 @@
         <field id="value" type="string" alias="value.text" />
     </interface>
     <children>
-        <Font
-           id="titleFont"
-           size="24"
-           uri="pkg:/fonts/Lato-Bold.ttf" />
-        <Font
-           id="valueFont"
-           size="50"
-           uri="pkg:/fonts/Lato-Light.ttf" />
-
         <LayoutGroup
             layoutDirection="vert"
-            itemSpacings="[0]">
-            <Label
+            itemSpacings="[4]">
+            <CBSLabel
                 id="title"
-                color="0x0092f3ff"
-                font="dictionary:titleFont" />
-            <Label
+                style="deci"
+                weight="bold" />
+            <CBSLabel
                 id="value"
-                color="0xffffffff"
-                opacity=".5"
-                font="dictionary:valueFont" />
+                style="micro"
+                themeColor="fiftyShadesOfCBS" />
         </LayoutGroup>
     </children>
 </component>

@@ -67,15 +67,9 @@ sub onButtonsChanged(nodeEvent as object)
     
     newButtons = []
     for each buttonText in buttons
-        button = createObject("roSGNode", "LabelButton")
-        button.width = 701
-        button.height = 88
-        button.textColor = "0xffffffff"
-        button.focusedTextColor = "0xffffffff"
-        button.backgroundUri = "pkg:/images/upsell_button.9.png"
-        button.focusedBackgroundUri = "pkg:/images/upsell_button_focused.9.png"
+        button = createObject("roSGNode", "CBSButton")
+        button.width = 700
         button.processKeyEvents = false
-        button.font = m.buttonFont
         button.text = buttonText
         newButtons.push(button)
     next

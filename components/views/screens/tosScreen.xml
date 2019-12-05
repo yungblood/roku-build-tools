@@ -10,15 +10,15 @@
         <Font
             id="buttonFont"
             size="32"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
+            uri="pkg:/fonts/Proxima Nova A Semibold.ttf" />
           <Font
               id="focusedButtonFont"
             size="32" 
-              uri="pkg:/fonts/Lato-Regular.ttf" />
+              uri="pkg:/fonts/Proxima Nova A Semibold.ttf" />
         <Font
             id="textFont"
             size="28" 
-            uri="pkg:/fonts/Lato-Regular.ttf" />
+            uri="pkg:/fonts/Proxima Nova A Semibold.ttf" />
         <Label
             translation="[0,100]"
             width="1920"
@@ -27,7 +27,7 @@
             color="0xe5e5e5ff">
               <Font
                   role="font"
-                  uri="pkg:/fonts/Lato-Bold.ttf"
+                  uri="pkg:/fonts/Proxima Nova A Bold.ttf"
                   size="50" />
         </Label>
         <Rectangle
@@ -43,14 +43,12 @@
             color="0xffffff11"
             visible="false" />
         
-        <ScrollableText
+        <CBSScrollableText
             id="text"
             translation="[200,200]"
             width="1520"
             height="605"
-            color="0xffffff99"
-            lineSpacing="0"
-            font="dictionary:textFont" />
+            style="centi" />
 
         <LabelButtonGroup
             id="buttons"
@@ -58,17 +56,9 @@
             layoutDirection="horiz"
             itemSpacings="[20]"
             horizAlignment="right">
-            <LabelButton
+            <CBSButton
                 id="ok"
-                width="400"
-                height="88"
                 text="OK"
-                textColor="0xffffffff"
-                focusedTextColor="0xffffffff"
-                backgroundUri="pkg:/images/upsell_button.9.png"
-                focusedBackgroundUri="pkg:/images/upsell_button_focused.9.png"
-                font="dictionary:buttonFont"
-                focusedFont="dictionary:focusedButtonFont"
                 processKeyEvents="false" />
         </LabelButtonGroup>
     </children>

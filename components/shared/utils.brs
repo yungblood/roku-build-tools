@@ -48,23 +48,17 @@ function showPinDialog(title as string, buttons as object, callbackFunction as s
     pinPad.pinLength = 4
     pinPad.secureMode = true
     
-    font = createObject("roSGNode", "Font")
-    font.uri = "pkg:/fonts/Lato-Bold.ttf"
-    font.size = 28
-    footerLabel = dialog.footerContentGroup.createChild("Label")
-    footerLabel.font = font
-    footerLabel.color = "0xffffffff"
+    footerLabel = dialog.footerContentGroup.createChild("CBSLabel")
+    footerLabel.style = "centi"
+    footerLabel.wieght = "bold"
     footerLabel.width = dialog.buttonWidth
     footerLabel.horizAlign = "center"
     footerLabel.text = "Forgot PIN?"
-    
-    font = createObject("roSGNode", "Font")
-    font.uri = "pkg:/fonts/Lato-Regular.ttf"
-    font.size = 28
-    footerLabel = dialog.footerContentGroup.createChild("Label")
+
+    footerLabel = dialog.footerContentGroup.createChild("CBSLabel")
     footerLabel.translation = [0, 35]
-    footerLabel.font = font
-    footerLabel.color = "0xffffff9b"
+    footerLabel.style = "centi"
+    footerLabel.themeColor = "fiftyShadesOfCBS"
     footerLabel.width = dialog.buttonWidth
     footerLabel.horizAlign = "center"
     footerLabel.text = "Visit www.cbs.com/PIN"
@@ -92,24 +86,18 @@ sub showPinErrorDialog(title as string, message as string, buttons as object, ca
     dialog.buttons = buttons
 
     dialog.includeContentSpacer = false
-    
-    font = createObject("roSGNode", "Font")
-    font.uri = "pkg:/fonts/Lato-Bold.ttf"
-    font.size = 28
-    footerLabel = dialog.footerContentGroup.createChild("Label")
-    footerLabel.font = font
-    footerLabel.color = "0xffffffff"
+
+    footerLabel = dialog.footerContentGroup.createChild("CBSLabel")
+    footerLabel.style = "deci"
     footerLabel.width = dialog.buttonWidth
     footerLabel.horizAlign = "center"
     footerLabel.text = "Forgot PIN?"
-    
-    font = createObject("roSGNode", "Font")
-    font.uri = "pkg:/fonts/Lato-Regular.ttf"
-    font.size = 28
-    footerLabel = dialog.footerContentGroup.createChild("Label")
+
+    footerLabel = dialog.footerContentGroup.createChild("CBSLabel")
     footerLabel.translation = [0, 35]
-    footerLabel.font = font
-    footerLabel.color = "0xffffff9b"
+    footerLabel.style = "deci"
+    footerLabel.weight = "regular"
+    footerLabel.themeColor = "fiftyShadesOfCBS"
     footerLabel.width = dialog.buttonWidth
     footerLabel.horizAlign = "center"
     footerLabel.text = "Visit www.cbs.com/PIN"
@@ -579,7 +567,7 @@ sub trackRMFEvent(eventName as string)
     rac = getGlobalField("rac")
     if rac = invalid then
         rac = createObject("roSGNode", "Roku_Analytics:AnalyticsNode")
-        rac.debug = true
+        rac.debug = false
         rac.init = { RED: {} }
         setGlobalField("rac", rac)
     end if
@@ -625,3 +613,4 @@ sub updateGlobalResumePoint(episodeID as string, resumePoint as integer)
         end if
     end if
 end sub
+

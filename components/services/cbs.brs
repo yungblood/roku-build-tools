@@ -397,7 +397,10 @@ sub cbs_populateStream(episode as object)
                 stream.encodingType = "PlayReadyLicenseAcquisitionUrl"
                 stream.encodingKey = playReady.url
                 stream.url = m.getVideoStreamUrl(episode.pid, m.dashSelectorUrl)
-                stream.authorization = "Bearer "+ playReady.ls_session
+
+                if not isNullOrEmpty(playReady.authorization) then
+                    stream.authHeader = "Bearer " + playReady.authorization
+                end if
             else
                 stream.streamFormat = "dash"
                 stream.url = m.getVideoStreamUrl(episode.pid, m.dashSelectorUrl)
@@ -414,8 +417,7 @@ sub cbs_populateStream(episode as object)
         end if
         
         episode.videoStream = stream
-        print stream
-        
+
         vmapUrl = m.vmapUrl
         vmapUrl = addQueryString(vmapUrl, "ppid", m.user.ppid)
         if lCase(episode.genre) = "kids" then
@@ -1108,7 +1110,7 @@ function cbs_getSectionVideos(sectionID as string, excludeShow as boolean, param
         next
     end if
     response = m.makeRequest(url, "GET", invalid, "json", true)
-    if isAssociativeArray(response) and response.success = true then
+    if isAssociativeArray(response) and response.success = true and response.sectionItems <> invalid then
         for each item in response.sectionItems.itemList
             video = invalid
             if item.mediaType = "Movie" then
@@ -1477,6 +1479,11 @@ end function
 function cbs_getPlayReadyInfo(id as string) as object
     playReady = invalid
     
+    if m.user.status = "ANONYMOUS" then
+        url = m.apiBaseUrl + "v3.0/roku/irdeto/anonymousSession.json"
+    else
+        url = m.apiBaseUrl + "v3.0/roku/irdeto/session.json"
+    end if
     if m.user.status = "ANONYMOUS" then
         url = m.apiBaseUrl + "v3.0/roku/irdeto-control/anonymous-session-token.json"
     else

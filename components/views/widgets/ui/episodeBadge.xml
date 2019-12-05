@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="EpisodeBadge" extends="Group">
+    <script type="text/brightscript" uri="./episodeBadge.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/theme.brs" />
+    <interface>
+        <field id="height" type="float" value="40" onChange="updateLayout" />
+        <field id="text" type="string" onChange="onTextChanged" />
+    </interface>
+    <children>
+        <Poster
+            id="background"
+            uri="pkg:/images/ui/bg_badge_episode_$$RES$$.9.png">
+            <LayoutGroup
+                id="textGroup"
+                horizAlignment="center"
+                vertAlignment="center">
+                <CBSLabel
+                    id="badgeText"
+                    style="nano"
+                    weight="bold" />
+            </LayoutGroup>
+        </Poster>
+    </children>
+</component>

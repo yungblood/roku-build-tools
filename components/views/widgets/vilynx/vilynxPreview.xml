@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name = "VilynxPreview" extends="Group">
     <script type="text/brightscript" uri="pkg:/components/views/widgets/vilynx/vilynxPreview.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/theme.brs" />
 
     <interface>
         <field id="width" type="float" onChange="updateLayout" />
@@ -28,7 +29,7 @@
             loadDisplayMode="scaleToZoom" />
         <Poster
             id="heroDarken"
-            uri="pkg:/images/show-hero-darken_480.png" 
+            uri="pkg:/images/ui/overlay_show_darken.png" 
             width="1920"
             height="1080"/>
 

@@ -8,7 +8,6 @@ function init()
     m.marquee.observeField("itemFocused", "onItemFocused")
     m.marquee.observeField("itemSelected", "onItemSelected")
 
-    m.actionButton = m.top.findNode("actionButton")
     m.dots = m.top.findNode("dots")
 
     m.itemIndex = 0
@@ -17,11 +16,8 @@ end function
 
 sub onFocusChanged()
     if m.top.isInFocusChain() then
-        m.actionButton.opacity = 1
         m.marquee.visible = true
         m.marquee.setFocus(true)
-    else
-        m.actionButton.opacity = .4
     end if
 end sub
 
@@ -34,15 +30,14 @@ sub updateContent(content as object)
     if content = invalid or content.getChildCount() = 0 then
         m.marquee.visible = false
         m.dots.visible = false
-        m.actionButton.visible = false
         m.marquee.content = invalid
     else
         m.dots.removeChildrenIndex(m.dots.getChildCount(), 0)
         for i = 1 to content.getChildCount()
             dot = m.dots.createChild("Poster")
-            dot.width = 12
-            dot.height = 12
-            dot.uri = "pkg:/images/marquee_dot.png"
+            dot.width = 14
+            dot.height = 14
+            dot.uri = "pkg:/images/ui/dot_marquee.png"
         next
         m.dots.visible = true
         m.marquee.visible = true
@@ -60,14 +55,10 @@ sub onItemFocused(nodeEvent as object)
             if i = itemFocused then
                 dot.opacity = 1
             else
-                dot.opacity = .55
+                dot.opacity = .4
             end if
         next
         item = m.marquee.content.getChild(itemFocused)
-        if item <> invalid then
-            m.actionButton.text = item.actionTitle
-            m.actionButton.visible = true
-        end if
         m.top.itemFocused = itemFocused
     end if
 end sub

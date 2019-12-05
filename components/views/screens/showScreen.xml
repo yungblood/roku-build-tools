@@ -16,11 +16,6 @@
         <field id="additionalContext" type="assocarray" />
     </interface>
     <children>
-       <Font
-           id="rowTitleFont"
-           size="43"
-           uri="pkg:/fonts/Lato-Light.ttf" />
-
         <DynamicPlayMarqueeTile
             id="dynamicPlay" />
 
@@ -31,22 +26,9 @@
             color="0x000000ff"
             opacity="0" />
 
-        <RowList
+        <CBSRowList
             id="list"
-            translation="[0,867]"
-            focusXOffset="[100]"
-            rowLabelOffset="[[98,13]]"
-            itemComponentName="GridTile"
-            itemSize="[1920,298]"
-            itemSpacing="[0,40]"
-            showRowLabel="[true]"
-            rowItemSpacing="[[30,0]]"
-            numRows="3"
-            rowLabelFont="dictionary:rowTitleFont"
-            rowLabelColor="0xffffffff"
-            focusBitmapUri="pkg:/images/frame_grid_$$RES$$.9.png"
-            drawFocusFeedback="false"
-            vertFocusAnimationStyle="fixedFocus" />
+            translation="[0,835]" />
         
         <Rectangle
             id="loadMask"

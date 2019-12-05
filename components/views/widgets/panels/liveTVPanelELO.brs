@@ -129,9 +129,11 @@ sub updateContent()
         m.loadTask.observeField("stations", "onStationsLoaded")
         m.loadTask.loadChannels = false
         m.loadTask.control = "run"
+        m.top.focusable = true
     else
         m.content.appendChild(m.signedOut)
         m.signedOut.visible = true
+        m.top.focusable = false
     end if
 end sub
 

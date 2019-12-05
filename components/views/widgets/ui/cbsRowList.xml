@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="CBSRowList" extends="RowList">
+    <script type="text/brightscript" uri="./cbsRowList.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/theme.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+
+    <script type="text/brightscript" uri="pkg:/components/framework/utilities/nodes.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
+    <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
+    <interface>
+        <field id="rowTypes" type="stringarray" onChange="onRowTypesChanged" />
+        <field id="peekVisible" type="boolean" onChange="onPeekVisibleChanged" />
+    </interface>
+    <children>
+        <Poster
+            id="leftPeek"
+            uri="pkg:/images/ui/overlay_peek_left.png"
+            loadSync="true"
+            opacity="0" />
+        <Poster
+            id="rightPeek"
+            uri="pkg:/images/ui/overlay_peek_right.png"
+            loadSync="true"
+            opacity="0" />
+
+        <ParallelAnimation
+            id="peekAnimation">
+            <Animation
+                duration=".5">
+                <FloatFieldInterpolator
+                    id="leftPeekInterp"
+                    key="[0,1]"
+                    keyValue="[0,.5]"
+                    fieldToInterp="leftPeek.opacity" />
+            </Animation>
+            <Animation
+                duration=".5">
+                <FloatFieldInterpolator
+                    id="rightPeekInterp"
+                    key="[0,1]"
+                    keyValue="[0,.5]"
+                    fieldToInterp="rightPeek.opacity" />
+            </Animation>
+        </ParallelAnimation>
+    </children>
+</component>

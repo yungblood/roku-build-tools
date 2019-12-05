@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="VideoScreen" extends="BaseScreen">
     <script type="text/brightscript" uri="pkg:/components/views/screens/VideoScreen.brs" />
+
+    <script type="text/brightscript" uri="pkg:/components/framework/utilities/nodes.brs" />
     <interface>
         <field id="control" type="string" alias="video.control" />
 
@@ -20,23 +22,23 @@
     <children>
         <Font
             id="showTitleFont"
-            uri="pkg:/fonts/Lato-Bold.ttf"
+            uri="pkg:/fonts/Proxima Nova A Bold.ttf"
             size="30" />
         <Font
             id="episodeTitleFont"
-            uri="pkg:/fonts/Lato-Regular.ttf"
+            uri="pkg:/fonts/Proxima Nova A Semibold.ttf"
             size="70" />
         <Font
             id="episodeNumberFont"
-            uri="pkg:/fonts/Lato-Bold.ttf"
+            uri="pkg:/fonts/Proxima Nova A Bold.ttf"
             size="26" />
         <Font
             id="descriptionFont"
-            uri="pkg:/fonts/Lato-Regular.ttf"
+            uri="pkg:/fonts/Proxima Nova A Semibold.ttf"
             size="28" />
         <Font
             id="debugFont"
-            uri="pkg:/fonts/Lato-Regular.ttf"
+            uri="pkg:/fonts/Proxima Nova A Semibold.ttf"
             size="18" />
 
         <EndCard
@@ -47,20 +49,21 @@
             id="video"
             notificationInterval="1" />
 
-        <Group
+        <Rectangle
             id="replayGroup"
+            translation="[0,813]"
+            color="0x000000ee"
+            width="1920"
+            height="267"
             visible="false">
-            <Rectangle
-                id="replayShading"
-                translation="[0,813]"
-                color="0x000000ee"
-                width="1920"
-                height="267" />
             <Label
                 id="replayText"
-                color="0xF0F0F0"
-                text="Loading"/>
-        </Group>
+                translation="[0,47]"
+                width="1920"
+                horizAlign="center"
+                color="0xf0f0f0ff"
+                text="Loading" />
+        </Rectangle>
 
         <Label
             id="adCounterShadow"

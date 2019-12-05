@@ -49,6 +49,7 @@
         <field id="seasonString" type="string" />
         <field id="episodeString" type="string" />
         <field id="durationString" type="string" />
+        <field id="durationStringSimple" type="string" />
 
         <field id="thumbnailUrl" type="string" />
         <field id="browseImageUrl" type="string" />

@@ -10,21 +10,14 @@
     <children>
         <LabelButtonGroup
             id="groups"
-            translation="[100,135]"
+            translation="[131,182]"
             layoutDirection="vert"
             itemSpacings="[20]">
         </LabelButtonGroup>
         
-        <MarkupGrid
+        <CBSPosterGrid
             id="grid"
-            translation="[350,142]"
-            itemComponentName="ShowTile"
-            itemSize="[266,399]"
-            itemSpacing="[30,30]"
-            numColumns="5"
-            numRows="2"
-            vertFocusAnimationStyle="fixedFocus"
-            focusBitmapUri="pkg:/images/frame_grid_$$RES$$.9.png" />
+            translation="[412,178]" />
         
         <TopMenu
             id="menu"
