@@ -83,9 +83,7 @@ sub onUpsellInfoLoaded(nodeEvent as object)
     if upsellInfo <> invalid and task.errorCode = 0 then
         m.top.upsellInfo = upsellInfo
     else
-        if task.errorCode > 0 then
-            showApiError(true)
-        end if
+        showApiError(true)
     end if
 
     ' Fire launch complete beacon (Roku cert requirement)
