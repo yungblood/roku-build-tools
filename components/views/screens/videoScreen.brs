@@ -523,8 +523,14 @@ sub onEpisodeLoaded(nodeEvent as object)
         ""
     ]
     if m.episode <> invalid then
-        if m.episode.isLive or (user.isAdFree and arrayContains(rafMediaTypes, m.episode.mediaType)) then
+        if m.episode.isLive then
             m.top.useDai = false
+        else if m.episode.isFullEpisode then
+            if user.isAdFree then
+                if arrayContains(rafMediaTypes, m.episode.mediaType) then
+                    m.top.useDai = false
+                end if
+            end if
         end if
     end if
 '   -------------------- end ------------------   
@@ -1075,7 +1081,6 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                 streamData.apiKey = config.daiKey
                 streamData.videoID = m.episode.id
                 
-                
                 ' Exclude the 5.1 options from "legacy" and select models
                 ' due to macroblocking issues
 '                model = getModel().mid (0, 2).toInt()
@@ -1089,7 +1094,7 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
 '                    end if
 '                end if
 
-'               -------------According to ticket 1031-------------
+'               -------------According to ticket 1031/1182-------------
                 if m.episode.isFullEpisode then
                     streamData.contentSourceID = config.daiSourceID
                 else
@@ -1101,7 +1106,6 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                 end if 
 '               ----------------------- end ----------------------
 
-    
                 ' Add encoded video specific custom parameters
                 custParams = m.episode.adParams["cust_params_encoded"]
                 if skipPreroll then
