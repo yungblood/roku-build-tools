@@ -90,7 +90,6 @@ sub updateClippingRect(scrollTop as float)
     else
         m.scrollUp.disabled = false
         m.scrollDown.disabled = false
-
         m.top.focusable = false
     end if
     m.scrollTop = scrollTop
@@ -128,5 +127,6 @@ sub updateScroll(scrollLine = 0 as integer)
     else
         updateClippingRect(0)
         m.scrollArrows.visible = false
+        m.top.focusable = false
     end if
 end sub
