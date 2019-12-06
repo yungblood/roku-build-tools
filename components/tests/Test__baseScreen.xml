@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--********** Copyright 2018 Roku Corp.  All Rights Reserved. **********-->
+
+<component name="Test__baseScreen" extends="baseScreen" xsi:noNamespaceSchemaLocation="https://devtools.web.roku.com/schema/RokuSceneGraph.xsd">
+
+	<interface>
+		<function name="TestFramework__RunNodeTests"/>
+	</interface>
+
+	<script type="text/brightscript" uri="pkg:/source/testFramework/UnitTestFramework.brs"/>
+
+	<script type="text/brightscript" uri="pkg:/components/tests/Init.brs"/>
+	<script type="text/brightscript" uri="pkg:/components/tests/Test__baseScreen__MainTestSuite.brs"/>
+
+</component>

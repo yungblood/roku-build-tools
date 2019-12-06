@@ -1,19 +1,4 @@
 sub runUserInterface(ecp as object)
-    if ecp.RunTests = "true" and type(TestRunner) = "Function" then
-        Runner = TestRunner()
-
-        Runner.SetFunctions([
-            TestSuite__Main
-        ])
-
-        Runner.Logger.SetVerbosity(3)
-        Runner.Logger.SetEcho(false)
-        Runner.Logger.SetJUnit(false)
-        Runner.SetFailFast(true)
-        
-        Runner.Run()
-        return
-    end if
     m.port = createObject("roMessagePort")
     m.inputListener = createObject("roInput")
     m.inputListener.setMessagePort(m.port)
@@ -43,17 +28,32 @@ sub runUserInterface(ecp as object)
     scene.callFunc("reinit", {})
 
     m.exitApp = false
-    while true
-        msg = wait(0, m.port)
-        msgType = type(msg)
-        if msgType = "roSGScreenEvent" then
-            if msg.isScreenClosed() then return
-        else if msgType = "roSGNodeEvent" then
-            if msg.getField() = "close" then
-                exit while
+    if ecp.RunTests = "true" and type(TestRunner) = "Function" then
+        Runner = TestRunner()
+
+        Runner.SetFunctions([
+            TestSuite__Main
+        ])
+
+        Runner.Logger.SetVerbosity(3)
+        Runner.Logger.SetEcho(false)
+        Runner.Logger.SetJUnit(false)
+        Runner.SetFailFast(true)
+        
+        Runner.Run()
+    else
+        while true
+            msg = wait(0, m.port)
+            msgType = type(msg)
+            if msgType = "roSGScreenEvent" then
+                if msg.isScreenClosed() then return
+            else if msgType = "roSGNodeEvent" then
+                if msg.getField() = "close" then
+                    exit while
+                end if
+            else if msgType = "roInputEvent" then
+                scene.setField("deeplink", msg.getInfo())
             end if
-        else if msgType = "roInputEvent" then
-            scene.setField("deeplink", msg.getInfo())
-        end if
-    end while
+        end while
+    end if
 end sub
