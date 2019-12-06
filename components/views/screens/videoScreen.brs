@@ -1207,7 +1207,9 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                 m.convivaTask.content = m.episode
                 m.convivaTask.control = "run"
 
-                m.video.addHeader("Authorization", m.episode.videoStream.authHeader)
+                if not isNullOrEmpty(m.episode.videoStream.authHeader) then
+                    m.video.addHeader("Authorization", m.episode.videoStream.authHeader)
+                end if
                 if m.top.useDai then
                     m.video.content = invalid
                     dai = getGlobalField("dai")

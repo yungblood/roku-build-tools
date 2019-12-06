@@ -1480,9 +1480,11 @@ function cbs_getPlayReadyInfo(id as string) as object
     playReady = invalid
     
     if m.user.status = "ANONYMOUS" then
-        url = m.apiBaseUrl + "v3.0/roku/irdeto-control/anonymous-session-token.json"
+        'url = m.apiBaseUrl + "v3.0/roku/irdeto-control/anonymous-session-token.json"
+        url = m.apiBaseUrl + "v3.0/roku/irdeto/anonymousSession.json"
     else
-        url = m.apiBaseUrl + "v3.0/roku/irdeto-control/session-token.json"
+        'url = m.apiBaseUrl + "v3.0/roku/irdeto-control/session-token.json"
+        url = m.apiBaseUrl + "v3.0/roku/irdeto/session.json"
     end if
     url = addQueryString(url, "contentId", id)
     response = m.makeRequest(url, "GET")

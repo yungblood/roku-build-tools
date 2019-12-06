@@ -77,17 +77,11 @@
                 wrap="true"
                 font="dictionary:subtitleFont" />
         </LayoutGroup>
-        <LabelButton
+        <CBSButton
             id="ctaButton"
             translation="[389,134]"
             width="447"
             height="63"
-            text=""
-            textColor="0xffffffff"
-            focusedTextColor="0xffffffff"
-            backgroundUri="pkg:/images/frame_generic.9.png"
-            focusedBackgroundUri="pkg:/images/button_focus.9.png"
-            font="dictionary:buttonFont"
             processKeyEvents="false" />
     </children>
 </component>
