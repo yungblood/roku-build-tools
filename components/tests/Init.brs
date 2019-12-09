@@ -1,9 +1,6 @@
 sub init()
     Runner = TestRunner()
-
     Runner.SetFunctions([
-        MainTestSuite__SetUp
-        MainTestSuite__TearDown
-        TestCase__Main_CheckItemAttributes
+        TestSuite__baseScene__MainTestSuite
     ])
 end sub
