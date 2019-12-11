@@ -27,6 +27,14 @@ def environmentMap = [
             "STAGE_PROD": "us",
             "CHANNEL_TOKEN" : "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2t1LXBlcm0iOlsiZ2V0X2RldmljZV9pZCJdLCJzdWIiOiJ1cm46cm9rdS5jb206c3RiLzMxNDQwIiwiaXNzIjoidXJuOnJva3UuY29tOnRva2VubWludDpjaGFubmVsdG9rZW4iLCJqdGkiOiJ1cm46ZDJhMzA0ZjctOGViMS00ZmY0LWFmNzUtNjg2NDExNGFhNzQ0IiwiZXhwIjoxNTU5MzUwODAwLCJpYXQiOjE1NTQ3Njk1MDIsInJva3UtY2hhbm5lbC1pZCI6WyIzMTQ0MCJdLCJuYmYiOjE0NzI5MDQwMDAsInJva3UtdGZ2IjoiMSIsImF1ZCI6InVybjpyb2t1LmNvbTpzdGIvY2hhbm5lbCJ9.DGt01TOljBt1HYaUt8_BxoUn10okS-OBliQ3YAX26W32fWFzsCnN1t6aODD62AHX_srtBDziqLSRbAEXnnEM9a0m_AgVxZ9SBAZSOnV02V-td4i8c3Ep-pre8LP40uAlOeXgawDdBj05lIukdandxfsaT6OXZElKWDaQ6a54oS5FPaUjjs0bmud8UwVtHFaDk9vP94RX53wetwJHysCrgHIlNaHf1uGnDDc8I-rQvaJIjahjt08gT7h20yImnQ7RmON6t2sOSCbnzzNYU7fXB_iQuKi4AJ4YybzvnyN52htacLbuv8dRJ2e4-cplVFSoyVgDSZppfShckZH4AgOjxw",
         ],
+        "test-testwww" : [
+            "BUILD_TYPE" : "test",
+            "BUILD_ENV" : "testwww",
+            "CONFIG_FILE" : "pkg:/config-staging.json",
+            "ANALYTICS_SSL" : "false",
+            "ANALYTICS_SERVER" : "aa.cbsi.com",
+            "MEDIAHEARTBEAT_SSL" : "false",
+        ],
         "qa-testwww" : [
             "BUILD_TYPE" : "qa",
             "BUILD_ENV" : "testwww",
@@ -62,6 +70,14 @@ def environmentMap = [
             "ROKU_GEO" : "canada",
             "STAGE_PROD": "ca",
             "CHANNEL_TOKEN" : "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2t1LXBlcm0iOlsiZ2V0X2RldmljZV9pZCJdLCJzdWIiOiJ1cm46cm9rdS5jb206c3RiLzMxNDQwIiwiaXNzIjoidXJuOnJva3UuY29tOnRva2VubWludDpjaGFubmVsdG9rZW4iLCJqdGkiOiJ1cm46ZDJhMzA0ZjctOGViMS00ZmY0LWFmNzUtNjg2NDExNGFhNzQ0IiwiZXhwIjoxNTU5MzUwODAwLCJpYXQiOjE1NTQ3Njk1MDIsInJva3UtY2hhbm5lbC1pZCI6WyIzMTQ0MCJdLCJuYmYiOjE0NzI5MDQwMDAsInJva3UtdGZ2IjoiMSIsImF1ZCI6InVybjpyb2t1LmNvbTpzdGIvY2hhbm5lbCJ9.DGt01TOljBt1HYaUt8_BxoUn10okS-OBliQ3YAX26W32fWFzsCnN1t6aODD62AHX_srtBDziqLSRbAEXnnEM9a0m_AgVxZ9SBAZSOnV02V-td4i8c3Ep-pre8LP40uAlOeXgawDdBj05lIukdandxfsaT6OXZElKWDaQ6a54oS5FPaUjjs0bmud8UwVtHFaDk9vP94RX53wetwJHysCrgHIlNaHf1uGnDDc8I-rQvaJIjahjt08gT7h20yImnQ7RmON6t2sOSCbnzzNYU7fXB_iQuKi4AJ4YybzvnyN52htacLbuv8dRJ2e4-cplVFSoyVgDSZppfShckZH4AgOjxw",
+        ],
+        "test-testwww" : [
+            "BUILD_TYPE" : "test",
+            "BUILD_ENV" : "testwww",
+            "CONFIG_FILE" : "pkg:/config-canada-staging.json",
+            "ANALYTICS_SSL" : "false",
+            "ANALYTICS_SERVER" : "om.cbsi.com",
+            "MEDIAHEARTBEAT_SSL" : "false",
         ],
         "qa-testwww" : [
             "BUILD_TYPE" : "qa",

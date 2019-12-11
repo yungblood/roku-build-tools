@@ -3,4 +3,5 @@ sub init()
     Runner.SetFunctions([
         TestSuite__baseScene__MainTestSuite
     ])
+    end if
 end sub
