@@ -19,28 +19,6 @@
         <field id="buttonSelected" type="string" alwaysNotify="true" />
     </interface>
     <children>
-        <Font
-            id="titleFont"
-            size="60"
-            uri="pkg:/fonts/Lato-Black.ttf" />
-        <Font
-            id="episodeFont"
-            size="42"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
-        <Font
-            id="descriptionFont"
-            size="28"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
-        <Font
-            id="timeIndicatorFont"
-            size="20"
-            uri="pkg:/fonts/Lato-Bold.ttf" />
-            
-        <Font
-            id="buttonFont"
-            size="26"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
-        
         <FadeInPoster
             id="hero"
             width="1920"
@@ -50,10 +28,10 @@
         
        <Poster
             id="heroDarken"
-            uri="pkg:/images/show-hero-darken_480.png" 
+            uri="pkg:/images/ui/overlay_show_darken.png" 
             width="1920"
             height="1080"
-            visible="true"/>    
+            visible="true"/>
             
         <Group
             id="previewGroup" />
@@ -61,78 +39,57 @@
         <LayoutGroup
             id="metadata"
             layoutDirection="vert"
-            itemSpacings="[0]"
-            translation="[100,297]" >
-            <Label
+            itemSpacings="[-3,29,36,64]"
+            translation="[128,732]"
+            vertAlignment="bottom">
+            <CBSLabel
                 id="showTitle"
-                width="800"
-                font="dictionary:titleFont"
+                width="812"
+                wrap="true"
                 maxLines="2"
-                wrap="true"
-                lineSpacing="-20"
-                color="0xffffffff" />
-            <Rectangle
-                width="1"
-                height="26"
-                color="0x00000000" />
-            <Label
+                style="mega" />
+            <CBSLabel
                 id="episodeTitle"
-                width="896"
-                font="dictionary:episodeFont"
-                wrap="false"
-                color="0xffffffff" />
-            <Label
-                id="episodeNumber"
-                width="896"
-                font="dictionary:episodeFont"
-                wrap="false"
-                color="0xffffffff" />
-            <Rectangle
-                id="progressSpacer"
-                width="1"
-                height="10"
-                color="0x00000000" />
-            <Group
-                id="progress">
-                <Label
-                    id="timeIndicator"
-                    translation = "[755,-11]"
-                    width="140"
-                    font="dictionary:timeIndicatorFont"
-                    color="0xffffffff"
-                    opacity = "0.50" />
-                <ProgressBar
-                    id="progressBar"
-                    width="735"
-                    height="8"
-                    backgroundColor="0xffffff80"
-                    barColor="0x0092f3ff"
-                    visible="false" />
-                <Rectangle
-                    width="1"
-                    height="26"
-                    color="0x00000000" />
-            </Group>
-            <Label
-                id="description"
-                width="896"
-                font="dictionary:descriptionFont"
-                maxLines="3"
-                lineSpacing="2"
+                width="812"
                 wrap="true"
-                color="0xffffffff" />
+                maxLines="2"
+                style="deca"
+                weight="regular" />
+            <CBSLabel
+                id="description"
+                width="812"
+                wrap="true"
+                maxLines="3"
+                style="deci"
+                weight="regular"
+                opacity=".75" />
+            <LayoutGroup
+                id="progress"
+                layoutDirection="horiz"
+                vertAlignment="center"
+                itemSpacings="[12]">
+                <CBSProgressBar
+                    id="progressBar"
+                    width="386"
+                    height="6" />
+                <CBSLabel
+                    id="timeIndicator"
+                    style="micro" />
+            </LayoutGroup>
+            <LayoutGroup
+                id="buttonGroup"
+                layoutDirection="horiz"
+                itemSpacings="[24]">
+                <CBSButton
+                    id="ctaButton"
+                    text=""
+                    processKeyEvents="false" />
+                <CBSButton
+                    id="about"
+                    text="ABOUT SHOW"
+                    processKeyEvents="false" />
+            </LayoutGroup>
         </LayoutGroup>
-        <LabelButton
-            id="ctaButton"
-            translation="[100,720]"
-            width="600"
-            height="88"
-            text=""
-            backgroundUri="pkg:/images/frame_generic.9.png"
-            focusedBackgroundUri="pkg:/images/button_focus.9.png"
-            font="dictionary:buttonFont"
-            processKeyEvents="false"
-            visible="false" />
 
         <Animation
             id="vilynxFadeOutAnimation"

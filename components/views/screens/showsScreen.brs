@@ -9,6 +9,7 @@ sub init()
     
     m.buttonFont = m.top.findNode("buttonFont")
     m.groups = m.top.findNode("groups")
+    m.groups.observeField("buttonSelected", "onGroupSelected")
     m.grid = m.top.findNode("grid")
     m.grid.observeField("itemSelected", "onItemSelected")
 
@@ -76,15 +77,15 @@ sub onGroupsLoaded(nodeEvent as object)
 
     if groups.count() > 0 then
         initialGroup = groups[0]
+        lastButton = invalid
         for each group in groups
-            button = m.groups.createChild("ShowGroupButton")
-            button.observeField("buttonSelected", "onGroupSelected")
-            button.group = group
+            button = m.groups.createChild("CBSCategoryButton")
+            button.category = group
             if lCase(group.title) = lCase(m.top.category) then
                 initialGroup = group
             end if
         next
-        selectGroup(initialGroup)
+        selectGroup(initialGroup, true)
         m.groups.setFocus(false)
         m.groups.setFocus(true)
         
@@ -113,14 +114,13 @@ sub onLicensingDialogClosed(nodeEvent as object)
 end sub
 
 sub onGroupSelected(nodeEvent as object)
-    button = nodeEvent.getRoSGNode()
-    group = button.group
-    if group <> invalid then
-        selectGroup(group)
+    button = m.groups.getChild(nodeEvent.getData())
+    if button <> invalid then
+        selectGroup(button.category)
     end if
 end sub
 
-sub selectGroup(group as object)
+sub selectGroup(group as object, updateFocus = false as boolean)
     if group <> invalid then
         m.top.omnitureName = "/shows/" + group.title
         m.top.omnitureSiteHier = "shows|other|show listings|" + group.title
@@ -132,7 +132,10 @@ sub selectGroup(group as object)
         
         for i = 0 to m.groups.getChildCount() - 1
             button = m.groups.getChild(i)
-            button.highlight = button.group.isSameNode(group)
+            button.highlighted = button.category.isSameNode(group)
+            if updateFocus and button.highlighted then
+                m.groups.jumpToIndex = i
+            end if
         next
     end if
 end sub

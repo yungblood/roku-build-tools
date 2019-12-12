@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component name="ChannelTile" extends="Group">
     <script type="text/brightscript" uri="pkg:/components/views/widgets/tiles/channelTile.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/theme.brs" />
 
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
@@ -26,32 +27,19 @@
                 width="436"
                 height="72"
                 loadDisplayMode="scaleToFit" />
-            <Label
+            <CBSLabel
                 id="error"
                 translation="[90,52]"
                 width="199"
-                color="0xffffffff"
-                wrap="true"
-                lineSpacing="0"
-                text="">
-                <Font
-                    role="font"
-                    size="38"
-                    uri="pkg:/fonts/Lato-Regular.ttf" />
-            </Label>
-            <Label
+                style="deca"
+                wrap="true" />
+            <CBSLabel
                 id="showTitle"
                 translation="[44,168]"
                 width="348"
                 horizAlign="center"
-                color="0xffffffff"
-                wrap="false"
-                text="">
-                <Font
-                    role="font"
-                    size="28"
-                    uri="pkg:/fonts/Lato-Regular.ttf" />
-            </Label>
+                style="centi"
+                wrap="false" />
         </Rectangle>
         <Rectangle
             id="liveNow"
@@ -60,25 +48,20 @@
             height="32"
             color="0x0092f3ff"
             visible="false">
-            <Label
+            <CBSLabel
                 width="80"
-                height="32"
-                color="0xffffffff"
-                wrap="false"
+                height="34"
+                style="mili"
+                weight="bold"
                 text="LIVE"
                 horizAlign="center"
-                vertAlign="center">
-                <Font
-                    role="font"
-                    size="27"
-                    uri="pkg:/fonts/Lato-Bold.ttf" />
-            </Label>
+                vertAlign="center" />
         </Rectangle>
         <Poster
             id="focusFrame"
             width="436"
             height="248"
-            uri="pkg:/images/frame_grid.9.png"
+            uri="pkg:/images/ui/focus_grid_$$RES$$.9.png"
             visible="false" />
 
         <Timer

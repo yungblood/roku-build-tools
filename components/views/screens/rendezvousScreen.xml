@@ -10,11 +10,11 @@
         <Font
             id="textFont"
             size="44"
-            uri="pkg:/fonts/Lato-Light.ttf" />
+            uri="pkg:/fonts/Proxima Nova A Regular.ttf" />
         <Font
             id="codeFont"
             size="94.8"
-            uri="pkg:/fonts/Lato-Light.ttf" />
+            uri="pkg:/fonts/Proxima Nova A Regular.ttf" />
 
         <Poster
             id="background"
@@ -35,7 +35,7 @@
             <Font
                 role="font"
                 size="60"
-                uri="pkg:/fonts/Lato-Regular.ttf" />
+                uri="pkg:/fonts/Proxima Nova A Semibold.ttf" />
         </Label>
         <LayoutGroup
             translation="[94,481]"

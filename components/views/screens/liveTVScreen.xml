@@ -16,10 +16,6 @@
         <field id="showChannels" type="boolean" alwaysNotify="true" onChange="showChannelSelection" />
     </interface>
     <children>
-        <Font
-            id="buttonFont"
-            size="24"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
         <Group
             id="liveTV"
             visible="false">
@@ -36,26 +32,15 @@
                 layoutDirection="vert"
                 itemSpacings="[65]"
                 visible="false">
-                <Label
+                <CBSLabel
                     text="Station Unavailable"
-                    color="0xffffffff"
-                    lineSpacing="0">
-                    <Font
-                        role="font"
-                        size="65"
-                        uri="pkg:/fonts/Lato-Regular.ttf" />
-                </Label>
-                <Label
+                    style="kilo"
+                    lineSpacing="0" />
+                <CBSLabel
                     text="We're sorry, but live TV is not currently supported in your area."
-                    color="0xa9a9a9ff"
                     width="600"
                     wrap="true"
-                    lineSpacing="0">
-                    <Font
-                        role="font"
-                        size="38"
-                        uri="pkg:/fonts/Lato-Regular.ttf" />
-                </Label>
+                    style="deca" />
             </LayoutGroup>
             <Group
                 id="overlay">
@@ -74,16 +59,12 @@
                         width="1920"
                         height="810"
                         uri="pkg:/images/overlay_livetv_bottom_480.png" />
-                    <Label
+                    <CBSLabel
                         translation="[100,23]"
                         text="Channels"
-                        color="0xffffffff"
-                        vertAlign="top">
-                       <Font
-                           role="font"
-                           size="32"
-                           uri="pkg:/fonts/Lato-Regular.ttf" />
-                    </Label>
+                        style="deci"
+                        weight="bold"
+                        vertAlign="top" />
                     <MarkupGrid
                         id="channelGrid"
                         translation="[100,73]"
@@ -104,32 +85,23 @@
                         width="1920"
                         height="810"
                         uri="pkg:/images/overlay_livetv_bottom_480.png" />
-                    <Label
+                    <CBSLabel
                         translation="[100,23]"
                         text="Schedule"
-                        color="0xffffffff"
-                        vertAlign="top">
-                       <Font
-                           role="font"
-                           size="32"
-                           uri="pkg:/fonts/Lato-Regular.ttf" />
-                    </Label>
+                        style="deci"
+                        weight="bold"
+                        vertAlign="top" />
                     <LayoutGroup
                         translation="[1820,23]"
                         layoutDirection="horiz"
                         itemSpacings="[18]"
                         horizAlignment="right"
                         vertAlignment="center">
-                        <Label
+                        <CBSLabel
                             id="scheduleChannelName"
-                            color="0xffffffff"
+                            style="deci"
                             horizAlign="right"
-                            wrap="false" >
-                            <Font
-                                role="font"
-                                size="34"
-                                uri="pkg:/fonts/Lato-Regular.ttf" />
-                        </Label>
+                            wrap="false" />
                         <Poster
                             id="scheduleChannelLogo"
                             height="30"
@@ -159,44 +131,25 @@
                             translation="[67,0]"
                             layoutDirection="horiz"
                             itemSpacings="[0]">
-                            <Label
+                            <CBSLabel
                                 id="scheduleShowTitle"
                                 height="60"
-                                text=""
-                                color="0xffffffff"
-                                vertAlign="center" >
-                                <Font
-                                    role="font"
-                                    size="35"
-                                    uri="pkg:/fonts/Lato-Regular.ttf" />
-                            </Label>
-                            <Label
+                                style="deci"
+                                vertAlign="center" />
+                            <CBSLabel
                                 id="scheduleEpisodeTitle"
                                 height="60"
-                                text=""
-                                color="0xffffffff"
-                                vertAlign="center" >
-                                <Font
-                                    role="font"
-                                    size="35"
-                                    uri="pkg:/fonts/Lato-Light.ttf" />
-                            </Label>
+                                style="deci"
+                                vertAlign="center" />
                         </LayoutGroup>
-                        <Label
+                        <CBSLabel
                             id="scheduleDescription"
                             translation="[67,76]"
                             width="1786"
                             wrap="true"
-                            lineSpacing="0"
                             maxLines="2"
-                            text=""
-                            color="0xffffffff"
-                            vertAlign="center" >
-                            <Font
-                                role="font"
-                                size="26"
-                                uri="pkg:/fonts/Lato-Regular.ttf" />
-                        </Label>
+                            style="centi"
+                            vertAlign="center" />
                         <Poster
                             translation="[851,142]"
                             width="218"
@@ -220,28 +173,16 @@
                             translation="[65,0]"
                             layoutDirection="horiz"
                             itemSpacings="[0]">
-                            <Label
+                            <CBSLabel
                                 id="showTitle"
                                 height="60"
-                                text=""
-                                color="0xffffffff"
-                                vertAlign="center" >
-                                <Font
-                                    role="font"
-                                    size="35"
-                                    uri="pkg:/fonts/Lato-Regular.ttf" />
-                            </Label>
+                                style="deci"
+                                vertAlign="center" />
                             <Label
                                 id="episodeTitle"
                                 height="60"
-                                text=""
-                                color="0xffffffff"
-                                vertAlign="center" >
-                                <Font
-                                    role="font"
-                                    size="35"
-                                    uri="pkg:/fonts/Lato-Light.ttf" />
-                            </Label>
+                                style="deci"
+                                vertAlign="center" />
                         </LayoutGroup>
                         <LayoutGroup
                             translation="[1855,30]"
@@ -249,15 +190,10 @@
                             itemSpacings="[18]"
                             horizAlignment="right"
                             vertAlignment="center">
-                            <Label
+                            <CBSLabel
                                 id="channelName"
-                                color="0xffffffff"
-                                horizAlign="right" >
-                                <Font
-                                    role="font"
-                                    size="34"
-                                    uri="pkg:/fonts/Lato-Regular.ttf" />
-                            </Label>
+                                style="deci"
+                                horizAlign="right" />
                             <Poster
                                 id="channelLogo"
                                 height="30"
@@ -279,25 +215,15 @@
                 translation="[102,333]"
                 layoutDirection="vert"
                 itemSpacings="[52]">
-                <Label
+                <CBSLabel
                     text="Select Your Local Station"
-                    color="0xffffffff">
-                    <Font
-                        role="font"
-                        size="62"
-                        uri="pkg:/fonts/Lato-Regular.ttf" />
-                </Label>
-                <Label
+                    style="kilo" />
+                <CBSLabel
                     width="600"
                     text="You can change this at any time by visiting Settings > Live TV."
-                    color="0xc3c3c3ff"
-                    wrap="true"
-                    lineSpacing="0">
-                    <Font
-                        role="font"
-                        size="40"
-                        uri="pkg:/fonts/Lato-Regular.ttf" />
-                </Label>
+                    themeColor="fiftyShadesOfCBS"
+                    style="deca"
+                    wrap="true" />
             </LayoutGroup>
             <Group
                 translation="[0,692]"
@@ -307,16 +233,11 @@
                     width="1920"
                     height="810"
                     uri="pkg:/images/overlay_livetv_bottom_480.png" />
-                <Label
+                <CBSLabel
                     translation="[100,23]"
                     text="Channels"
-                    color="0xffffffff"
-                    vertAlign="top">
-                   <Font
-                       role="font"
-                       size="32"
-                       uri="pkg:/fonts/Lato-Regular.ttf" />
-                </Label>
+                    style="deci"
+                    vertAlign="top" />
                 <LabelButtonGroup
                     id="stations"
                     translation="[100,73]"
@@ -330,18 +251,11 @@
             horizAlignment="center"
             vertAlignment="center"
             visible="false">
-            <Label
+            <CBSLabel
                 width="1000"
                 text="You've reached the maximum number of simultaneous video streams for your account. To view this video, close the other videos you're watching and try again."
-                color="0xffffffff"
-                opacity=".75"
-                wrap="true"
-                lineSpacing="0">
-                <Font
-                    role="font"
-                    size="42"
-                    uri="pkg:/fonts/Lato-Regular.ttf" />
-            </Label>
+                style="deca"
+                wrap="true" />
         </LayoutGroup>
         
         <TopMenu

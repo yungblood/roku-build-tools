@@ -4,7 +4,13 @@
     <interface>
         <field id="width" type="float" onChange="onLayoutChanged" />
         <field id="height" type="float" onChange="onLayoutChanged" />
-        <field id="padding" type="integer" onChange="onLayoutChanged" />
+        <field id="padding" type="float" onChange="onPaddingChanged" />
+        <field id="paddingTop" type="float" onChange="onLayoutChanged" />
+        <field id="paddingBottom" type="float" onChange="onLayoutChanged" />
+        <field id="paddingLeft" type="float" onChange="onLayoutChanged" />
+        <field id="paddingRight" type="float" onChange="onLayoutChanged" />
+
+        <field id="wrap" type="boolean" value="true" onChange="onWrapChanged" />
 
         <field id="tts" type="string" />
         <field id="ttsComponentType" type="string" value="button" />
@@ -60,6 +66,8 @@
         <field id="disabledOpacity" type="float" value=".25" />
         <field id="normalOpacity" type="float" value="1" onChange="onFocusChanged" />
         <field id="focusedOpacity" type="float" value="1" onChange="onFocusChanged" />
+
+        <field id="forceUpperCase" type="boolean" />
     </interface>
     <children>
         <Rectangle

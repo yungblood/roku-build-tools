@@ -62,7 +62,8 @@ sub onJsonChanged()
         if asInteger(m.top.episodeNumber) > 0 then
             m.top.episodeString = "E" + asString(m.top.episodeNumber)
         end if
-        m.top.durationString    = getDurationStringStandard(m.top.length)
+        m.top.durationString = getDurationStringStandard(m.top.length)
+        m.top.durationStringSimple = GetDurationString(m.top.length, true)
         
         m.top.convivaTrackingTitle = m.top.showName + " - " + m.top.title
         m.top.comscoreTrackingTitle = m.top.showName '+ " - " + m.top.title + "--" + m.top.seasonNumber + m.top.episodeNumber

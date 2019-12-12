@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component name="LiveTVButton" extends="LabelButton">
     <script type="text/brightscript" uri="pkg:/components/views/widgets/liveTVButton.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/theme.brs" />
     <interface>
         <field id="station" type="node" onChange="onStationChanged" />
         <field id="selected" type="boolean" onChange="onSelectedChanged" />
@@ -16,21 +17,15 @@
                 id="logo"
                 height="72"
                 loadDisplayMode="scaleToFit" />
-            <Label
+            <CBSLabel
                 id="title"
                 horizAlign="center"
-                color="0xffffffff"
+                style=""
                 wrap="false"
-                text="">
-                <Font
-                    role="font"
-                    size="28"
-                    uri="pkg:/fonts/Lato-Regular.ttf" />
-            </Label>
+                text="centi" />
         </LayoutGroup>
         <Poster
             id="frame"
-            uri="pkg:/images/frame_generic.9.png"
-            opacity=".5" />
+            uri="pkg:/images/ui/focus_grid_$$RES$$.9.png" />
     </children>
 </component>

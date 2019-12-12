@@ -15,7 +15,6 @@ sub init()
     
     m.searchText = m.top.findNode("searchText")
     m.searchText.observeField("text", "onSearchTextChanged")
-    m.searchTask = createObject("roSGNode", "LoadSearchResultsTask")
 
     m.keyboard = m.top.findNode("keyboard")
     m.keyboard.observeField("buttonSelected", "onKeyboardButtonSelected")
@@ -27,6 +26,11 @@ sub init()
     m.grid.observeField("itemSelected", "onItemSelected")
 
     m.noResults = m.top.findNode("noResults")
+
+    m.delayTimer = m.top.findNode("delayTimer")
+    m.delayTimer.observeField("fire", "onDelayTimerFired")
+
+    m.deviceInfo = createObject("roDeviceInfo")
 
     m.top.setFocus(true)
 end sub
@@ -68,8 +72,17 @@ sub onFocusChanged()
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
-    ?"HomeScreen.onKeyEvent: ";key,press
+    '?"SearchScreen.onKeyEvent: ";key,press
     if press then
+        if m.keyboard.isInFocusChain() then
+            if key.inStr("Lit_") = 0 then
+                updateSearchText(key.mid(4))
+                return true
+            else if key = "backspace" or key = "replay" then
+                updateSearchText("backspace")
+                return true
+            end if
+        end if
         if key = "down" then
             if m.menu.isInFocusChain() then
                 m.keyboard.setFocus(true)
@@ -103,25 +116,33 @@ sub onKeyboardButtonSelected()
         updateKeyboard(false)
         m.keyboard.setFocus(true)
     else if key.id = "space" then
-        m.searchText.text = m.searchText.text + " "
+        updateSearchText(" ")
     else if key.id = "backspace" then
+        updateSearchText("backspace")
+    else
+        updateSearchText(key.text)
+    end if
+end sub
+
+sub updateSearchText(key as string)
+    if key = "backspace" then
         if m.searchText.text.len() > 0 then
             m.searchText.text = m.searchText.text.mid(0, m.searchText.text.len() - 1)
         end if
     else
-        m.searchText.text = m.searchText.text + key.text
+        m.searchText.text = m.searchText.text + key
     end if
 end sub
 
 sub onItemSelected(nodeEvent as object)
-    list = nodeEvent.getRoSGNode()
-    if list <> invalid then
+    grid = nodeEvent.getRoSGNode()
+    if grid <> invalid then
         selected = nodeEvent.getData()
-        item = list.content.getChild(selected)
+        item = grid.content.getChild(selected)
         if item <> invalid then
-            omnitureData = getOmnitureData(m.grid.content, selected)
-            omnitureData["searchTerm"] = lcase(m.searchText.text)
-            omnitureData.v41 = lcase(m.searchText.text)
+            omnitureData = getOmnitureData(grid.content, selected)
+            omnitureData["searchTerm"] = lCase(m.searchText.text)
+            omnitureData.v41 = lCase(m.searchText.text)
             omnitureData["searchEventComplete"] = 1
             omnitureData.e49 = 1
             trackScreenAction("trackSearchResult", omnitureData)
@@ -140,43 +161,65 @@ sub onMenuItemSelected(nodeEvent as object)
     end if
 end sub
 
-sub onSearchTextChanged()
-    if not isNullOrEmpty(m.searchText.text) then
-        search(m.searchText.text)
+sub onSearchTextChanged(nodeEvent as object)
+    text = nodeEvent.getData()
+    stopSearch()
+    if not isNullOrEmpty(text) then
+        ' Delay before initiating the search, so we don't
+        ' send too many requests to the server while the
+        ' user is still entering search text
+        m.delayTimer.control = "start"
     else
-        m.searchTask.control = "stop"
-        m.searchTask.unObserveField("results")
         m.noResults.visible = false
         m.grid.visible = false
     end if
 end sub
 
-sub onResultsLoaded()
-    m.grid.content = m.searchTask.results
-    if m.searchTask.results = invalid or m.searchTask.results.getChildCount() = 0 then
+sub onDelayTimerFired(nodeEvent as object)
+    if m.deviceInfo.timeSinceLastKeypress() > 0 then
+        if not isNullOrEmpty(m.searchText.text.trim()) then
+            search(m.searchText.text)
+        end if
+    else
+        ' The user is still navigating the screen, so restart
+        ' the timer
+        m.delayTimer.control = "start"
+    end if
+end sub
+
+sub onResultsLoaded(nodeEvent as object)
+    stopSearch()
+    results = nodeEvent.getData()
+    m.grid.content = results
+    if results = invalid or results.getChildCount() = 0 then
         m.grid.visible = false
-        m.noResults.visible = (m.searchText.text.len() > 0)
-        m.searchTask.unobserveField("results")
-        if not isNullOrEmpty(m.searchText.text) then
-            omnitureData = getOmnitureData(m.grid.content, 0)
-            omnitureData["searchTerm"] = lcase(m.searchText.text)
-            omnitureData.v41 = lcase(m.searchText.text)
+        if not isNullOrEmpty(m.searchText.text.trim()) then
+            m.noResults.visible = true
+            omnitureData = getOmnitureData(results, 0)
+            omnitureData["searchTerm"] = lCase(m.searchText.text)
+            omnitureData.v41 = lCase(m.searchText.text)
             trackScreenAction("trackNoSearchResult", omnitureData)
+        else
+            m.noResults.visible = false
         end if
     else
         m.grid.visible = true
-        m.noResults.visible = false
     end if
 end sub
 
 sub search(searchTerm as string)
-    if m.searchTask <> invalid then
-        if m.searchTask.state = "running" then
-            m.searchTask.control = "stop"
-            m.searchTask.unobserveField("results")
-        end if
-    end if
+    stopSearch()
+    m.searchTask = createObject("roSGNode", "LoadSearchResultsTask")
     m.searchTask.observeField("results", "onResultsLoaded")
     m.searchTask.searchTerm = searchTerm
     m.searchTask.control = "run"
+end sub
+
+sub stopSearch()
+    m.delayTimer.control = "stop"
+    if m.searchTask <> invalid then
+        m.searchTask.control = "stop"
+        m.searchTask.unobserveField("results")
+        m.searchTask = invalid
+    end if
 end sub

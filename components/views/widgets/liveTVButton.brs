@@ -1,5 +1,5 @@
 sub init()
-    m.top.focusedBackgroundUri = "pkg:/images/frame_grid.9.png"
+    m.top.focusedBackgroundUri = "pkg:/images/ui/focus_grid_$$RES$$.9.png"
     m.top.backgroundColor = "0x2b2b2bff"
     m.top.focusedBackgroundColor = "0x2b2b2bff"
     m.top.width = 384

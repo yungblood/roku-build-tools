@@ -55,16 +55,18 @@ sub onEligibleProductsChanged()
 end sub
 
 function isRokuSubscriber(packageInfo) as boolean
-    for each package in packageInfo
-        if package.packageSource = "roku" then
-            return true
-        end if
-    next
+    if packageInfo <> invalid then
+        for each package in packageInfo
+            if package.packageSource = "roku" then
+                return true
+            end if
+        next
+    end if
     return false
 end function
 
 function getPackageName(packageInfo as object) as string
-    if m.top.isSubscriber then
+    if m.top.isSubscriber and packageInfo <> invalid then
         if packageInfo.count() > 0 then
             package = packageInfo[0]
             if package.isAdFree then
@@ -80,7 +82,7 @@ function getPackageName(packageInfo as object) as string
 end function
 
 function isAdFree(packageInfo as object) as boolean
-    if m.top.isSubscriber then
+    if m.top.isSubscriber and packageInfo <> invalid then
         if packageInfo.count() > 0 then
             package = packageInfo[0]
             if package.isAdFree then
@@ -92,7 +94,7 @@ function isAdFree(packageInfo as object) as boolean
 end function
 
 function getProductForTracking(packageInfo as object) as string
-    if packageInfo.count() > 0 then
+    if packageInfo <> invalid and packageInfo.count() > 0 then
         return asString(packageInfo[0].productCode)
     end if
     return ""

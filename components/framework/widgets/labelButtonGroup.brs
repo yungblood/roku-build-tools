@@ -67,6 +67,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
                 handled = updateFocus(m.top.buttonFocused + 1)
             end if
         else if key = "ok" then
+            startTimer = m.top.repeatSelection
             if m.top.buttonFocused = -1 then
                 handled = false
             else
@@ -128,6 +129,8 @@ function updateFocus(index as integer) as boolean
     if button <> invalid then
         if button.disabled = true and index < m.top.getChildCount() -1 then
             return updateFocus(index + 1)
+        else if button.disabled = true
+            return false
         else
             if m.top.isInFocusChain() then
                 button.setFocus(true)
@@ -153,6 +156,8 @@ sub jumpToIndex(nodeEvent as object)
             button.setFocus(false)
         end if
     next
+    ' Break any key repeat that might be happening
+    m.keyPressed = ""
 end sub
 
 sub jumpToButton()

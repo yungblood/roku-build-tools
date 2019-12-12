@@ -2,8 +2,7 @@ sub init()
     m.poster = m.top.findNode("poster")
     m.title = m.top.findNode("title")
 
-    m.whiteRect = m.top.findNode("whiteRect")
-    m.blackRect = m.top.findNode("blackRect")
+    m.border = m.top.findNode("border")
     
     m.badge = m.top.findNode("badge")
     m.badgeText = m.top.findNode("badgeText")
@@ -12,7 +11,7 @@ end sub
 sub onContentChanged()
     m.content = m.top.itemContent
     if m.content <> invalid then
-        m.title.text = uCase(m.content.title)
+        m.title.text = m.content.title
         m.badge.visible = (m.content.hasNewEpisodes = true)
         updatePoster()
     end if
@@ -29,10 +28,12 @@ sub updateLayout()
             m.badge.width = m.top.width
             m.badgeText.width = m.top.width
             
-            m.whiteRect.width = m.top.width - 2
-            m.whiteRect.height = m.top.height - 2
-            m.blackRect.width = m.top.width - 6
-            m.blackRect.height = m.top.height - 6
+            ' this 1px adjustment is for 720p scaling
+            ' logic would suggest -2, but Roku scaling has no logic
+            ' trust me, it's correct ;)
+            m.border.translation = [1, 1]
+            m.border.width = m.top.width - 1
+            m.border.height = m.top.height - 1
         end if
         updatePoster()
     end if

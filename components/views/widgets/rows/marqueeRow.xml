@@ -9,10 +9,6 @@
         <field id="animateToItem" type="integer" alwaysNotify="true" />
     </interface>
     <children>
-        <Font
-            id="buttonFont"
-            size="24"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
         <MarkupGrid
             id="marquee"
             numRows="1"
@@ -20,22 +16,13 @@
             itemSpacing="[0,0]"
             itemComponentName="MarqueeTile"
             horizFocusAnimationStyle="fixedFocusWrap"
-            drawFocusFeedback="false" />
-        <LabelButton
-            id="actionButton"
-            translation="[100,521]"
-            width="395"
-            height="75"
-            text=""
-            backgroundUri="pkg:/images/frame_generic.9.png"
-            focusedBackgroundUri="pkg:/images/frame_generic.9.png"
-            font="dictionary:buttonFont"
-            opacity=".4"
-            visible="false" />
-        <LayoutGroup
-            id="dots"
-            translation="[100,642]"
-            layoutDirection="horiz"
-            itemSpacings="[8]" />
+            drawFocusFeedback="false">
+            <LayoutGroup
+                id="dots"
+                translation="[1792,734]"
+                layoutDirection="horiz"
+                horizAlignment="right"
+                itemSpacings="[13]" />
+        </MarkupGrid>
     </children>
 </component>

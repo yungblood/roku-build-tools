@@ -34,23 +34,26 @@ function onKeyEvent(key as string, press as boolean) as boolean
 end function
             
 sub onLayoutChanged()
+    updateLayout()
+end sub
+
+sub updateLayout()
     if m.top.width > 0 and m.top.height > 0 then
         if m.top.vertAlignment = "bottom" then
-            m.labelGroup.translation = [m.top.padding, 0]
-            m.label.width = m.top.width - m.top.padding * 2 - m.icon.width
-            m.label.height = m.top.height - m.top.padding
-            m.labelGroupFocused.translation = [m.top.padding, 0]
-            m.labelFocused.width = m.top.width - m.top.padding * 2 - m.iconFocused.width
-            m.labelFocused.height = m.top.height - m.top.padding
+            m.labelGroup.translation = [m.top.paddingLeft, 0]
+            m.label.width = m.top.width - m.top.paddingLeft - m.top.paddingRight - m.icon.width
+            m.label.height = m.top.height - m.top.paddingTop - m.top.paddingBottom
+            m.labelGroupFocused.translation = [m.top.paddingLeft, 0]
+            m.labelFocused.width = m.top.width - m.top.paddingLeft - m.top.paddingRight - m.iconFocused.width
+            m.labelFocused.height = m.top.height - m.top.paddingTop - m.top.paddingbottom
         else
-            m.labelGroup.translation = [m.top.padding, m.top.padding]
-            m.label.width = m.top.width - m.top.padding * 2 - m.icon.width
+            m.labelGroup.translation = [m.top.paddingLeft, m.top.paddingTop]
+            m.label.width = m.top.width - m.top.paddingLeft - m.top.paddingRight - m.icon.width
             m.label.height = m.top.height
-            m.labelGroupFocused.translation = [m.top.padding, m.top.padding]
-            m.labelFocused.width = m.top.width - m.top.padding * 2 - m.iconFocused.width
+            m.labelGroupFocused.translation = [m.top.paddingLeft, m.top.paddingTop]
+            m.labelFocused.width = m.top.width - m.top.paddingLeft - m.top.paddingRight - m.iconFocused.width
             m.labelFocused.height = m.top.height
         end if
-        
         m.background.width = m.top.width
         m.background.height = m.top.height
         m.backgroundFocused.width = m.top.width
@@ -84,48 +87,69 @@ sub onLayoutChanged()
 end sub
 
 sub onLabelWidthChanged()
-    m.background.width = m.label.width + (m.top.padding * 2) + m.icon.width
-    m.backgroundImage.width = m.label.width + (m.top.padding * 2) + m.icon.width
+    m.background.width = m.label.width + (m.top.paddingLeft + m.top.paddingRight) + m.icon.width
+    m.backgroundImage.width = m.label.width + (m.top.paddingLeft + m.top.paddingRight) + m.icon.width
     if m.top.foregroundImageWidth = 0 then
-        m.foregroundImage.width = m.label.width + (m.top.padding * 2) + m.icon.width
+        m.foregroundImage.width = m.label.width + (m.top.paddingLeft + m.top.paddingRight) + m.icon.width
     end if
-    m.backgroundFocused.width = m.label.width + (m.top.padding * 2) + m.icon.width
-    m.backgroundImageFocused.width = m.label.width + (m.top.padding * 2) + m.icon.width
+    m.backgroundFocused.width = m.label.width + (m.top.paddingLeft + m.top.paddingRight) + m.icon.width
+    m.backgroundImageFocused.width = m.label.width + (m.top.paddingLeft + m.top.paddingRight) + m.icon.width
     if m.top.focusedForegroundImageWidth = 0 then
-        m.foregroundImageFocused.width = m.label.width + (m.top.padding * 2) + m.icon.width
+        m.foregroundImageFocused.width = m.label.width + (m.top.paddingLeft + m.top.paddingRight) + m.icon.width
     end if
 end sub
 
-sub onFontChanged()
-    m.label.font = m.top.font
+sub onPaddingChanged(nodeEvent as object)
+    padding = nodeEvent.getData()
+    m.top.paddingTop = padding
+    m.top.paddingBottom = padding
+    m.top.paddingLeft = padding
+    m.top.paddingRight = padding
+    updateLayout()
+end sub
+
+sub onWrapChanged(nodeEvent as object)
+    wrap = nodeEvent.getData()
+    m.label.wrap = wrap
+    m.labelFocused.wrap = wrap
+end sub
+
+sub onFontChanged(nodeEvent as object)
+    font = nodeEvent.getData()
+    m.label.font = font
     if m.top.focusedFont = invalid then
-        m.labelFocused.font = m.top.font
+        m.labelFocused.font = font
     end if
 end sub
 
-sub onFocusedFontChanged()
-    m.labelFocused.font = m.top.focusedFont
+sub onFocusedFontChanged(nodeEvent as object)
+    font = nodeEvent.getData()
+    m.labelFocused.font = font
 end sub
 
-sub onTextChanged()
-    m.label.text = m.top.text
-    m.labelFocused.text = m.top.text
+sub onTextChanged(nodeEvent as object)
+    text = nodeEvent.getData()
+    if m.top.forceUpperCase then
+        text = uCase(text)
+    end if
+    m.label.text = text
+    m.labelFocused.text = text
     
     if m.top.width = 0 then
-        m.top.width = m.label.boundingRect().width
+        m.top.width = m.label.boundingRect().width + m.top.paddingLeft + m.top.paddingRight + m.icon.width
     end if
 end sub
 
 sub onHorizAlignmentChanged()
     m.label.horizAlign = m.top.horizAlignment
     m.labelFocused.horizAlign = m.top.horizAlignment
-    onLayoutChanged()
+    updateLayout()
 end sub
 
 sub onVertAlignmentChanged()
     m.label.vertAlign = m.top.vertAlignment
     m.labelFocused.vertAlign = m.top.vertAlignment
-    onLayoutChanged()
+    updateLayout()
 end sub
 
 sub onItemContentChanged()

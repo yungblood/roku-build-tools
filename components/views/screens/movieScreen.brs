@@ -5,11 +5,18 @@ sub init()
     m.top.observeField("visible", "onVisibleChanged")
     
     m.heroImageUrl = ""
+    
+    m.backgroundDarken = m.top.findNode("backgroundDarken")
+    m.backgroundDarken.color = getThemeColor("singularity")
+    
+    m.badges = m.top.findNode("badges")
+    m.airDate = m.top.findNode("airDate")
 
     m.background = m.top.findNode("background")
     m.poster = m.top.findNode("poster")
+    
+    m.metadata = m.top.findNode("metadata")
     m.movieTitle = m.top.findNode("movieTitle")
-    m.movieSubtitle = m.top.findNode("movieSubtitle")
     m.movieDescription = m.top.findNode("movieDescription")
     m.progressBar = m.top.findNode("progressBar")
     
@@ -25,6 +32,23 @@ sub init()
     m.firstLoad = true
     m.top.setFocus(true)
 end sub
+
+function onKeyEvent(key as string, press as boolean) as boolean
+    if press then
+        if key = "down" then
+            if m.buttons.isInFocusChain() and m.movieDescription.focusable then
+                m.movieDescription.setFocus(true)
+                return true
+            end if
+        else if key = "up" then
+            if m.movieDescription.isInFocusChain() then
+                m.buttons.setFocus(true)
+                return true
+            end if
+        end if
+    end if
+    return false
+end function
 
 sub onFocusChanged()
     if m.top.hasFocus() then
@@ -80,19 +104,31 @@ sub onMovieChanged()
         trackScreenView()
 
         m.movieTitle.text = movie.title
-        m.movieSubtitle.text = movie.subtitle
         m.movieDescription.text = movie.description
+        
+        m.badges.removeChildrenIndex(m.badges.getChildCount(), 0)
+        if not isNullOrEmpty(movie.rating) then
+            rating = m.badges.createChild("EpisodeBadge")
+            rating.text = movie.rating
+        end if
+        if not isNullOrEmpty(movie.durationStringSimple) then
+            length = m.badges.createChild("EpisodeBadge")
+            length.text = movie.durationStringSimple
+        end if
+        m.airDate.text = movie.releaseDate
+        m.badges.appendChild(m.airDate)
 
         m.poster.uri = getImageUrl(movie.thumbnailUrl, m.poster.width)
 
-        ' if watch history exists leave progress bar at 100%
         if movie.resumePoint > 0 then
+            percentage = movie.resumePoint / movie.length
             m.progressBar.maxValue = movie.length
             m.progressBar.value = movie.resumePoint
-            if m.progressBar.value / m.progressBar.maxValue > .97 then
+            if percentage > .97 then
+                ' if watch history exists leave progress bar at 100%
                 m.progressBar.value = m.progressBar.maxValue
             end if
-            if m.progressBar.value / m.progressBar.maxValue > .05 then
+            if percentage > .05 then
                 m.progressBar.visible = true
             else
                 m.progressBar.visible = false
@@ -100,6 +136,7 @@ sub onMovieChanged()
         else
             m.progressBar.visible = false
         end if
+        updateGlobalResumePoint(movie.id, movie.resumePoint)
 
         m.background.uri = getImageUrl(movie.thumbnailUrl, m.background.width)
         
@@ -112,13 +149,19 @@ sub onMovieChanged()
                 m.watch.text = "RESTART"
                 m.buttons.insertChild(m.resume, 0)
             else
-                m.watch.text = "WATCH"
+                m.watch.text = "WATCH MOVIE"
                 m.buttons.removeChild(m.resume)
             end if
         else
             m.watch.text = "SUBSCRIBE"
             m.buttons.removeChild(m.resume)
         end if
+        
+        boundingRect = m.metadata.boundingRect()
+        x = boundingRect.x
+        y = boundingRect.y + boundingRect.height + 55
+        m.movieDescription.translation = [x, y]
+        m.movieDescription.height = 908 - y
 
         m.buttons.visible = true
         m.buttons.setFocus(false)
@@ -130,11 +173,10 @@ sub onMovieChanged()
         else
             if createObject("roDeviceInfo").isAudioGuideEnabled() then
                 m.tts.say(m.movieTitle.text)
-                m.tts.say(m.movieSubtitle.text)
                 m.tts.say(m.movieDescription.text)
             end if
         end if
-    else        
+    else
         dialog = createCbsDialog("Content Unavailable", "The content you are trying to play is currently unavailable. Please try again later.", ["OK"])
         dialog.observeField("buttonSelected", "onUnavailableDialogClosed")
         setGlobalField("cbsDialog", dialog)

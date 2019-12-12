@@ -11,117 +11,45 @@
         <function name="read" />
     </interface>
     <children>
-        <Font
-            id="buttonFont"
-            size="24"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
-
         <LayoutGroup
             id="content"
             layoutDirection="vert"
-            translation="[0,416]"
-            itemSpacings="[40]"
-            vertAlignment="center">
+            itemSpacings="[31]">
             <SettingsLabel
                 id="name"
-                title="SIGNED IN AS"
+                title="Signed In As"
                 value="" />
             <SettingsLabel
                 id="email"
-                title="EMAIL"
+                title="Email"
                 value="" />
             <SettingsLabel
                 id="level"
-                title="ACCOUNT LEVEL"
+                title="Account Level"
                 value="" />
             <LabelButtonGroup
                 id="buttons"
-                layoutDirection="horiz"
-                itemSpacings="50">
-                <LabelButton
+                layoutDirection="vert"
+                itemSpacings="24">
+                <CBSButton
                     id="freeTrial"
-                    width="300"
-                    height="300"
-                    backgroundUri="pkg:/images/upsell_button.9.png"
-                    focusedBackgroundUri="pkg:/images/upsell_button_focused.9.png"
-                    foregroundUri="pkg:/images/icon_upgrade.png"
-                    focusedForegroundUri="pkg:/images/icon_upgrade.png"
-                    foregroundImageWidth="140"
-                    foregroundImageHeight="140"
-                    focusedForegroundImageWidth="140"
-                    focusedForegroundImageHeight="140"
-                    padding="25"
-                    vertAlignment="bottom"
                     text="START YOUR FREE TRIAL"
-                    font="dictionary:buttonFont"
                     processKeyEvents="false" />
-                <LabelButton
+                <CBSButton
                     id="upgrade"
-                    width="300"
-                    height="300"
-                    backgroundUri="pkg:/images/upsell_button.9.png"
-                    focusedBackgroundUri="pkg:/images/upsell_button_focused.9.png"
-                    foregroundUri="pkg:/images/icon_upgrade.png"
-                    focusedForegroundUri="pkg:/images/icon_upgrade.png"
-                    foregroundImageWidth="140"
-                    foregroundImageHeight="140"
-                    focusedForegroundImageWidth="140"
-                    focusedForegroundImageHeight="140"
-                    padding="25"
-                    vertAlignment="bottom"
                     text="UPGRADE"
-                    font="dictionary:buttonFont"
                     processKeyEvents="false" />
-                <LabelButton
+                <CBSButton
                     id="manageAccount"
-                    width="300"
-                    height="300"
-                    backgroundUri="pkg:/images/upsell_button.9.png"
-                    focusedBackgroundUri="pkg:/images/upsell_button_focused.9.png"
-                    foregroundUri="pkg:/images/icon_account.png"
-                    focusedForegroundUri="pkg:/images/icon_account.png"
-                    foregroundImageWidth="140"
-                    foregroundImageHeight="140"
-                    focusedForegroundImageWidth="140"
-                    focusedForegroundImageHeight="140"
-                    padding="25"
-                    vertAlignment="bottom"
                     text="MANAGE ACCOUNT"
-                    font="dictionary:buttonFont"
                     processKeyEvents="false" />
-                <LabelButton
+                <CBSButton
                     id="signIn"
-                    width="300"
-                    height="300"
-                    backgroundUri="pkg:/images/upsell_button.9.png"
-                    focusedBackgroundUri="pkg:/images/upsell_button_focused.9.png"
-                    foregroundUri="pkg:/images/icon_account.png"
-                    focusedForegroundUri="pkg:/images/icon_account.png"
-                    foregroundImageWidth="140"
-                    foregroundImageHeight="140"
-                    focusedForegroundImageWidth="140"
-                    focusedForegroundImageHeight="140"
-                    padding="25"
-                    vertAlignment="bottom"
                     text="SIGN IN"
-                    font="dictionary:buttonFont"
                     processKeyEvents="false" />
-                <LabelButton
+                <CBSButton
                     id="signOut"
-                    width="300"
-                    height="300"
-                    backgroundUri="pkg:/images/upsell_button.9.png"
-                    focusedBackgroundUri="pkg:/images/upsell_button_focused.9.png"
-                    foregroundUri="pkg:/images/icon_account.png"
-                    focusedForegroundUri="pkg:/images/icon_account.png"
-                    foregroundImageWidth="140"
-                    foregroundImageHeight="140"
-                    focusedForegroundImageWidth="140"
-                    focusedForegroundImageHeight="140"
-                    padding="25"
-                    vertAlignment="bottom"
                     text="SIGN OUT"
-                    font="dictionary:buttonFont"
                     processKeyEvents="false" />
             </LabelButtonGroup>
         </LayoutGroup>

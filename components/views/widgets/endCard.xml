@@ -20,19 +20,19 @@
     <children>
         <Font
             id="endCardEpisodeNumberFont"
-            uri="pkg:/fonts/Lato-Light.ttf"
+            uri="pkg:/fonts/Proxima Nova A Regular.ttf"
             size="46" />
         <Font
             id="endCardEpisodeTitleFont"
-            uri="pkg:/fonts/Lato-Light.ttf"
+            uri="pkg:/fonts/Proxima Nova A Regular.ttf"
             size="34" />
         <Font
             id="endCardShowTitleFont"
-            uri="pkg:/fonts/Lato-Bold.ttf"
+            uri="pkg:/fonts/Proxima Nova A Bold.ttf"
             size="46" />
         <Font
             id="headerFont"
-            uri="pkg:/fonts/Lato-Regular.ttf"
+            uri="pkg:/fonts/Proxima Nova A Semibold.ttf"
             size="30" />
 
         <CrossfadePoster

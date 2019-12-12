@@ -12,8 +12,6 @@ sub onContentChanged()
             contentType = parent.subtype()
             if contentType = "Section" and parent.title.inStr("Movies") >= 0 then
                 m.tile = m.top.createChild("PosterTile")
-            else if contentType = "Favorites" then
-                m.tile = m.top.createChild("FavoriteTile")
             else if contentType = "LiveTVChannels" then
                 m.tile = m.top.createChild("ChannelTile")
             else if contentType = "RecentlyWatched" or contentType = "ContinueWatching" then

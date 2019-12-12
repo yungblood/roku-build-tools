@@ -7,6 +7,8 @@
         <field id="buttonUnfocused" type="integer" value="-1" alwaysNotify="true" />
         <field id="jumpToIndex" type="integer" onChange="jumpToIndex" alwaysNotify="true" />
         <field id="jumpToButton" type="string" onChange="jumpToButton" alwaysNotify="true" />
+
+        <field id="repeatSelection" type="boolean" />
         
         <field id="wrap" type="boolean" />
 	</interface>

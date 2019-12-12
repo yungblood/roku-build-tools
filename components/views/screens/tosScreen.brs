@@ -19,13 +19,13 @@ end sub
 function onKeyEvent(key as string, press as boolean) as boolean
     if press then
         if key = "down" then
-            if m.text.hasFocus() then
+            if m.text.isInFocusChain() then
                 m.buttons.setFocus(true)
                 m.textFocus.visible = false
                 return true
             end if
         else if key = "up" then
-            if m.buttons.isInFocusChain() then
+            if m.buttons.isInFocusChain() and m.text.focusable then
                 m.text.setFocus(true)
                 m.textFocus.visible = true
                 return true

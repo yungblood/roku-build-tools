@@ -13,17 +13,17 @@ sub updateContent()
         m.content.removeChildrenIndex(m.content.getChildCount(), 0)
         if not isNullOrEmpty(config.touUrl) then
             label = m.content.createChild("SettingsLabel")
-            label.title = "TERMS OF USE"
+            label.title = "Terms of Use"
             label.value = config.touUrl
         end if
         if not isNullOrEmpty(config.privacyUrl) then
             label = m.content.createChild("SettingsLabel")
-            label.title = "PRIVACY STATEMENT"
+            label.title = "Privacy Statement"
             label.value = config.privacyUrl
         end if
         if not isNullOrEmpty(config.videoPolicyUrl) then
             label = m.content.createChild("SettingsLabel")
-            label.title = "VIDEO SERVICES POLICY"
+            label.title = "Video Services Policy"
             label.value = config.videoPolicyUrl
         end if
     end if

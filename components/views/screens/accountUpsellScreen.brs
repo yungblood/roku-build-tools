@@ -123,15 +123,8 @@ sub onButtonsChanged()
     buttons = m.top.buttons
     m.buttons.removeChildrenIndex(m.buttons.getChildCount(), 0)
     for each buttonText in buttons
-        button = m.buttons.createChild("LabelButton")
-        button.width = 701
-        button.height = 88
-        button.textColor = "0xffffffff"
-        button.focusedTextColor = "0xffffffff"
-        button.backgroundUri = "pkg:/images/upsell_button.9.png"
-        button.focusedBackgroundUri = "pkg:/images/upsell_button_focused.9.png"
+        button = m.buttons.createChild("CBSButton")
         button.processKeyEvents = false
-        button.font = m.buttonFont
         button.text = buttonText
     next
 end sub

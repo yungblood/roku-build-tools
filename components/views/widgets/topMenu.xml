@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component name="TopMenu" extends="Group">
     <script type="text/brightscript" uri="pkg:/components/views/widgets/topMenu.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/theme.brs" />
     <script type="text/brightscript" uri="pkg:/components/shared/utils.brs" />
+
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/general.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
     <script type="text/brightscript" uri="pkg:/source/framework/utilities/strings.brs" />
@@ -10,88 +12,40 @@
         <field id="buttonSelected" type="string" alwaysNotify="true" />
     </interface>
     <children>
-        <Font
-           id="buttonFont"
-           size="25"
-           uri="pkg:/fonts/Lato-Regular.ttf" />
+        <Poster
+            id="background"
+            width="1920"
+            height="194"
+            uri="pkg:/images/ui/overlay_topnav_darken.png" />
         <Poster
             id="logo"
-            translation="[95,51]"
-            width="131"
-            height="39"
-            uri="pkg:/images/cbsNavLogoConsole.png" />
+            translation="[132,79]"
+            width="138"
+            height="41"
+            uri="pkg:/images/new/logo_nav.png" />
         <LabelButtonGroup
             id="navButtons"
-            translation="[304,47]"
+            translation="[337,79]"
             layoutDirection="horiz"
-            itemSpacings="[70]">
-            <LabelButton
+            itemSpacings="[61]">
+            <CBSNavButton
                 id="home"
-                text="HOME"
-                textColor="0xffffff66"
-                focusedTextColor="0xffffffff"
-                width="77"
-                height="46"
-                backgroundUri=""
-                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
-                font="dictionary:buttonFont"
-                ttsComponentType="tab"
-                processKeyEvents="false" />
-            <LabelButton
+                text="Home" />
+            <CBSNavButton
                 id="shows"
-                text="SHOWS"
-                textColor="0xffffff66"
-                focusedTextColor="0xffffffff"
-                width="93"
-                height="46"
-                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
-                font="dictionary:buttonFont"
-                ttsComponentType="tab"
-                processKeyEvents="false" />
-            <LabelButton
+                text="Shows" />
+            <CBSNavButton
                 id="liveTV"
-                text="LIVE TV"
-                textColor="0xffffff66"
-                focusedTextColor="0xffffffff"
-                width="89"
-                height="46"
-                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
-                font="dictionary:buttonFont"
-                ttsComponentType="tab"
-                processKeyEvents="false" />
-            <LabelButton
+                text="Live TV" />
+            <CBSNavButton
                 id="movies"
-                text="MOVIES"
-                textColor="0xffffff66"
-                focusedTextColor="0xffffffff"
-                width="95"
-                height="46"
-                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
-                font="dictionary:buttonFont"
-                ttsComponentType="tab"
-                processKeyEvents="false" />
-            <LabelButton
+                text="Movies" />
+            <CBSNavButton
                 id="search"
-                text="SEARCH"
-                textColor="0xffffff66"
-                focusedTextColor="0xffffffff"
-                width="97"
-                height="46"
-                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
-                font="dictionary:buttonFont"
-                ttsComponentType="tab"
-                processKeyEvents="false" />
-            <LabelButton
+                text="Search" />
+            <CBSNavButton
                 id="settings"
-                text="SETTINGS"
-                textColor="0xffffff66"
-                focusedTextColor="0xffffffff"
-                width="116"
-                height="46"
-                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
-                font="dictionary:buttonFont"
-                ttsComponentType="tab"
-                processKeyEvents="false" />
+                text="Settings" />
         </LabelButtonGroup>
     </children>
 </component>

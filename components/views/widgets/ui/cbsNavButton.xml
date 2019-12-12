@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="CBSNavButton" extends="Group">
+    <script type="text/brightscript" uri="./cbsNavButton.brs" />
+    <script type="text/brightscript" uri="pkg:/components/shared/theme.brs" />
+    <interface>
+        <field id="highlighted" type="boolean" onChange="onHighlightedChanged" />
+
+        <field id="text" type="string" alias="label.text" onChange="onTextChanged" />
+        <field id="style" type="string" alias="label.style" />
+        <field id="ttsComponentType" type="string" value="tab" />
+    </interface>
+    <children>
+        <CBSLabel
+            id="label"
+            style="deci" />
+        <Poster
+            id="focus"
+            height="4"
+            uri="pkg:/images/ui/focus_nav.9.png"
+            visible="false" />
+        <Rectangle
+            id="fixedWidth"
+            color="0x00000000" />
+    </children>
+</component>

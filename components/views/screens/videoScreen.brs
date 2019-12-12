@@ -21,11 +21,6 @@ sub init()
     m.trickPlayVisible = false
 
     m.replayGroup = m.top.findNode("replayGroup")
-    'child 0 is poster, child 1 is text
-    'we are going to utilize this as a group item, so these operations will be done once in case the text is changed later in the xml
-    exrect = m.replayGroup.GetChild(1).boundingRect()
-    centerx = (1920 - exrect.width) / 2
-    m.replayGroup.GetChild(1).translation = [centerx, 860]
 
    ' if getGlobalField("extremeMemoryManagement") = true then
     if getModel().mid(0, 2).toInt() <= 35 then
@@ -90,13 +85,20 @@ sub init()
     m.firstPlay = true
 
     m.timedOut = false
-    
     m.idleTimeout = asInteger(config.playback_timeout_bblf, config.liveTimeout)
+    
+    m.buffering = false
+
+    ' HACK: grab reference to the firmware rectangle
+    '       This is dangerous, as Roku could move or add components
+    '       so we need to be careful retrieving components like this
+    m.firmwareRect = m.video.getChild(1).getChild(1)
 
     'destroy the clock
-    m.video.getChild(1).removeChildIndex(9)
-    'grab reference to the firmware rectangle
-    m.firmRect = m.video.getChild(1).getChild(1)
+    clock = findNodeOfType("Clock", m.video)
+    if clock <> invalid then
+        clock.getParent().removeChild(clock)
+    end if
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
@@ -105,6 +107,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
         if not m.inAd then
             if key = "back" then
                 if m.overlay.visible then
+                    fixFirmRectOpacity(0)
                     m.overlay.visible = false
                     m.overlayTimer.control = "stop"
                 else
@@ -152,10 +155,10 @@ function onKeyEvent(key as string, press as boolean) as boolean
 end function
 
 sub fixFirmRectOpacity(desiredOpacity As integer)
-    if m.firmRect <> invalid then
+    if m.firmwareRect <> invalid then
         'this is intended to eliminate flicker, if we don't need to change the value then don't change the value
-        if m.firmRect.opacity <> desiredOpacity then
-            m.firmRect.opacity = desiredOpacity
+        if m.firmwareRect.opacity <> desiredOpacity then
+            m.firmwareRect.opacity = desiredOpacity
         end if
     end if
 end sub
@@ -258,7 +261,6 @@ sub onBifTranslationChanged()
 end sub
 
 sub onVideoStateChanged()
-    if m.buffering = invalid then m.buffering = false
     if m.video <> invalid then
         state = LCase(m.video.state)
         ?"VIDEO STATE: ";state
@@ -521,8 +523,14 @@ sub onEpisodeLoaded(nodeEvent as object)
         ""
     ]
     if m.episode <> invalid then
-        if m.episode.isLive or (user.isAdFree and arrayContains(rafMediaTypes, m.episode.mediaType)) then
+        if m.episode.isLive then
             m.top.useDai = false
+        else if m.episode.isFullEpisode then
+            if user.isAdFree then
+                if arrayContains(rafMediaTypes, m.episode.mediaType) then
+                    m.top.useDai = false
+                end if
+            end if
         end if
     end if
 '   -------------------- end ------------------   
@@ -827,8 +835,10 @@ sub onVideoStart()
     'trackScreenAction("trackVideoLoad", m.omnitureParams, m.top.omnitureName, m.top.omniturePageType, ["event52"])
     trackVideoLoad(m.episode, m.heartbeatContext)
     trackVideoStart()
+
     'bugfix-1394 : Force adobe into buffering state to prevent multiple start calls.
     trackVideoBufferStart()
+
     m.watchNextType = ""
 end sub
 
@@ -1071,7 +1081,6 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                 streamData.apiKey = config.daiKey
                 streamData.videoID = m.episode.id
                 
-                
                 ' Exclude the 5.1 options from "legacy" and select models
                 ' due to macroblocking issues
 '                model = getModel().mid (0, 2).toInt()
@@ -1085,7 +1094,7 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
 '                    end if
 '                end if
 
-'               -------------According to ticket 1031-------------
+'               -------------According to ticket 1031/1182-------------
                 if m.episode.isFullEpisode then
                     streamData.contentSourceID = config.daiSourceID
                 else
@@ -1097,7 +1106,6 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                 end if 
 '               ----------------------- end ----------------------
 
-    
                 ' Add encoded video specific custom parameters
                 custParams = m.episode.adParams["cust_params_encoded"]
                 if skipPreroll then
@@ -1199,6 +1207,9 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                 m.convivaTask.content = m.episode
                 m.convivaTask.control = "run"
 
+                if not isNullOrEmpty(m.episode.videoStream.authHeader) then
+                    m.video.addHeader("Authorization", m.episode.videoStream.authHeader)
+                end if
                 if m.top.useDai then
                     m.video.content = invalid
                     dai = getGlobalField("dai")
@@ -1207,10 +1218,8 @@ sub startPlayback(skipPreroll = false as boolean, resumePosition = 0 as integer,
                         dai.video = m.video
                         dai.content = m.episode
                         dai.streamData = streamData
-                        m.video.addHeader("Authorization", m.episode.videoStream.authorization)
                     end if
                 else
-                    m.video.addHeader("Authorization", m.episode.videoStream.authorization)
                     m.video.content = m.episode.videoStream
                     m.rafTask = createObject("roSGNode", "RafTask")
                     m.rafTask.observeField("adPodReady", "onAdPodReady")

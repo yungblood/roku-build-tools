@@ -7,70 +7,27 @@
         <field id="buttonSelected" type="string" alwaysNotify="true" />
     </interface>
     <children>
-        <Font
-           id="buttonFont"
-           size="30"
-           uri="pkg:/fonts/Lato-Regular.ttf" />
-
         <LabelButtonGroup
             id="settingsButtons"
-            translation="[95,389]"
+            translation="[132,222]"
             layoutDirection="vert"
-            itemSpacings="[30]">
-            <LabelButton
+            itemSpacings="[20]">
+            <CBSCategoryButton
                 id="account"
-                text="My Account"
-                textColor="0xffffff66"
-                focusedTextColor="0xffffffff"
-                horizAlignment="left"
-                width="165"
-                height="46"
-                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
-                font="dictionary:buttonFont"
-                processKeyEvents="false" />
-            <LabelButton
+                text="My Account" />
+            <CBSCategoryButton
                 id="legal"
-                text="Legal Notices"
-                textColor="0xffffff66"
-                focusedTextColor="0xffffffff"
-                horizAlignment="left"
-                width="180"
-                height="46"
-                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
-                font="dictionary:buttonFont"
-                processKeyEvents="false" />
-            <LabelButton
+                text="Legal Notices" />
+            <CBSCategoryButton
                 id="support"
-                text="Support"
-                textColor="0xffffff66"
-                focusedTextColor="0xffffffff"
-                horizAlignment="left"
-                width="110"
-                height="46"
-                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
-                font="dictionary:buttonFont"
-                processKeyEvents="false" />
-            <LabelButton
+                text="Support" />
+            <CBSCategoryButton
                 id="liveTV"
-                text="Live TV"
-                textColor="0xffffff66"
-                focusedTextColor="0xffffffff"
-                horizAlignment="left"
-                width="100"
-                height="46"
-                focusedBackgroundUri="pkg:/images/menu_focus_$$RES$$.9.png"
-                font="dictionary:buttonFont"
-                processKeyEvents="false" />
+                text="Live TV" />
         </LabelButtonGroup>
-        <Rectangle
-            translation="[463,176]"
-            width="2"
-            height="832"
-            color="0xffffffff"
-            opacity=".23" />
         <Group
             id="panels"
-            translation="[570,176]">
+            translation="[412,219]">
             <AccountPanel
                 id="accountPanel"
                 visible="false" />

@@ -8,7 +8,7 @@
         <Font
             id="buttonFont"
             size="32"
-            uri="pkg:/fonts/Lato-Regular.ttf" />
+            uri="pkg:/fonts/Proxima Nova A Semibold.ttf" />
             
         <Poster
             id="background"
@@ -25,7 +25,7 @@
             color="0xe5e5e5ff">
             <Font
                 role="font"
-                uri="pkg:/fonts/Lato-Bold.ttf"
+                uri="pkg:/fonts/Proxima Nova A Bold.ttf"
                 size="50" />
         </Label>
 <!--         <CenteredPoster -->

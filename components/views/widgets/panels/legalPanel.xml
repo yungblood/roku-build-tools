@@ -12,9 +12,7 @@
         <LayoutGroup
             id="content"
             layoutDirection="vert"
-            translation="[0,416]"
-            itemSpacings="[69]"
-            vertAlignment="center">
+            itemSpacings="[31]">
         </LayoutGroup>
     </children>
 </component>

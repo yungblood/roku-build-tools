@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<component name="HorizontalList" extends="MarkupGrid" >
-    <script type="text/brightscript" uri="pkg:/components/framework/widgets/horizontalList.brs" />
-</component>

@@ -6,5 +6,7 @@
 
         <field id="sessionID" type="string" />
         <field id="ticket" type="string" />
+
+        <field id="authorization" type="string" />
     </interface>
 </component>
