@@ -1,28 +1,24 @@
 title=CBS All Access
-dial_title=CBS All Access
-
 major_version=2
-minor_version=22
-build_version=20191125
-
-mm_icon_focus_fhd=pkg:/storeassets/channelstore_fhd.png
-mm_icon_focus_hd=pkg:/storeassets/channelstore_hd.png
-
-splash_screen_sd=pkg:/images/splash_fhd.png
-splash_screen_hd=pkg:/images/splash_fhd.png
-splash_screen_fhd=pkg:/images/splash_fhd.png
+minor_version=0
+build_version=0
+mm_icon_focus_hd=pkg:/storeassets/AALogo_RokuStore_540x405.png
+mm_icon_focus_sd=pkg:/storeassets/AALogo_RokuStore_290x218.png
+subtitle=Watch Full Seasons of Your Shows. Anytime, Anywhere.
+mm_icon_side_hd=pkg:/storeassets/AALogo_RokuStore_512x512.png
+mm_icon_side_sd=pkg:/storeassets/AALogo_RokuStore_214x144.png
+bs_libs_required=roku_ads_lib,googleima3
+splash_screen_fhd=pkg:/images/logoLoadingScreen_HD.png
+splash_screen_hd=pkg:/images/logoLoadingScreen_HD.png
+splash_screen_sd=pkg:/images/logoLoadingScreen_HD.png
 splash_color=#000000
 splash_min_time=0
-
-bs_libs_required=roku_ads_lib,googleima3
-sg_component_libs_required=roku_analytics
-
-rsg_version=1.2
-supports_input_launch=true
-
 ui_resolutions=fhd
 uri_resolution_autosub=$$RES$$,fhd,hd,fhd
-
-config_file=pkg:/config.json
-
-channel_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2t1LXBlcm0iOlsiZ2V0X2RldmljZV9pZCJdLCJzdWIiOiJ1cm46cm9rdS5jb206c3RiLzMxNDQwIiwiaXNzIjoidXJuOnJva3UuY29tOnRva2VubWludDpjaGFubmVsdG9rZW4iLCJqdGkiOiJ1cm46ZDJhMzA0ZjctOGViMS00ZmY0LWFmNzUtNjg2NDExNGFhNzQ0IiwiZXhwIjoxNTU5MzUwODAwLCJpYXQiOjE1NTQ3Njk1MDIsInJva3UtY2hhbm5lbC1pZCI6WyIzMTQ0MCJdLCJuYmYiOjE0NzI5MDQwMDAsInJva3UtdGZ2IjoiMSIsImF1ZCI6InVybjpyb2t1LmNvbTpzdGIvY2hhbm5lbCJ9.DGt01TOljBt1HYaUt8_BxoUn10okS-OBliQ3YAX26W32fWFzsCnN1t6aODD62AHX_srtBDziqLSRbAEXnnEM9a0m_AgVxZ9SBAZSOnV02V-td4i8c3Ep-pre8LP40uAlOeXgawDdBj05lIukdandxfsaT6OXZElKWDaQ6a54oS5FPaUjjs0bmud8UwVtHFaDk9vP94RX53wetwJHysCrgHIlNaHf1uGnDDc8I-rQvaJIjahjt08gT7h20yImnQ7RmON6t2sOSCbnzzNYU7fXB_iQuKi4AJ4YybzvnyN52htacLbuv8dRJ2e4-cplVFSoyVgDSZppfShckZH4AgOjxw
+config_file=pkg:/config-canada.json
+dial_title=CBS All Access
+mm_icon_focus_fhd=pkg:/storeassets/channelstore_fhd.png
+mm_icon_side_fhd=pkg:/storeassets/channelstore_fhd.png
+rsg_version=1.2
+sg_component_libs_required=roku_analytics
+supports_input_launch=1
