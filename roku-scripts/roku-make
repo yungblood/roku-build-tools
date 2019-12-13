@@ -1,0 +1,19 @@
+#!/usr/bin/php
+<?php 
+require(__DIR__."/roku-make-functions.php");
+require(__DIR__."/roku-config.php");
+#require(__DIR__."/roku-art.php");
+require(__DIR__."/roku-custom.php");
+require(__DIR__."/roku-test-functions.php");
+require(__DIR__."/roku-sdk.php");
+
+if($argc <> 2) help();
+if(!function_exists($argv[1])) help();
+call_user_func($argv[1]);
+$msg = sprintf("*** %s($argv[1]) $E[APPFULLNAME] complete ***", basename($argv[0]));
+if(!empty($E['ARTIFACTORY'])) {
+	if(file_exists("$E[ZIPDIR]/$E[APPFULLNAME].zip")) $msg .= sprintf("\n $E[ARTIFACTORY]/$E[APPFULLNAME].zip ");
+	if(file_exists("$E[PKGDIR]/$E[APPFULLNAME].pkg")) $msg .= sprintf("\n $E[ARTIFACTORY]/$E[APPFULLNAME].pkg ");
+}
+finish($msg);
+?>
