@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<component name="ShowGroup" extends="ContentNode">
-    <script type="text/brightscript" uri="pkg:/components/models/showGroup.brs" />
-    <interface>
-        <field id="json" type="assocarray" onChange="onJsonChanged" />
-
-        <field id="loadShows" type="boolean" onChange="onLoadShows" alwaysNotify="true" />
-    </interface>
-</component>

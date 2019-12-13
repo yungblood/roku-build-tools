@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<component name="LiveFeed" extends="Episode">
-    <script type="text/brightscript" uri="pkg:/components/models/liveFeed.brs" />
-    <interface>
-        <field id="trackingAstID" type="integer" value="595" />
-    </interface>
-</component>

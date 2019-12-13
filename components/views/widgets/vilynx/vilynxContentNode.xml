@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<component name="VilynxContentNode" extends="ContentNode">
-    <interface>
-        <field id="vilynxThumbnail" type="string"/>
-        <field id="vilynxUrlHigh" type="string"/>
-        <field id="vilynxUrl" type="string"/>
-    </interface>
-</component>

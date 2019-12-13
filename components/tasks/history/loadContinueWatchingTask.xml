@@ -1,6 +1,0 @@
-<component name="LoadContinueWatchingTask" extends="ApiTask">
-    <script type="text/brightscript" uri="pkg:/components/tasks/history/loadContinueWatchingTask.brs" />
-    <interface>
-        <field id="episodes" type="nodearray" alwaysNotify="true" />
-    </interface>
-</component>

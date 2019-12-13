@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<component name="KeyPadDialog" extends="Dialog">
-    <script type="text/brightscript" uri="pkg:/components/views/screens/keyPadDialog.brs" />
-    <script type="text/brightscript" uri="pkg:/source/framework/utilities/types.brs" />
-    <interface>
-        <field id="text" type="string" />
-        <field id="textLength" type="integer" value="2" onChange="onTextLengthChanged" />
-    </interface>
-</component>

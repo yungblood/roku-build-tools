@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<component name="CBSFont" extends="Font">
-    <script type="text/brightscript" uri="./cbsFont.brs" />
-    <interface>
-        <field id="fontInfo" type="assocarray" onChange="onFontInfoChanged"/>
-        <field id="weight" type="string" onChange="onWeightChanged"/>
-        <field id="lineSpacing" type="integer" />
-    </interface>
-</component>

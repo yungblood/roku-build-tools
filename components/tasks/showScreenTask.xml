@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<component name="ShowScreenTask" extends="ApiTask">
-    <script type="text/brightscript" uri="pkg:/components/tasks/showScreenTask.brs" />
-    <interface>
-        <field id="errorCode" type="integer" />
-        <field id="showID" type="string" />
-        <field id="content" type="assocarray" alwaysNotify="true" />
-    </interface>
-</component>

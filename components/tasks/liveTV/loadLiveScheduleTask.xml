@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<component name="LoadLiveScheduleTask" extends="ApiTask">
-    <script type="text/brightscript" uri="pkg:/components/tasks/liveTV/loadLiveScheduleTask.brs" />
-    <script type="text/brightscript" uri="pkg:/components/services/syncbak.brs" />
-    <interface>
-        <field id="scheduleUrl" type="string" />
-        <field id="schedule" type="nodearray" alwaysNotify="true" />
-    </interface>
-</component>

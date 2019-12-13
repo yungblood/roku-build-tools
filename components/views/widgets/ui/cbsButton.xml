@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<component name="CBSButton" extends="LabelButton">
-    <script type="text/brightscript" uri="./cbsButton.brs" />
-    <script type="text/brightscript" uri="pkg:/components/shared/theme.brs" />
-    <interface>
-        <field id="style" type="string" onChange="updateFont" />
-        <field id="weight" type="string" onChange="updateFont" />
-    </interface>
-</component>
