@@ -41,7 +41,10 @@
     $timeout = 0;
     
     $script = [
-        [ 'expect' => 'AppExitComplete', 'action' => 'none', 'parms' => [] ],
-        [ 'expect' => '________',        'action' => 'none', 'parms' => [] ]
+        // The following line is not needed, as it is automatically run to launch the channel.
+        [ 'expect' => '',                'action' => 'rokuLaunch', 'parms' => [$E['ROKU_CHAN'], $E['ROKU_PARMS']]],
+        // Wait for app to exit.
+        [ 'expect' => 'AppExitComplete', 'action' => 'none',       'parms' => [] ],
+        [ 'expect' => '________',        'action' => 'none',       'parms' => [] ]
     ];
 ?>

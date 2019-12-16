@@ -1,13 +1,14 @@
 <?php 
 function help() {
     global $argv;
-    pl("Usage: $argv[0] [OPTION]");
+    pl("Usage: $argv[0] [COMMAND] [VAR=VALUE]...");
     pl("Build Simple PHP script for packaging Roku SDK Applications.");
     pl("Common usage:");
     pl("> $argv[0] build");
     pl("> $argv[0] install");
     pl("> $argv[0] package");
     pl("> $argv[0] remove");
+    pl("> $argv[0] run_ecp_test ROKU_TEST=sample-test");
     finish("", 0, true);
 }
 

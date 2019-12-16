@@ -48,6 +48,18 @@ if(empty($E['ZIP_EXCLUDE'])) $E['ZIP_EXCLUDE'] = "-x \*.pkg -x exclude\* -x \.* 
 if(empty($E['ROKU_CHAN'])) $E['ROKU_CHAN'] = "dev";
 if(empty($E['ROKU_DEV'])) $E['ROKU_DEV'] = "10.16.181.8";
 
+if($argc > 2) {
+    $vars = $argv;
+    for ($v = 2; $v < $argc; $v++) {
+        if(strpos($argv[$v], '=') !== false) {
+            $override = explode('=',$argv[$v]);
+            $E[$override[0]] = $override[1];
+        } else if($argv[$v] == '--showvars') {
+            $showvars = true;
+        }
+    }
+}
+
 $E['PKG_TIME'] = time();
 $E['DATE'] = date("Ymd");
 $E['TIME'] = date("mdHi");
@@ -67,5 +79,5 @@ function updateEnv() {
     if(!empty($E['BUILD_ENV'])) $E['APPFULLNAME'] .= ".$E[BUILD_ENV]";
 }
 updateEnv();
-    
+if(isset($showvars)) print_r($E);
 ?>
