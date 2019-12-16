@@ -43,7 +43,7 @@ $E['PKGDIR'] = "$E[DISTDIR]/packages";
 if(!empty($E['ROKU_PASS'])) $E['USERPASS'] = "rokudev:$E[ROKU_PASS]";
 else $E['USERPASS'] = "rokudev";
 
-if(empty($E['ZIP_EXCLUDE'])) $E['ZIP_EXCLUDE'] = "-x \*.pkg -x exclude\* -x \.* -x \*/.\* -x /.git\* -x \*~ -x Makefile -x Jenkinsfile";
+if(empty($E['ZIP_EXCLUDE'])) $E['ZIP_EXCLUDE'] = "-x \*.pkg -x exclude\* -x \.* -x \*/.\* -x /.git\* -x /.history\* -x \*~ -x Makefile -x Jenkinsfile";
 
 if(empty($E['ROKU_CHAN'])) $E['ROKU_CHAN'] = "dev";
 if(empty($E['ROKU_DEV'])) $E['ROKU_DEV'] = "10.16.181.8";
