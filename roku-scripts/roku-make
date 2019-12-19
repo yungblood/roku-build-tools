@@ -14,6 +14,8 @@ $msg = sprintf("*** %s($argv[1]) $E[APPFULLNAME] complete ***", basename($argv[0
 if(!empty($E['ARTIFACTORY'])) {
 	if(file_exists("$E[ZIPDIR]/$E[APPFULLNAME].zip")) $msg .= sprintf("\n $E[ARTIFACTORY]/$E[APPFULLNAME].zip ");
 	if(file_exists("$E[PKGDIR]/$E[APPFULLNAME].pkg")) $msg .= sprintf("\n $E[ARTIFACTORY]/$E[APPFULLNAME].pkg ");
+	exec("git log -1 --pretty=%b", $output);
+	echo $output;
 }
 finish($msg);
 ?>
