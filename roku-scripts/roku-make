@@ -7,16 +7,53 @@ require(__DIR__."/roku-custom.php");
 require(__DIR__."/roku-test-functions.php");
 require(__DIR__."/roku-sdk.php");
 
-if($argc < 2) help();
-if(!function_exists($argv[1])) help();
-call_user_func($argv[1]);
-$msg = sprintf("*** %s($argv[1]) $E[APPFULLNAME] complete ***", basename($argv[0]));
-if(!empty($E['ARTIFACTORY'])) {
-	if(file_exists("$E[ZIPDIR]/$E[APPFULLNAME].zip")) $msg .= sprintf("\n $E[ARTIFACTORY]/$E[APPFULLNAME].zip ");
-	if(file_exists("$E[PKGDIR]/$E[APPFULLNAME].pkg")) $msg .= sprintf("\n $E[ARTIFACTORY]/$E[APPFULLNAME].pkg ");
-#	exec("git log --after yesterday --pretty=%b | sed '/^$/d'", $output);
-	exec("git log -1 --pretty=%b | sed '/^$/d'", $output);
-	$msg .= "\nThis Build Includes:\n```".implode("\n",$output)."```";
+$commands = [];
+
+for ($v = 1; $v < $argc; $v++) {
+	if(strpos($argv[$v], '=') !== false) {
+		$override = explode('=',$argv[$v]);
+		$E[$override[0]] = $override[1];
+	} else if(substr($argv[$v], 0, 2) == '--') {
+		$option = substr($argv[$v], 2);
+		switch($option) {
+			case 'showvars': 
+				$showvars = true;
+				break;
+			default: 
+				pl("Unknown option: --".$option);
+				help();
+		}
+	} else if(substr($argv[$v], 0, 1) == '-') {
+		$option = substr($argv[$v], 1);
+		switch($option) {
+			case 'V': 
+				$showvars = true;
+				break;
+			default: 
+				pl("Unknown option: -".$option);
+				help();
+		}
+	} else {
+		if(!function_exists($argv[$v])) {
+			pl("Unknown command: ".$argv[$v]);
+			help();
+		}
+		$commands[] = $argv[$v];
+	}
 }
-finish($msg);
+
+if(count($commands) == 0) help();
+
+foreach ($commands as $command) {	
+	call_user_func($command);
+	$msg = sprintf("*** %s($command) $E[APPFULLNAME] complete ***", basename($argv[0]));
+	if(!empty($E['ARTIFACTORY'])) {
+		if(file_exists("$E[ZIPDIR]/$E[APPFULLNAME].zip")) $msg .= sprintf("\n $E[ARTIFACTORY]/$E[APPFULLNAME].zip ");
+		if(file_exists("$E[PKGDIR]/$E[APPFULLNAME].pkg")) $msg .= sprintf("\n $E[ARTIFACTORY]/$E[APPFULLNAME].pkg ");
+	#	exec("git log --after yesterday --pretty=%b | sed '/^$/d'", $output);
+		exec("git log -1 --pretty=%b | sed '/^$/d'", $output);
+		$msg .= "\nThis Build Includes:\n```".implode("\n",$output)."```";
+	}
+	finish($msg);
+}
 ?>

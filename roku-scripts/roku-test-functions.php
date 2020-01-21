@@ -134,6 +134,7 @@
         $scriptMax = count($script);
         $lasttime = time();
         $scriptName = debug_backtrace()[1]["function"];
+        $ecpline = "";
         if ($scriptName === "run_ecp_test") $scriptName = $E['ROKU_TEST'];
         do {
             $read   = array( $console);
