@@ -18,7 +18,7 @@
 def environmentMap = [
     "us" : [
         "default" : [
-        	"APPNAME": "CBSAllAccess",
+            "APPNAME": "CBSAllAccess",
             "REPO" : "allaccess-domestic",
             "ROLE" : "roku",
             "ROKU_DEV" : "10.16.180.78",
