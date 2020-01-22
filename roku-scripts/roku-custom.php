@@ -169,94 +169,29 @@ function build() {
     install();
 }
 
-function pkg_us_default() {
+function jenkins_pkg() {
     global $E;
-    $E["APPNAME"]="cbs-roku";
-    $E["REPO"]="allaccess-domestic";
-    $E["ROLE"]="roku";
-    $E["ROKU_GEO"]="domestic";
-    $E["STAGE_PROD"]="us";
-    $E["CHANNEL_TOKEN"]="eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2t1LXBlcm0iOlsiZ2V0X2RldmljZV9pZCJdLCJzdWIiOiJ1cm46cm9rdS5jb206c3RiLzMxNDQwIiwiaXNzIjoidXJuOnJva3UuY29tOnRva2VubWludDpjaGFubmVsdG9rZW4iLCJqdGkiOiJ1cm46ZDJhMzA0ZjctOGViMS00ZmY0LWFmNzUtNjg2NDExNGFhNzQ0IiwiZXhwIjoxNTU5MzUwODAwLCJpYXQiOjE1NTQ3Njk1MDIsInJva3UtY2hhbm5lbC1pZCI6WyIzMTQ0MCJdLCJuYmYiOjE0NzI5MDQwMDAsInJva3UtdGZ2IjoiMSIsImF1ZCI6InVybjpyb2t1LmNvbTpzdGIvY2hhbm5lbCJ9.DGt01TOljBt1HYaUt8_BxoUn10okS-OBliQ3YAX26W32fWFzsCnN1t6aODD62AHX_srtBDziqLSRbAEXnnEM9a0m_AgVxZ9SBAZSOnV02V-td4i8c3Ep-pre8LP40uAlOeXgawDdBj05lIukdandxfsaT6OXZElKWDaQ6a54oS5FPaUjjs0bmud8UwVtHFaDk9vP94RX53wetwJHysCrgHIlNaHf1uGnDDc8I-rQvaJIjahjt08gT7h20yImnQ7RmON6t2sOSCbnzzNYU7fXB_iQuKi4AJ4YybzvnyN52htacLbuv8dRJ2e4-cplVFSoyVgDSZppfShckZH4AgOjxw";
-}
+    if(!is_file("Jenkinsfile")) finish("Unable to find: Jenkinsfile", -1);
+    if(!isset($E['JENKINS']))  finish("Required var not set: JENKINS", -1);
+    $jenkins = file_get_contents("Jenkinsfile");
+    $envMapStart = strpos($jenkins, "[");
+    $envMapLen = strpos($jenkins, "//end environmentMap") - $envMapStart;
+    //Convert to clean json.
+    $json = str_replace(["[","]","\n","\t"],["{","}","",""], substr($jenkins, $envMapStart, $envMapLen));
+    while (strpos($json, " ") !== false) $json = str_replace(" ", "", $json);
+    $json = str_replace(",}", "}", $json);
+    $envMap = json_decode($json, true);
 
-function pkg_us_qa_testwww() {
-    global $E;
-    pkg_us_default();
-    $E["BUILD_TYPE"]="qa";
-    $E["BUILD_ENV"]="testwww";
-    $E["CONFIG_FILE"]="pkg:/config-staging.json";
-    $E["ANALYTICS_SSL"]="false";
-    $E["ANALYTICS_SERVER"]="aa.cbsi.com";
-    $E["MEDIAHEARTBEAT_SSL"]="false";
+    list($region, $typeEnv) = explode("/", $E['JENKINS']);
+    if(!isset($envMap[$region])) finish("Region ($region) not found in Jenkinsfile", -1);
+    foreach ($envMap[$region]["default"] as $key=>$val) {
+        if(empty($E[$key])) $E[$key] = $val;
+    }
+    if(!isset($envMap[$region][$typeEnv])) finish("$region Type/Env ($typeEnv) not found in Jenkinsfile", -1);
+    foreach ($envMap[$region][$typeEnv] as $key=>$val) {
+        if(empty($E[$key])) $E[$key] = $val;
+    }
     all();
 }
 
-function pkg_us_qa_prod() {
-    global $E;
-    pkg_us_default();
-    $E["BUILD_TYPE"]="qa";
-    $E["BUILD_ENV"]="prod";
-    $E["CONFIG_FILE"]="pkg:/config.json";
-    $E["ANALYTICS_SSL"]="true";
-    $E["ANALYTICS_SERVER"]="saa.cbsi.com";
-    $E["MEDIAHEARTBEAT_SSL"]="true";
-    all();
-}
-
-function pkg_us_cert_prod() {
-    global $E;
-    pkg_us_default();
-    $E["BUILD_TYPE"]="cert";
-    $E["BUILD_ENV"]="prod";
-    $E["CONFIG_FILE"]="pkg:/config.json";
-    $E["ANALYTICS_SSL"]="true";
-    $E["ANALYTICS_SERVER"]="saa.cbsi.com";
-    $E["MEDIAHEARTBEAT_SSL"]="true";
-    all();
-}
-
-function pkg_ca_default() {
-    global $E;
-    $E["APPNAME"]="cbs-roku";
-    $E["REPO"]="allaccess-ca";
-    $E["ROLE"]="roku";
-    $E["ROKU_GEO"]="canada";
-    $E["STAGE_PROD"]="ca";
-    $E["CHANNEL_TOKEN"]="eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2t1LXBlcm0iOlsiZ2V0X2RldmljZV9pZCJdLCJzdWIiOiJ1cm46cm9rdS5jb206c3RiLzMxNDQwIiwiaXNzIjoidXJuOnJva3UuY29tOnRva2VubWludDpjaGFubmVsdG9rZW4iLCJqdGkiOiJ1cm46ZDJhMzA0ZjctOGViMS00ZmY0LWFmNzUtNjg2NDExNGFhNzQ0IiwiZXhwIjoxNTU5MzUwODAwLCJpYXQiOjE1NTQ3Njk1MDIsInJva3UtY2hhbm5lbC1pZCI6WyIzMTQ0MCJdLCJuYmYiOjE0NzI5MDQwMDAsInJva3UtdGZ2IjoiMSIsImF1ZCI6InVybjpyb2t1LmNvbTpzdGIvY2hhbm5lbCJ9.DGt01TOljBt1HYaUt8_BxoUn10okS-OBliQ3YAX26W32fWFzsCnN1t6aODD62AHX_srtBDziqLSRbAEXnnEM9a0m_AgVxZ9SBAZSOnV02V-td4i8c3Ep-pre8LP40uAlOeXgawDdBj05lIukdandxfsaT6OXZElKWDaQ6a54oS5FPaUjjs0bmud8UwVtHFaDk9vP94RX53wetwJHysCrgHIlNaHf1uGnDDc8I-rQvaJIjahjt08gT7h20yImnQ7RmON6t2sOSCbnzzNYU7fXB_iQuKi4AJ4YybzvnyN52htacLbuv8dRJ2e4-cplVFSoyVgDSZppfShckZH4AgOjxw";
-}
-
-function pkg_ca_qa_testwww() {
-    global $E;
-    pkg_ca_default();
-    $E["BUILD_TYPE"]="qa";
-    $E["BUILD_ENV"]="testwww";
-    $E["CONFIG_FILE"]="pkg:/config-canada-staging.json";
-    $E["ANALYTICS_SSL"]="false";
-    $E["ANALYTICS_SERVER"]="om.cbsi.com";
-    $E["MEDIAHEARTBEAT_SSL"]="false";
-    all();
-}
-
-function pkg_ca_qa_prod() {
-    global $E;
-    pkg_ca_default();
-    $E["BUILD_TYPE"]="qa";
-    $E["BUILD_ENV"]="prod";
-    $E["CONFIG_FILE"]="pkg:/config-canada.json";
-    $E["ANALYTICS_SSL"]="false";
-    $E["ANALYTICS_SERVER"]="om.cbsi.com";
-    $E["MEDIAHEARTBEAT_SSL"]="false";
-    all();
-}
-
-function pkg_ca_cert_prod() {
-    global $E;
-    pkg_ca_default();
-    $E["BUILD_TYPE"]="cert";
-    $E["BUILD_ENV"]="prod";
-    $E["CONFIG_FILE"]="pkg:/config-canada.json";
-    $E["ANALYTICS_SSL"]="false";
-    $E["ANALYTICS_SERVER"]="om.cbsi.com";
-    $E["MEDIAHEARTBEAT_SSL"]="false";
-    all();
-}
+?>

@@ -97,11 +97,15 @@ function package() {
 	pl("Downloading Package...");
 	$pkg = filterString($response, "a href", "pkgs//", '">', true);
 	if(!empty($pkg)) {
-	    curl_binary("http://$E[ROKU_DEV]/pkgs/$pkg", "$E[KEYDIR]/$E[APPNAME].pkg", $E['USERPASS']);
+        curl_binary("http://$E[ROKU_DEV]/pkgs/$pkg", "$E[PKGDIR]/$E[APPFULLNAME].pkg", $E['USERPASS']);
+        if(!is_file("$E[KEYDIR]/$E[APPNAME].pkg")) {
+            copy("$E[PKGDIR]/$E[APPFULLNAME].pkg", "$E[KEYDIR]/$E[APPNAME].pkg");
+        }
 	    if(!empty($E['ROKU_GEO']) &&  !empty($E['BUILD_ENV'])) {
-	        copy("$E[KEYDIR]/$E[APPNAME].pkg", "$E[KEYDIR]/$E[ROKU_GEO]-$E[BUILD_ENV]-$E[APPNAME].pkg");
+            if(!is_file("$E[KEYDIR]/$E[APPNAME].pkg")) {
+                copy("$E[PKGDIR]/$E[APPFULLNAME].pkg", "$E[KEYDIR]/$E[ROKU_GEO]-$E[BUILD_ENV]-$E[APPNAME].pkg");
+            }
 	    }
-	    copy("$E[KEYDIR]/$E[APPNAME].pkg", "$E[PKGDIR]/$E[APPFULLNAME].pkg");
 	    finish("*** Package $E[APPFULLNAME] complete ***");
 	} else {
 	    finish("*** Package $E[APPFULLNAME] failed ***", -1);

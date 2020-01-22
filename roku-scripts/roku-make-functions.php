@@ -12,7 +12,7 @@ function help() {
     finish("", 0, true);
 }
 
-function pl($line) {
+function pl($line = "") {
     printf("%s\n", $line);
 }
 
