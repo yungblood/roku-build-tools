@@ -51,7 +51,7 @@ foreach ($commands as $command) {
 		if(file_exists("$E[ZIPDIR]/$E[APPFULLNAME].zip")) $msg .= sprintf("\n $E[ARTIFACTORY]/$E[APPFULLNAME].zip ");
 		if(file_exists("$E[PKGDIR]/$E[APPFULLNAME].pkg")) $msg .= sprintf("\n $E[ARTIFACTORY]/$E[APPFULLNAME].pkg ");
 	#	exec("git log --after yesterday --pretty=%b | sed '/^$/d'", $output);
-		exec("git log -1 --pretty=%b | sed '/^$/d'", $output);
+		exec("git log -1 --pretty=%B | sed '/^$/d'", $output);
 		$msg .= "\nThis Build Includes:\n```".implode("\n",$output)."```";
 	}
 	finish($msg);
