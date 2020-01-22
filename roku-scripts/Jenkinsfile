@@ -63,7 +63,7 @@ def environmentMap = [
     ],
     "ca" : [
         "default" : [
-        	"APPNAME": "CBSAllAccess",
+            "APPNAME": "CBSAllAccess",
             "REPO" : "allaccess-ca",
             "ROLE" : "roku",
             "ROKU_DEV" : "10.16.180.78",
@@ -139,7 +139,7 @@ pipeline {
                     env.HELM_TARGET="${env.REPO}/${env.ROLE}"
                 }
 
-		slackSend (color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Started by ${getJobInitiator()} on ${new Date().format('yyyy/MM/dd HH:mm:ss')} (<${env.BUILD_URL}|Open)>\n Changes:\n${showChangeLogs()}")
+            slackSend (color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Started by ${getJobInitiator()} on ${new Date().format('yyyy/MM/dd HH:mm:ss')} (<${env.BUILD_URL}|Open)>\n Changes:\n${showChangeLogs()}")
             }
         }
         stage('clean-workspace') {
@@ -164,45 +164,45 @@ pipeline {
     }
     post {
         success {
-        	script {
-	        	def output = readFile('.roku-make.out')
-	            slackSend (channel: "#i-cbsi-roku-deploys", color: 'good', message: "@here ${output}")
+            script {
+                def output = readFile('.roku-make.out')
+                slackSend (channel: "#i-cbsi-roku-deploys", color: 'good', message: "@here ${output}")
             }
         }
 
         failure {
-        	script {
-	        	def output = readFile('.roku-make.out')
-            	slackSend (channel: "#i-cbsi-roku-deploys", color: 'danger', message: "@here ${env.JOB_NAME} - #${env.BUILD_NUMBER} Failed (<${env.BUILD_URL}|Open)>\n${output}")
-        	}
+            script {
+                def output = readFile('.roku-make.out')
+                slackSend (channel: "#i-cbsi-roku-deploys", color: 'danger', message: "@here ${env.JOB_NAME} - #${env.BUILD_NUMBER} Failed (<${env.BUILD_URL}|Open)>\n${output}")
+            }
         }
     }
 }
 
 @NonCPS
 def showChangeLogs() {
-	def changeLogSets = currentBuild.changeSets
-	def messages = ""
-	for (int i = 0; i < changeLogSets.size(); i++) {
-	    def entries = changeLogSets[i].items
-	    for (int j = 0; j < entries.length; j++) {
-		def entry = entries[j]
-		messages += " - ${entry.msg} [${entry.author}]\n"
-	    }
-	}
+    def changeLogSets = currentBuild.changeSets
+    def messages = ""
+    for (int i = 0; i < changeLogSets.size(); i++) {
+        def entries = changeLogSets[i].items
+        for (int j = 0; j < entries.length; j++) {
+            def entry = entries[j]
+            messages += " - ${entry.msg} [${entry.author}]\n"
+        }
+    }
 
-	if ( messages.equals("") ) 
-		messages = "No Changes"
+    if ( messages.equals("") ) 
+        messages = "No Changes"
 
-	return messages
+    return messages
 }
 @NonCPS
 def getJobInitiator() {
-        def cause = currentBuild.rawBuild.getCause(hudson.model.Cause.UserIdCause.class)
-	if ( cause == null ) 
-		return "jenkins";
-        else
-		return cause.getUserName()
+    def cause = currentBuild.rawBuild.getCause(hudson.model.Cause.UserIdCause.class)
+    if ( cause == null ) 
+        return "jenkins";
+    else
+        return cause.getUserName()
 }
 @NonCPS
 def configureArtifactoryAndDeploy() {
