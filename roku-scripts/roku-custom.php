@@ -5,6 +5,18 @@
 # @2019 Kevin Hoos
 ##########################################################################  
 
+function clean() {
+    global $E;
+    $files = array_merge(glob($E['ZIPDIR'] . '/*'), glob($E['PKGDIR'] . '/*'));
+    
+    foreach($files as $file){
+        if(is_file($file)){
+            pl("Deleting: $file");
+            unlink($file);
+        }
+    }
+}
+
 function genkey() {
     global $E;
     if(!is_dir($E['KEYDIR'])) {
