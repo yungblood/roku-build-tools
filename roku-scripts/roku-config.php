@@ -24,7 +24,7 @@
 //import needed env vars into php script.
 $E = array();
 $env_vars = ["ARTIFACTORY","APPNAME","REPO","ROLE","ROKU_DEV","ROKU_PASS","ROKU_GEO","STAGE_PROD","BUILD_TYPE","BUILD_ENV",
-    "ROKU_TEST","ROKU_CHAN","ROKU_PARMS","HOME"];
+    "ROKU_TEST","ROKU_CHAN","ROKU_PARMS","HOME","COMMENT"];
 foreach ($env_vars as $var) $E[$var] = getenv($var);
 
 $E['SOURCEDIR'] = getcwd();
@@ -58,7 +58,8 @@ function updateEnv() {
     $E['V1'] = getValueFromFile("manifest", "major_version", "=");
     $E['V2'] = getValueFromFile("manifest", "minor_version", "=");
     $E['V3'] = getValueFromFile("manifest", "build_version", "=");
-    $E['COMMENT'] = getValueFromFile("manifest", "build_comment", "=");
+    $comment = getValueFromFile("manifest", "build_comment", "=");
+    if(!empty($comment)) $E['COMMENT'] = $comment;
     $E['VERSION'] = "$E[V1].$E[V2].$E[V3]";
     $E['APPFULLNAME'] = "$E[APPNAME].$E[VERSION].$E[TIME]";
     if(!empty($E['BUILD_TYPE'])) $E['APPFULLNAME'] .= ".$E[BUILD_TYPE]";
@@ -67,5 +68,4 @@ function updateEnv() {
     if(!empty($E['BUILD_ENV'])) $E['APPFULLNAME'] .= ".$E[BUILD_ENV]";
 }
 updateEnv();
-if(isset($showvars)) print_r($E);
 ?>

@@ -56,4 +56,5 @@ foreach ($commands as $command) {
 	}
 	finish($msg);
 }
+if(isset($showvars)) print_r($E);
 ?>

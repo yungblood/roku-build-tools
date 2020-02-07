@@ -149,6 +149,7 @@ function home() {
 }
 
 function setconfig() {
+    global $E;
     pl("*** Setting config options ***");
     $manifest_options = [
         "CONFIG_FILE"=>"config_file",
@@ -162,16 +163,18 @@ function setconfig() {
     ];
     foreach($manifest_options as $opt=>$key) {
         $val = getenv($opt);
-        if(!empty($val)) {
-            setIniVal("manifest", $key, $val);
-            pl("> manifest > $key, $val");
+        if(!empty($val)) $E[$opt] = $val;
+        if(!empty($E[$opt])) {
+            setIniVal("manifest", $key, $E[$opt]);
+            pl("> manifest > $key, $E[$opt]");
         }
     }
     foreach($ADBMobile_options as $opt=>$key) {
         $val = getenv($opt);
-        if(!empty($val)) {
-            setJsonVal("ADBMobileConfig.json", $key, $val);
-            pl("> ADBMobileConfig.json > $key, $val");
+        if(!empty($val)) $E[$opt] = $val;
+        if(!empty($E[$opt])) {
+            setJsonVal("ADBMobileConfig.json", $key, $E[$opt]);
+            pl("> ADBMobileConfig.json > $key, $E[$opt]");
         }
     }
 }
@@ -203,6 +206,7 @@ function jenkins_pkg() {
     foreach ($envMap[$region][$typeEnv] as $key=>$val) {
         if(empty($E[$key])) $E[$key] = $val;
     }
+    updateEnv();
     all();
 }
 
