@@ -24,7 +24,7 @@
 //import needed env vars into php script.
 $E = array();
 $env_vars = ["ARTIFACTORY","APPNAME","REPO","ROLE","ROKU_DEV","ROKU_PASS","ROKU_GEO","STAGE_PROD","BUILD_TYPE","BUILD_ENV",
-    "ROKU_TEST","ROKU_CHAN","ROKU_PARMS","HOME","COMMENT"];
+    "ROKU_TEST","ROKU_CHAN","ROKU_PARMS","HOME","COMMENT","JENKINS_DISABLE"];
 foreach ($env_vars as $var) $E[$var] = getenv($var);
 
 $E['SOURCEDIR'] = getcwd();

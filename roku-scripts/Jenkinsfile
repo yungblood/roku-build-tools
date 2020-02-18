@@ -97,6 +97,24 @@ def environmentMap = [
             "ANALYTICS_SERVER" : "om.cbsi.com",
             "MEDIAHEARTBEAT_SSL" : "false",
         ],
+        "qa-testwww-no-geoblock" : [
+            "JENKINS_DISABLE" : "true",
+            "BUILD_TYPE" : "qa",
+            "BUILD_ENV" : "testwww-no-geoblock",
+            "CONFIG_FILE" : "pkg:/config-canada-staging-no-geoblock.json",
+            "ANALYTICS_SSL" : "false",
+            "ANALYTICS_SERVER" : "om.cbsi.com",
+            "MEDIAHEARTBEAT_SSL" : "false",
+        ],
+        "qa-prod-no-geoblock" : [
+            "JENKINS_DISABLE" : "true",
+            "BUILD_TYPE" : "qa",
+            "BUILD_ENV" : "prod-no-geoblock",
+            "CONFIG_FILE" : "pkg:/config-canada-no-geoblock.json",
+            "ANALYTICS_SSL" : "false",
+            "ANALYTICS_SERVER" : "om.cbsi.com",
+            "MEDIAHEARTBEAT_SSL" : "false",
+        ],
         "cert-prod" : [
             "BUILD_TYPE" : "cert",
             "BUILD_ENV" : "prod",
@@ -149,7 +167,6 @@ pipeline {
         }
         stage('build') {
             steps {
-                sh 'echo "Test roku build"'
                 sh 'cp -rv $SCRIPTS_ROOT/roku exclude'
                 sh 'roku-make all'
             }
@@ -160,20 +177,24 @@ pipeline {
                     configureArtifactoryAndDeploy()
                 }
             }
-        }        
+        }
     }
     post {
         success {
             script {
                 def output = readFile('.roku-make.out')
-                slackSend (channel: "#i-cbsi-roku-deploys", color: 'good', message: "@here ${output}")
+                if (output && !output.allWhitespace) {
+                    slackSend (channel: "#i-cbsi-roku-deploys", color: 'good', message: "@here ${output}")
+                }
             }
         }
 
         failure {
             script {
                 def output = readFile('.roku-make.out')
-                slackSend (channel: "#i-cbsi-roku-deploys", color: 'danger', message: "@here ${env.JOB_NAME} - #${env.BUILD_NUMBER} Failed (<${env.BUILD_URL}|Open)>\n${output}")
+                if (output && !output.allWhitespace) {
+                    slackSend (channel: "#i-cbsi-roku-deploys", color: 'danger', message: "@here ${env.JOB_NAME} - #${env.BUILD_NUMBER} Failed (<${env.BUILD_URL}|Open)>\n${output}")
+                }
             }
         }
     }

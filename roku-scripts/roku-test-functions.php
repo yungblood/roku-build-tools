@@ -68,6 +68,10 @@
         global $E;
         return rokuCurl('GET', "http://$E[ROKU_DEV]:8060/query/icon/$channel");
     }
+    function rokuMediaPlayer() {
+        global $E;
+        return rokuCurl('GET', "http://$E[ROKU_DEV]:8060/query/media-player");
+    }
     function rokuInput($inputparms) {
         global $E;
         return rokuCurl('POST', "http://$E[ROKU_DEV]:8060/input/$inputparms");

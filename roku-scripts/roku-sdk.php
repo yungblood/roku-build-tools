@@ -1,5 +1,11 @@
 <?php
 function all() {
+    global $E;
+    $processUser = posix_getpwuid(posix_geteuid());
+    if($processUser['name'] == 'jenkins') {
+        if(!is_file("Jenkinsfile")) finish("Unable to find: Jenkinsfile", -1);
+        if($E["JENKINS_DISABLE"] == "true") finish("", 0, 1);
+    }
     remove();
     rekey();
     //setbuild(); //Removed auto build number, now it requires you to manually set the build number in the manifest file.

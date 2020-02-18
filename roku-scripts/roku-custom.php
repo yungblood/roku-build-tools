@@ -36,8 +36,10 @@ function rekey() {
     global $E;
     if(!empty($E['ROKU_GEO']) &&  !empty($E['BUILD_ENV'])) {
 		pl("Copying $E[ROKU_GEO]-$E[BUILD_ENV]-* files to primary key files...");
-		copy("$E[KEYDIR]/$E[ROKU_GEO]-$E[BUILD_ENV]-$E[APPNAME].key", "$E[KEYDIR]/$E[APPNAME].key");
-		copy("$E[KEYDIR]/$E[ROKU_GEO]-$E[BUILD_ENV]-$E[APPNAME].pkg", "$E[KEYDIR]/$E[APPNAME].pkg");
+		$key = copy("$E[KEYDIR]/$E[ROKU_GEO]-$E[BUILD_ENV]-$E[APPNAME].key", "$E[KEYDIR]/$E[APPNAME].key");
+        $pkg = copy("$E[KEYDIR]/$E[ROKU_GEO]-$E[BUILD_ENV]-$E[APPNAME].pkg", "$E[KEYDIR]/$E[APPNAME].pkg");
+        $output = ($key && $pkg) ? "Success" : "Failed";
+        finish("Copy: $output", checkSuccess($output));
 		updateEnv();
 		pl("Setting Key for $E[ROKU_GEO]-$E[BUILD_ENV]-$E[APPNAME] on host $E[ROKU_DEV]");
     } else {
