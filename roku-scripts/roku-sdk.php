@@ -74,6 +74,32 @@ function install() {
     }
 }
 
+function cramfs() {
+    global $E, $timeout, $testOk;
+    pl("Convert to CramFS on host $E[ROKU_DEV]");
+    $data = [
+        'mysubmit'=>'Convert to cramfs',
+        'archive'=>curl_file_create("$E[ZIPDIR]/$E[APPFULLNAME].zip"),
+        'passwd'=>""
+    ];
+    $response = curl_post("http://$E[ROKU_DEV]/plugin_install", $data, $E['USERPASS']);
+    $output = filterString($response, "Roku.Message", "n.innerHTML='", "<p>");
+    finish("CramFS: $output", checkSuccess($output, "succeeded"));
+}
+
+function squashfs() {
+    global $E, $timeout, $testOk;
+    pl("Convert to SquashFS on host $E[ROKU_DEV]");
+    $data = [
+        'mysubmit'=>'Convert to squashfs',
+        'archive'=>curl_file_create("$E[ZIPDIR]/$E[APPFULLNAME].zip"),
+        'passwd'=>""
+    ];
+    $response = curl_post("http://$E[ROKU_DEV]/plugin_install", $data, $E['USERPASS']);
+    $output = filterString($response, "Roku.Message", "n.innerHTML='", "<p>");
+    finish("SquashFS: $output", checkSuccess($output, "succeeded"));
+}
+
 function pkg() {
     package();
 }
@@ -81,6 +107,7 @@ function pkg() {
 function package() {
     global $E;
     install();
+    squashfs();
     if(!is_dir($E['PKGDIR'])) {
         pl("  >> creating destination directory $E[PKGDIR]");
         mkdir($E['PKGDIR'], 0755, true);
