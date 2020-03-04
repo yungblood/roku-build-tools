@@ -36,6 +36,7 @@ $E['COMMONDIR'] = "$E[SOURCEDIR]/exclude/common";
 $E['APPSOURCEDIR'] = "$E[SOURCEDIR]/source";
 $E['APPCOMPDIR'] = "$E[SOURCEDIR]/components";
 $E['CONSOLE_LOG'] = "$E[HOME]/console.log";
+$E['MINI_PKG_ZIP'] = "$E[SOURCEDIR]/exclude/keys/mini-pkg.zip";
 
 $E['ZIPDIR'] = "$E[DISTDIR]/apps";
 $E['PKGDIR'] = "$E[DISTDIR]/packages";
@@ -54,7 +55,6 @@ $E['TIME'] = date("mdHi");
 
 function updateEnv() {
     global $E;
-    $E['PKG_KEY'] = getValueFromFile("$E[KEYDIR]/$E[APPNAME].key", "Password", ":");
     $E['V1'] = getValueFromFile("manifest", "major_version", "=");
     $E['V2'] = getValueFromFile("manifest", "minor_version", "=");
     $E['V3'] = getValueFromFile("manifest", "build_version", "=");
@@ -66,6 +66,10 @@ function updateEnv() {
     if(!empty($E['COMMENT'])) $E['APPFULLNAME'] .= ".$E[COMMENT]";
     if(!empty($E['ROKU_GEO'])) $E['APPFULLNAME'] .= ".$E[ROKU_GEO]";
     if(!empty($E['BUILD_ENV'])) $E['APPFULLNAME'] .= ".$E[BUILD_ENV]";
+    $E['PKG_KEY_FILE'] = "$E[KEYDIR]/$E[APPNAME].pkg";
+    if(!empty($E['ROKU_GEO']) &&  !empty($E['BUILD_ENV'])) {
+        $E['PKG_KEY_FILE'] = "$E[KEYDIR]/$E[ROKU_GEO]-$E[BUILD_ENV]-$E[APPNAME].pkg";
+    }
+    $E['PKG_KEY'] = getValueFromFile(substr($E['PKG_KEY_FILE'], 0, -3)."key", "Password", ":");
 }
-updateEnv();
 ?>

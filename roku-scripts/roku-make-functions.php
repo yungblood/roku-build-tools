@@ -263,4 +263,13 @@ function checkSuccess($output, $success = "Succe") {
     return (stripos($output, $success) === false) ? -1 : 0;
 }
 
+function showvars() {
+    global $E;
+    $keys = array_keys($E);
+    sort($keys);
+    foreach($keys as $idx=>$key) {
+        pl("$key => $E[$key]");
+    }
+}
+
 ?>

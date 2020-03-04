@@ -26,33 +26,39 @@ function genkey() {
         pl("  >> setting directory permissions for $E[KEYDIR]");
         chmod($E['KEYDIR'], 0755);
     }
-    $key_file = "$E[KEYDIR]/$E[APPNAME].key";
-    pl("*** Generate Key on host $E[ROKU_DEV] ***");
+    $key_file = substr($E['PKG_KEY_FILE'], 0, -3)."key";
+    pl("*** Generate Key: $E[PKG_KEY_FILE] on host $E[ROKU_DEV] ***");
     telnet($E['ROKU_DEV'], 8080, "genkey", $key_file);
     finish("*** Key stored in $key_file  ***");
+    updateEnv();
+    pl("Installing mini-pkg on host $E[ROKU_DEV]");
+    home();
+    $data = [
+        'mysubmit'=>'Install',
+        'archive'=>curl_file_create($E['MINI_PKG_ZIP']),
+        'passwd'=>""
+    ];
+    $response = curl_post("http://$E[ROKU_DEV]/plugin_install", $data, $E['USERPASS']);
+    $output = filterString($response, "Roku.Message", "trigger('Set message content', '", "').trigger('Render', node);");
+    finish("Install mini-pkg: $output", checkSuccess($output, "Received"));
+    package();
 }
 
 function rekey() {
     global $E;
-    if(!empty($E['ROKU_GEO']) &&  !empty($E['BUILD_ENV'])) {
-		pl("Copying $E[ROKU_GEO]-$E[BUILD_ENV]-* files to primary key files...");
-		$key = copy("$E[KEYDIR]/$E[ROKU_GEO]-$E[BUILD_ENV]-$E[APPNAME].key", "$E[KEYDIR]/$E[APPNAME].key");
-        $pkg = copy("$E[KEYDIR]/$E[ROKU_GEO]-$E[BUILD_ENV]-$E[APPNAME].pkg", "$E[KEYDIR]/$E[APPNAME].pkg");
-        $output = ($key && $pkg) ? "Success" : "Failed";
-        finish("Copy: $output", checkSuccess($output));
-		updateEnv();
-		pl("Setting Key for $E[ROKU_GEO]-$E[BUILD_ENV]-$E[APPNAME] on host $E[ROKU_DEV]");
+    pl("*** Setting Key: $E[PKG_KEY_FILE] on host $E[ROKU_DEV] ***");
+    if(is_file($E['PKG_KEY_FILE'])) {
+        $data = [
+            'mysubmit'=>'Rekey',
+            'archive'=>curl_file_create($E['PKG_KEY_FILE']),
+            'passwd'=>"$E[PKG_KEY]"
+        ];
+        $response = curl_post("http://$E[ROKU_DEV]/plugin_inspect", $data, $E['USERPASS']);
+        $output = filterString($response, "Roku.Message", "trigger('Set message content', '", "').trigger('Render', node);");
+        finish("Rekey: $output", checkSuccess($output));
     } else {
-		pl("Setting Key for $E[APPNAME] on host $E[ROKU_DEV]");
+        finish("Rekey: $E[PKG_KEY_FILE] does not exist", -1);
     }
-    $data = [
-        'mysubmit'=>'Rekey',
-        'archive'=>curl_file_create("$E[KEYDIR]/$E[APPNAME].pkg"),
-        'passwd'=>"$E[PKG_KEY]"
-    ];
-    $response = curl_post("http://$E[ROKU_DEV]/plugin_inspect", $data, $E['USERPASS']);
-    $output = filterString($response, "Roku.Message", "trigger('Set message content', '", "').trigger('Render', node);");
-    finish("Rekey: $output", checkSuccess($output));
 }
 
 function setbuild() {
@@ -211,5 +217,4 @@ function jenkins_pkg() {
     updateEnv();
     all();
 }
-
 ?>

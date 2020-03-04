@@ -9,6 +9,8 @@ function all() {
     remove();
     rekey();
     //setbuild(); //Removed auto build number, now it requires you to manually set the build number in the manifest file.
+    install();
+    squashfs();
     package();
 }
 
@@ -106,8 +108,7 @@ function pkg() {
 
 function package() {
     global $E;
-    install();
-    squashfs();
+    
     if(!is_dir($E['PKGDIR'])) {
         pl("  >> creating destination directory $E[PKGDIR]");
         mkdir($E['PKGDIR'], 0755, true);
@@ -131,14 +132,9 @@ function package() {
 	$pkg = filterString($response, "a href", "pkgs//", '">', true);
 	if(!empty($pkg)) {
         curl_binary("http://$E[ROKU_DEV]/pkgs/$pkg", "$E[PKGDIR]/$E[APPFULLNAME].pkg", $E['USERPASS']);
-        if(!is_file("$E[KEYDIR]/$E[APPNAME].pkg")) {
-            copy("$E[PKGDIR]/$E[APPFULLNAME].pkg", "$E[KEYDIR]/$E[APPNAME].pkg");
+        if(!is_file($E['PKG_KEY_FILE'])) {
+            copy("$E[PKGDIR]/$E[APPFULLNAME].pkg", "$E[PKG_KEY_FILE]");
         }
-	    if(!empty($E['ROKU_GEO']) &&  !empty($E['BUILD_ENV'])) {
-            if(!is_file("$E[KEYDIR]/$E[APPNAME].pkg")) {
-                copy("$E[PKGDIR]/$E[APPFULLNAME].pkg", "$E[KEYDIR]/$E[ROKU_GEO]-$E[BUILD_ENV]-$E[APPNAME].pkg");
-            }
-	    }
 	    finish("*** Package $E[APPFULLNAME] complete ***");
 	} else {
 	    finish("*** Package $E[APPFULLNAME] failed ***", -1);
