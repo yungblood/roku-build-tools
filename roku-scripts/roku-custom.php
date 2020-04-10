@@ -161,7 +161,11 @@ function setconfig() {
     pl("*** Setting config options ***");
     $manifest_options = [
         "CONFIG_FILE"=>"config_file",
-        "CHANNEL_TOKEN"=>"channel_token"
+        "CHANNEL_TOKEN"=>"channel_token",
+        "SPLASH_SCREEN"=>"splash_screen_fhd",
+        "SPLASH_SCREEN"=>"splash_screen_hd",
+        "SPLASH_SCREEN"=>"splash_screen_sd",
+        "SPLASH_COLOR"=>"splash_color"
     ];
     $ADBMobile_options = [
         "ANALYTICS_SSL"=>"analytics/ssl",
