@@ -106,7 +106,7 @@ function debug() {
     if(function_exists("consoleCreate")) {
         $console = consoleCreate();
         $script = [
-            [ 'expect' => 'NeverGonnaHappen', 'action' => 'none', 'parms' => [] ], // Just open debug port, and copy to terminal & file. Needed a rule that doesn't get matched...
+            [ 'expect' => 'AppExitComplete', 'action' => 'none', 'parms' => [] ], // Stop debugging when app exits.
         ];
         consoleScript($console, $script);
     } else {
