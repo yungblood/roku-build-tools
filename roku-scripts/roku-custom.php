@@ -162,9 +162,9 @@ function setconfig() {
     $manifest_options = [
         "CONFIG_FILE"=>"config_file",
         "CHANNEL_TOKEN"=>"channel_token",
-        "SPLASH_SCREEN"=>"splash_screen_fhd",
-        "SPLASH_SCREEN"=>"splash_screen_hd",
-        "SPLASH_SCREEN"=>"splash_screen_sd",
+        "SPLASH_SCREEN_FHD"=>"splash_screen_fhd",
+        "SPLASH_SCREEN_HD"=>"splash_screen_hd",
+        "SPLASH_SCREEN_SD"=>"splash_screen_sd",
         "SPLASH_COLOR"=>"splash_color"
     ];
     $ADBMobile_options = [
