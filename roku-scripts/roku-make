@@ -45,6 +45,8 @@ for ($v = 1; $v < $argc; $v++) {
 if(count($commands) == 0) help();
 updateEnv();
 
+if(function_exists("consoleCreate")) $console = consoleCreate();
+
 foreach ($commands as $command) {	
 	call_user_func($command);
 	$msg = sprintf("*** %s($command) $E[APPFULLNAME] complete ***", basename($argv[0]));

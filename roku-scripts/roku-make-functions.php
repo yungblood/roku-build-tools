@@ -79,24 +79,50 @@ function httpStatusString($code) {
 }
 
 function curl_post($url, $data = '', $digest = '') {
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    if(!empty($digest)) {
-        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-        curl_setopt($ch, CURLOPT_USERPWD, $digest);
+    //HACK: php-curl 7.68 doesn't work with roku, revert to command line
+    if(floatval(curl_version()['version']) < 7.60) $ch = curl_init();
+    
+    if(!isset($ch)) {
+        $info = ['http_code'=>0];
+        $curl = "curl";
+        if(!empty($digest)) $curl .= " --digest -u$digest";
+        $curl .= " -X POST";
+        if(is_array($data)) {
+            foreach($data as $key=>$val) {
+                if(is_string($val)) $curl .= " -F '$key=$val'";
+                else if(is_string($val->name)) $curl .= " -F '$key=@$val->name'";
+            }
+        }
+        $curl .= " $url";
+        exec($curl, $result, $errno);
+        if(array_key_exists(0, $result)) {
+            $status = explode(' ', $result[0]);
+            if($status[0] == "Error") {
+                $info['http_code'] = intval($status[1]);
+            } else {
+                $result = implode("\n", $result);
+            }
+        }
+    } else {
+        //curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_VERBOSE, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        if(!empty($digest)) {
+            curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+            curl_setopt($ch, CURLOPT_USERPWD, $digest);
+        }
+        $result = curl_exec($ch);
+        $info = curl_getinfo($ch);
+        $errno = curl_errno($ch);
     }
-    $result = curl_exec($ch);
-    $info = curl_getinfo($ch);
-    $errno = curl_errno($ch);
     if($errno) {
-        $result = sprintf("cURL Error(%d): %s\n", $errno, curl_strerror($errno));
+        $result = sprintf("cURL Error %d: %s\n", $errno, curl_strerror($errno));
     } else if($info['http_code'] >= 300) {
-        $result = sprintf("HTTP Error(%d): %s\n", $info['http_code'], httpStatusString($info['http_code']));
+        $result = sprintf("HTTP Error %d: %s\n", $info['http_code'], httpStatusString($info['http_code']));
     }
-    curl_close($ch);
+    if(isset($ch)) curl_close($ch);
     return $result;
 }
 
@@ -114,12 +140,25 @@ function curl_binary($url, $filename, $digest) {
     $info = curl_getinfo($ch);
     $errno = curl_errno($ch);
     if($errno) {
-        $result = sprintf("cURL Error(%d): %s\n", $errno, curl_strerror($errno));
+        $result = sprintf("cURL Error (%d): %s\n", $errno, curl_strerror($errno));
     } else if($info['http_code'] >= 300) {
-        $result = sprintf("HTTP Error(%d): %s\n", $info['http_code'], httpStatusString($info['http_code']));
+        $result = sprintf("HTTP Error (%d): %s\n", $info['http_code'], httpStatusString($info['http_code']));
     }
     curl_close($ch);
     fclose($fp);
+    return $result;
+}
+
+function curl_upload_artifactory() {
+    global $E;
+    $E['ARTIFACTORY'] = "http://maven.cbs.com:7305/artifactory/cbs-roku-deploys";
+    $curl = "curl -v -u admin:password --upload-file ";
+    if(is_file("$E[PKGDIR]/$E[APPFULLNAME].pkg")) {
+        exec("$curl $E[PKGDIR]/$E[APPFULLNAME].pkg $E[ARTIFACTORY]/$E[APPFULLNAME].pkg", $result, $errno);
+    }
+    if(is_file("$E[ZIPDIR]/$E[APPFULLNAME].zip")) {
+        exec("$curl $E[ZIPDIR]/$E[APPFULLNAME].zip $E[ARTIFACTORY]/$E[APPFULLNAME].zip", $result, $errno);
+    }
     return $result;
 }
 
@@ -270,6 +309,10 @@ function showvars() {
     foreach($keys as $idx=>$key) {
         pl("$key => $E[$key]");
     }
+}
+
+function info() {
+    phpinfo();
 }
 
 ?>

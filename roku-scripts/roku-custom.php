@@ -99,12 +99,11 @@ function incmajor() {
 }
 
 function debug() {
-    global $E, $testOk, $timeout;
+    global $E, $testOk, $timeout, $console;
     $testOk = 1;
     $timeout = 0;
     pl("*** Brightscript Debug on host $E[ROKU_DEV] ***");
-    if(function_exists("consoleCreate")) {
-        $console = consoleCreate();
+    if(isset($console)) {
         $script = [
             [ 'expect' => 'AppExitComplete', 'action' => 'none', 'parms' => [] ], // Stop debugging when app exits.
         ];
@@ -137,16 +136,17 @@ function run_ecp_test() {
 }
 
 function run_unit_tests() {
-    global $E, $testOk, $timeout;
+    global $E, $testOk, $timeout, $console;
     $testOk = 1;
     $timeout = 0;
     pl("*** Running Unit Tests on $E[ROKU_DEV] ***");
-    $console = consoleCreate();
     curl_post("http://$E[ROKU_DEV]:8060/launch/dev?RunTests=true");
-    $script = [
-        [ 'expect' => '***   Total', 'action' => 'testString', 'parms' => ['Failed   =  0'] ]
-    ];
-    consoleScript($console, $script);
+    if(isset($console)) {
+        $script = [
+            [ 'expect' => '***   Total', 'action' => 'testString', 'parms' => ['Failed   =  0'] ]
+        ];
+        consoleScript($console, $script);
+    }
 }
 
 function home() {
@@ -220,5 +220,6 @@ function jenkins_pkg() {
     }
     updateEnv();
     all();
+    curl_upload_artifactory();
 }
 ?>

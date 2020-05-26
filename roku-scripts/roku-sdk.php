@@ -48,18 +48,21 @@ function zip() {
 }
 
 function install() {
-    global $E, $timeout, $testOk;
+    global $E, $timeout, $testOk, $console;
     zip();
-    pl("Installing $E[APPFULLNAME] on host $E[ROKU_DEV]");
     home();
-    if(function_exists("consoleCreate")) $console = consoleCreate();
-    $data = [
-        'mysubmit'=>'Install',
-        'archive'=>curl_file_create("$E[ZIPDIR]/$E[APPFULLNAME].zip"),
-        'passwd'=>""
-    ];
+    pl("Installing $E[APPFULLNAME] on host $E[ROKU_DEV]");
+
+    $data = [];
+    $data['mysubmit'] = 'Install';
+//    $data['archive']  = curl_file_create("$E[ZIPDIR]/$E[APPFULLNAME].zip");
+    $data['archive']  = new CURLFile(realpath("$E[ZIPDIR]/$E[APPFULLNAME].zip"));
+    $data['passwd']   = "";
+
     $response = curl_post("http://$E[ROKU_DEV]/plugin_install", $data, $E['USERPASS']);
-    if(isset($console)) {
+    if(explode(' ', $response)[1] == "Error") {
+        finish("Install: $response", false, -1);
+    } else if(isset($console)) {
         $timeout = 10;
     
         $script = [
