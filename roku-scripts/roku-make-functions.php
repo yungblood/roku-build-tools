@@ -86,7 +86,7 @@ function curl_post($url, $data = '', $digest = '') {
         $info = ['http_code'=>0];
         $curl = "curl";
         if(!empty($digest)) $curl .= " --digest -u$digest";
-        $curl .= " -X POST";
+        $curl .= " -s -X POST";
         if(is_array($data)) {
             foreach($data as $key=>$val) {
                 if(is_string($val)) $curl .= " -F '$key=$val'";
