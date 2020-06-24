@@ -81,7 +81,7 @@ function httpStatusString($code) {
 function curl_post($url, $data = '', $digest = '') {
     //HACK: php-curl 7.68 doesn't work with roku, revert to command line
     if(floatval(curl_version()['version']) < 7.60) $ch = curl_init();
-    
+    unset($ch); // force command line version.
     if(!isset($ch)) {
         $info = ['http_code'=>0];
         $curl = "curl";
@@ -94,7 +94,8 @@ function curl_post($url, $data = '', $digest = '') {
             }
         }
         $curl .= " $url";
-        exec($curl, $result, $errno);
+        $url = $curl;
+        exec($url, $result, $errno);
         if(array_key_exists(0, $result)) {
             $status = explode(' ', $result[0]);
             if($status[0] == "Error") {
@@ -104,7 +105,8 @@ function curl_post($url, $data = '', $digest = '') {
             }
         }
     } else {
-        //curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_VERBOSE, true);
@@ -117,8 +119,9 @@ function curl_post($url, $data = '', $digest = '') {
         $info = curl_getinfo($ch);
         $errno = curl_errno($ch);
     }
+    pl($url);
     if($errno) {
-        $result = sprintf("cURL Error %d: %s\n", $errno, curl_strerror($errno));
+        $result = sprintf("%s\ncURL Error %d: %s\n", $url, $errno, curl_strerror($errno));
     } else if($info['http_code'] >= 300) {
         $result = sprintf("HTTP Error %d: %s\n", $info['http_code'], httpStatusString($info['http_code']));
     }

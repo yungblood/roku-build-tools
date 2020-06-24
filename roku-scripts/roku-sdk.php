@@ -7,10 +7,10 @@ function all() {
         if($E["JENKINS_DISABLE"] == "true") finish("", 0, 1);
     }
     remove();
-    rekey();
     //setbuild(); //Removed auto build number, now it requires you to manually set the build number in the manifest file.
     install();
     squashfs();
+    rekey();
     package();
 }
 
