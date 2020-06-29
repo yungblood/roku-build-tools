@@ -25,8 +25,8 @@ def environmentMap = [
             "ROKU_PASS" : "1234",
             "ROKU_GEO" : "domestic",
             "STAGE_PROD": "us",
-            "SPLASH_SCREEN"="pkg:/images/splash_fhd.png",
-            "SPLASH_COLOR"="#121212",
+            "SPLASH_SCREEN": "pkg:/images/splash_fhd.png",
+            "SPLASH_COLOR": "#121212",
             "CHANNEL_TOKEN" : "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2t1LXBlcm0iOlsiZ2V0X2RldmljZV9pZCJdLCJzdWIiOiJ1cm46cm9rdS5jb206c3RiLzMxNDQwIiwiaXNzIjoidXJuOnJva3UuY29tOnRva2VubWludDpjaGFubmVsdG9rZW4iLCJqdGkiOiJ1cm46ZDJhMzA0ZjctOGViMS00ZmY0LWFmNzUtNjg2NDExNGFhNzQ0IiwiZXhwIjoxNTU5MzUwODAwLCJpYXQiOjE1NTQ3Njk1MDIsInJva3UtY2hhbm5lbC1pZCI6WyIzMTQ0MCJdLCJuYmYiOjE0NzI5MDQwMDAsInJva3UtdGZ2IjoiMSIsImF1ZCI6InVybjpyb2t1LmNvbTpzdGIvY2hhbm5lbCJ9.DGt01TOljBt1HYaUt8_BxoUn10okS-OBliQ3YAX26W32fWFzsCnN1t6aODD62AHX_srtBDziqLSRbAEXnnEM9a0m_AgVxZ9SBAZSOnV02V-td4i8c3Ep-pre8LP40uAlOeXgawDdBj05lIukdandxfsaT6OXZElKWDaQ6a54oS5FPaUjjs0bmud8UwVtHFaDk9vP94RX53wetwJHysCrgHIlNaHf1uGnDDc8I-rQvaJIjahjt08gT7h20yImnQ7RmON6t2sOSCbnzzNYU7fXB_iQuKi4AJ4YybzvnyN52htacLbuv8dRJ2e4-cplVFSoyVgDSZppfShckZH4AgOjxw",
             "ANALYTICS_RSIDS" : "cnetcbscomsite",
         ],
@@ -72,8 +72,8 @@ def environmentMap = [
             "ROKU_PASS" : "1234",
             "ROKU_GEO" : "canada",
             "STAGE_PROD": "ca",
-            "SPLASH_SCREEN"="pkg:/images/logoLoadingScreen_HD.png",
-            "SPLASH_COLOR"="#000000",
+            "SPLASH_SCREEN": "pkg:/images/logoLoadingScreen_HD.png",
+            "SPLASH_COLOR": "#000000",
             "CHANNEL_TOKEN" : "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2t1LXBlcm0iOlsiZ2V0X2RldmljZV9pZCJdLCJzdWIiOiJ1cm46cm9rdS5jb206c3RiLzMxNDQwIiwiaXNzIjoidXJuOnJva3UuY29tOnRva2VubWludDpjaGFubmVsdG9rZW4iLCJqdGkiOiJ1cm46ZDJhMzA0ZjctOGViMS00ZmY0LWFmNzUtNjg2NDExNGFhNzQ0IiwiZXhwIjoxNTU5MzUwODAwLCJpYXQiOjE1NTQ3Njk1MDIsInJva3UtY2hhbm5lbC1pZCI6WyIzMTQ0MCJdLCJuYmYiOjE0NzI5MDQwMDAsInJva3UtdGZ2IjoiMSIsImF1ZCI6InVybjpyb2t1LmNvbTpzdGIvY2hhbm5lbCJ9.DGt01TOljBt1HYaUt8_BxoUn10okS-OBliQ3YAX26W32fWFzsCnN1t6aODD62AHX_srtBDziqLSRbAEXnnEM9a0m_AgVxZ9SBAZSOnV02V-td4i8c3Ep-pre8LP40uAlOeXgawDdBj05lIukdandxfsaT6OXZElKWDaQ6a54oS5FPaUjjs0bmud8UwVtHFaDk9vP94RX53wetwJHysCrgHIlNaHf1uGnDDc8I-rQvaJIjahjt08gT7h20yImnQ7RmON6t2sOSCbnzzNYU7fXB_iQuKi4AJ4YybzvnyN52htacLbuv8dRJ2e4-cplVFSoyVgDSZppfShckZH4AgOjxw",
             "ANALYTICS_RSIDS" : "cbsicbsca",
         ],
@@ -152,7 +152,7 @@ pipeline {
             steps {
                 script {
                     environmentMap.get(env.COUNTRY).get("default").each{ k, v -> println("Assigning: ${k} -- ${v}") ;env[k] = v }
-                    environmentMap.get(env.COUNTRY).get(env.ENV_NAMESPACE).each{ k, v -> println("Assigning: ${k} -- ${v}") ;env[k] = v }
+                    //environmentMap.get(env.COUNTRY).get(env.ENV_NAMESPACE).each{ k, v -> println("Assigning: ${k} -- ${v}") ;env[k] = v }
                     //hack to get the right helm user.
                     env.COUNTRY = env.COUNTRY.replaceAll('-util', '')
                     //this sets the command and makes sure that the country / env and roots are all set.
@@ -172,7 +172,7 @@ pipeline {
         stage('build') {
             steps {
                 sh 'cp -rv $SCRIPTS_ROOT/roku exclude'
-                sh 'roku-make all'
+                sh 'roku-make jenkins'
             }
         }
         stage('configure-artifactory-and-deploy') {
