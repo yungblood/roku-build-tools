@@ -87,17 +87,6 @@ function setConfig() {
         "/components/services/comscore/ComScore",
         "/components/services/conviva/Conviva_Roku"
     ];
-    if(!empty($E["ENABLE_PROXY"]) and $E["ENABLE_PROXY"] == "true") {
-        $E["BS_CONST"] = "enableProxy=true";
-        foreach ($proxyFiles as $proxyFile) {
-            swapFiles($proxyFile, ".brs.ref", ".brs", "brs.orig");
-        }
-    } else {
-        $E["BS_CONST"] = "enableProxy=false";
-        foreach ($proxyFiles as $proxyFile) {
-            swapFiles($proxyFile, ".brs.orig", ".brs", "brs.ref");
-        }
-    }
     $manifest_options = [
         "CONFIG_FILE"=>"config_file",
         "CHANNEL_TOKEN"=>"channel_token",
@@ -105,7 +94,6 @@ function setConfig() {
         "SPLASH_SCREEN_HD"=>"splash_screen_hd",
         "SPLASH_SCREEN_SD"=>"splash_screen_sd",
         "SPLASH_COLOR"=>"splash_color",
-        "BS_CONST"=>"bs_const"
     ];
     $ADBMobile_options = [
         "ANALYTICS_SSL"=>"analytics/ssl",
@@ -113,6 +101,20 @@ function setConfig() {
         "ANALYTICS_SERVER"=>"analytics/server",
         "MEDIAHEARTBEAT_SSL"=>"mediaHeartbeat/ssl",
     ];
+    if(!empty($E["ENABLE_PROXY"])) {
+        if($E["ENABLE_PROXY"] == "true") {
+            $E["BS_CONST"] = "enableProxy=true";
+            foreach ($proxyFiles as $proxyFile) {
+                swapFiles($proxyFile, ".brs.ref", ".brs", "brs.orig");
+            }
+        } else {
+            $E["BS_CONST"] = "enableProxy=false";
+            foreach ($proxyFiles as $proxyFile) {
+                swapFiles($proxyFile, ".brs.orig", ".brs", "brs.ref");
+            }
+        }
+        $manifest_options["BS_CONST"]="bs_const";
+    }
     foreach($manifest_options as $opt=>$key) {
         $val = getenv($opt);
         if(!empty($val)) $E[$opt] = $val;
