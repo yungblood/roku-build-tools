@@ -1,98 +1,6 @@
 <?php
-    function rokuCurl($method, $url) {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL,  $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        if($method == 'POST') {
-            curl_setopt($ch, CURLOPT_POST, 1);
-        }
-        $output = curl_exec($ch);
-        curl_close($ch);
+    $console = consoleCreate();
 
-        return $output;
-    }
-    
-//Roku ECP commands.
-    function rokuApps() {
-        global $E;
-        return rokuCurl('GET', "http://$E[ROKU_DEV]:8060/query/apps");
-    }
-    function rokuActiveApp() {
-        global $E;
-        return rokuCurl('GET', "http://$E[ROKU_DEV]:8060/query/active-app");
-    }
-    function rokuKeydown($key) {
-        global $E;
-        return rokuCurl('POST', "http://$E[ROKU_DEV]:8060/keydown/$key");
-    }
-    function rokuKeyup($key) {
-        global $E;
-        return rokuCurl('POST', "http://$E[ROKU_DEV]:8060/keyup/$key");
-    }
-    function rokuKeypress($key, $count = 1) {
-        global $E;
-        for ($c = 0; $c < $count; $c++) {
-            rokuCurl('POST', "http://$E[ROKU_DEV]:8060/keypress/$key");
-        }
-    }
-    function rokuKeyChar($char = '') {
-        if(ctype_alnum($char)) {
-            return rokuKeypress("Lit_".$char);
-        } else {
-            return rokuKeypress("Lit_%".dechex(ord($char)));
-        }
-    }
-    function rokuKeyString($string) {
-        $len = strlen($string);
-        for ($i = 0; $i < $len; $i++){
-            rokuKeyChar($string[$i]);
-        }
-    }
-    function rokuLaunch($channel = '', $launchparms = '') {
-        global $E;
-        if(empty($channel)) $channel = $E['ROKU_CHAN'];
-        if(empty($launchparms)) $launchparms = $E['ROKU_PARMS'];
-        return rokuCurl('POST', "http://$E[ROKU_DEV]:8060/launch/$channel$launchparms");
-    }
-    function rokuInstall($channel = '', $launchparms = '') {
-        global $E;
-        if(empty($channel)) $channel = $E['ROKU_CHAN'];
-        if(empty($launchparms)) $launchparms = $E['ROKU_PARMS'];
-        return rokuCurl('POST', "http://$E[ROKU_DEV]:8060/install/$channel$launchparms");
-    }
-    function rokuDeviceInfo() {
-        global $E;
-        return rokuCurl('GET', "http://$E[ROKU_DEV]:8060/query/device-info");
-    }
-    function rokuAppIcon($channel) {
-        global $E;
-        return rokuCurl('GET', "http://$E[ROKU_DEV]:8060/query/icon/$channel");
-    }
-    function rokuMediaPlayer() {
-        global $E;
-        return rokuCurl('GET', "http://$E[ROKU_DEV]:8060/query/media-player");
-    }
-    function rokuInput($inputparms) {
-        global $E;
-        return rokuCurl('POST', "http://$E[ROKU_DEV]:8060/input/$inputparms");
-    }
-    function rokuSearch($searchparms) {
-        global $E;
-        return rokuCurl('POST', "http://$E[ROKU_DEV]:8060/search/browse$searchparms");
-    }
-    function rokuTvChannels() {
-        global $E;
-        return rokuCurl('GET', "http://$E[ROKU_DEV]:8060/query/tv-channels");
-    }
-    function rokuTvActiveChannel() {
-        global $E;
-        return rokuCurl('GET', "http://$E[ROKU_DEV]:8060/query/tv-active-channel");
-    }
-    function rokuTvLaunch($launchparms = '') {
-        global $E;
-        if(empty($launchparms)) $launchparms = $E['ROKU_PARMS'];
-        return rokuCurl('POST', "http://$E[ROKU_DEV]:8060/launch/tvinput.dtv$launchparms");
-    }
     function testString($haystack, $needle) {
         global $testOk;
         if(strpos($haystack, $needle) === false) $testOk = 0;
@@ -197,4 +105,34 @@
         }
     }
 
+    function run_ecp_test() {
+        global $E, $testOk, $timeout;
+        $testOk = 1;
+        $timeout = 0;
+        $req = ['ROKU_DEV','ROKU_CHAN','ROKU_TEST'];
+        foreach ($req as $var) if(empty($E[$var])) finish("Run_Ecp_Test: $var not set.", -1);
+        $scriptfile = __DIR__.'/'.$E['ROKU_TEST'].'.php';
+        #$E['CONSOLE_LOG'] = __DIR__.'/'.$E['ROKU_TEST'].date(".Ymd.His").".log";
+        if(!file_exists($scriptfile)) finish("Run_Ecp_Test: file '$scriptfile' not found.", -2);
+        pl("*** Running ECP Test $E[ROKU_TEST] on $E[ROKU_DEV] ***");
+        include $scriptfile;
+        $console = consoleCreate();
+        rokuLaunch($E['ROKU_CHAN'], $E['ROKU_PARMS']);
+        consoleScript($console, $script);
+    }
+    
+    function run_unit_tests() {
+        global $E, $testOk, $timeout, $console;
+        $testOk = 1;
+        $timeout = 0;
+        pl("*** Running Unit Tests on $E[ROKU_DEV] ***");
+        curl_post("http://$E[ROKU_DEV]:8060/launch/dev?RunTests=true");
+        if(isset($console)) {
+            $script = [
+                [ 'expect' => '***   Total', 'action' => 'testString', 'parms' => ['Failed   =  0'] ]
+            ];
+            consoleScript($console, $script);
+        }
+    }
+    
 ?>

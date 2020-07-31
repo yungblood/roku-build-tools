@@ -27,19 +27,22 @@ $env_vars = ["ARTIFACTORY","APPNAME","REPO","ROLE","ROKU_DEV","ROKU_PASS","ROKU_
     "ROKU_TEST","ROKU_CHAN","ROKU_PARMS","HOME","COMMENT","COUNTRY"];
 foreach ($env_vars as $var) $E[$var] = getenv($var);
 
-$E['SOURCEDIR'] = getcwd();
-if(empty($E['APPNAME'])) $E['APPNAME'] = getValueFromFile("$E[SOURCEDIR]/Makefile", 'APPNAME');
-if(empty($E['APPNAME'])) $E['APPNAME'] = basename($E['SOURCEDIR']);
-$E['KEYDIR'] = "$E[SOURCEDIR]/exclude/keys";
-$E['DISTDIR'] = "$E[SOURCEDIR]/exclude/dist";
-$E['COMMONDIR'] = "$E[SOURCEDIR]/exclude/common";
-$E['APPSOURCEDIR'] = "$E[SOURCEDIR]/source";
-$E['APPCOMPDIR'] = "$E[SOURCEDIR]/components";
-$E['CONSOLE_LOG'] = "$E[HOME]/console.log";
-$E['MINI_PKG_ZIP'] = "$E[SOURCEDIR]/exclude/keys/mini-pkg.zip";
+$E['TOOLDIR'] = basename(__DIR__);
+$E['KEYDIR'] = "$E[TOOLDIR]/keys";
+$E['DISTDIR'] = "$E[TOOLDIR]/dist";
+$E['COMMONDIR'] = "$E[TOOLDIR]/common";
+$E['MINI_PKG_ZIP'] = "$E[TOOLDIR]/keys/mini-pkg.zip";
 
 $E['ZIPDIR'] = "$E[DISTDIR]/apps";
 $E['PKGDIR'] = "$E[DISTDIR]/packages";
+
+$E['SOURCEDIR'] = getcwd();
+if(empty($E['APPNAME'])) $E['APPNAME'] = getValueFromFile("$E[SOURCEDIR]/Makefile", 'APPNAME');
+if(empty($E['APPNAME'])) $E['APPNAME'] = basename($E['SOURCEDIR']);
+$E['APPSOURCEDIR'] = "$E[SOURCEDIR]/source";
+$E['APPCOMPDIR'] = "$E[SOURCEDIR]/components";
+
+$E['CONSOLE_LOG'] = "$E[HOME]/console.log";
 
 if(!empty($E['ROKU_PASS'])) $E['USERPASS'] = "rokudev:$E[ROKU_PASS]";
 else $E['USERPASS'] = "rokudev";
@@ -72,4 +75,110 @@ function updateEnv() {
     }
     $E['PKG_KEY'] = getValueFromFile(substr($E['PKG_KEY_FILE'], 0, -3)."key", "Password", ":");
 }
+
+function setConfig() {
+    global $E;
+    pl("*** Setting config options ***");
+    $proxyFiles = [
+        "/components/shared/proxy",
+        "/components/services/dw",
+        "/components/services/innovid",
+        "/components/services/adobe/adbmobile",
+        "/components/services/comscore/ComScore",
+        "/components/services/conviva/Conviva_Roku"
+    ];
+    if(!empty($E["ENABLE_PROXY"]) and $E["ENABLE_PROXY"] == "true") {
+        $E["BS_CONST"] = "enableProxy=true";
+        foreach ($proxyFiles as $proxyFile) {
+            swapFiles($proxyFile, ".brs.ref", ".brs", "brs.orig");
+        }
+    } else {
+        $E["BS_CONST"] = "enableProxy=false";
+        foreach ($proxyFiles as $proxyFile) {
+            swapFiles($proxyFile, ".brs.orig", ".brs", "brs.ref");
+        }
+    }
+    $manifest_options = [
+        "CONFIG_FILE"=>"config_file",
+        "CHANNEL_TOKEN"=>"channel_token",
+        "SPLASH_SCREEN_FHD"=>"splash_screen_fhd",
+        "SPLASH_SCREEN_HD"=>"splash_screen_hd",
+        "SPLASH_SCREEN_SD"=>"splash_screen_sd",
+        "SPLASH_COLOR"=>"splash_color",
+        "BS_CONST"=>"bs_const"
+    ];
+    $ADBMobile_options = [
+        "ANALYTICS_SSL"=>"analytics/ssl",
+        "ANALYTICS_RSIDS"=>"analytics/rsids",
+        "ANALYTICS_SERVER"=>"analytics/server",
+        "MEDIAHEARTBEAT_SSL"=>"mediaHeartbeat/ssl",
+    ];
+    foreach($manifest_options as $opt=>$key) {
+        $val = getenv($opt);
+        if(!empty($val)) $E[$opt] = $val;
+        if(!empty($E[$opt])) {
+            setIniVal("manifest", $key, $E[$opt]);
+            pl("> manifest > $key, $E[$opt]");
+        }
+    }
+    foreach($ADBMobile_options as $opt=>$key) {
+        $val = getenv($opt);
+        if(!empty($val)) $E[$opt] = $val;
+        if(!empty($E[$opt])) {
+            setJsonVal("ADBMobileConfig.json", $key, $E[$opt]);
+            pl("> ADBMobileConfig.json > $key, $E[$opt]");
+        }
+    }
+}
+
+function swapFiles($base, $from, $active, $to) {
+    global $E;
+    if(is_file($E["APPSOURCEDIR"].$base.$from)) {
+        if(is_file($E["APPSOURCEDIR"].$base.$active)) {
+            if(!is_file($E["APPSOURCEDIR"].$base.$to)) {
+                pl("> Swapping Files: $base$from to $base$active");
+                rename($E["APPSOURCEDIR"].$base.$active, $E["APPSOURCEDIR"].$base.$to);
+                rename($E["APPSOURCEDIR"].$base.$from, $E["APPSOURCEDIR"].$base.$active);
+            }
+        }
+    }
+}
+
+function setbuild() {
+    global $E;
+    pl("*** Setting Build Number ***");
+    setIniVal("manifest", "build_version", $E['DATE']);
+    updateEnv();
+	finish("*** Version $E[VERSION] ***");
+}
+
+function incbuild() {
+    global $E;
+    pl("*** Incrementing Build Number ***");
+    $E['V3'] = getIniVal("manifest", "build_version") + 1;
+    setIniVal("manifest", "build_version", $E['V3']);
+    updateEnv();
+    finish("*** Version $E[VERSION] ***");
+}
+
+function incminor() {
+    global $E;
+    pl("*** Incrementing Minor Version ***");
+    $E['V2'] = getIniVal("manifest", "minor_version") + 1;
+    setIniVal("manifest", "minor_version", $E['V2']);
+    updateEnv();
+    finish("*** Version $E[VERSION] ***");
+}
+
+function incmajor() {
+    global $E;
+    pl("*** Incrementing Major Version ***");
+    $E['V1'] = getIniVal("manifest", "major_version") + 1;
+    $E['V2'] = 0;
+    setIniVal("manifest", "major_version", $E['V1']);
+    setIniVal("manifest", "minor_version", $E['V2']);
+    updateEnv();
+    finish("*** Version $E[VERSION] ***");
+}
+
 ?>

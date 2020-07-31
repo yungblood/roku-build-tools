@@ -1,14 +1,14 @@
 <?php 
 function help() {
     global $argv;
-    pl("Usage: $argv[0] [COMMAND] [VAR=VALUE]...");
+    pl("Usage: roku-make [COMMAND] [VAR=VALUE]...");
     pl("Build Simple PHP script for packaging Roku SDK Applications.");
     pl("Common usage:");
-    pl("> $argv[0] build");
-    pl("> $argv[0] install");
-    pl("> $argv[0] package");
-    pl("> $argv[0] remove");
-    pl("> $argv[0] run_ecp_test ROKU_TEST=sample-test");
+    pl("> roku-make build");
+    pl("> roku-make install");
+    pl("> roku-make package");
+    pl("> roku-make remove");
+    pl("> roku-make run_ecp_test ROKU_TEST=sample-test");
     finish("", 0, true);
 }
 
@@ -149,19 +149,6 @@ function curl_binary($url, $filename, $digest) {
     }
     curl_close($ch);
     fclose($fp);
-    return $result;
-}
-
-function curl_upload_artifactory() {
-    global $E;
-    $E['ARTIFACTORY'] = "http://maven.cbs.com:7305/artifactory/cbs-roku-deploys";
-    $curl = "curl -v -u admin:password --upload-file ";
-    if(is_file("$E[PKGDIR]/$E[APPFULLNAME].pkg")) {
-        exec("$curl $E[PKGDIR]/$E[APPFULLNAME].pkg $E[ARTIFACTORY]/$E[APPFULLNAME].pkg", $result, $errno);
-    }
-    if(is_file("$E[ZIPDIR]/$E[APPFULLNAME].zip")) {
-        exec("$curl $E[ZIPDIR]/$E[APPFULLNAME].zip $E[ARTIFACTORY]/$E[APPFULLNAME].zip", $result, $errno);
-    }
     return $result;
 }
 

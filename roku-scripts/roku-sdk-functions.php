@@ -17,7 +17,7 @@ function all() {
 function zip() {
     global $E;
     updateEnv();
-    setconfig();
+    setConfig();
     if(!is_dir($E['ZIPDIR'])) {
 	    pl("  >> creating destination directory $E[ZIPDIR]");
 	    mkdir($E['ZIPDIR'], 0755, true);
