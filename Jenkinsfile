@@ -18,17 +18,20 @@
 def environmentMap = [
     "us" : [
         "default" : [
-            "APPNAME": "CBSAllAccess",
+            "APPNAME" : "CBSAllAccess",
             "REPO" : "allaccess-domestic",
             "ROLE" : "roku",
             "ROKU_DEV" : "10.16.180.78",
             "ROKU_PASS" : "1234",
             "ROKU_GEO" : "domestic",
-            "STAGE_PROD": "us",
-            "SPLASH_SCREEN": "pkg:/images/splash_fhd.png",
-            "SPLASH_COLOR": "#121212",
+            "STAGE_PROD" : "us",
+            "SPLASH_SCREEN_SD" : "pkg:/images/splash_sd.png",
+            "SPLASH_SCREEN_HD" : "pkg:/images/splash_hd.png",
+            "SPLASH_SCREEN_FHD" : "pkg:/images/splash_fhd.png",
+            "SPLASH_COLOR" : "#121212",
             "CHANNEL_TOKEN" : "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2t1LXBlcm0iOlsiZ2V0X2RldmljZV9pZCJdLCJzdWIiOiJ1cm46cm9rdS5jb206c3RiLzMxNDQwIiwiaXNzIjoidXJuOnJva3UuY29tOnRva2VubWludDpjaGFubmVsdG9rZW4iLCJqdGkiOiJ1cm46ZDJhMzA0ZjctOGViMS00ZmY0LWFmNzUtNjg2NDExNGFhNzQ0IiwiZXhwIjoxNTU5MzUwODAwLCJpYXQiOjE1NTQ3Njk1MDIsInJva3UtY2hhbm5lbC1pZCI6WyIzMTQ0MCJdLCJuYmYiOjE0NzI5MDQwMDAsInJva3UtdGZ2IjoiMSIsImF1ZCI6InVybjpyb2t1LmNvbTpzdGIvY2hhbm5lbCJ9.DGt01TOljBt1HYaUt8_BxoUn10okS-OBliQ3YAX26W32fWFzsCnN1t6aODD62AHX_srtBDziqLSRbAEXnnEM9a0m_AgVxZ9SBAZSOnV02V-td4i8c3Ep-pre8LP40uAlOeXgawDdBj05lIukdandxfsaT6OXZElKWDaQ6a54oS5FPaUjjs0bmud8UwVtHFaDk9vP94RX53wetwJHysCrgHIlNaHf1uGnDDc8I-rQvaJIjahjt08gT7h20yImnQ7RmON6t2sOSCbnzzNYU7fXB_iQuKi4AJ4YybzvnyN52htacLbuv8dRJ2e4-cplVFSoyVgDSZppfShckZH4AgOjxw",
             "ANALYTICS_RSIDS" : "cnetcbscomsite",
+            "ENABLE_PROXY" : "false",
         ],
         "test-testwww" : [
             "BUILD_TYPE" : "test",
@@ -45,6 +48,23 @@ def environmentMap = [
             "ANALYTICS_SSL" : "false",
             "ANALYTICS_SERVER" : "aa.cbsi.com",
             "MEDIAHEARTBEAT_SSL" : "false",
+        ],
+        "qa-hob" : [
+            "BUILD_TYPE" : "qa",
+            "BUILD_ENV" : "hob",
+            "CONFIG_FILE" : "pkg:/config-hob.json",
+            "ANALYTICS_SSL" : "true",
+            "ANALYTICS_SERVER" : "saa.cbsi.com",
+            "MEDIAHEARTBEAT_SSL" : "true",
+        ],
+        "qa-prod-proxy" : [
+            "ENABLE_PROXY" : "true",
+            "BUILD_TYPE" : "qa",
+            "BUILD_ENV" : "prod--PROXY--DO-NOT-PUBLISH--",
+            "CONFIG_FILE" : "pkg:/config.json",
+            "ANALYTICS_SSL" : "true",
+            "ANALYTICS_SERVER" : "saa.cbsi.com",
+            "MEDIAHEARTBEAT_SSL" : "true",
         ],
         "qa-prod" : [
             "BUILD_TYPE" : "qa",
@@ -65,15 +85,17 @@ def environmentMap = [
     ],
     "ca" : [
         "default" : [
-            "APPNAME": "CBSAllAccess",
+            "APPNAME" : "CBSAllAccess",
             "REPO" : "allaccess-ca",
             "ROLE" : "roku",
             "ROKU_DEV" : "10.16.180.78",
             "ROKU_PASS" : "1234",
             "ROKU_GEO" : "canada",
-            "STAGE_PROD": "ca",
-            "SPLASH_SCREEN": "pkg:/images/logoLoadingScreen_HD.png",
-            "SPLASH_COLOR": "#000000",
+            "STAGE_PROD" : "ca",
+            "SPLASH_SCREEN_SD" : "pkg:/images/logoLoadingScreen_HD.png",
+            "SPLASH_SCREEN_HD" : "pkg:/images/logoLoadingScreen_HD.png",
+            "SPLASH_SCREEN_FHD" : "pkg:/images/logoLoadingScreen_HD.png",
+            "SPLASH_COLOR" : "#000000",
             "CHANNEL_TOKEN" : "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2t1LXBlcm0iOlsiZ2V0X2RldmljZV9pZCJdLCJzdWIiOiJ1cm46cm9rdS5jb206c3RiLzMxNDQwIiwiaXNzIjoidXJuOnJva3UuY29tOnRva2VubWludDpjaGFubmVsdG9rZW4iLCJqdGkiOiJ1cm46ZDJhMzA0ZjctOGViMS00ZmY0LWFmNzUtNjg2NDExNGFhNzQ0IiwiZXhwIjoxNTU5MzUwODAwLCJpYXQiOjE1NTQ3Njk1MDIsInJva3UtY2hhbm5lbC1pZCI6WyIzMTQ0MCJdLCJuYmYiOjE0NzI5MDQwMDAsInJva3UtdGZ2IjoiMSIsImF1ZCI6InVybjpyb2t1LmNvbTpzdGIvY2hhbm5lbCJ9.DGt01TOljBt1HYaUt8_BxoUn10okS-OBliQ3YAX26W32fWFzsCnN1t6aODD62AHX_srtBDziqLSRbAEXnnEM9a0m_AgVxZ9SBAZSOnV02V-td4i8c3Ep-pre8LP40uAlOeXgawDdBj05lIukdandxfsaT6OXZElKWDaQ6a54oS5FPaUjjs0bmud8UwVtHFaDk9vP94RX53wetwJHysCrgHIlNaHf1uGnDDc8I-rQvaJIjahjt08gT7h20yImnQ7RmON6t2sOSCbnzzNYU7fXB_iQuKi4AJ4YybzvnyN52htacLbuv8dRJ2e4-cplVFSoyVgDSZppfShckZH4AgOjxw",
             "ANALYTICS_RSIDS" : "cbsicbsca",
         ],
@@ -102,8 +124,7 @@ def environmentMap = [
             "MEDIAHEARTBEAT_SSL" : "false",
         ],
         "qa-testwww-no-geoblock" : [
-            "JENKINS_DISABLE" : "true",
-            "BUILD_TYPE" : "qa",
+            "BUILD_TYPE" : "qa-no-geoblock",
             "BUILD_ENV" : "testwww-no-geoblock",
             "CONFIG_FILE" : "pkg:/config-canada-staging-no-geoblock.json",
             "ANALYTICS_SSL" : "false",
@@ -111,8 +132,7 @@ def environmentMap = [
             "MEDIAHEARTBEAT_SSL" : "false",
         ],
         "qa-prod-no-geoblock" : [
-            "JENKINS_DISABLE" : "true",
-            "BUILD_TYPE" : "qa",
+            "BUILD_TYPE" : "qa-no-geoblock",
             "BUILD_ENV" : "prod-no-geoblock",
             "CONFIG_FILE" : "pkg:/config-canada-no-geoblock.json",
             "ANALYTICS_SSL" : "false",
@@ -138,8 +158,9 @@ def environmentMap = [
 pipeline {
     agent any
     environment {
+        ROKU_MAKE_ROOT="/home/jenkins/workspace/tools/roku-make"
         SCRIPTS_ROOT="/home/jenkins/workspace/tools/cbs-tools"
-        PATH = "/bin/:/usr/bin/:/usr/local/bin:$JRUBY_ROOT/bin:/usr/bin:/usr/local/bin:$SCRIPTS_ROOT/bin/solr/:$SCRIPTS_ROOT/bin/contest/:$SCRIPTS_ROOT/bin/deploy/:$SCRIPTS_ROOT/bin/can/:$SCRIPTS_ROOT/bin/prod_utilities:$SCRIPTS_ROOT/prod/jenkins:$SCRIPTS_ROOT/bin/infrastructure:$SCRIPTS_ROOT/bin/webmastertools:$SCRIPTS_ROOT/prod/jenkins/phx2/:$RUBYLIB:$SCRIPTS_ROOT/bin/deploy/phx2/:$SCRIPTS_ROOT/docker/bin:$SCRIPTS_ROOT/roku/roku-scripts/:$PATH"
+        PATH = "/bin/:/usr/bin/:/usr/local/bin:$JRUBY_ROOT/bin:/usr/bin:/usr/local/bin:$SCRIPTS_ROOT/bin/solr/:$SCRIPTS_ROOT/bin/contest/:$SCRIPTS_ROOT/bin/deploy/:$SCRIPTS_ROOT/bin/can/:$SCRIPTS_ROOT/bin/prod_utilities:$SCRIPTS_ROOT/prod/jenkins:$SCRIPTS_ROOT/bin/infrastructure:$SCRIPTS_ROOT/bin/webmastertools:$SCRIPTS_ROOT/prod/jenkins/phx2/:$RUBYLIB:$SCRIPTS_ROOT/bin/deploy/phx2/:$SCRIPTS_ROOT/docker/bin:$ROKU_MAKE_ROOT/roku-scripts:$PATH"
         ARTIFACTORY = "http://maven.cbs.com:7305/artifactory/cbs-roku-deploys"
     }
 
@@ -171,8 +192,15 @@ pipeline {
         }
         stage('build') {
             steps {
-                sh 'cp -rv $SCRIPTS_ROOT/roku exclude'
-                sh 'roku-make jenkins'
+                sh '''#!/bin/bash -xe
+                    if [ -d "/home/jenkins/workspace/tools/roku-make" ]
+                    then
+                        git -C /home/jenkins/workspace/tools/roku-make pull
+                    else
+                        git clone --single-branch --branch builds/tools git@github.com:cbs-ci/cbs-roku.git /home/jenkins/workspace/tools/roku-make
+                    fi
+                '''
+                sh 'roku-make.sh jenkins'
             }
         }
         stage('configure-artifactory-and-deploy') {
