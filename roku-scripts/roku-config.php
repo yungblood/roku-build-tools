@@ -27,7 +27,7 @@ $env_vars = ["ARTIFACTORY","APPNAME","REPO","ROLE","ROKU_DEV","ROKU_PASS","ROKU_
     "ROKU_TEST","ROKU_CHAN","ROKU_PARMS","HOME","COMMENT","COUNTRY"];
 foreach ($env_vars as $var) $E[$var] = getenv($var);
 
-$E['TOOLDIR'] = basename(__DIR__);
+$E['TOOLDIR'] = dirname(__DIR__);
 $E['KEYDIR'] = "$E[TOOLDIR]/keys";
 $E['DISTDIR'] = "$E[TOOLDIR]/dist";
 $E['COMMONDIR'] = "$E[TOOLDIR]/common";
