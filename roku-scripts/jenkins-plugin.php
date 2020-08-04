@@ -14,7 +14,7 @@ function read_jenkinsfile() {
 }
 
 function jenkins() {
-    global $E;
+    global $E, $completeMsgs;
     if(empty($E['COUNTRY'])) finish("Required var not set: COUNTRY", -1);
     if(empty($E['BUILD_TYPE'])) finish("Required var not set: BUILD_TYPE", -1);
     $envMap = read_jenkinsfile();
@@ -38,6 +38,8 @@ function jenkins() {
             }
         }
     }
+    exec("git log -1 --pretty=%B | sed '/^$/d'", $output);
+    $completeMsgs[] = "This Build Includes:\n```".implode("\n",$output)."```";
 }
 
 ?>

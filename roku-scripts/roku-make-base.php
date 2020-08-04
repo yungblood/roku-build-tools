@@ -55,8 +55,7 @@ updateEnv();
 
 foreach ($commands as $command) {	
 	call_user_func($command);
-	$msg = "*** roku-make $command $E[APPFULLNAME] complete ***";
-	foreach ($completeMsgs as $completeMsg) $msg .= call_user_func($completeMsg);
-	finish($msg);
 }
+$completeMsgs[] = "*** roku-make $command $E[APPFULLNAME] complete ***\n\n";
+finish(implode("\n", $completeMsgs));
 ?>
