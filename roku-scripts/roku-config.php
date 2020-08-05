@@ -105,7 +105,7 @@ function setConfig() {
         if($E["ENABLE_PROXY"] == "true") {
             $E["BS_CONST"] = "enableProxy=true";
             foreach ($proxyFiles as $proxyFile) {
-                swapFiles($proxyFile, ".brs.ref", ".brs", ".brs.orig");
+                swapFiles($proxyFile, ".brs.proxy", ".brs", ".brs.orig");
             }
         } else {
             $E["BS_CONST"] = "enableProxy=false";
