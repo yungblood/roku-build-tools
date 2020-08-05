@@ -105,12 +105,12 @@ function setConfig() {
         if($E["ENABLE_PROXY"] == "true") {
             $E["BS_CONST"] = "enableProxy=true";
             foreach ($proxyFiles as $proxyFile) {
-                swapFiles($proxyFile, ".brs.ref", ".brs", "brs.orig");
+                swapFiles($proxyFile, ".brs.ref", ".brs", ".brs.orig");
             }
         } else {
             $E["BS_CONST"] = "enableProxy=false";
             foreach ($proxyFiles as $proxyFile) {
-                swapFiles($proxyFile, ".brs.orig", ".brs", "brs.ref");
+                swapFiles($proxyFile, ".brs.orig", ".brs", ".brs.ref");
             }
         }
         $manifest_options["BS_CONST"]="bs_const";
@@ -135,12 +135,12 @@ function setConfig() {
 
 function swapFiles($base, $from, $active, $to) {
     global $E;
-    if(is_file($E["APPSOURCEDIR"].$base.$from)) {
-        if(is_file($E["APPSOURCEDIR"].$base.$active)) {
-            if(!is_file($E["APPSOURCEDIR"].$base.$to)) {
+    if(file_exists($E["SOURCEDIR"].$base.$from)) {
+        if(is_file($E["SOURCEDIR"].$base.$active)) {
+            if(!is_file($E["SOURCEDIR"].$base.$to)) {
                 pl("> Swapping Files: $base$from to $base$active");
-                rename($E["APPSOURCEDIR"].$base.$active, $E["APPSOURCEDIR"].$base.$to);
-                rename($E["APPSOURCEDIR"].$base.$from, $E["APPSOURCEDIR"].$base.$active);
+                rename($E["SOURCEDIR"].$base.$active, $E["SOURCEDIR"].$base.$to);
+                rename($E["SOURCEDIR"].$base.$from, $E["SOURCEDIR"].$base.$active);
             }
         }
     }
