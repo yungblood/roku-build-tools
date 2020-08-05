@@ -56,5 +56,5 @@ updateEnv();
 foreach ($commands as $command) {	
 	call_user_func($command);
 }
-finish("*** roku-make $command $E[APPFULLNAME] complete ***\n".implode("\n", $completeMsgs)."\n";
+finish("*** roku-make $command $E[APPFULLNAME] complete ***\n".implode("\n", $completeMsgs)."\n");
 ?>
