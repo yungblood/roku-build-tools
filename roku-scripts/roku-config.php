@@ -85,7 +85,8 @@ function setConfig() {
         "/components/services/innovid",
         "/components/services/adobe/adbmobile",
         "/components/services/comscore/ComScore",
-        "/components/services/conviva/Conviva_Roku"
+        "/components/services/conviva/Conviva_Roku",
+        "/components/services/conviva/ConvivaCoreLib"
     ];
     $manifest_options = [
         "CONFIG_FILE"=>"config_file",
