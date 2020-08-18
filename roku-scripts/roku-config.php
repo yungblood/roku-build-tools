@@ -111,7 +111,7 @@ function setConfig() {
         } else {
             $E["BS_CONST"] = "enableProxy=false";
             foreach ($proxyFiles as $proxyFile) {
-                swapFiles($proxyFile, ".brs.orig", ".brs", ".brs.ref");
+                swapFiles($proxyFile, ".brs.orig", ".brs", ".brs.proxy");
             }
         }
         $manifest_options["BS_CONST"]="bs_const";
