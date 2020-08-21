@@ -137,13 +137,16 @@ function setConfig() {
 function swapFiles($base, $from, $active, $to) {
     global $E;
     if(file_exists($E["SOURCEDIR"].$base.$from)) {
+        pl("> Swapping Files: $base$from to $base$active");
         if(is_file($E["SOURCEDIR"].$base.$active)) {
             if(!is_file($E["SOURCEDIR"].$base.$to)) {
-                pl("> Swapping Files: $base$from to $base$active");
                 rename($E["SOURCEDIR"].$base.$active, $E["SOURCEDIR"].$base.$to);
-                rename($E["SOURCEDIR"].$base.$from, $E["SOURCEDIR"].$base.$active);
             }
         }
+        if(is_file($E["SOURCEDIR"].$base.$active)) {
+            rename($E["SOURCEDIR"].$base.$active);
+        }
+        rename($E["SOURCEDIR"].$base.$from, $E["SOURCEDIR"].$base.$active);
     }
 }
 
