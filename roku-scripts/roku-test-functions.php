@@ -1,5 +1,7 @@
 <?php
-    $console = consoleCreate();
+    $env_vars[] = "ROKU_TEST";
+    $env_vars[] = "ROKU_CHAN";
+    $env_vars[] = "ROKU_PARMS";
 
     function testString($haystack, $needle) {
         global $testOk;
@@ -14,28 +16,6 @@
     function setTimeout($sec = 0) {
         global $timeout;
         $timeout = $sec;
-    }
-    
-    function consoleCreate() {
-        global $E;
-        $console = fsockopen($E['ROKU_DEV'], 8085);
-        if(!$console) finish("Failed to open console connection to $E[ROKU_DEV]", -1, true);
-        file_put_contents($E['CONSOLE_LOG'], "Connection Started: ".date("Y-m-d h:i:sa")."\n\n");
-        do {
-            $read   = array($console);
-            $write  = NULL;
-            $except = NULL;
-            
-            if(!is_resource($console)) return;
-            $num_changed_streams = @stream_select($read, $write, $except, 1);
-            if(feof($console)) return ;
-            
-            if($num_changed_streams === false) finish("Crashed while ignoring previous console data\n", -1, true);
-            if($num_changed_streams > 0) {
-                $data = fgets($console, 4096);
-            }
-        } while($num_changed_streams > 0);
-        return $console;
     }
     
     function consoleScript(&$console, $script) {
@@ -126,7 +106,7 @@
         $testOk = 1;
         $timeout = 0;
         pl("*** Running Unit Tests on $E[ROKU_DEV] ***");
-        curl_post("http://$E[ROKU_DEV]:8060/launch/dev?RunTests=true");
+        rokuLaunch($E['ROKU_CHAN'], 'RunTests=true');
         if(isset($console)) {
             $script = [
                 [ 'expect' => '***   Total', 'action' => 'testString', 'parms' => ['Failed   =  0'] ]

@@ -1,1 +1,1 @@
-php "$PSScriptRoot\roku-make-base.php" $args
+php "$PSScriptRoot\roku-make.php" $args

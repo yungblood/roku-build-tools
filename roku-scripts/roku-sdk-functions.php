@@ -1,10 +1,7 @@
 <?php
 function all() {
     global $E;
-    $processUser = posix_getpwuid(posix_geteuid());
-    if($processUser['name'] == 'jenkins') {
-        if(!is_file("Jenkinsfile")) finish("Unable to find: Jenkinsfile", -1);
-    }
+    home();
     remove();
     //setbuild(); //Removed auto build number, now it requires you to manually set the build number in the manifest file.
     install();
@@ -15,8 +12,7 @@ function all() {
 
 function zip() {
     global $E;
-    updateEnv();
-    setConfig();
+    updateEnv(true);
     if(!is_dir($E['ZIPDIR'])) {
 	    pl("  >> creating destination directory $E[ZIPDIR]");
 	    mkdir($E['ZIPDIR'], 0755, true);
@@ -34,8 +30,8 @@ function zip() {
 # zip .png files without compression
     $E['ZIPFILE'] = "$E[ZIPDIR]/$E[APPFULLNAME].zip";
 	pl("  >> creating application zip $E[APPFULLNAME]");	
-    echo shell_exec("zip -0 -r \"$E[ZIPFILE]\" . -i \*.png $E[ZIP_EXCLUDE]");
-    echo shell_exec("zip -9 -r \"$E[ZIPFILE]\" . -x \*.png $E[ZIP_EXCLUDE]");
+    echo shell_exec("$E[ZIPCMD] -0 -r \"$E[ZIPFILE]\" . -i \*.png $E[ZIP_EXCLUDE]");
+    echo shell_exec("$E[ZIPCMD] -9 -r \"$E[ZIPFILE]\" . -x \*.png $E[ZIP_EXCLUDE]");
 
     if(!empty($E["IMPORTFILES"])) {
         pl("  >> deleting imports");
@@ -46,19 +42,13 @@ function zip() {
 	finish("Zipping $E[APPFULLNAME]");
 }
 
-function install() {
+function install($fullpath = '') {
     global $E, $timeout, $testOk, $console;
-    zip();
-    home();
-    pl("Installing $E[APPFULLNAME] on host $E[ROKU_DEV]");
-
-    $data = [];
-    $data['mysubmit'] = 'Install';
-//    $data['archive']  = curl_file_create("$E[ZIPDIR]/$E[APPFULLNAME].zip");
-    $data['archive']  = new CURLFile(realpath("$E[ZIPDIR]/$E[APPFULLNAME].zip"));
-    $data['passwd']   = "";
-
-    $response = curl_post("http://$E[ROKU_DEV]/plugin_install", $data, $E['USERPASS']);
+    if ($fullpath === '') {
+        zip();
+        $fullpath = realpath("$E[ZIPDIR]/$E[APPFULLNAME].zip");
+    }
+    $response = rokuSubmit("plugin_install", 'Install', _curl_file($fullpath));
     if(explode(' ', $response)[1] == "Error") {
         finish("Install: $response", false, -1);
     } else if(isset($console)) {
@@ -79,27 +69,15 @@ function install() {
 }
 
 function cramfs() {
-    global $E, $timeout, $testOk;
-    pl("Convert to CramFS on host $E[ROKU_DEV]");
-    $data = [
-        'mysubmit'=>'Convert to cramfs',
-        'archive'=>curl_file_create("$E[ZIPDIR]/$E[APPFULLNAME].zip"),
-        'passwd'=>""
-    ];
-    $response = curl_post("http://$E[ROKU_DEV]/plugin_install", $data, $E['USERPASS']);
+    global $E;
+    $response = rokuSubmit("plugin_install", 'Convert to cramfs', _curl_file("$E[ZIPDIR]/$E[APPFULLNAME].zip"));
     $output = filterString($response, "Roku.Message", "n.innerHTML='", "<p>");
     finish("CramFS: $output", checkSuccess($output, "succeeded"));
 }
 
 function squashfs() {
-    global $E, $timeout, $testOk;
-    pl("Convert to SquashFS on host $E[ROKU_DEV]");
-    $data = [
-        'mysubmit'=>'Convert to squashfs',
-        'archive'=>curl_file_create("$E[ZIPDIR]/$E[APPFULLNAME].zip"),
-        'passwd'=>""
-    ];
-    $response = curl_post("http://$E[ROKU_DEV]/plugin_install", $data, $E['USERPASS']);
+    global $E;
+    $response = rokuSubmit("plugin_install", 'Convert to squashfs',_curl_file("$E[ZIPDIR]/$E[APPFULLNAME].zip"));
     $output = filterString($response, "Roku.Message", "n.innerHTML='", "<p>");
     finish("SquashFS: $output", checkSuccess($output, "succeeded"));
 }
@@ -120,41 +98,38 @@ function package() {
         chmod($E['PKGDIR'], 0755);
     }
     
-	pl("Packaging $E[APPFULLNAME] on host $E[ROKU_DEV]");
-	$data = [
-	    'mysubmit'=>'Package',
-	    'app_name'=>"$E[APPNAME]/$E[VERSION]",
-	    'passwd'=>"$E[PKG_KEY]",
-	    'pkg_time'=>"$E[PKG_TIME]"
-	];
-	$response = curl_post("http://$E[ROKU_DEV]/plugin_package", $data, $E['USERPASS']);
-	$output = filterString($response, "Roku.Message", "trigger('Set message content', '", "').trigger('Render', node);");
-	finish("Package: $output", checkSuccess($output));
-	pl("Downloading Package...");
-	$pkg = filterString($response, "a href", "pkgs//", '">', true);
-	if(!empty($pkg)) {
-        curl_binary("http://$E[ROKU_DEV]/pkgs/$pkg", "$E[PKGDIR]/$E[APPFULLNAME].pkg", $E['USERPASS']);
+    $response = rokuSubmit("plugin_package", 'Package', "" , "$E[PKG_KEY]", "$E[APPNAME]/$E[VERSION]","$E[PKG_TIME]");
+    $output = filterString($response, "Roku.Message", "trigger('Set message content', '", "').trigger('Render', node);");
+    finish("Package: $output", checkSuccess($output));
+    pl("Downloading Package...");
+    $pkg = filterString($response, "a href", "pkgs//", '">', true);
+    if(!empty($pkg)) {
+        _curl("http://$E[ROKU_DEV]/pkgs/$pkg", 'GET', $E['USERPASS'], '', "$E[PKGDIR]/$E[APPFULLNAME].pkg");
         if(!is_file($E['PKG_KEY_FILE'])) {
             copy("$E[PKGDIR]/$E[APPFULLNAME].pkg", "$E[PKG_KEY_FILE]");
         }
-	    finish("*** Package $E[APPFULLNAME] complete ***");
-	} else {
-	    finish("*** Package $E[APPFULLNAME] failed ***", -1);
-	}
+        finish("*** Package $E[APPFULLNAME] complete ***");
+    } else {
+        finish("*** Package $E[APPFULLNAME] failed ***", -1);
+    }
 }
 
 function remove() {
     global $E;
-    pl("Removing dev app from host $E[ROKU_DEV]");
-    home();
-    $data = [
-        'mysubmit'=>'Delete',
-        'archive'=>"",
-        'passwd'=>""
-    ];
-    $response = curl_post("http://$E[ROKU_DEV]/plugin_install", $data, $E['USERPASS']);
+    $response = rokuSubmit("plugin_install", 'Delete');
     $output = filterString($response, "Roku.Message", "trigger('Set message content', '", "').trigger('Render', node);");
     finish("Remove: $output");
 }
 
+function rokuSubmit($url, $submit, $archive = "", $passwd = "", $app_name = "", $pkg_time = "") {
+    global $E;
+    $data = [];
+    $data['mysubmit'] = $submit;
+    $data['archive']  = $archive;
+    $data['passwd']   = $passwd;
+    $data['app_name'] = $app_name;
+    $data['pkg_time'] = $pkg_time;
+    pl("$submit $E[APPFULLNAME] on host $E[ROKU_DEV]");
+    return _curl("http://$E[ROKU_DEV]/$url", 'POST', $E['USERPASS'], $data);
+}
 ?>

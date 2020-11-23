@@ -1,12 +1,15 @@
 <?php
+$env_vars[] = "BUILD_TYPE";
+$env_vars[] = "COUNTRY";
 
 function read_jenkinsfile() {
     if(!is_file("Jenkinsfile")) finish("Unable to find: Jenkinsfile", -1);
     $jenkins = file_get_contents("Jenkinsfile");
     $envMapStart = strpos($jenkins, "[");
     $envMapLen = strpos($jenkins, "//end environmentMap") - $envMapStart;
+    $rawJson = substr($jenkins, $envMapStart, $envMapLen);
     //Convert to clean json.
-    $json = str_replace(["[","]","\n","\t"],["{","}","",""], substr($jenkins, $envMapStart, $envMapLen));
+    $json = str_replace(["[","]","\r","\n","\t"],["{","}","","",""], $rawJson);
     while (strpos($json, " ") !== false) $json = str_replace(" ", "", $json);
     $json = str_replace(",}", "}", $json);
     $envMap = json_decode($json, true);
@@ -38,8 +41,13 @@ function jenkins() {
             }
         }
     }
-    exec("git log -1 --pretty=%B | sed '/^$/d'", $output);
+    if(strpos($E['OS'],"windows") !== false) {
+        exec("git log -1 --pretty=%B", $output);
+    } else {
+        exec("git log -1 --pretty=%B | sed '/^$/d'", $output);
+    }
     $completeMsgs[] = "This Build Includes:\n```".implode("\n",$output)."```";
+    exec("git reset --hard", $output);
 }
 
 ?>

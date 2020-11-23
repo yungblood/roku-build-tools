@@ -1,4 +1,5 @@
 <?php
+$env_vars[] = "ARTIFACTORY";
 
 function curl_upload_artifactory() {
     global $E, $completeMsgs;
