@@ -31,16 +31,8 @@ function genkey() {
     telnet($E['ROKU_DEV'], 8080, "genkey", $key_file);
     finish("*** Key stored in $key_file  ***");
     updateEnv();
-    pl("Installing mini-pkg on host $E[ROKU_DEV]");
     home();
-    $data = [
-        'mysubmit'=>'Install',
-        'archive'=>curl_file_create($E['MINI_PKG_ZIP']),
-        'passwd'=>""
-    ];
-    $response = curl_post("http://$E[ROKU_DEV]/plugin_install", $data, $E['USERPASS']);
-    $output = filterString($response, "Roku.Message", "trigger('Set message content', '", "').trigger('Render', node);");
-    finish("Install mini-pkg: $output", checkSuccess($output, "Received"));
+    install(realpath($E['MINI_PKG_ZIP']));
     package();
 }
 
@@ -48,12 +40,7 @@ function rekey() {
     global $E;
     pl("*** Setting Key: $E[PKG_KEY_FILE] on host $E[ROKU_DEV] ***");
     if(is_file($E['PKG_KEY_FILE'])) {
-        $data = [
-            'mysubmit'=>'Rekey',
-            'archive'=>curl_file_create($E['PKG_KEY_FILE']),
-            'passwd'=>"$E[PKG_KEY]"
-        ];
-        $response = curl_post("http://$E[ROKU_DEV]/plugin_inspect", $data, $E['USERPASS']);
+        $response = rokuSubmit("plugin_inspect", 'Rekey', _curl_file($E['PKG_KEY_FILE']) , "$E[PKG_KEY]");
         $output = filterString($response, "Roku.Message", "trigger('Set message content', '", "').trigger('Render', node);");
         finish("Rekey: $output", checkSuccess($output));
     } else {
@@ -79,14 +66,13 @@ function debug() {
 function launch() {
     global $E;
     pl("*** Launching DEV app on $E[ROKU_DEV] ***");
-    curl_post("http://$E[ROKU_DEV]:8060/launch/dev");
+    rokuLaunch("dev");
 }
 
 function home() {
     global $E;
     pl("*** Pressing Home on $E[ROKU_DEV] ***");
-    curl_post("http://$E[ROKU_DEV]:8060/keypress/home");
-    curl_post("http://$E[ROKU_DEV]:8060/keypress/home");
+    rokuKeypress('home', 2);
 }
 
 function build() {
