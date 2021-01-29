@@ -16,8 +16,11 @@ function customConfig() {
         "CHANNEL_TOKEN"=>"channel_token",
         "SPLASH_SCREEN_FHD"=>"splash_screen_fhd",
         "SPLASH_SCREEN_HD"=>"splash_screen_hd",
-        "SPLASH_SCREEN_SD"=>"splash_screen_sd",
         "SPLASH_COLOR"=>"splash_color",
+        "ICON_FHD"=>"mm_icon_focus_fhd",
+        "ICON_HD"=>"mm_icon_focus_hd",
+        "TITLE"=>"title",
+        "DIAL_TITLE"=>"dial_title",
     ];
     $ADBMobile_options = [
         "ANALYTICS_SSL"=>"analytics/ssl",
