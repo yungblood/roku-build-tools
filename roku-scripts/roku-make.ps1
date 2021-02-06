@@ -1,0 +1,1 @@
+php "$PSScriptRoot\roku-make.php" $args
